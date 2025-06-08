@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}} - JobScanner Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/app.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-upc-scan"></i> JobScanner Pro
+            </a>
+            <div class="navbar-nav me-auto">
+                <a class="nav-link" href="/jobs">
+                    <i class="bi bi-briefcase"></i> Jobs
+                </a>
+                <a class="nav-link" href="/devices">
+                    <i class="bi bi-cpu"></i> Devices
+                </a>
+                <a class="nav-link" href="/customers">
+                    <i class="bi bi-people"></i> Customers
+                </a>
+            </div>
+            <div class="navbar-nav">
+                <button class="btn btn-outline-light btn-sm" onclick="toggleTheme()">
+                    <i class="bi bi-moon-fill" id="theme-icon"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>{{.title}}</h5>
+                    </div>
+                    <div class="card-body">
+                        {{if .error}}
+                        <div class="alert alert-danger">{{.error}}</div>
+                        {{end}}
+                        
+                        <form method="POST" action="{{if .device.DeviceID}}/devices/{{.device.DeviceID}}{{else}}/devices{{end}}">
+                            {{if .device.DeviceID}}
+                            <input type="hidden" name="_method" value="PUT">
+                            {{end}}
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Product *</label>
+                                        <select class="form-select" name="productID" required>
+                                            <option value="">Select Product</option>
+                                            {{range .products}}
+                                            <option value="{{.ProductID}}" {{if eq .ProductID (deref $.device.ProductID)}}selected{{end}}>
+                                                {{.Name}}
+                                            </option>
+                                            {{end}}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Serial Number</label>
+                                        <input type="text" class="form-control" name="serialnumber" value="{{derefString .device.SerialNumber}}" placeholder="Optional">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Purchase Date</label>
+                                        <input type="date" class="form-control" name="purchase_date" value="{{if .device.PurchaseDate}}{{.device.PurchaseDate.Format "2006-01-02"}}{{end}}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Last Maintenance</label>
+                                        <input type="date" class="form-control" name="last_maintenance" value="{{if .device.LastMaintenance}}{{.device.LastMaintenance.Format "2006-01-02"}}{{end}}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label class="form-label">Next Maintenance</label>
+                                        <input type="date" class="form-control" name="next_maintenance" value="{{if .device.NextMaintenance}}{{.device.NextMaintenance.Format "2006-01-02"}}{{end}}">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Status</label>
+                                        <select class="form-select" name="status">
+                                            <option value="free" {{if eq .device.Status "free"}}selected{{end}}>Free</option>
+                                            <option value="rented" {{if eq .device.Status "rented"}}selected{{end}}>Rented</option>
+                                            <option value="maintenance" {{if eq .device.Status "maintenance"}}selected{{end}}>Maintenance</option>
+                                            <option value="blocked" {{if eq .device.Status "blocked"}}selected{{end}}>Blocked</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label class="form-label">Insurance Number</label>
+                                        <input type="text" class="form-control" name="insurance_number" value="{{derefString .device.InsuranceNumber}}">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-between">
+                                <a href="/devices" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary">
+                                    {{if .device.DeviceID}}Update{{else}}Create{{end}} Device
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-light mt-5 py-3">
+        <div class="container text-center">
+            <small class="text-muted">JobScanner Pro - Equipment Management System</small>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/app.js"></script>
+    {{if .scripts}}
+        {{range .scripts}}
+            <script src="{{.}}"></script>
+        {{end}}
+    {{end}}
+</body>
+</html>

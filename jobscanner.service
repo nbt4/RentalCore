@@ -1,0 +1,36 @@
+[Unit]
+Description=JobScanner Pro - Equipment Management System
+Documentation=https://github.com/your-repo/go-barcode-webapp
+After=network.target mysql.service
+Wants=mysql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/dev/go-barcode-webapp
+ExecStart=/opt/dev/go-barcode-webapp/start-production.sh
+Restart=always
+RestartSec=10
+
+# Environment variables (set these appropriately)
+Environment=DB_HOST=tsunami-events.de
+Environment=DB_NAME=TS-Lager
+Environment=DB_USER=root
+Environment=DB_PASSWORD=your_secure_password_here
+Environment=GIN_MODE=release
+
+# Security settings
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/dev/go-barcode-webapp/logs
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=jobscanner
+
+[Install]
+WantedBy=multi-user.target

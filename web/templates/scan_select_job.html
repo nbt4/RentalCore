@@ -1,0 +1,120 @@
+{{template "base.html" .}}
+{{define "content"}}
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1><i class="bi bi-qr-code-scan"></i> Select Job for Scanning</h1>
+                <p class="text-muted">Choose a job to start scanning devices</p>
+            </div>
+            <a href="/jobs" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left"></i> Back to Jobs
+            </a>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="stats-mobile">
+            <div class="stat-mobile">
+                <h4 class="text-info">{{if .jobs}}{{len .jobs}}{{else}}0{{end}}</h4>
+                <small>Active Jobs</small>
+            </div>
+            <div class="stat-mobile">
+                <h4 class="text-success">{{.totalDevices}}</h4>
+                <small>Available</small>
+            </div>
+            <div class="stat-mobile">
+                <h4 class="text-warning">{{.assignedDevices}}</h4>
+                <small>Assigned</small>
+            </div>
+        </div>
+
+        <!-- Jobs Grid -->
+        {{if .jobs}}
+        <div class="d-none d-md-block">
+            <div class="row">
+                {{range .jobs}}
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card job-card" onclick="selectJob({{.JobID}})">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <strong>Job #{{.JobID}}</strong>
+                            <span class="badge bg-{{if eq .StatusName "open"}}warning{{else if eq .StatusName "in progress"}}info{{else if eq .StatusName "paid"}}success{{else}}secondary{{end}}">
+                                {{.StatusName}}
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <h6 class="card-title">{{.Description}}</h6>
+                            <p class="card-text">
+                                <i class="bi bi-person"></i> {{.CustomerName}}<br>
+                                {{if .StartDate}}
+                                <i class="bi bi-calendar"></i> {{.StartDate.Format "02.01.2006"}}
+                                {{if .EndDate}} - {{.EndDate.Format "02.01.2006"}}{{end}}<br>
+                                {{end}}
+                                <i class="bi bi-cpu"></i> {{.DeviceCount}} device(s)<br>
+                                <i class="bi bi-currency-euro"></i> €{{printf "%.2f" .TotalRevenue}}
+                            </p>
+                        </div>
+                        <div class="card-footer">
+                            <button type="button" class="btn btn-primary btn-sm w-100">
+                                <i class="bi bi-qr-code-scan"></i> Start Scanning
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+        </div>
+        
+        <!-- Mobile Job List -->
+        <div class="d-md-none">
+            {{range .jobs}}
+            <div class="job-card-mobile" onclick="selectJob({{.JobID}})">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h6>Job #{{.JobID}} - {{.Description}}</h6>
+                    <span class="status-indicator-mobile status-{{.StatusName}}"></span>
+                </div>
+                <div class="job-meta">
+                    <i class="bi bi-person"></i> {{.CustomerName}} | 
+                    {{if .StartDate}}<i class="bi bi-calendar"></i> {{.StartDate.Format "02.01.2006"}} | {{end}}
+                    <i class="bi bi-cpu"></i> {{.DeviceCount}} devices | 
+                    <i class="bi bi-currency-euro"></i> €{{printf "%.2f" .TotalRevenue}}
+                </div>
+                <div class="job-actions">
+                    <button type="button" class="btn btn-primary">
+                        <i class="bi bi-qr-code-scan"></i> Start Scanning
+                    </button>
+                </div>
+            </div>
+            {{end}}
+        </div>
+        {{else}}
+        <div class="text-center py-5">
+            <i class="bi bi-briefcase display-1 text-muted"></i>
+            <h4 class="text-muted">No active jobs found</h4>
+            <p class="text-muted">Create a job first to start scanning devices.</p>
+            <a href="/jobs/new" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Create Job
+            </a>
+        </div>
+        {{end}}
+
+    <script>
+        function selectJob(jobId) {
+            // Add visual feedback
+            document.querySelectorAll('.job-card, .job-card-mobile').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            // Redirect to scanner page after short delay for visual feedback
+            setTimeout(() => {
+                window.location.href = `/scan/${jobId}`;
+            }, 200);
+        }
+
+        // Make cards touch-friendly on mobile
+        if (window.innerWidth <= 768) {
+            document.querySelectorAll('.job-card, .job-card-mobile').forEach(card => {
+                card.style.padding = '10px';
+                card.style.marginBottom = '15px';
+            });
+        }
+    </script>
+{{end}}

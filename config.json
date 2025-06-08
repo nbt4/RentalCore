@@ -1,0 +1,35 @@
+{
+  "database": {
+    "host": "tsunami-events.de",
+    "port": 3306,
+    "database": "TS-Lager",
+    "username": "root",
+    "password": "goQhQTACjH2cwx657fdNDes6SicLWI",
+    "pool_size": 5
+  },
+  "server": {
+    "port": 9000,
+    "host": "0.0.0.0"
+  },
+  "ui": {
+    "theme_dark": "darkly",
+    "theme_light": "flatly",
+    "current_theme": "dark",
+    "colors": {
+      "primary": "#007bff",
+      "background": "#ffffff",
+      "text": "#000000",
+      "selection": "#e9ecef",
+      "success": "#28a745",
+      "error": "#dc3545",
+      "warning": "#ffc107",
+      "dark_bg": "#2b2b2b",
+      "dark_text": "#ffffff"
+    },
+    "auto_save": true,
+    "auto_save_interval": 300,
+    "cache_timeout": 300,
+    "window_width": 1400,
+    "window_height": 800
+  }
+}

@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Job #{{.job.JobID}} - JobScanner Pro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/app.css" rel="stylesheet">
+    <style>
+        body { background-color: #f8f9fa; }
+        .navbar-brand { font-weight: 600; }
+        
+        .product-group {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+        }
+        
+        .product-group:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .product-header {
+            cursor: pointer;
+            padding: 15px;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .product-header:hover {
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+        }
+        
+        .device-list {
+            padding: 0;
+            margin: 0;
+            background: white;
+        }
+        
+        .device-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s;
+        }
+        
+        .device-item:last-child {
+            border-bottom: none;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .device-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .quantity-badge {
+            font-size: 1.1em;
+            font-weight: 600;
+        }
+        
+        .product-summary {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .product-info h6 {
+            margin: 0;
+            color: #2c3e50;
+        }
+        
+        .product-meta {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .product-summary {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .product-actions {
+                margin-top: 10px;
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-upc-scan"></i> JobScanner Pro
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav">
+                    <a class="nav-link active" href="/jobs">Jobs</a>
+                    <a class="nav-link" href="/devices">Devices</a>
+                    <a class="nav-link" href="/customers">Customers</a>
+                    <a class="nav-link" href="/scan/select">
+                        <i class="bi bi-qr-code-scan"></i> Scanner
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        <!-- Job Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/jobs">Jobs</a></li>
+                        <li class="breadcrumb-item active">Job #{{.job.JobID}}</li>
+                    </ol>
+                </nav>
+                <h1>{{.job.Description}}</h1>
+                <p class="text-muted mb-0">
+                    <i class="bi bi-person"></i> {{.job.Customer.GetDisplayName}} | 
+                    <span class="badge bg-{{if eq .job.Status.Status "open"}}warning{{else if eq .job.Status.Status "in progress"}}info{{else if eq .job.Status.Status "paid"}}success{{else}}secondary{{end}}">
+                        {{.job.Status.Status}}
+                    </span>
+                </p>
+            </div>
+            <div class="btn-group">
+                <a href="/jobs/{{.job.JobID}}/edit" class="btn btn-outline-primary">
+                    <i class="bi bi-pencil"></i> Edit
+                </a>
+                <a href="/scan/{{.job.JobID}}" class="btn btn-warning">
+                    <i class="bi bi-qr-code-scan"></i> Scan Devices
+                </a>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Job Information -->
+            <div class="col-lg-4">
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6><i class="bi bi-info-circle"></i> Job Details</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">Start Date</small>
+                                <p class="mb-2">{{if .job.StartDate}}{{.job.StartDate.Format "02.01.2006"}}{{else}}-{{end}}</p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">End Date</small>
+                                <p class="mb-2">{{if .job.EndDate}}{{.job.EndDate.Format "02.01.2006"}}{{else}}-{{end}}</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <small class="text-muted">Revenue</small>
+                                <p class="mb-2"><strong>€{{printf "%.2f" .job.Revenue}}</strong></p>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted">Final Revenue</small>
+                                <p class="mb-2"><strong>€{{printf "%.2f" .job.FinalRevenue}}</strong></p>
+                            </div>
+                        </div>
+                        {{if .job.JobCategory}}
+                        <div class="mb-2">
+                            <small class="text-muted">Category</small>
+                            <p class="mb-0">{{.job.JobCategory.Name}}</p>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="card">
+                    <div class="card-header">
+                        <h6><i class="bi bi-bar-chart"></i> Quick Stats</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="border-end">
+                                    <h4 class="text-primary">{{len .productGroups}}</h4>
+                                    <small class="text-muted">Products</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="border-end">
+                                    <h4 class="text-success">{{.totalDevices}}</h4>
+                                    <small class="text-muted">Devices</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <h4 class="text-info">€{{printf "%.0f" .totalValue}}</h4>
+                                <small class="text-muted">Value</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Equipment List -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6><i class="bi bi-list-ul"></i> Equipment Assignment</h6>
+                        <div class="btn-group btn-group-sm">
+                            <a href="/scan/{{.job.JobID}}" class="btn btn-outline-warning">
+                                <i class="bi bi-qr-code-scan"></i> Scanner
+                            </a>
+                            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addDeviceModal">
+                                <i class="bi bi-plus-lg"></i> Add
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        {{if .productGroups}}
+                        <!-- Desktop Product Groups -->
+                        <div id="product-groups" class="d-none d-lg-block">
+                            {{range $productName, $group := .productGroups}}
+                            <div class="product-group" data-product="{{$productName}}">
+                                <div class="product-header" onclick="toggleProductGroup('{{$productName}}')">
+                                    <div class="product-summary">
+                                        <div class="product-info">
+                                            <h6>{{$productName}} 
+                                                <span class="quantity-badge badge bg-primary">{{len $group.Devices}}x</span>
+                                            </h6>
+                                            <div class="product-meta">
+                                                {{if $group.Product.Brand}}{{$group.Product.Brand.Name}} | {{end}}
+                                                {{if $group.Product.Category}}{{$group.Product.Category.Name}} | {{end}}
+                                                €{{printf "%.2f" $group.Product.ItemCostPerDay}}/day
+                                            </div>
+                                        </div>
+                                        <div class="product-actions">
+                                            <span class="text-muted me-3">€{{printf "%.2f" $group.TotalValue}}</span>
+                                            <i class="bi bi-chevron-down toggle-icon"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="device-list collapse" id="devices-{{$productName}}">
+                                    {{range $group.Devices}}
+                                    <div class="device-item">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <strong>{{.Device.DeviceID}}</strong>
+                                                {{if .Device.SerialNumber}}<br><small class="text-muted">SN: {{.Device.SerialNumber}}</small>{{end}}
+                                            </div>
+                                            <div class="text-end">
+                                                <span class="text-muted">€{{printf "%.2f" .CustomPrice}}</span>
+                                                <div class="btn-group btn-group-sm ms-2">
+                                                    <a href="/devices/{{.Device.DeviceID}}" class="btn btn-outline-info btn-sm">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                    <a href="/devices/{{.Device.DeviceID}}/qr" target="_blank" class="btn btn-outline-secondary btn-sm">
+                                                        <i class="bi bi-qr-code"></i>
+                                                    </a>
+                                                    <button class="btn btn-outline-danger btn-sm" onclick="removeDevice('{{.Device.DeviceID}}')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {{end}}
+                                </div>
+                            </div>
+                            {{end}}
+                        </div>
+                        
+                        <!-- Mobile Product Groups -->
+                        <div id="product-groups-mobile" class="d-lg-none">
+                            {{range $productName, $group := .productGroups}}
+                            <div class="product-group-mobile" data-product="{{$productName}}">
+                                <div class="product-header-mobile" onclick="toggleProductGroupMobile('{{$productName}}')">
+                                    <div class="product-info-mobile">
+                                        <h6>{{$productName}} <span class="quantity-badge-mobile">{{len $group.Devices}}x</span></h6>
+                                        <div class="product-meta-mobile">
+                                            {{if $group.Product.Brand}}{{$group.Product.Brand.Name}} | {{end}}
+                                            €{{printf "%.2f" $group.Product.ItemCostPerDay}}/day | €{{printf "%.2f" $group.TotalValue}} total
+                                        </div>
+                                    </div>
+                                    <i class="bi bi-chevron-down toggle-icon-mobile"></i>
+                                </div>
+                                <div class="device-list-mobile collapse" id="devices-mobile-{{$productName}}">
+                                    {{range $group.Devices}}
+                                    <div class="device-item-mobile">
+                                        <div class="device-item-info-mobile">
+                                            <strong>{{.Device.DeviceID}}</strong>
+                                            {{if .Device.SerialNumber}}<br><small class="text-muted">SN: {{.Device.SerialNumber}}</small>{{end}}
+                                            <br><small class="text-muted">€{{printf "%.2f" .CustomPrice}}</small>
+                                        </div>
+                                        <div class="device-item-actions-mobile">
+                                            <a href="/devices/{{.Device.DeviceID}}" class="btn btn-outline-info">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="/devices/{{.Device.DeviceID}}/qr" target="_blank" class="btn btn-outline-secondary">
+                                                <i class="bi bi-qr-code"></i>
+                                            </a>
+                                            <button class="btn btn-outline-danger" onclick="removeDevice('{{.Device.DeviceID}}')">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {{end}}
+                                </div>
+                            </div>
+                            {{end}}
+                        </div>
+                        {{else}}
+                        <div class="text-center py-5">
+                            <i class="bi bi-box display-1 text-muted"></i>
+                            <h5 class="text-muted mt-3">No equipment assigned</h5>
+                            <p class="text-muted">Start by scanning device barcodes or adding them manually</p>
+                            <div class="mt-4">
+                                <a href="/scan/{{.job.JobID}}" class="btn btn-warning me-2">
+                                    <i class="bi bi-qr-code-scan"></i> Start Scanning
+                                </a>
+                                <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addDeviceModal">
+                                    <i class="bi bi-plus-lg"></i> Add Manually
+                                </button>
+                            </div>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Add Device Modal -->
+    <div class="modal fade" id="addDeviceModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Device to Job</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addDeviceForm">
+                        <div class="mb-3">
+                            <label class="form-label">Device ID or Serial Number</label>
+                            <input type="text" class="form-control" id="deviceInput" placeholder="Enter device ID or scan barcode" required>
+                            <div class="form-text">You can enter the device ID or serial number</div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Custom Price (optional)</label>
+                            <div class="input-group">
+                                <span class="input-group-text">€</span>
+                                <input type="number" class="form-control" id="customPrice" step="0.01" placeholder="0.00">
+                            </div>
+                            <div class="form-text">Leave empty to use default product price</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="addDevice()">Add Device</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        const jobId = {{.job.JobID}};
+
+        function toggleProductGroup(productName) {
+            const safeName = productName.replace(/\s/g, '-').replace(/\./g, '-');
+            const devicesElement = document.getElementById(`devices-${productName}`);
+            const toggleIcon = document.querySelector(`[data-product="${productName}"] .toggle-icon`);
+            
+            if (devicesElement.classList.contains('show')) {
+                devicesElement.classList.remove('show');
+                toggleIcon.classList.remove('bi-chevron-up');
+                toggleIcon.classList.add('bi-chevron-down');
+            } else {
+                devicesElement.classList.add('show');
+                toggleIcon.classList.remove('bi-chevron-down');
+                toggleIcon.classList.add('bi-chevron-up');
+            }
+        }
+
+        function toggleProductGroupMobile(productName) {
+            const safeName = productName.replace(/\s/g, '-').replace(/\./g, '-');
+            const devicesElement = document.getElementById(`devices-mobile-${productName}`);
+            const toggleIcon = document.querySelector(`[data-product="${productName}"] .toggle-icon-mobile`);
+            
+            if (devicesElement.classList.contains('show')) {
+                devicesElement.classList.remove('show');
+                toggleIcon.classList.remove('bi-chevron-up');
+                toggleIcon.classList.add('bi-chevron-down');
+            } else {
+                devicesElement.classList.add('show');
+                toggleIcon.classList.remove('bi-chevron-down');
+                toggleIcon.classList.add('bi-chevron-up');
+            }
+        }
+
+        async function addDevice() {
+            const deviceInput = document.getElementById('deviceInput').value.trim();
+            const customPrice = parseFloat(document.getElementById('customPrice').value) || 0;
+            
+            if (!deviceInput) {
+                alert('Please enter a device ID or serial number');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/v1/jobs/${jobId}/assign-device`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        device_id: deviceInput,
+                        price: customPrice
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Success
+                    bootstrap.Modal.getInstance(document.getElementById('addDeviceModal')).hide();
+                    location.reload();
+                } else {
+                    alert('Error: ' + (result.error || 'Failed to add device'));
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            }
+        }
+
+        async function removeDevice(deviceId) {
+            if (!confirm('Remove this device from the job?')) return;
+
+            try {
+                const response = await fetch(`/api/v1/jobs/${jobId}/devices/${deviceId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    location.reload();
+                } else {
+                    const result = await response.json();
+                    alert('Error: ' + (result.error || 'Failed to remove device'));
+                }
+            } catch (error) {
+                alert('Network error: ' + error.message);
+            }
+        }
+
+        // Auto-focus device input when modal opens
+        document.getElementById('addDeviceModal').addEventListener('shown.bs.modal', function () {
+            document.getElementById('deviceInput').focus();
+        });
+
+        // Handle Enter key in device input
+        document.getElementById('deviceInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addDevice();
+            }
+        });
+    </script>
+</body>
+</html>
