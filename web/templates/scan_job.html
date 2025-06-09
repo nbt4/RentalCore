@@ -1,132 +1,521 @@
-{{template "base.html" .}}
-{{define "content"}}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>{{.title}} - TS Jobscanner</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- iOS Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="JobScanner">
+    <link rel="apple-touch-icon" href="/static/images/icon-180.png">
+    
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#6c757d">
+    <meta name="msapplication-TileColor" content="#6c757d">
+    
+    <!-- CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/app.css" rel="stylesheet">
+    
     <style>
-        body { background-color: #f8f9fa; }
-        .navbar-brand { font-weight: 600; }
-        
-        /* Scanner Styles */
-        #scanner-container {
+        /* Professional Scanner Styles */
+        .scanner-container {
             position: relative;
-            width: 100%;
-            max-width: 500px;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
             margin: 0 auto;
+            max-width: 400px;
+            height: 300px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
         
-        #scanner-video {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
+        .scanner-video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            display: block !important;
             background: #000;
         }
         
-        #scanner-overlay {
+        /* Force ALL video elements in scanner to be visible */
+        .scanner-container video {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            background: black !important;
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            z-index: 1 !important;
+        }
+        
+        /* Ensure modal doesn't interfere with video */
+        .modal {
+            z-index: 1050 !important;
+        }
+        
+        .modal-backdrop {
+            z-index: 1040 !important;
+        }
+        
+        .scanner-overlay {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            right: 0;
+            bottom: 0;
             pointer-events: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
         }
         
-        .scan-frame {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 250px;
-            height: 150px;
-            border: 2px solid #0d6efd;
-            border-radius: 8px;
-            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+        .scanner-ready {
+            border: 4px solid #28a745;
+            border-radius: 16px;
+            box-shadow: 0 0 20px rgba(40, 167, 69, 0.3);
         }
         
-        .scan-frame::before {
-            content: '';
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            right: -2px;
-            bottom: -2px;
-            border: 2px solid #fff;
-            border-radius: 8px;
-            animation: pulse 2s infinite;
+        .scanner-status-area {
+            margin: 12px 0;
         }
         
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        .scanner-status {
+            background: var(--bg-secondary);
+            border: 1px solid var(--accent-color);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            display: inline-block;
+            transition: all 0.3s ease;
         }
         
-        /* Scan Results */
-        .scan-result {
-            animation: slideIn 0.3s ease-out;
+        .scanner-status.code-detected {
+            background: rgba(111, 66, 193, 0.1);
+            border-color: #6f42c1;
+            color: #6f42c1;
+            animation: pulse-ready 2s infinite;
         }
         
-        @keyframes slideIn {
-            from { transform: translateX(-100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        
-        .scan-success {
-            background-color: #d1e7dd;
-            border-color: #badbcc;
-            color: #0f5132;
-        }
-        
-        .scan-error {
-            background-color: #f8d7da;
-            border-color: #f5c2c7;
-            color: #842029;
-        }
-        
-        /* Mobile Optimizations */
-        @media (max-width: 768px) {
-            .container { padding: 0 10px; }
-            .scan-frame {
-                width: 200px;
-                height: 120px;
+        @keyframes pulse-ready {
+            0% { 
+                border-color: #6f42c1;
+                box-shadow: 0 0 0 0 rgba(111, 66, 193, 0.7);
             }
-            #manual-input {
-                font-size: 16px; /* Prevents zoom on iOS */
+            70% {
+                border-color: #6f42c1;
+                box-shadow: 0 0 0 10px rgba(111, 66, 193, 0);
+            }
+            100% {
+                border-color: #6f42c1;
+                box-shadow: 0 0 0 0 rgba(111, 66, 193, 0);
             }
         }
         
-        /* Controls */
-        .scanner-controls {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1000;
+        .camera-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 16px;
+            position: relative;
+            padding-bottom: 40px;
         }
         
-        .btn-scanner {
+        .camera-btn {
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            margin: 0 10px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .camera-btn.start {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+        
+        .camera-btn.start:hover::before {
+            content: "Start Camera";
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        
+        .camera-btn.stop {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            animation: pulse-red 2s infinite;
+        }
+        
+        .camera-btn.stop:hover::before {
+            content: "Stop Camera";
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        
+        @keyframes pulse-red {
+            0% { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2); }
+            50% { box-shadow: 0 4px 20px rgba(220, 53, 69, 0.4); }
+            100% { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2); }
+        }
+        
+        .camera-status-bar {
+            background: rgba(40, 167, 69, 0.1);
+            border: 1px solid #28a745;
+            border-radius: 8px;
+            padding: 8px 16px;
+            margin: 16px 0;
+            font-size: 14px;
+            font-weight: 500;
+            color: #28a745;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: pulse-green 2s infinite;
+        }
+        
+        @keyframes pulse-green {
+            0% { 
+                background: #28a745;
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+            }
+            70% {
+                background: #28a745;
+                box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+            }
+            100% {
+                background: #28a745;
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+            }
+        }
+        
+        .camera-btn.flash {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: white;
+        }
+        
+        .camera-btn.trigger {
+            background: linear-gradient(135deg, #6f42c1, #563d7c);
+            color: white;
+            animation: pulse-trigger 3s infinite;
+        }
+        
+        .camera-btn.trigger:hover::before {
+            content: "Scan Trigger (or Spacebar)";
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        
+        .camera-btn.trigger.active {
+            animation: pulse-trigger-active 1s infinite;
+        }
+        
+        @keyframes pulse-trigger {
+            0% { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2); }
+            50% { box-shadow: 0 4px 20px rgba(111, 66, 193, 0.4); }
+            100% { box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2); }
+        }
+        
+        @keyframes pulse-trigger-active {
+            0% { 
+                background: linear-gradient(135deg, #6f42c1, #563d7c);
+                box-shadow: 0 4px 16px rgba(111, 66, 193, 0.3);
+            }
+            50% { 
+                background: linear-gradient(135deg, #28a745, #20c997);
+                box-shadow: 0 4px 20px rgba(40, 167, 69, 0.6);
+            }
+            100% { 
+                background: linear-gradient(135deg, #6f42c1, #563d7c);
+                box-shadow: 0 4px 16px rgba(111, 66, 193, 0.3);
+            }
+        }
+        
+        .camera-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .manual-input-section {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            border: 2px solid var(--accent-color);
+        }
+        
+        .device-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .device-item {
+            background: var(--bg-secondary);
+            border: 1px solid var(--bg-tertiary);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .device-item:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .product-group {
+            background: var(--bg-secondary);
+            border: 1px solid var(--bg-tertiary);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .product-group .accordion-button {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            padding: 12px 16px;
+        }
+        
+        .product-group .accordion-button:not(.collapsed) {
+            background: var(--accent-color);
+            color: white;
+            box-shadow: none;
+        }
+        
+        .product-group .accordion-button:focus {
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+            border-color: transparent;
+        }
+        
+        .product-info .product-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .device-item-grouped {
+            background: var(--bg-tertiary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .device-item-grouped:hover {
+            border-color: var(--accent-color);
+            background: rgba(220, 53, 69, 0.1);
+        }
+        
+        .device-item-grouped:last-child {
+            margin-bottom: 0;
+        }
+        
+        .accordion-body {
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .device-id {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--accent-color);
+        }
+        
+        .device-name {
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        .device-price {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        
+        .job-header {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 2px solid var(--accent-color);
+        }
+        
+        .job-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        
+        .job-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            color: var(--text-muted);
+        }
+        
+        .job-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .scan-result {
+            background: var(--bg-secondary);
+            border: 1px solid var(--success-color);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        .scan-result.error {
+            border-color: var(--danger-color);
+            background: rgba(220, 53, 69, 0.1);
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--bg-tertiary);
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
-        <!-- Job Info Header -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h5 class="mb-1">{{.job.Description}}</h5>
-                        <p class="mb-0 text-muted">
-                            <i class="bi bi-person"></i> {{.job.Customer.GetDisplayName}} | 
-                            <i class="bi bi-calendar"></i> {{if .job.StartDate}}{{.job.StartDate.Format "02.01.2006"}}{{end}} | 
-                            <i class="bi bi-cpu"></i> {{len .assignedDevices}} devices assigned
-                        </p>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-upc-scan"></i> TS Jobscanner
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    <a class="nav-link" href="/jobs">
+                        <i class="bi bi-briefcase"></i> Jobs
+                    </a>
+                    <a class="nav-link" href="/devices">
+                        <i class="bi bi-cpu"></i> Devices
+                    </a>
+                    <a class="nav-link" href="/customers">
+                        <i class="bi bi-people"></i> Customers
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container mt-4">
+        <!-- Job Header -->
+        <div class="job-header">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1 class="job-title">{{.job.Description}}</h1>
+                    <div class="job-meta">
+                        <div class="job-meta-item">
+                            <i class="bi bi-person"></i>
+                            <span>{{.job.Customer.GetDisplayName}}</span>
+                        </div>
+                        <div class="job-meta-item">
+                            <i class="bi bi-calendar"></i>
+                            <span>{{if .job.StartDate}}{{.job.StartDate.Format "02.01.2006"}}{{end}}</span>
+                        </div>
+                        <div class="job-meta-item">
+                            <i class="bi bi-cpu"></i>
+                            <span>{{len .assignedDevices}} devices assigned</span>
+                        </div>
                     </div>
-                    <div class="col-md-4 text-end">
-                        <a href="/scan/select" class="btn btn-outline-secondary">
+                </div>
+                <div class="d-flex flex-column gap-2">
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="bulkMode" onchange="toggleBulkMode()" checked>
+                        <label class="form-check-label" for="bulkMode">Custom Prices (uncheck for bulk scan)</label>
+                    </div>
+                    <div class="btn-group">
+                        <a href="/scan/select" class="btn btn-outline-secondary btn-sm">
                             <i class="bi bi-arrow-left"></i> Change Job
                         </a>
-                        <a href="/jobs/{{.job.JobID}}" class="btn btn-outline-primary">
+                        <a href="/jobs/{{.job.JobID}}" class="btn btn-outline-primary btn-sm">
                             <i class="bi bi-eye"></i> View Details
                         </a>
                     </div>
+                    <button id="bulkFinishBtn" class="btn btn-success btn-sm" onclick="finishBulkScan()" style="display: none;">
+                        <i class="bi bi-check-lg"></i> Finish Bulk Scan
+                    </button>
                 </div>
             </div>
         </div>
@@ -138,65 +527,140 @@
                     <div class="card-header">
                         <h6><i class="bi bi-camera"></i> Barcode Scanner</h6>
                     </div>
-                    <div class="card-body text-center">
-                        <!-- Camera Scanner -->
-                        <div id="scanner-container" class="scanner-container-mobile d-lg-none">
-                            <video id="scanner-video" class="scanner-video-mobile" autoplay muted playsinline></video>
-                            <div id="scanner-overlay">
-                                <div class="scan-frame-mobile"></div>
+                    <div class="card-body">
+                        <!-- Camera Scanner Container -->
+                        <div class="scanner-container">
+                            <div class="loading active" id="camera-loading">
+                                <div class="spinner"></div>
+                                <p>Click camera button to start continuous scanning</p>
+                                <small style="color: #666; margin-top: 10px; display: block;">
+                                    📱 Camera requires HTTPS or localhost access
+                                </small>
+                            </div>
+                            <video id="scanner-video" class="scanner-video" autoplay muted playsinline style="display: none;"></video>
+                            <div class="scanner-overlay" id="scanner-overlay" style="display: none;">
+                                <!-- Overlay content for targeting box, etc. -->
                             </div>
                         </div>
                         
-                        <!-- Desktop Scanner -->
-                        <div id="scanner-container-desktop" class="d-none d-lg-block">
-                            <video id="scanner-video-desktop" autoplay muted playsinline></video>
-                            <div id="scanner-overlay-desktop">
-                                <div class="scan-frame"></div>
-                            </div>
-                        </div>
-                        
-                        <!-- Manual Input -->
-                        <div class="manual-input-mobile">
-                            <div class="input-group">
-                                <input type="text" id="manual-input" class="form-control" placeholder="Or type device ID manually" autocomplete="off">
-                                <button class="btn btn-outline-primary" onclick="processManualInput()">
-                                    <i class="bi bi-plus-lg"></i>
-                                </button>
+                        <!-- Camera Status Indicator -->
+                        <div class="camera-status-bar" id="camera-status-bar" style="display: none;">
+                            <div class="d-flex align-items-center justify-content-center">
+                                <div class="status-dot"></div>
+                                <span class="ms-2">Camera On - Continuous Scanning Active</span>
                             </div>
                         </div>
                         
                         <!-- Scanner Status -->
-                        <div id="scanner-status" class="mt-3">
-                            <p class="text-muted mb-0">Point camera at device barcode</p>
+                        <div class="scanner-status-area text-center" id="scanner-status-area">
+                            <div class="scanner-status" id="scanner-status">Ready to scan</div>
+                        </div>
+                        
+                        <!-- Camera Controls -->
+                        <div class="camera-controls">
+                            <button class="camera-btn start" id="start-btn" onclick="toggleCamera()">
+                                <i class="bi bi-camera"></i>
+                            </button>
+                            <button class="camera-btn stop" id="stop-btn" onclick="toggleCamera()" style="display: none;">
+                                <i class="bi bi-stop"></i>
+                            </button>
+                            <button class="camera-btn trigger" id="trigger-btn" onclick="triggerScan()" style="display: none;">
+                                <i class="bi bi-bullseye"></i>
+                            </button>
+                            <button class="camera-btn flash" id="flash-btn" onclick="toggleFlash()">
+                                <i class="bi bi-lightbulb"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Manual Input -->
+                        <div class="manual-input-section">
+                            <h6><i class="bi bi-keyboard"></i> Manual Input</h6>
+                            <div class="alert alert-info" style="margin-bottom: 15px; font-size: 14px;">
+                                <i class="bi bi-info-circle"></i> 
+                                <strong>Camera not working?</strong> Use manual input below or try:
+                                <br>• Access via <code>https://</code> URL
+                                <br>• Access via <code>localhost:9000</code> instead of IP
+                            </div>
+                            <div class="input-group">
+                                <input type="text" id="manual-input" class="form-control" 
+                                       placeholder="Type device ID manually (e.g. SUB1001, MIC1002)" autocomplete="off">
+                                <button class="btn btn-primary" onclick="processManualInput()">
+                                    <i class="bi bi-plus-lg"></i> Add
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Results Column -->
+            <!-- Devices Column -->
             <div class="col-lg-6">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h6><i class="bi bi-list-check"></i> Scanned Devices</h6>
-                        <span class="badge bg-primary">{{len .assignedDevices}} devices</span>
+                        <span class="badge bg-primary">{{.totalDevices}} devices</span>
                     </div>
                     <div class="card-body">
-                        <div id="scan-results" style="max-height: 400px; overflow-y: auto;">
-                            {{range .assignedDevices}}
-                            <div class="scan-result alert scan-success d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong>{{.Device.DeviceID}}</strong><br>
-                                    <small class="text-muted">{{.Device.Product.Name}}</small>
+                        <div class="device-list" id="device-list">
+                            {{if .productGroups}}
+                            <div class="accordion" id="deviceAccordion">
+                                {{range $productName, $group := .productGroups}}
+                                {{$productId := "unknown"}}
+                                {{if $group.Product}}{{$productId = printf "%d" $group.Product.ProductID}}{{end}}
+                                <div class="accordion-item product-group">
+                                    <h2 class="accordion-header" id="heading-product-{{$productId}}">
+                                        <button class="accordion-button collapsed" type="button" 
+                                                data-bs-toggle="collapse" 
+                                                data-bs-target="#collapse-product-{{$productId}}" 
+                                                aria-expanded="false" 
+                                                aria-controls="collapse-product-{{$productId}}">
+                                            <div class="d-flex justify-content-between align-items-center w-100 me-3">
+                                                <div class="product-info">
+                                                    <div class="product-name">{{$productName}}</div>
+                                                    {{if $group.Product.ItemCostPerDay}}
+                                                    <small class="text-muted">€{{printf "%.2f" (derefFloat $group.Product.ItemCostPerDay)}} per day</small>
+                                                    {{end}}
+                                                </div>
+                                                <span class="badge bg-secondary">{{len $group.Devices}} devices</span>
+                                            </div>
+                                        </button>
+                                    </h2>
+                                    <div id="collapse-product-{{$productId}}" 
+                                         class="accordion-collapse collapse" 
+                                         aria-labelledby="heading-product-{{$productId}}" 
+                                         data-bs-parent="#deviceAccordion">
+                                        <div class="accordion-body">
+                                            {{range $group.Devices}}
+                                            <div class="device-item-grouped">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div class="flex-grow-1">
+                                                        <div class="device-id">{{.Device.DeviceID}}</div>
+                                                        <div class="device-price">
+                                                            {{if .CustomPrice}}
+                                                                €{{printf "%.2f" (derefFloat .CustomPrice)}} (custom price)
+                                                            {{else if .Device.Product.ItemCostPerDay}}
+                                                                €{{printf "%.2f" (derefFloat .Device.Product.ItemCostPerDay)}} (default price)
+                                                            {{else}}
+                                                                No price set
+                                                            {{end}}
+                                                        </div>
+                                                    </div>
+                                                    <button class="btn btn-outline-danger btn-sm" onclick="removeDevice('{{.Device.DeviceID}}')">
+                                                        <i class="bi bi-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            {{end}}
+                                        </div>
+                                    </div>
                                 </div>
-                                <button class="btn btn-sm btn-outline-danger" onclick="removeDevice('{{.Device.DeviceID}}')">
-                                    <i class="bi bi-trash"></i>
-                                </button>
+                                {{end}}
                             </div>
                             {{else}}
-                            <div class="text-center py-4 text-muted">
-                                <i class="bi bi-qr-code display-4"></i>
-                                <p>No devices scanned yet</p>
-                                <p><small>Start scanning to see results here</small></p>
+                            <div class="text-center py-5" id="empty-state">
+                                <i class="bi bi-qr-code display-4 text-muted"></i>
+                                <h5 class="mt-3 text-muted">No devices scanned yet</h5>
+                                <p class="text-muted">Start scanning to see results here</p>
                             </div>
                             {{end}}
                         </div>
@@ -206,160 +670,516 @@
         </div>
     </main>
 
-    <!-- Scanner Controls (Mobile) -->
-    <div class="scanner-controls d-lg-none">
-        <button class="btn btn-success btn-scanner" onclick="startScanner()" id="start-btn">
-            <i class="bi bi-camera"></i>
-        </button>
-        <button class="btn btn-danger btn-scanner" onclick="stopScanner()" id="stop-btn" style="display: none;">
-            <i class="bi bi-stop"></i>
-        </button>
-        <button class="btn btn-warning btn-scanner" onclick="toggleFlashlight()" id="flash-btn">
-            <i class="bi bi-lightbulb"></i>
-        </button>
+    <!-- Custom Price Modal -->
+    <div class="modal fade" id="priceModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Set Custom Price</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Device</label>
+                        <div class="p-3 bg-light rounded">
+                            <div class="device-id" id="modal-device-id">-</div>
+                            <div class="device-name" id="modal-device-name">-</div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="customPrice" class="form-label">Custom Price (EUR)</label>
+                        <div class="input-group">
+                            <span class="input-group-text">€</span>
+                            <input type="number" class="form-control" id="customPrice" 
+                                   placeholder="Leave empty for default" step="0.01" min="0">
+                        </div>
+                        <div class="form-text" id="default-price-info">
+                            Default price will be used if left empty
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirm-assign">Assign Device</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://unpkg.com/@zxing/library@latest/umd/index.min.js"></script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
+    
     <script>
-        let codeReader = null;
-        let scanning = false;
-        let stream = null;
-        
-        // Initialize scanner when page loads
+        // Global variables
+        let isScanning = false;
+        let isBulkMode = true;
+        let bulkDevices = [];
+        let priceModalCallback = null;
+        let scanningEnabled = false;
+        let lastDetectedCode = null;
+        let triggerCooldown = false;
+
+        // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded');
+            console.log('QuaggaJS available:', typeof Quagga !== 'undefined');
+            console.log('Navigator mediaDevices available:', !!navigator.mediaDevices);
+            console.log('getUserMedia available:', !!navigator.mediaDevices?.getUserMedia);
+            
             initializeScanner();
+            setupEventListeners();
+            toggleBulkMode(); // Set initial mode based on checkbox
         });
 
-        async function initializeScanner() {
-            try {
-                codeReader = new ZXing.BrowserMultiFormatReader();
-                await startScanner();
-            } catch (error) {
-                console.error('Scanner initialization failed:', error);
-                updateStatus('Camera access failed. Please use manual input.', 'error');
-            }
+        function initializeScanner() {
+            console.log('Scanner initialized, ready to start');
+            // Keep the loading visible with "Click start to begin scanning" message
+            // Don't remove 'active' class here - let startScanner() handle it
+        }
+
+        function setupEventListeners() {
+            // Manual input Enter key
+            document.getElementById('manual-input').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    processManualInput();
+                }
+            });
+            
+            // Trigger scan with spacebar
+            document.addEventListener('keydown', function(e) {
+                if (e.code === 'Space' && isScanning) {
+                    e.preventDefault();
+                    triggerScan();
+                }
+            });
+
+            // Price modal Enter key
+            document.getElementById('customPrice').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    document.getElementById('confirm-assign').click();
+                }
+            });
+
+            // Confirm assign button
+            document.getElementById('confirm-assign').addEventListener('click', function() {
+                const customPrice = document.getElementById('customPrice').value;
+                const price = customPrice && customPrice.trim() !== '' ? parseFloat(customPrice) : null;
+                
+                const modal = bootstrap.Modal.getInstance(document.getElementById('priceModal'));
+                modal.hide();
+                
+                if (priceModalCallback) {
+                    priceModalCallback(price);
+                    priceModalCallback = null;
+                }
+            });
         }
 
         async function startScanner() {
-            if (scanning) return;
+            if (isScanning) return;
+
+            console.log('startScanner() called - using simple camera approach');
             
-            try {
-                updateStatus('Starting camera...', 'info');
+            // Check if QuaggaJS is loaded
+            if (typeof Quagga === 'undefined') {
+                updateStatus('QuaggaJS library not loaded', 'error');
+                return;
+            }
+
+            // Check if camera is available
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                console.error('Camera not available - HTTPS required or browser incompatible');
+                updateStatus('Camera requires HTTPS or secure connection. Try accessing via https:// or localhost', 'error');
                 
-                const videoElement = document.getElementById('scanner-video');
-                stream = await navigator.mediaDevices.getUserMedia({ 
-                    video: { 
-                        facingMode: 'environment',
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    } 
+                // Reset UI
+                document.getElementById('start-btn').style.display = 'block';
+                document.getElementById('stop-btn').style.display = 'none';
+                return;
+            }
+
+            // Update loading message and ensure it's visible
+            const loadingDiv = document.getElementById('camera-loading');
+            const loadingText = loadingDiv.querySelector('p');
+            loadingText.textContent = 'Getting camera stream...';
+            loadingDiv.classList.add('active');
+            
+            const video = document.getElementById('scanner-video');
+            
+            // Update buttons immediately
+            document.getElementById('start-btn').style.display = 'none';
+            document.getElementById('stop-btn').style.display = 'block';
+            
+            updateStatus('Starting camera...', 'info');
+
+            try {
+                // STEP 1: Get camera stream directly first
+                console.log('Getting camera stream manually...');
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: "environment"
+                    }
                 });
                 
-                videoElement.srcObject = stream;
-                scanning = true;
+                console.log('Got camera stream:', stream);
                 
-                document.getElementById('start-btn').style.display = 'none';
-                document.getElementById('stop-btn').style.display = 'block';
+                // STEP 2: Set the stream to our video element
+                video.srcObject = stream;
+                video.style.display = 'block';
+                video.style.visibility = 'visible';
+                video.style.opacity = '1';
                 
-                updateStatus('Point camera at barcode', 'success');
+                // STEP 3: Wait for video to load and play
+                await new Promise((resolve) => {
+                    video.onloadedmetadata = resolve;
+                });
                 
-                // Start barcode detection
-                detectBarcodes();
+                await video.play();
+                console.log('Video is playing - you should see camera feed now!');
+                
+                // STEP 4: Show UI immediately since we have working video
+                document.getElementById('camera-loading').classList.remove('active');
+                document.getElementById('scanner-overlay').style.display = 'block';
+                
+                // Show camera status bar and trigger button
+                document.getElementById('camera-status-bar').style.display = 'block';
+                document.getElementById('trigger-btn').style.display = 'block';
+                
+                // Add ready border to whole container
+                const scannerContainer = document.querySelector('.scanner-container');
+                scannerContainer.classList.add('scanner-ready');
+                
+                updateStatus('Camera working! Initializing barcode scanner...', 'success');
                 
             } catch (error) {
-                console.error('Failed to start camera:', error);
-                updateStatus('Camera access denied. Use manual input.', 'error');
+                console.error('Manual camera failed:', error);
+                updateStatus('Camera failed: ' + error.message, 'error');
+                
+                // Reset UI
+                document.getElementById('camera-loading').classList.add('active');
+                video.style.display = 'none';
+                document.getElementById('scanner-overlay').style.display = 'none';
+                document.getElementById('camera-status-bar').style.display = 'none';
+                document.getElementById('trigger-btn').style.display = 'none';
+                document.getElementById('start-btn').style.display = 'block';
+                document.getElementById('stop-btn').style.display = 'none';
+                return;
+            }
+
+            // STEP 5: Now initialize QuaggaJS with the already-working video
+            const config = {
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: video
+                },
+                locator: {
+                    patchSize: "medium",
+                    halfSample: true
+                },
+                numOfWorkers: 1,
+                frequency: 10,
+                decoder: {
+                    readers: [
+                        "code_128_reader",
+                        "ean_reader", 
+                        "code_39_reader"
+                    ]
+                },
+                locate: true
+            };
+
+            console.log('Initializing QuaggaJS with existing video stream...');
+            
+            // Clear any existing event listeners first
+            Quagga.offDetected();
+            
+            // Set up barcode detection
+            Quagga.onDetected(function(result) {
+                if (result && result.codeResult && result.codeResult.code) {
+                    const code = result.codeResult.code.trim();
+                    console.log('Barcode detected:', code);
+                    if (code && code.length > 3) {
+                        lastDetectedCode = code;
+                        updateStatus(`Code detected: ${code} - Press trigger to scan`, 'info');
+                        document.getElementById('scanner-status').classList.add('code-detected');
+                    }
+                }
+            });
+            
+            Quagga.init(config, function(err) {
+                if (err) {
+                    console.error('QuaggaJS init failed:', err);
+                    updateStatus('Scanner initialization failed, but camera is working for manual input', 'warning');
+                    return;
+                }
+                
+                console.log('QuaggaJS initialized successfully');
+                Quagga.start();
+                isScanning = true;
+                updateStatus('Point camera at barcode', 'success');
+            });
+        }
+
+        function toggleCamera() {
+            if (isScanning) {
+                stopScanner();
+            } else {
+                startScanner();
             }
         }
 
         function stopScanner() {
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-                stream = null;
-            }
-            scanning = false;
+            console.log('Stopping scanner...');
             
+            if (isScanning) {
+                try {
+                    // Remove event listeners first
+                    Quagga.offDetected();
+                    Quagga.stop();
+                    console.log('QuaggaJS stopped');
+                } catch (error) {
+                    console.error('Error stopping QuaggaJS:', error);
+                }
+                isScanning = false;
+            }
+            
+            // Clean up camera stream
+            const video = document.getElementById('scanner-video');
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => {
+                    track.stop();
+                    console.log('Camera track stopped:', track.label);
+                });
+                video.srcObject = null;
+            }
+            
+            // Reset UI
+            video.style.display = 'none';
+            document.getElementById('scanner-overlay').style.display = 'none';
+            
+            // Hide camera status bar and trigger button
+            document.getElementById('camera-status-bar').style.display = 'none';
+            document.getElementById('trigger-btn').style.display = 'none';
+            
+            // Remove ready border
+            const scannerContainer = document.querySelector('.scanner-container');
+            scannerContainer.classList.remove('scanner-ready');
+            
+            // Reset loading state and message
+            const loadingDiv = document.getElementById('camera-loading');
+            const loadingText = loadingDiv.querySelector('p');
+            loadingText.textContent = 'Click camera button to start continuous scanning';
+            loadingDiv.classList.add('active');
+            
+            // Update buttons
             document.getElementById('start-btn').style.display = 'block';
             document.getElementById('stop-btn').style.display = 'none';
             
-            updateStatus('Scanner stopped', 'info');
+            updateStatus('Camera stopped', 'info');
         }
 
-        async function detectBarcodes() {
-            if (!scanning) return;
-            
-            try {
-                const videoElement = document.getElementById('scanner-video');
-                if (!videoElement.videoWidth || !videoElement.videoHeight) {
-                    // Video not ready yet, try again
-                    if (scanning) {
-                        setTimeout(detectBarcodes, 100);
-                    }
-                    return;
-                }
-                
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                
-                canvas.width = videoElement.videoWidth;
-                canvas.height = videoElement.videoHeight;
-                ctx.drawImage(videoElement, 0, 0);
-                
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const result = await codeReader.decodeFromImageData(imageData);
-                
-                if (result && result.text) {
-                    processScannedCode(result.text);
-                    return; // Stop scanning temporarily while processing
-                }
-            } catch (error) {
-                // No barcode found or other error, continue scanning
+        function toggleFlash() {
+            updateStatus('Flash toggle not available in this version', 'warning');
+        }
+
+        function triggerScan() {
+            if (triggerCooldown) {
+                updateStatus('Please wait...', 'warning');
+                return;
             }
             
-            // Continue scanning
-            if (scanning) {
-                setTimeout(detectBarcodes, 100);
+            if (!lastDetectedCode) {
+                updateStatus('No barcode detected - point camera at barcode first', 'warning');
+                return;
             }
+            
+            // Set cooldown to prevent double-scanning
+            triggerCooldown = true;
+            const triggerBtn = document.getElementById('trigger-btn');
+            triggerBtn.classList.add('active');
+            
+            // Process the last detected code
+            processScannedCode(lastDetectedCode);
+            
+            // Clear the detected code and remove cooldown after 2 seconds
+            setTimeout(() => {
+                lastDetectedCode = null;
+                triggerCooldown = false;
+                triggerBtn.classList.remove('active');
+                document.getElementById('scanner-status').classList.remove('code-detected');
+                updateStatus('Point camera at barcode', 'success');
+            }, 2000);
         }
 
         async function processScannedCode(code) {
-            updateStatus('Processing barcode...', 'info');
+            updateStatus('Checking...', 'info');
             
+            // Validate device exists
+            const device = await validateDevice(code);
+            if (!device) {
+                updateStatus('Device not found: ' + code, 'error');
+                addScanResult(code, 'error', 'Device not found');
+                
+                // Camera stays on regardless of error
+                setTimeout(() => {
+                    updateStatus('Ready for next scan', 'success');
+                }, 2000);
+                return;
+            }
+            
+            if (isBulkMode) {
+                // Bulk mode (default) - add to bulk list
+                bulkDevices.push({
+                    deviceId: code,
+                    deviceName: device.product ? device.product.name : 'Unknown Product',
+                    defaultPrice: device.product ? device.product.itemcostperday : null
+                });
+                
+                addScanResult(code, 'success', `Added to bulk (${bulkDevices.length})`);
+                updateStatus(`${bulkDevices.length} devices scanned`, 'success');
+                // Keep scanning in bulk mode
+            } else {
+                // Custom price mode - show price modal
+                // Camera stays on - just show modal over it
+                
+                // Show price modal
+                showPriceModal(code, device, async (customPrice) => {
+                    await assignDevice(code, customPrice);
+                    // Scanner continues running - camera stays on
+                    updateStatus('Added', 'success');
+                });
+            }
+        }
+
+        async function validateDevice(deviceId) {
             try {
-                const response = await fetch(`/api/v1/jobs/{{.job.JobID}}/assign-device`, {
+                const response = await fetch(`/api/v1/devices/${deviceId}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.device || null;
+                }
+                return null;
+            } catch (error) {
+                console.error('Error validating device:', error);
+                return null;
+            }
+        }
+
+        async function assignDevice(deviceId, customPrice) {
+            try {
+                const response = await fetch('/api/v1/jobs/{{.job.JobID}}/assign-device', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         job_id: {{.job.JobID}},
-                        device_id: code,
-                        price: 0
+                        device_id: deviceId,
+                        price: customPrice || null
                     })
                 });
                 
                 const result = await response.json();
                 
                 if (response.ok) {
-                    addScanResult(code, 'success', 'Device assigned successfully');
-                    updateStatus('Device assigned!', 'success');
-                    // Reload to update device list
-                    setTimeout(() => window.location.reload(), 1000);
+                    addScanResult(deviceId, 'success', 'Device assigned successfully');
+                    updateStatus('Added successfully', 'success');
+                    // Don't reload page - keep camera running
                 } else {
-                    addScanResult(code, 'error', result.error || 'Failed to assign device');
+                    addScanResult(deviceId, 'error', result.error || 'Failed to assign device');
                     updateStatus('Assignment failed', 'error');
                 }
             } catch (error) {
                 console.error('Error assigning device:', error);
-                addScanResult(code, 'error', 'Network error');
+                addScanResult(deviceId, 'error', 'Network error');
                 updateStatus('Network error', 'error');
             }
+        }
+
+        function showPriceModal(deviceCode, device, callback) {
+            priceModalCallback = callback;
             
-            // Continue scanning
-            if (scanning) {
-                setTimeout(detectBarcodes, 500);
+            document.getElementById('modal-device-id').textContent = deviceCode;
+            document.getElementById('modal-device-name').textContent = 
+                device.product ? device.product.name : 'Unknown Product';
+            document.getElementById('customPrice').value = '';
+            
+            if (device.product && device.product.itemcostperday) {
+                document.getElementById('default-price-info').textContent = 
+                    `Default price: €${device.product.itemcostperday.toFixed(2)} per day`;
+            } else {
+                document.getElementById('default-price-info').textContent = 'No default price set';
             }
+            
+            const modal = new bootstrap.Modal(document.getElementById('priceModal'));
+            
+            // Ensure video stays visible after modal
+            modal._element.addEventListener('hidden.bs.modal', function() {
+                // Force video to stay visible after modal close
+                const video = document.getElementById('scanner-video');
+                if (video && video.srcObject) {
+                    video.style.display = 'block';
+                    video.style.visibility = 'visible';
+                    video.style.opacity = '1';
+                    video.style.zIndex = '1';
+                    
+                    // Make sure it's still playing
+                    video.play().catch(e => console.log('Video play after modal:', e));
+                }
+            });
+            
+            modal.show();
+        }
+
+        function toggleBulkMode() {
+            // Checkbox now controls custom prices, so reverse the logic
+            isBulkMode = !document.getElementById('bulkMode').checked;
+            const bulkBtn = document.getElementById('bulkFinishBtn');
+            
+            if (isBulkMode) {
+                bulkBtn.style.display = 'inline-block';
+                bulkDevices = [];
+                updateStatus('Bulk mode enabled. Scan devices continuously.', 'info');
+            } else {
+                bulkBtn.style.display = 'none';
+                updateStatus('Bulk mode disabled.', 'info');
+            }
+        }
+
+        async function finishBulkScan() {
+            if (bulkDevices.length === 0) {
+                alert('No devices scanned in bulk mode.');
+                return;
+            }
+            
+            updateStatus(`Assigning ${bulkDevices.length} devices...`, 'info');
+            
+            let successCount = 0;
+            
+            for (const device of bulkDevices) {
+                try {
+                    const response = await fetch('/api/v1/jobs/{{.job.JobID}}/assign-device', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            job_id: {{.job.JobID}},
+                            device_id: device.deviceId,
+                            price: null
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        successCount++;
+                    }
+                } catch (error) {
+                    console.error('Error assigning device:', device.deviceId, error);
+                }
+            }
+            
+            updateStatus(`Bulk scan complete: ${successCount} devices assigned`, 'success');
+            bulkDevices = [];
+            setTimeout(() => window.location.reload(), 2000);
         }
 
         function processManualInput() {
@@ -372,37 +1192,11 @@
             }
         }
 
-        function addScanResult(deviceId, type, message) {
-            const resultsContainer = document.getElementById('scan-results');
-            
-            const resultDiv = document.createElement('div');
-            resultDiv.className = `scan-result alert scan-${type} d-flex justify-content-between align-items-center`;
-            resultDiv.innerHTML = `
-                <div>
-                    <strong>${deviceId}</strong><br>
-                    <small>${message}</small>
-                </div>
-                ${type === 'success' ? 
-                    `<button class="btn btn-sm btn-outline-danger" onclick="removeDevice('${deviceId}')">
-                        <i class="bi bi-trash"></i>
-                    </button>` : ''
-                }
-            `;
-            
-            resultsContainer.insertBefore(resultDiv, resultsContainer.firstChild);
-            
-            // Remove empty state if present
-            const emptyState = resultsContainer.querySelector('.text-center.py-4');
-            if (emptyState) {
-                emptyState.remove();
-            }
-        }
-
         async function removeDevice(deviceId) {
             if (!confirm('Remove this device from the job?')) return;
             
             try {
-                const response = await fetch(`/api/v1/jobs/{{.job.JobID}}/devices/${deviceId}`, {
+                const response = await fetch('/api/v1/jobs/{{.job.JobID}}/devices/' + deviceId, {
                     method: 'DELETE'
                 });
                 
@@ -416,40 +1210,62 @@
             }
         }
 
+        function addScanResult(deviceId, type, message) {
+            const deviceList = document.getElementById('device-list');
+            const emptyState = document.getElementById('empty-state');
+            
+            if (emptyState) {
+                emptyState.remove();
+            }
+            
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `scan-result ${type}`;
+            resultDiv.innerHTML = `
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <div class="device-id">${deviceId}</div>
+                        <div class="device-name">${message}</div>
+                    </div>
+                    ${type === 'success' ? 
+                        `<button class="btn btn-outline-danger btn-sm" onclick="removeDevice('${deviceId}')">
+                            <i class="bi bi-trash"></i>
+                        </button>` : ''
+                    }
+                </div>
+            `;
+            
+            deviceList.insertBefore(resultDiv, deviceList.firstChild);
+            
+            // Remove after 5 seconds if it's an error
+            if (type === 'error') {
+                setTimeout(() => {
+                    if (resultDiv.parentNode) {
+                        resultDiv.remove();
+                    }
+                }, 5000);
+            }
+        }
+
         function updateStatus(message, type) {
             const statusElement = document.getElementById('scanner-status');
-            const colorClass = type === 'success' ? 'text-success' : 
-                             type === 'error' ? 'text-danger' : 
-                             type === 'info' ? 'text-info' : 'text-muted';
-            
-            statusElement.innerHTML = `<p class="${colorClass} mb-0">${message}</p>`;
-        }
-
-        function toggleFlashlight() {
-            // Flashlight functionality for mobile devices
-            if (stream) {
-                const track = stream.getVideoTracks()[0];
-                const capabilities = track.getCapabilities();
+            if (statusElement) {
+                statusElement.textContent = message;
                 
-                if ('torch' in capabilities) {
-                    const settings = track.getSettings();
-                    track.applyConstraints({
-                        advanced: [{torch: !settings.torch}]
-                    });
-                }
+                // Remove existing color classes
+                statusElement.classList.remove('text-success', 'text-danger', 'text-warning', 'text-info');
+                
+                // Add appropriate color class
+                if (type === 'success') statusElement.classList.add('text-success');
+                else if (type === 'error') statusElement.classList.add('text-danger');
+                else if (type === 'warning') statusElement.classList.add('text-warning');
+                else if (type === 'info') statusElement.classList.add('text-info');
             }
         }
-
-        // Handle manual input on Enter
-        document.getElementById('manual-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                processManualInput();
-            }
-        });
 
         // Cleanup on page unload
         window.addEventListener('beforeunload', function() {
             stopScanner();
         });
     </script>
-{{end}}
+</body>
+</html>

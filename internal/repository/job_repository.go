@@ -113,7 +113,7 @@ func (r *JobRepository) List(params *models.FilterParams) ([]models.JobWithDetai
 func (r *JobRepository) GetJobDevices(jobID uint) ([]models.JobDevice, error) {
 	var jobDevices []models.JobDevice
 	err := r.db.Where("jobID = ?", jobID).
-		Preload("Device").
+		Preload("Device.Product").
 		Find(&jobDevices).Error
 	return jobDevices, err
 }
@@ -131,9 +131,13 @@ func (r *JobRepository) AssignDevice(jobID uint, deviceID string, price float64)
 
 	// Create new assignment
 	jobDevice := &models.JobDevice{
-		JobID:       jobID,
-		DeviceID:    deviceID,
-		CustomPrice: &price,
+		JobID:    jobID,
+		DeviceID: deviceID,
+	}
+
+	// Only set custom price if it's greater than 0
+	if price > 0 {
+		jobDevice.CustomPrice = &price
 	}
 
 	return r.db.Create(jobDevice).Error

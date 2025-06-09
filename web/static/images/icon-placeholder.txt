@@ -1,0 +1,19 @@
+Icon files needed for PWA:
+- icon-72.png (72x72)
+- icon-96.png (96x96)
+- icon-128.png (128x128)
+- icon-144.png (144x144)
+- icon-152.png (152x152)
+- icon-180.png (180x180) - Apple touch icon
+- icon-192.png (192x192)
+- icon-384.png (384x384)
+- icon-512.png (512x512)
+
+You can create these icons using any image editing software or online icon generator.
+Recommended: Use a QR code or barcode scanner icon with the JobScanner Pro branding.
+
+Screenshots needed:
+- screenshot-narrow.png (540x720) - Mobile screenshot
+- screenshot-wide.png (1280x720) - Desktop screenshot
+
+These improve the PWA installation experience on Android devices.

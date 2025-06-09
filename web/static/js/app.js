@@ -382,15 +382,33 @@ window.addEventListener('error', function(e) {
     showAlert('An error occurred. Please refresh the page if problems persist.', 'warning');
 });
 
-// Service worker registration (for PWA features)
+// Enhanced Service worker registration (for PWA features and performance)
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/sw.js')
+        navigator.serviceWorker.register('/static/sw.js')
             .then(registration => {
-                console.log('ServiceWorker registered:', registration);
+                console.log('ServiceWorker registered successfully:', registration.scope);
+                
+                // Check for updates
+                registration.addEventListener('updatefound', () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener('statechange', () => {
+                        if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // New content is available
+                            showAlert('New version available! Refresh to update.', 'info');
+                        }
+                    });
+                });
             })
             .catch(error => {
                 console.log('ServiceWorker registration failed:', error);
             });
+    });
+    
+    // Listen for service worker messages
+    navigator.serviceWorker.addEventListener('message', event => {
+        if (event.data && event.data.type === 'CACHE_UPDATED') {
+            console.log('Cache updated:', event.data.url);
+        }
     });
 }

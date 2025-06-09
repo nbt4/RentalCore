@@ -78,17 +78,40 @@ func (h *ScannerHandler) ScanJob(c *gin.Context) {
 		return
 	}
 
+	// Group devices by product
+	productGroups := make(map[string]*ProductGroup)
+	totalDevices := len(assignedDevices)
+
+	for _, jd := range assignedDevices {
+		var productName string
+		if jd.Device.Product != nil {
+			productName = jd.Device.Product.Name
+		} else {
+			productName = "Unknown Product"
+		}
+
+		if _, exists := productGroups[productName]; !exists {
+			productGroups[productName] = &ProductGroup{
+				Product: jd.Device.Product,
+				Devices: []models.JobDevice{},
+			}
+		}
+		productGroups[productName].Devices = append(productGroups[productName].Devices, jd)
+	}
+
 	c.HTML(http.StatusOK, "scan_job.html", gin.H{
 		"title":           "Scanning Job #" + strconv.FormatUint(jobID, 10),
 		"job":             job,
 		"assignedDevices": assignedDevices,
+		"productGroups":   productGroups,
+		"totalDevices":    totalDevices,
 	})
 }
 
 type ScanDeviceRequest struct {
-	JobID    uint   `json:"job_id" binding:"required"`
-	DeviceID string `json:"device_id" binding:"required"`
-	Price    float64 `json:"price"`
+	JobID    uint     `json:"job_id" binding:"required"`
+	DeviceID string   `json:"device_id" binding:"required"`
+	Price    *float64 `json:"price"`
 }
 
 func (h *ScannerHandler) ScanDevice(c *gin.Context) {
@@ -122,8 +145,13 @@ func (h *ScannerHandler) ScanDevice(c *gin.Context) {
 	}
 
 	// Assign device to job
-	price := req.Price
-	// Note: device price is stored in product table, not device table in your schema
+	var price float64
+	// Only use custom price if explicitly provided, otherwise pass 0 (which means NULL in DB)
+	if req.Price != nil {
+		price = *req.Price
+	} else {
+		price = 0.0 // This will result in NULL custom_price in database
+	}
 
 	if err := h.jobRepo.AssignDevice(req.JobID, device.DeviceID, price); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

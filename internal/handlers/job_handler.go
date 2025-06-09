@@ -132,7 +132,7 @@ func (h *JobHandler) CreateJob(c *gin.Context) {
 		customers, _ := h.customerRepo.List(&models.FilterParams{})
 		statuses, _ := h.statusRepo.List()
 		jobCategories, _ := h.jobCategoryRepo.List()
-		c.HTML(http.StatusInternalServerError, "job_form.html", gin.H{
+		c.HTML(http.StatusInternalServerError, "job_form_new.html", gin.H{
 			"title":        "New Job",
 			"job":          &job,
 			"customers":    customers,
@@ -165,9 +165,47 @@ func (h *JobHandler) GetJob(c *gin.Context) {
 		return
 	}
 
+	// Group devices by product and calculate pricing
+	productGroups := make(map[string]*ProductGroup)
+	totalDevices := len(jobDevices)
+	totalValue := 0.0
+
+	for _, jd := range jobDevices {
+		if jd.Device.Product == nil {
+			continue
+		}
+
+		productName := jd.Device.Product.Name
+		if _, exists := productGroups[productName]; !exists {
+			productGroups[productName] = &ProductGroup{
+				Product: jd.Device.Product,
+				Devices: []models.JobDevice{},
+			}
+		}
+
+		// Calculate effective price (custom price if set, otherwise default product price)
+		var effectivePrice float64
+		if jd.CustomPrice != nil && *jd.CustomPrice > 0 {
+			effectivePrice = *jd.CustomPrice
+		} else if jd.Device.Product.ItemCostPerDay != nil {
+			effectivePrice = *jd.Device.Product.ItemCostPerDay
+		}
+
+		// Create a copy of the job device with calculated price for display
+		jdCopy := jd
+		jdCopy.CustomPrice = &effectivePrice
+
+		productGroups[productName].Devices = append(productGroups[productName].Devices, jdCopy)
+		productGroups[productName].TotalValue += effectivePrice
+		totalValue += effectivePrice
+	}
+
 	c.HTML(http.StatusOK, "job_detail.html", gin.H{
-		"job":        job,
-		"jobDevices": jobDevices,
+		"job":           job,
+		"jobDevices":    jobDevices,
+		"productGroups": productGroups,
+		"totalDevices":  totalDevices,
+		"totalValue":    totalValue,
 	})
 }
 
@@ -272,7 +310,7 @@ func (h *JobHandler) UpdateJob(c *gin.Context) {
 		customers, _ := h.customerRepo.List(&models.FilterParams{})
 		statuses, _ := h.statusRepo.List()
 		jobCategories, _ := h.jobCategoryRepo.List()
-		c.HTML(http.StatusInternalServerError, "job_form.html", gin.H{
+		c.HTML(http.StatusInternalServerError, "job_form_new.html", gin.H{
 			"title":        "Edit Job",
 			"job":          &job,
 			"customers":    customers,

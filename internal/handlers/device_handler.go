@@ -272,11 +272,15 @@ func (h *DeviceHandler) GetDeviceAPI(c *gin.Context) {
 	deviceID := c.Param("id")
 	device, err := h.deviceRepo.GetByID(deviceID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Device not found"})
-		return
+		// Try by serial number if not found by ID
+		device, err = h.deviceRepo.GetBySerialNo(deviceID)
+		if err != nil {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Device not found"})
+			return
+		}
 	}
 
-	c.JSON(http.StatusOK, device)
+	c.JSON(http.StatusOK, gin.H{"device": device})
 }
 
 func (h *DeviceHandler) UpdateDeviceAPI(c *gin.Context) {

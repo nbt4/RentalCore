@@ -28,7 +28,7 @@ func (r *DeviceRepository) GetByID(deviceID string) (*models.Device, error) {
 
 func (r *DeviceRepository) GetBySerialNo(serialNo string) (*models.Device, error) {
 	var device models.Device
-	err := r.db.Where("serialnumber = ?", serialNo).First(&device).Error
+	err := r.db.Where("serialnumber = ?", serialNo).Preload("Product").First(&device).Error
 	if err != nil {
 		return nil, err
 	}

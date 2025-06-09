@@ -128,18 +128,18 @@ func (JobDevice) TableName() string {
 
 // JobWithDetails represents a job with aggregated information
 type JobWithDetails struct {
-	JobID        uint       `json:"jobID"`
-	CustomerID   uint       `json:"customerID"`
-	StatusID     uint       `json:"statusID"`
-	Description  *string    `json:"description"`
-	StartDate    *time.Time `json:"startDate"`
-	EndDate      *time.Time `json:"endDate"`
-	Revenue      float64    `json:"revenue"`
-	FinalRevenue *float64   `json:"final_revenue"`
-	CustomerName string     `json:"customer_name"`
-	StatusName   string     `json:"status_name"`
-	DeviceCount  int        `json:"device_count"`
-	TotalRevenue float64    `json:"total_revenue"`
+	JobID        uint       `json:"jobID" gorm:"column:jobID"`
+	CustomerID   uint       `json:"customerID" gorm:"column:customerID"`
+	StatusID     uint       `json:"statusID" gorm:"column:statusID"`
+	Description  *string    `json:"description" gorm:"column:description"`
+	StartDate    *time.Time `json:"startDate" gorm:"column:startDate"`
+	EndDate      *time.Time `json:"endDate" gorm:"column:endDate"`
+	Revenue      float64    `json:"revenue" gorm:"column:revenue"`
+	FinalRevenue *float64   `json:"final_revenue" gorm:"column:final_revenue"`
+	CustomerName string     `json:"customer_name" gorm:"column:customer_name"`
+	StatusName   string     `json:"status_name" gorm:"column:status_name"`
+	DeviceCount  int        `json:"device_count" gorm:"column:device_count"`
+	TotalRevenue float64    `json:"total_revenue" gorm:"column:total_revenue"`
 }
 
 // DeviceWithJobInfo represents a device with its current job assignment
@@ -220,4 +220,35 @@ type FilterParams struct {
 	Available    *bool      `form:"available"`
 	Limit        int        `form:"limit"`
 	Offset       int        `form:"offset"`
+}
+
+// User represents a user account for authentication
+type User struct {
+	UserID       uint      `json:"userID" gorm:"primaryKey;column:userID"`
+	Username     string    `json:"username" gorm:"unique;not null;column:username"`
+	Email        string    `json:"email" gorm:"unique;not null;column:email"`
+	PasswordHash string    `json:"-" gorm:"not null;column:password_hash"`
+	FirstName    string    `json:"firstName" gorm:"column:first_name"`
+	LastName     string    `json:"lastName" gorm:"column:last_name"`
+	IsActive     bool      `json:"isActive" gorm:"default:true;column:is_active"`
+	CreatedAt    time.Time `json:"createdAt" gorm:"column:created_at"`
+	UpdatedAt    time.Time `json:"updatedAt" gorm:"column:updated_at"`
+	LastLogin    *time.Time `json:"lastLogin" gorm:"column:last_login"`
+}
+
+func (User) TableName() string {
+	return "users"
+}
+
+// Session represents a user session
+type Session struct {
+	SessionID string    `json:"sessionID" gorm:"primaryKey;column:session_id"`
+	UserID    uint      `json:"userID" gorm:"not null;column:user_id"`
+	User      User      `json:"user,omitempty" gorm:"foreignKey:UserID;references:UserID"`
+	ExpiresAt time.Time `json:"expiresAt" gorm:"not null;column:expires_at"`
+	CreatedAt time.Time `json:"createdAt" gorm:"column:created_at"`
+}
+
+func (Session) TableName() string {
+	return "sessions"
 }

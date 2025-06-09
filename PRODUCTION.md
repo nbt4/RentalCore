@@ -2,12 +2,14 @@
 
 ## Quick Start
 
-### 1. Set Environment Variables
+### 1. Configure Application
+The application now uses a configuration file instead of environment variables. The configuration is stored in `config.production.direct.json`.
+
 ```bash
-export DB_HOST=tsunami-events.de
-export DB_NAME=TS-Lager
-export DB_USER=root
-export DB_PASSWORD=your_secure_password
+# Configuration is already set up for your environment
+# Database: tsunami-events.de / TS-Lager
+# Port: 8080
+# No manual environment variables needed!
 ```
 
 ### 2. Deploy Application
@@ -41,10 +43,11 @@ sudo journalctl -u jobscanner -f
 ## Production Features
 
 - ✅ **Release Mode**: Optimized performance with GIN_MODE=release
-- ✅ **Secure Config**: Database credentials via environment variables
+- ✅ **File-based Config**: Configuration stored in `config.production.direct.json`
 - ✅ **Logging**: Structured logging to `logs/production.log`
 - ✅ **Auto-restart**: Systemd service with automatic restart on failure
 - ✅ **Security**: Restricted file access and no new privileges
+- ✅ **No Environment Variables**: All configuration in JSON file
 
 ## Application Access
 
@@ -54,14 +57,15 @@ sudo journalctl -u jobscanner -f
 
 ## Configuration
 
-- **Production Config**: `config.production.json` (template with env vars)
-- **Runtime Config**: `config.runtime.json` (generated at startup)
-- **Environment**: `.env.production.example` (copy and customize)
+- **Production Config**: `config.production.direct.json` (contains all settings)
+- **Template Config**: `config.production.json` (legacy template with env vars)
+- **Development Config**: `config.json` (development settings)
 
 ## Security Notes
 
-- Never commit database passwords to git
-- Use environment variables for all sensitive data
+- ⚠️ **Config File Security**: `config.production.direct.json` contains sensitive database credentials
+- Keep the production config file secure with appropriate file permissions (600)
+- Never commit production config files to git
 - Run service as non-root user (www-data)
 - Enable firewall and restrict access to port 8080
 - Consider using HTTPS reverse proxy (nginx/apache)
@@ -89,8 +93,8 @@ curl http://localhost:8080/jobs
 # Check configuration
 sudo journalctl -u jobscanner --no-pager
 
-# Verify environment variables
-sudo systemctl show jobscanner -p Environment
+# Verify config file exists and is readable
+ls -la config.production.direct.json
 
 # Test manually
 sudo -u www-data ./start-production.sh
@@ -98,15 +102,15 @@ sudo -u www-data ./start-production.sh
 
 ### Database connection issues
 - Verify database host is reachable
-- Check database credentials
+- Check database credentials in config.production.direct.json
 - Ensure database exists and user has permissions
-- Test connection manually: `mysql -h $DB_HOST -u $DB_USER -p $DB_NAME`
+- Test connection manually: `mysql -h tsunami-events.de -u root -p TS-Lager`
 
 ## Backup & Maintenance
 
 ```bash
 # Backup database
-mysqldump -h $DB_HOST -u $DB_USER -p $DB_NAME > backup_$(date +%Y%m%d).sql
+mysqldump -h tsunami-events.de -u root -p TS-Lager > backup_$(date +%Y%m%d).sql
 
 # Update application
 git pull

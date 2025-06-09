@@ -13,6 +13,13 @@ go build -o server ./cmd/server
 # Create logs directory
 mkdir -p logs
 
+# Check if production config exists
+if [ ! -f "config.production.direct.json" ]; then
+    echo "⚠️  Production config file not found!"
+    echo "Please ensure config.production.direct.json exists with your production settings"
+    echo "You can copy and modify config.production.json as a template"
+fi
+
 # Install systemd service (requires root)
 if [ "$EUID" -eq 0 ]; then
     echo "🔧 Installing systemd service..."
@@ -30,11 +37,10 @@ else
 fi
 
 echo ""
-echo "🔑 Make sure to set these environment variables:"
-echo "   export DB_HOST=your_database_host"
-echo "   export DB_NAME=TS-Lager"  
-echo "   export DB_USER=your_database_user"
-echo "   export DB_PASSWORD=your_database_password"
+echo "✅ Configuration:"
+echo "   📄 Using config file: config.production.direct.json"
+echo "   🌐 Server will run on: http://0.0.0.0:8080"
+echo "   📝 Logs location: logs/production.log"
 echo ""
 echo "🚀 To start manually:"
 echo "   ./start-production.sh"
