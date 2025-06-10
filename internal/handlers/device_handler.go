@@ -244,13 +244,14 @@ func (h *DeviceHandler) ListDevicesAPI(c *gin.Context) {
 		return
 	}
 
-	devices, err := h.deviceRepo.List(params)
+	// Use the new method with categories for case management
+	devices, err := h.deviceRepo.ListWithCategories(params)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"devices": devices})
+	c.JSON(http.StatusOK, devices)
 }
 
 func (h *DeviceHandler) CreateDeviceAPI(c *gin.Context) {

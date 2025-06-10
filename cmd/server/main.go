@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 
 	"go-barcode-webapp/internal/config"
 	"go-barcode-webapp/internal/handlers"
@@ -62,13 +63,18 @@ func main() {
 	statusRepo := repository.NewStatusRepository(db)
 	productRepo := repository.NewProductRepository(db)
 	jobCategoryRepo := repository.NewJobCategoryRepository(db)
+	caseRepo := repository.NewCaseRepository(db)
 
 	// Initialize services
 	barcodeService := services.NewBarcodeService()
 
-	// Auto-migrate database tables (add this for user authentication)
-	if err := db.GetDB().AutoMigrate(&models.User{}, &models.Session{}); err != nil {
-		log.Printf("Failed to auto-migrate auth tables: %v", err)
+	// Auto-migrate database tables in correct order (User first, then Session)
+	if err := db.AutoMigrate(&models.User{}); err != nil {
+		log.Printf("Failed to auto-migrate users table: %v", err)
+	}
+	
+	if err := db.AutoMigrate(&models.Session{}); err != nil {
+		log.Printf("Failed to auto-migrate sessions table: %v", err)
 	}
 
 	// Initialize handlers
@@ -78,30 +84,13 @@ func main() {
 	statusHandler := handlers.NewStatusHandler(statusRepo)
 	productHandler := handlers.NewProductHandler(productRepo)
 	barcodeHandler := handlers.NewBarcodeHandler(barcodeService, deviceRepo)
-	scannerHandler := handlers.NewScannerHandler(jobRepo, deviceRepo, customerRepo)
-	authHandler := handlers.NewAuthHandler(db.GetDB())
+	scannerHandler := handlers.NewScannerHandler(jobRepo, deviceRepo, customerRepo, caseRepo)
+	authHandler := handlers.NewAuthHandler(db.DB)
+	caseHandler := handlers.NewCaseHandler(caseRepo, deviceRepo)
 
 	// Setup Gin router
 	r := gin.Default()
 
-	// Method override middleware for HTML forms
-	r.Use(func(c *gin.Context) {
-		if c.Request.Method == "POST" {
-			// Check if this is a form submission
-			contentType := c.GetHeader("Content-Type")
-			if contentType == "application/x-www-form-urlencoded" || 
-			   (contentType != "" && len(contentType) > 33 && contentType[:33] == "application/x-www-form-urlencoded") {
-				
-				// Parse the form to access _method field
-				if err := c.Request.ParseForm(); err == nil {
-					if method := c.Request.FormValue("_method"); method == "PUT" || method == "DELETE" {
-						c.Request.Method = method
-					}
-				}
-			}
-		}
-		c.Next()
-	})
 
 	// Load HTML templates with custom functions
 	funcMap := template.FuncMap{
@@ -134,13 +123,43 @@ func main() {
 		c.File("web/static/sw.js")
 	})
 
+	// Demo routes (no authentication required)
+	r.GET("/demo/case-management", caseHandler.CaseManagementDemo)
+	r.GET("/demo/case-management-minimal", caseHandler.CaseManagementDemoMinimal)
+	r.GET("/demo/case-management-real", caseHandler.CaseManagement)
+	r.GET("/demo/case-management-simple", caseHandler.CaseManagementSimple)
+
 	// Routes
-	setupRoutes(r, jobHandler, deviceHandler, customerHandler, statusHandler, productHandler, barcodeHandler, scannerHandler, authHandler)
+	setupRoutes(r, jobHandler, deviceHandler, customerHandler, statusHandler, productHandler, barcodeHandler, scannerHandler, authHandler, caseHandler)
 
 	// Start server
 	addr := cfg.Server.Host + ":" + strconv.Itoa(cfg.Server.Port)
+	// Wrap Gin router with method override support
+	methodOverrideHandler := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		originalMethod := req.Method
+		if req.Method == "POST" {
+			contentType := req.Header.Get("Content-Type")
+			log.Printf("POST request to %s with Content-Type: '%s'", req.URL.Path, contentType)
+			
+			if contentType == "application/x-www-form-urlencoded" || 
+			   strings.HasPrefix(contentType, "application/x-www-form-urlencoded") {
+				
+				if err := req.ParseForm(); err == nil {
+					methodParam := req.FormValue("_method")
+					log.Printf("Form _method parameter: '%s'", methodParam)
+					if methodParam == "PUT" || methodParam == "DELETE" {
+						log.Printf("Method override: %s -> %s for path: %s", originalMethod, methodParam, req.URL.Path)
+						req.Method = methodParam
+					}
+				}
+			}
+		}
+		// Pass to Gin router
+		r.ServeHTTP(w, req)
+	})
+
 	log.Printf("Server starting on %s", addr)
-	log.Fatal(http.ListenAndServe(addr, r))
+	log.Fatal(http.ListenAndServe(addr, methodOverrideHandler))
 }
 
 func setupRoutes(r *gin.Engine, 
@@ -151,7 +170,8 @@ func setupRoutes(r *gin.Engine,
 	productHandler *handlers.ProductHandler,
 	barcodeHandler *handlers.BarcodeHandler,
 	scannerHandler *handlers.ScannerHandler,
-	authHandler *handlers.AuthHandler) {
+	authHandler *handlers.AuthHandler,
+	caseHandler *handlers.CaseHandler) {
 
 	// Authentication routes (no auth required)
 	r.GET("/login", authHandler.LoginForm)
@@ -226,6 +246,22 @@ func setupRoutes(r *gin.Engine,
 			products.GET("", productHandler.ListProducts)
 		}
 
+		// Case routes
+		cases := protected.Group("/cases")
+		{
+			cases.GET("", caseHandler.ListCases)
+			cases.GET("/management", caseHandler.CaseManagement)
+			cases.GET("/new", caseHandler.NewCaseForm)
+			cases.POST("", caseHandler.CreateCase)
+			cases.GET("/:id", caseHandler.GetCase)
+			cases.GET("/:id/edit", caseHandler.EditCaseForm)
+			cases.PUT("/:id", caseHandler.UpdateCase)
+			cases.DELETE("/:id", caseHandler.DeleteCase)
+			cases.GET("/:id/devices", caseHandler.CaseDeviceMapping)
+			cases.POST("/:id/devices", caseHandler.ScanDeviceToCase)
+			cases.DELETE("/:id/devices/:deviceId", caseHandler.RemoveDeviceFromCase)
+		}
+
 		// Barcode routes
 		barcodes := protected.Group("/barcodes")
 		{
@@ -259,6 +295,7 @@ func setupRoutes(r *gin.Engine,
 				
 				// Scanner API endpoints
 				apiJobs.POST("/:id/assign-device", scannerHandler.ScanDevice)
+				apiJobs.POST("/:id/assign-case", scannerHandler.ScanCase)
 			}
 
 			// Device API
@@ -280,6 +317,16 @@ func setupRoutes(r *gin.Engine,
 				apiCustomers.GET("/:id", customerHandler.GetCustomerAPI)
 				apiCustomers.PUT("/:id", customerHandler.UpdateCustomerAPI)
 				apiCustomers.DELETE("/:id", customerHandler.DeleteCustomerAPI)
+			}
+
+			// Case API
+			apiCases := api.Group("/cases")
+			{
+				apiCases.GET("", caseHandler.ListCasesAPI)
+				apiCases.POST("", caseHandler.CreateCaseAPI)
+				apiCases.GET("/:id", caseHandler.GetCaseAPI)
+				apiCases.PUT("/:id", caseHandler.UpdateCaseAPI)
+				apiCases.DELETE("/:id", caseHandler.DeleteCaseAPI)
 			}
 		}
 	}

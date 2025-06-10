@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 
@@ -14,13 +15,15 @@ type ScannerHandler struct {
 	deviceRepo   *repository.DeviceRepository
 	jobRepo      *repository.JobRepository
 	customerRepo *repository.CustomerRepository
+	caseRepo     *repository.CaseRepository
 }
 
-func NewScannerHandler(jobRepo *repository.JobRepository, deviceRepo *repository.DeviceRepository, customerRepo *repository.CustomerRepository) *ScannerHandler {
+func NewScannerHandler(jobRepo *repository.JobRepository, deviceRepo *repository.DeviceRepository, customerRepo *repository.CustomerRepository, caseRepo *repository.CaseRepository) *ScannerHandler {
 	return &ScannerHandler{
 		deviceRepo:   deviceRepo,
 		jobRepo:      jobRepo,
 		customerRepo: customerRepo,
+		caseRepo:     caseRepo,
 	}
 }
 
@@ -99,12 +102,20 @@ func (h *ScannerHandler) ScanJob(c *gin.Context) {
 		productGroups[productName].Devices = append(productGroups[productName].Devices, jd)
 	}
 
+	// Get available cases for case scanning functionality
+	cases, err := h.caseRepo.List(&models.FilterParams{})
+	if err != nil {
+		// If we can't get cases, continue without them - don't fail the page
+		cases = []models.Case{}
+	}
+
 	c.HTML(http.StatusOK, "scan_job.html", gin.H{
 		"title":           "Scanning Job #" + strconv.FormatUint(jobID, 10),
 		"job":             job,
 		"assignedDevices": assignedDevices,
 		"productGroups":   productGroups,
 		"totalDevices":    totalDevices,
+		"cases":           cases,
 	})
 }
 
@@ -112,6 +123,11 @@ type ScanDeviceRequest struct {
 	JobID    uint     `json:"job_id" binding:"required"`
 	DeviceID string   `json:"device_id" binding:"required"`
 	Price    *float64 `json:"price"`
+}
+
+type ScanCaseRequest struct {
+	JobID  uint `json:"job_id" binding:"required"`
+	CaseID uint `json:"case_id" binding:"required"`
 }
 
 func (h *ScannerHandler) ScanDevice(c *gin.Context) {
@@ -180,4 +196,79 @@ func (h *ScannerHandler) RemoveDevice(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Device removed from job successfully"})
+}
+
+func (h *ScannerHandler) ScanCase(c *gin.Context) {
+	var req ScanCaseRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Get the case and its devices
+	case_, err := h.caseRepo.GetByID(req.CaseID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Case not found"})
+		return
+	}
+
+	// Get all devices in the case
+	devicesInCase, err := h.caseRepo.GetDevicesInCase(req.CaseID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get devices in case"})
+		return
+	}
+
+	if len(devicesInCase) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Case is empty - no devices to assign"})
+		return
+	}
+
+	// Track results
+	var results []map[string]interface{}
+	successCount := 0
+	errorCount := 0
+
+	// Assign all devices in the case to the job
+	for _, deviceCase := range devicesInCase {
+		device := deviceCase.Device
+		
+		// Check if device is available
+		if device.Status != "free" {
+			results = append(results, map[string]interface{}{
+				"device_id": device.DeviceID,
+				"success":   false,
+				"message":   "Device is not available (status: " + device.Status + ")",
+			})
+			errorCount++
+			continue
+		}
+
+		// Assign device to job using default pricing (no custom price for case scanning)
+		if err := h.jobRepo.AssignDevice(req.JobID, device.DeviceID, 0.0); err != nil {
+			results = append(results, map[string]interface{}{
+				"device_id": device.DeviceID,
+				"success":   false,
+				"message":   err.Error(),
+			})
+			errorCount++
+		} else {
+			results = append(results, map[string]interface{}{
+				"device_id": device.DeviceID,
+				"success":   true,
+				"message":   "Device assigned successfully",
+			})
+			successCount++
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":       fmt.Sprintf("Case scan complete: %d devices assigned, %d errors", successCount, errorCount),
+		"case_id":       req.CaseID,
+		"case_name":     case_.Name,
+		"total_devices": len(devicesInCase),
+		"success_count": successCount,
+		"error_count":   errorCount,
+		"results":       results,
+	})
 }

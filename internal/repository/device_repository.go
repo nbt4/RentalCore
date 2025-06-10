@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"log"
+	"runtime/debug"
 	"go-barcode-webapp/internal/models"
 	"gorm.io/gorm"
 )
@@ -14,6 +16,25 @@ func NewDeviceRepository(db *Database) *DeviceRepository {
 }
 
 func (r *DeviceRepository) Create(device *models.Device) error {
+	// DEBUG: Log device creation attempts to track automatic creation
+	log.Printf("🚨 DEVICE CREATION ATTEMPT:")
+	log.Printf("   DeviceID: '%s'", device.DeviceID)
+	if device.ProductID != nil {
+		log.Printf("   ProductID: %d", *device.ProductID)
+	} else {
+		log.Printf("   ProductID: NULL")
+	}
+	if device.SerialNumber != nil {
+		log.Printf("   SerialNumber: '%s'", *device.SerialNumber)
+	} else {
+		log.Printf("   SerialNumber: NULL")
+	}
+	log.Printf("   Status: '%s'", device.Status)
+	
+	// Print stack trace to see what's calling this
+	log.Printf("   📍 Stack trace:")
+	log.Printf("%s", debug.Stack())
+	
 	return r.db.Create(device).Error
 }
 
@@ -94,6 +115,34 @@ func (r *DeviceRepository) List(params *models.FilterParams) ([]models.DeviceWit
 	return result, nil
 }
 
+func (r *DeviceRepository) ListWithCategories(params *models.FilterParams) ([]models.Device, error) {
+	var devices []models.Device
+
+	query := r.db.Model(&models.Device{}).
+		Preload("Product").
+		Preload("Product.Category").
+		Preload("Product.Subcategory").
+		Preload("Product.Brand").
+		Preload("Product.Manufacturer")
+
+	if params.SearchTerm != "" {
+		searchPattern := "%" + params.SearchTerm + "%"
+		query = query.Where("deviceID LIKE ? OR serialnumber LIKE ?", searchPattern, searchPattern)
+	}
+
+	if params.Limit > 0 {
+		query = query.Limit(params.Limit)
+	}
+	if params.Offset > 0 {
+		query = query.Offset(params.Offset)
+	}
+
+	query = query.Order("deviceID DESC")
+
+	err := query.Find(&devices).Error
+	return devices, err
+}
+
 func (r *DeviceRepository) GetAvailableDevices() ([]models.Device, error) {
 	var devices []models.Device
 	
@@ -129,4 +178,18 @@ func (r *DeviceRepository) GetDeviceJobHistory(deviceID uint) ([]models.JobDevic
 		Find(&jobDevices).Error
 	
 	return jobDevices, err
+}
+
+func (r *DeviceRepository) GetAvailableDevicesForCaseManagement() ([]models.Device, error) {
+	var devices []models.Device
+	err := r.db.Where("status = 'free'").
+		Preload("Product").
+		Preload("Product.Category").
+		Preload("Product.Subcategory").
+		Find(&devices).Error
+	
+	// Log device count for monitoring
+	log.Printf("Found %d devices with status='free' for case management", len(devices))
+	
+	return devices, err
 }

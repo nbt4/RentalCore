@@ -34,6 +34,12 @@ This will prompt you for all user details interactively.
 ```
 You'll be prompted for the password securely.
 
+#### Command-line User Creation with Password (Use with Caution)
+```bash
+./user_manager -username admin -email admin@tsunami-events.de -firstname Admin -lastname User -password "your_secure_password"
+```
+**Warning:** Only use the `-password` flag in secure environments where command history is protected.
+
 #### List All Users
 ```bash
 ./user_manager -list
@@ -59,12 +65,10 @@ You'll be prompted for the password securely.
 
 2. **Create an admin user:**
    ```bash
-   ./user_manager -username admin -email admin@tsunami-events.de -firstname Admin -lastname User
+   ./user_manager -username admin -email admin@tsunami-events.de -firstname Admin -lastname User -password "admin123"
    ```
    
-3. **Enter a secure password when prompted**
-
-4. **Start the application:**
+3. **Start the application:**
    ```bash
    ./server
    ```

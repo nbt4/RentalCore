@@ -106,12 +106,29 @@ type Product struct {
 	Height                *float64 `json:"height" gorm:"column:height"`
 	Width                 *float64 `json:"width" gorm:"column:width"`
 	Depth                 *float64 `json:"depth" gorm:"column:depth"`
-	PowerConsumption      *float64 `json:"powerconsumption" gorm:"column:powerconsumption"`
-	PosInCategory         *uint    `json:"pos_in_category" gorm:"column:pos_in_category"`
+	PowerConsumption      *float64     `json:"powerconsumption" gorm:"column:powerconsumption"`
+	PosInCategory         *uint        `json:"pos_in_category" gorm:"column:pos_in_category"`
+	Category              *Category    `json:"category,omitempty" gorm:"foreignKey:CategoryID;references:CategoryID"`
+	Subcategory           *Subcategory `json:"subcategory,omitempty" gorm:"foreignKey:SubcategoryID;references:SubcategoryID"`
+	Brand                 *Brand       `json:"brand,omitempty" gorm:"foreignKey:BrandID;references:BrandID"`
+	Manufacturer          *Manufacturer `json:"manufacturer,omitempty" gorm:"foreignKey:ManufacturerID;references:ManufacturerID"`
 }
 
 func (Product) TableName() string {
 	return "products"
+}
+
+
+type Subcategory struct {
+	SubcategoryID string  `json:"subcategoryID" gorm:"primaryKey;column:subcategoryID"`
+	Name          string  `json:"name" gorm:"not null;column:name"`
+	Abbreviation  string  `json:"abbreviation" gorm:"column:abbreviation"`
+	CategoryID    uint    `json:"categoryID" gorm:"column:categoryID"`
+	Category      Category `json:"category,omitempty" gorm:"foreignKey:CategoryID;references:CategoryID"`
+}
+
+func (Subcategory) TableName() string {
+	return "subcategories"
 }
 
 type JobDevice struct {
@@ -243,7 +260,7 @@ func (User) TableName() string {
 // Session represents a user session
 type Session struct {
 	SessionID string    `json:"sessionID" gorm:"primaryKey;column:session_id"`
-	UserID    uint      `json:"userID" gorm:"not null;column:user_id"`
+	UserID    uint      `json:"userID" gorm:"not null;column:user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 	User      User      `json:"user,omitempty" gorm:"foreignKey:UserID;references:UserID"`
 	ExpiresAt time.Time `json:"expiresAt" gorm:"not null;column:expires_at"`
 	CreatedAt time.Time `json:"createdAt" gorm:"column:created_at"`
@@ -251,4 +268,31 @@ type Session struct {
 
 func (Session) TableName() string {
 	return "sessions"
+}
+
+type Case struct {
+	CaseID      uint            `json:"caseID" gorm:"primaryKey;column:caseID"`
+	Name        string          `json:"name" gorm:"not null;column:name"`
+	Description *string         `json:"description" gorm:"column:description"`
+	Weight      *float64        `json:"weight" gorm:"column:weight"`
+	Width       *float64        `json:"width" gorm:"column:width"`
+	Height      *float64        `json:"height" gorm:"column:height"`
+	Depth       *float64        `json:"depth" gorm:"column:depth"`
+	Status      string          `json:"status" gorm:"not null;column:status;default:free"`
+	Devices     []DeviceCase    `json:"devices,omitempty" gorm:"foreignKey:CaseID;references:CaseID"`
+}
+
+func (Case) TableName() string {
+	return "cases"
+}
+
+type DeviceCase struct {
+	CaseID   uint   `json:"caseID" gorm:"primaryKey;column:caseID"`
+	DeviceID string `json:"deviceID" gorm:"primaryKey;column:deviceID"`
+	Case     Case   `json:"case,omitempty" gorm:"foreignKey:CaseID;references:CaseID"`
+	Device   Device `json:"device,omitempty" gorm:"foreignKey:DeviceID;references:DeviceID"`
+}
+
+func (DeviceCase) TableName() string {
+	return "devicescases"
 }

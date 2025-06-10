@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,40 +8,39 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
     <link href="/static/css/app.css" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; }
         .navbar-brand { font-weight: 600; }
         
         .product-group {
-            border: 1px solid #e0e0e0;
+            border: 1px solid var(--bs-border-color);
             border-radius: 8px;
             margin-bottom: 15px;
             transition: all 0.2s;
         }
         
         .product-group:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
         
         .product-header {
             cursor: pointer;
             padding: 15px;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            background: var(--bs-gray-800);
             border-radius: 8px 8px 0 0;
         }
         
         .product-header:hover {
-            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+            background: var(--bs-gray-700);
         }
         
         .device-list {
             padding: 0;
             margin: 0;
-            background: white;
+            background: var(--bs-body-bg);
         }
         
         .device-item {
             padding: 10px 15px;
-            border-bottom: 1px solid #f0f0f0;
+            border-bottom: 1px solid var(--bs-border-color);
             transition: background-color 0.2s;
         }
         
@@ -51,7 +50,7 @@
         }
         
         .device-item:hover {
-            background-color: #f8f9fa;
+            background-color: var(--bs-gray-800);
         }
         
         .quantity-badge {
@@ -67,11 +66,11 @@
         
         .product-info h6 {
             margin: 0;
-            color: #2c3e50;
+            color: var(--bs-body-color);
         }
         
         .product-meta {
-            color: #6c757d;
+            color: var(--bs-secondary-color);
             font-size: 0.9em;
         }
         
@@ -98,13 +97,24 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="navbar-nav">
-                    <a class="nav-link active" href="/jobs">Jobs</a>
-                    <a class="nav-link" href="/devices">Devices</a>
-                    <a class="nav-link" href="/customers">Customers</a>
-                    <a class="nav-link" href="/scan/select">
-                        <i class="bi bi-qr-code-scan"></i> Scanner
+                <div class="navbar-nav me-auto">
+                    <a class="nav-link active" href="/jobs">
+                        <i class="bi bi-briefcase"></i> Jobs
                     </a>
+                    <a class="nav-link" href="/devices">
+                        <i class="bi bi-cpu"></i> Devices
+                    </a>
+                    <a class="nav-link" href="/customers">
+                        <i class="bi bi-people"></i> Customers
+                    </a>
+                    <a class="nav-link" href="/cases">
+                        <i class="bi bi-box"></i> Cases
+                    </a>
+                </div>
+                <div class="navbar-nav">
+                    <button class="btn btn-outline-light btn-sm" onclick="toggleTheme()">
+                        <i class="bi bi-moon-fill" id="theme-icon"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -163,7 +173,7 @@
                             </div>
                             <div class="col-6">
                                 <small class="text-muted">Final Revenue</small>
-                                <p class="mb-2"><strong>€{{printf "%.2f" .job.FinalRevenue}}</strong></p>
+                                <p class="mb-2"><strong>€{{printf "%.2f" (derefFloat .job.FinalRevenue)}}</strong></p>
                             </div>
                         </div>
                         {{if .job.JobCategory}}
@@ -365,6 +375,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/static/js/app.js"></script>
     <script>
         const jobId = {{.job.JobID}};
 

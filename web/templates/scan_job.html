@@ -595,6 +595,50 @@
 
             <!-- Devices Column -->
             <div class="col-lg-6">
+                <!-- Case Scanning Section -->
+                {{if .cases}}
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h6><i class="bi bi-box"></i> Scan Cases</h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {{range $index, $case := .cases}}
+                            {{if lt $index 6}}
+                            <div class="col-md-6 mb-2">
+                                <button class="btn btn-outline-warning btn-sm w-100" onclick="scanCase({{$case.CaseID}}, '{{$case.Name}}', {{len $case.Devices}})">
+                                    <i class="bi bi-box"></i> {{$case.Name}}
+                                    <br><small>{{len $case.Devices}} devices</small>
+                                </button>
+                            </div>
+                            {{end}}
+                            {{end}}
+                        </div>
+                        {{if gt (len .cases) 6}}
+                        <div class="text-center mt-2">
+                            <button class="btn btn-link btn-sm" onclick="toggleAllCases()">
+                                <i class="bi bi-chevron-down" id="cases-toggle-icon"></i> Show all {{len .cases}} cases
+                            </button>
+                        </div>
+                        <div id="all-cases" style="display: none;">
+                            <div class="row">
+                                {{range $index, $case := .cases}}
+                                {{if ge $index 6}}
+                                <div class="col-md-6 mb-2">
+                                    <button class="btn btn-outline-warning btn-sm w-100" onclick="scanCase({{$case.CaseID}}, '{{$case.Name}}', {{len $case.Devices}})">
+                                        <i class="bi bi-box"></i> {{$case.Name}}
+                                        <br><small>{{len $case.Devices}} devices</small>
+                                    </button>
+                                </div>
+                                {{end}}
+                                {{end}}
+                            </div>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+                {{end}}
+
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h6><i class="bi bi-list-check"></i> Scanned Devices</h6>
@@ -1017,6 +1061,12 @@
         async function processScannedCode(code) {
             updateStatus('Checking...', 'info');
             
+            // Check if this is a case barcode (starts with 'CASE:' or is just a number that could be a case ID)
+            if (code.startsWith('CASE:') || /^\d+$/.test(code)) {
+                await processCaseCode(code);
+                return;
+            }
+            
             // Validate device exists
             const device = await validateDevice(code);
             if (!device) {
@@ -1259,6 +1309,92 @@
                 else if (type === 'error') statusElement.classList.add('text-danger');
                 else if (type === 'warning') statusElement.classList.add('text-warning');
                 else if (type === 'info') statusElement.classList.add('text-info');
+            }
+        }
+
+        // Case scanning functions
+        async function processCaseCode(code) {
+            // Extract case ID from the code
+            let caseId;
+            if (code.startsWith('CASE:')) {
+                caseId = parseInt(code.substring(5));
+            } else {
+                caseId = parseInt(code);
+            }
+            
+            if (isNaN(caseId)) {
+                updateStatus('Invalid case code: ' + code, 'error');
+                return;
+            }
+            
+            // Find the case in our available cases
+            const availableCases = [{{range .cases}}{{.CaseID}},{{end}}];
+            if (!availableCases.includes(caseId)) {
+                updateStatus('Case not found: ' + caseId, 'error');
+                addScanResult(code, 'error', 'Case not found');
+                setTimeout(() => updateStatus('Ready for next scan', 'success'), 2000);
+                return;
+            }
+            
+            // Assign all devices in the case
+            await scanCase(caseId, 'Scanned Case', 0);
+        }
+
+        async function scanCase(caseId, caseName, deviceCount) {
+            updateStatus('Scanning case: ' + caseName + '...', 'info');
+            
+            try {
+                const response = await fetch('/api/v1/jobs/{{.job.JobID}}/assign-case', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        job_id: {{.job.JobID}},
+                        case_id: caseId
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    updateStatus('Case scanned successfully!', 'success');
+                    addScanResult('CASE:' + caseId, 'success', 
+                        `${result.case_name}: ${result.success_count} devices assigned` + 
+                        (result.error_count > 0 ? `, ${result.error_count} errors` : ''));
+                    
+                    // Show detailed results if there were errors
+                    if (result.results && result.error_count > 0) {
+                        result.results.forEach(deviceResult => {
+                            if (!deviceResult.success) {
+                                addScanResult(deviceResult.device_id, 'error', deviceResult.message);
+                            }
+                        });
+                    }
+                    
+                    // Reload page after 3 seconds to show new devices
+                    setTimeout(() => window.location.reload(), 3000);
+                } else {
+                    updateStatus('Case scan failed: ' + result.error, 'error');
+                    addScanResult('CASE:' + caseId, 'error', result.error || 'Case scan failed');
+                }
+            } catch (error) {
+                console.error('Error scanning case:', error);
+                updateStatus('Network error during case scan', 'error');
+                addScanResult('CASE:' + caseId, 'error', 'Network error');
+            }
+        }
+
+        function toggleAllCases() {
+            const allCases = document.getElementById('all-cases');
+            const toggleIcon = document.getElementById('cases-toggle-icon');
+            
+            if (allCases.style.display === 'none') {
+                allCases.style.display = 'block';
+                toggleIcon.className = 'bi bi-chevron-up';
+                event.target.innerHTML = '<i class="bi bi-chevron-up" id="cases-toggle-icon"></i> Show less';
+            } else {
+                allCases.style.display = 'none';
+                toggleIcon.className = 'bi bi-chevron-down';
+                event.target.innerHTML = '<i class="bi bi-chevron-down" id="cases-toggle-icon"></i> Show all {{len .cases}} cases';
             }
         }
 

@@ -256,8 +256,18 @@ func (h *JobHandler) UpdateJob(c *gin.Context) {
 		return
 	}
 
+	// Load existing job first
+	job, err := h.jobRepo.GetByID(uint(id))
+	if err != nil {
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Job not found"})
+		return
+	}
+
+	// Update fields from form
 	customerID, _ := strconv.ParseUint(c.PostForm("customer_id"), 10, 32)
 	statusID, _ := strconv.ParseUint(c.PostForm("status_id"), 10, 32)
+	job.CustomerID = uint(customerID)
+	job.StatusID = uint(statusID)
 
 	var startDate, endDate *time.Time
 	if startDateStr := c.PostForm("start_date"); startDateStr != "" {
@@ -270,22 +280,17 @@ func (h *JobHandler) UpdateJob(c *gin.Context) {
 			endDate = &parsed
 		}
 	}
+	job.StartDate = startDate
+	job.EndDate = endDate
 
 	description := c.PostForm("description")
+	job.Description = &description
+	
 	discountType := c.PostForm("discount_type")
 	if discountType == "" {
 		discountType = "amount" // default
 	}
-	
-	job := models.Job{
-		JobID:        uint(id),
-		CustomerID:   uint(customerID),
-		StatusID:     uint(statusID),
-		Description:  &description,
-		StartDate:    startDate,
-		EndDate:      endDate,
-		DiscountType: discountType,
-	}
+	job.DiscountType = discountType
 
 	if jobCategoryIDStr := c.PostForm("job_category_id"); jobCategoryIDStr != "" {
 		if jobCategoryID, err := strconv.ParseUint(jobCategoryIDStr, 10, 32); err == nil {
@@ -306,19 +311,28 @@ func (h *JobHandler) UpdateJob(c *gin.Context) {
 		}
 	}
 
-	if err := h.jobRepo.Update(&job); err != nil {
+	if err := h.jobRepo.Update(job); err != nil {
 		customers, _ := h.customerRepo.List(&models.FilterParams{})
 		statuses, _ := h.statusRepo.List()
 		jobCategories, _ := h.jobCategoryRepo.List()
 		c.HTML(http.StatusInternalServerError, "job_form_new.html", gin.H{
 			"title":        "Edit Job",
-			"job":          &job,
+			"job":          job,
 			"customers":    customers,
 			"statuses":     statuses,
 			"jobCategories": jobCategories,
 			"error":        err.Error(),
 		})
 		return
+	}
+
+	// Only recalculate revenue automatically if no manual revenue was provided
+	// This preserves manual revenue entries while still updating when dates change
+	if c.PostForm("revenue") == "" {
+		h.jobRepo.CalculateAndUpdateRevenue(uint(id))
+	} else {
+		// If manual revenue was provided, still calculate final_revenue based on discount
+		h.jobRepo.UpdateFinalRevenue(uint(id))
 	}
 
 	c.Redirect(http.StatusFound, "/jobs")
