@@ -1,0 +1,83 @@
+{{template "base.html" .}}
+
+{{define "content"}}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">User Details</h4>
+                    <div>
+                        <a href="/users/{{.user.UserID}}/edit" class="btn btn-warning btn-sm">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a href="/users" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-list"></i> Back to List
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th width="30%">User ID:</th>
+                                    <td>{{.user.UserID}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Username:</th>
+                                    <td><strong>{{.user.Username}}</strong></td>
+                                </tr>
+                                <tr>
+                                    <th>Email:</th>
+                                    <td>{{.user.Email}}</td>
+                                </tr>
+                                <tr>
+                                    <th>First Name:</th>
+                                    <td>{{derefString .user.FirstName}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Last Name:</th>
+                                    <td>{{derefString .user.LastName}}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th width="30%">Status:</th>
+                                    <td>
+                                        {{if .user.IsActive}}
+                                            <span class="badge bg-success">Active</span>
+                                        {{else}}
+                                            <span class="badge bg-secondary">Inactive</span>
+                                        {{end}}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <th>Created:</th>
+                                    <td>{{.user.CreatedAt.Format "2006-01-02 15:04:05"}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Updated:</th>
+                                    <td>{{.user.UpdatedAt.Format "2006-01-02 15:04:05"}}</td>
+                                </tr>
+                                <tr>
+                                    <th>Last Login:</th>
+                                    <td>
+                                        {{if .user.LastLogin}}
+                                            {{.user.LastLogin.Format "2006-01-02 15:04:05"}}
+                                        {{else}}
+                                            <span class="text-muted">Never logged in</span>
+                                        {{end}}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

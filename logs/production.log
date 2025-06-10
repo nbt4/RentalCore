@@ -44151,3 +44151,31 @@ Error #01: html/template:case_management.html: ends in a non-text context: {stat
 2025/06/10 16:27:44 [32m/opt/dev/go-barcode-webapp/internal/repository/case_repository.go:66
 [0m[33m[74.013ms] [34;1m[rows:1][0m SELECT * FROM `devicescases` WHERE caseID = 1001
 [GIN] 2025/06/10 - 16:27:44 | 200 |  191.577403ms |       10.0.0.18 | GET      "/cases/1001/devices"
+2025/06/10 19:18:50 Running in production mode
+2025/06/10 19:18:50 Database connection established successfully
+
+2025/06/10 19:18:50 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:72
+[0m[33m[11.362ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/10 19:18:50 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:72
+[0m[33m[22.549ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/10 19:18:50 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:72
+[0m[33m[22.441ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
+
+2025/06/10 19:18:50 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:72
+[0m[33m[28.437ms] [34;1m[rows:0][0m CREATE TABLE `users` (`userID` bigint unsigned AUTO_INCREMENT,`username` varchar(191) NOT NULL UNIQUE,`email` varchar(191) NOT NULL UNIQUE,`password_hash` longtext NOT NULL,`first_name` longtext,`last_name` longtext,`is_active` boolean DEFAULT true,`created_at` datetime(3) NULL,`updated_at` datetime(3) NULL,`last_login` datetime(3) NULL,PRIMARY KEY (`userID`))
+
+2025/06/10 19:18:50 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:76
+[0m[33m[11.208ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/10 19:18:50 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:76
+[0m[33m[23.072ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/10 19:18:50 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:76
+[0m[33m[22.589ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
+
+2025/06/10 19:18:50 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:76
+[0m[33m[22.895ms] [34;1m[rows:0][0m CREATE TABLE `sessions` (`session_id` varchar(191),`user_id` bigint unsigned NOT NULL,`expires_at` datetime(3) NOT NULL,`created_at` datetime(3) NULL,PRIMARY KEY (`session_id`))
+2025/06/10 19:18:50 Server starting on 0.0.0.0:8080
+2025/06/10 19:18:50 listen tcp 0.0.0.0:8080: bind: address already in use

@@ -278,6 +278,18 @@ func setupRoutes(r *gin.Engine,
 			scan.DELETE("/:jobId/devices/:deviceId", scannerHandler.RemoveDevice)
 		}
 
+		// User Management routes
+		users := protected.Group("/users")
+		{
+			users.GET("", authHandler.ListUsers)
+			users.GET("/new", authHandler.NewUserForm)
+			users.POST("", authHandler.CreateUserWeb)
+			users.GET("/:id", authHandler.GetUser)
+			users.GET("/:id/edit", authHandler.EditUserForm)
+			users.PUT("/:id", authHandler.UpdateUser)
+			users.DELETE("/:id", authHandler.DeleteUser)
+		}
+
 		// API routes
 		api := protected.Group("/api/v1")
 		{

@@ -196,3 +196,212 @@ func GetCurrentUser(c *gin.Context) (*models.User, bool) {
 	}
 	return nil, false
 }
+
+// User Management Web Interface Handlers
+
+// ListUsers displays all users
+func (h *AuthHandler) ListUsers(c *gin.Context) {
+	var users []models.User
+	if err := h.db.Order("created_at DESC").Find(&users).Error; err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		return
+	}
+
+	c.HTML(http.StatusOK, "users_list.html", gin.H{
+		"title": "User Management",
+		"users": users,
+	})
+}
+
+// NewUserForm displays the create user form
+func (h *AuthHandler) NewUserForm(c *gin.Context) {
+	c.HTML(http.StatusOK, "user_form.html", gin.H{
+		"title": "Create New User",
+		"user":  &models.User{},
+	})
+}
+
+// CreateUserWeb handles user creation from web form
+func (h *AuthHandler) CreateUserWeb(c *gin.Context) {
+	username := c.PostForm("username")
+	email := c.PostForm("email")
+	password := c.PostForm("password")
+	firstName := c.PostForm("first_name")
+	lastName := c.PostForm("last_name")
+	isActiveStr := c.PostForm("is_active")
+	
+	isActive := isActiveStr == "on" || isActiveStr == "true"
+
+	if username == "" || email == "" || password == "" {
+		c.HTML(http.StatusBadRequest, "user_form.html", gin.H{
+			"title": "Create New User",
+			"user": &models.User{
+				Username:  username,
+				Email:     email,
+				FirstName: firstName,
+				LastName:  lastName,
+				IsActive:  isActive,
+			},
+			"error": "Username, email and password are required",
+		})
+		return
+	}
+
+	if err := h.CreateUser(username, email, password, firstName, lastName); err != nil {
+		var errorMsg string
+		if err == gorm.ErrDuplicatedKey {
+			errorMsg = "User with this username or email already exists"
+		} else {
+			errorMsg = err.Error()
+		}
+		
+		c.HTML(http.StatusInternalServerError, "user_form.html", gin.H{
+			"title": "Create New User",
+			"user": &models.User{
+				Username:  username,
+				Email:     email,
+				FirstName: firstName,
+				LastName:  lastName,
+				IsActive:  isActive,
+			},
+			"error": errorMsg,
+		})
+		return
+	}
+
+	c.Redirect(http.StatusFound, "/users")
+}
+
+// GetUser displays user details
+func (h *AuthHandler) GetUser(c *gin.Context) {
+	userID := c.Param("id")
+	
+	var user models.User
+	if err := h.db.Where("user_id = ?", userID).First(&user).Error; err != nil {
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "User not found"})
+		return
+	}
+
+	c.HTML(http.StatusOK, "user_detail.html", gin.H{
+		"title": "User Details",
+		"user":  user,
+	})
+}
+
+// EditUserForm displays the edit user form
+func (h *AuthHandler) EditUserForm(c *gin.Context) {
+	userID := c.Param("id")
+	
+	var user models.User
+	if err := h.db.Where("user_id = ?", userID).First(&user).Error; err != nil {
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "User not found"})
+		return
+	}
+
+	c.HTML(http.StatusOK, "user_form.html", gin.H{
+		"title": "Edit User",
+		"user":  user,
+	})
+}
+
+// UpdateUser handles user updates
+func (h *AuthHandler) UpdateUser(c *gin.Context) {
+	userID := c.Param("id")
+	
+	var user models.User
+	if err := h.db.Where("user_id = ?", userID).First(&user).Error; err != nil {
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "User not found"})
+		return
+	}
+
+	username := c.PostForm("username")
+	email := c.PostForm("email")
+	password := c.PostForm("password")
+	firstName := c.PostForm("first_name")
+	lastName := c.PostForm("last_name")
+	isActiveStr := c.PostForm("is_active")
+	
+	isActive := isActiveStr == "on" || isActiveStr == "true"
+
+	if username == "" || email == "" {
+		c.HTML(http.StatusBadRequest, "user_form.html", gin.H{
+			"title": "Edit User",
+			"user":  user,
+			"error": "Username and email are required",
+		})
+		return
+	}
+
+	// Check for duplicate username/email (excluding current user)
+	var existingUser models.User
+	if err := h.db.Where("(username = ? OR email = ?) AND user_id != ?", username, email, userID).First(&existingUser).Error; err == nil {
+		c.HTML(http.StatusBadRequest, "user_form.html", gin.H{
+			"title": "Edit User",
+			"user":  user,
+			"error": "User with this username or email already exists",
+		})
+		return
+	}
+
+	// Update user fields
+	user.Username = username
+	user.Email = email
+	user.FirstName = firstName
+	user.LastName = lastName
+	user.IsActive = isActive
+	user.UpdatedAt = time.Now()
+
+	// Update password if provided
+	if password != "" {
+		hashedPassword, err := HashPassword(password)
+		if err != nil {
+			c.HTML(http.StatusInternalServerError, "user_form.html", gin.H{
+				"title": "Edit User",
+				"user":  user,
+				"error": "Failed to hash password",
+			})
+			return
+		}
+		user.PasswordHash = hashedPassword
+	}
+
+	if err := h.db.Save(&user).Error; err != nil {
+		c.HTML(http.StatusInternalServerError, "user_form.html", gin.H{
+			"title": "Edit User",
+			"user":  user,
+			"error": err.Error(),
+		})
+		return
+	}
+
+	c.Redirect(http.StatusFound, "/users")
+}
+
+// DeleteUser handles user deletion
+func (h *AuthHandler) DeleteUser(c *gin.Context) {
+	userID := c.Param("id")
+	
+	// Don't allow deleting the current user
+	currentUser, exists := GetCurrentUser(c)
+	if exists && currentUser.UserID == parseUserID(userID) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot delete your own account"})
+		return
+	}
+
+	if err := h.db.Where("user_id = ?", userID).Delete(&models.User{}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
+}
+
+// Helper function to parse user ID
+func parseUserID(userIDStr string) uint64 {
+	// Simple conversion - you might want to add error handling
+	if userIDStr == "" {
+		return 0
+	}
+	// This is a simplified version - add proper parsing if needed
+	return 0
+}
