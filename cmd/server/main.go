@@ -87,6 +87,8 @@ func main() {
 	scannerHandler := handlers.NewScannerHandler(jobRepo, deviceRepo, customerRepo, caseRepo)
 	authHandler := handlers.NewAuthHandler(db.DB)
 	caseHandler := handlers.NewCaseHandler(caseRepo, deviceRepo)
+	analyticsHandler := handlers.NewAnalyticsHandler(db.DB)
+	searchHandler := handlers.NewSearchHandler(db.DB)
 
 	// Setup Gin router
 	r := gin.Default()
@@ -130,7 +132,7 @@ func main() {
 	r.GET("/demo/case-management-simple", caseHandler.CaseManagementSimple)
 
 	// Routes
-	setupRoutes(r, jobHandler, deviceHandler, customerHandler, statusHandler, productHandler, barcodeHandler, scannerHandler, authHandler, caseHandler)
+	setupRoutes(r, jobHandler, deviceHandler, customerHandler, statusHandler, productHandler, barcodeHandler, scannerHandler, authHandler, caseHandler, analyticsHandler, searchHandler)
 
 	// Start server
 	addr := cfg.Server.Host + ":" + strconv.Itoa(cfg.Server.Port)
@@ -171,7 +173,9 @@ func setupRoutes(r *gin.Engine,
 	barcodeHandler *handlers.BarcodeHandler,
 	scannerHandler *handlers.ScannerHandler,
 	authHandler *handlers.AuthHandler,
-	caseHandler *handlers.CaseHandler) {
+	caseHandler *handlers.CaseHandler,
+	analyticsHandler *handlers.AnalyticsHandler,
+	searchHandler *handlers.SearchHandler) {
 
 	// Authentication routes (no auth required)
 	r.GET("/login", authHandler.LoginForm)
@@ -276,6 +280,25 @@ func setupRoutes(r *gin.Engine,
 			scan.GET("/:jobId", scannerHandler.ScanJob)
 			scan.POST("/:jobId/assign", scannerHandler.ScanDevice)
 			scan.DELETE("/:jobId/devices/:deviceId", scannerHandler.RemoveDevice)
+		}
+
+		// Analytics routes
+		analytics := protected.Group("/analytics")
+		{
+			analytics.GET("", analyticsHandler.Dashboard)
+			analytics.GET("/revenue", analyticsHandler.GetRevenueAPI)
+			analytics.GET("/equipment", analyticsHandler.GetEquipmentAPI)
+			analytics.GET("/export", analyticsHandler.ExportAnalytics)
+		}
+
+		// Search routes
+		search := protected.Group("/search")
+		{
+			search.GET("/global", searchHandler.GlobalSearch)
+			search.POST("/advanced", searchHandler.AdvancedSearch)
+			search.GET("/suggestions", searchHandler.SearchSuggestions)
+			search.GET("/saved", searchHandler.SavedSearches)
+			search.DELETE("/saved/:id", searchHandler.DeleteSavedSearch)
 		}
 
 		// User Management - Use explicit routing without parameter conflicts
