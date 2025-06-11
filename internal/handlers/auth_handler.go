@@ -3,7 +3,9 @@ package handlers
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"go-barcode-webapp/internal/models"
@@ -79,7 +81,9 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		CreatedAt: time.Now(),
 	}
 
+	fmt.Printf("DEBUG: Creating session for user %s (ID: %d)\n", user.Username, user.UserID)
 	if err := h.db.Create(&session).Error; err != nil {
+		fmt.Printf("DEBUG: Session creation failed: %v\n", err)
 		c.HTML(http.StatusInternalServerError, "login.html", gin.H{
 			"title": "Login",
 			"error": "Login failed. Please try again.",
@@ -94,6 +98,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	// Set cookie
 	c.SetCookie("session_id", sessionID, 86400, "/", "", false, true)
+	fmt.Printf("DEBUG: Login successful, session created: %s\n", sessionID)
 
 	// Redirect to home
 	c.Redirect(http.StatusSeeOther, "/")
@@ -116,25 +121,43 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 // AuthMiddleware checks if user is authenticated
 func (h *AuthHandler) AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		fmt.Printf("DEBUG: AuthMiddleware called for URL: %s\n", c.Request.URL.Path)
+		
 		sessionID, err := c.Cookie("session_id")
 		if err != nil || sessionID == "" {
+			fmt.Printf("DEBUG: No session cookie found, redirecting to login\n")
 			c.Redirect(http.StatusSeeOther, "/login")
 			c.Abort()
 			return
 		}
 
+		fmt.Printf("DEBUG: Found session cookie: %s\n", sessionID)
+
 		// Validate session
 		var session models.Session
-		if err := h.db.Preload("User").Where("session_id = ? AND expires_at > ?", sessionID, time.Now()).First(&session).Error; err != nil {
+		if err := h.db.Where("session_id = ? AND expires_at > ?", sessionID, time.Now()).First(&session).Error; err != nil {
+			fmt.Printf("DEBUG: Session validation failed: %v\n", err)
 			c.SetCookie("session_id", "", -1, "/", "", false, true)
 			c.Redirect(http.StatusSeeOther, "/login")
 			c.Abort()
 			return
 		}
 
+		// Load the user manually since Preload doesn't work
+		var user models.User
+		if err := h.db.Where("userID = ?", session.UserID).First(&user).Error; err != nil {
+			fmt.Printf("DEBUG: User not found for session: %v\n", err)
+			c.SetCookie("session_id", "", -1, "/", "", false, true)
+			c.Redirect(http.StatusSeeOther, "/login")
+			c.Abort()
+			return
+		}
+
+		fmt.Printf("DEBUG: Session valid for user: %s (ID: %d)\n", user.Username, user.UserID)
+
 		// Store user in context
-		c.Set("user", session.User)
-		c.Set("user_id", session.UserID)
+		c.Set("user", user)
+		c.Set("userID", session.UserID)
 		c.Next()
 	}
 }
@@ -201,24 +224,48 @@ func GetCurrentUser(c *gin.Context) (*models.User, bool) {
 
 // ListUsers displays all users
 func (h *AuthHandler) ListUsers(c *gin.Context) {
+	fmt.Printf("DEBUG: ListUsers called - URL: %s\n", c.Request.URL.Path)
+	
 	var users []models.User
 	if err := h.db.Order("created_at DESC").Find(&users).Error; err != nil {
+		fmt.Printf("DEBUG: Database error: %v\n", err)
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
 		return
 	}
 
+	fmt.Printf("DEBUG: Found %d users\n", len(users))
+	currentUser, exists := GetCurrentUser(c)
+	fmt.Printf("DEBUG: Current user exists: %v, User: %+v\n", exists, currentUser)
+	
 	c.HTML(http.StatusOK, "users_list.html", gin.H{
 		"title": "User Management",
 		"users": users,
+		"user":  currentUser,
 	})
+	fmt.Printf("DEBUG: ListUsers template rendered\n")
 }
 
 // NewUserForm displays the create user form
 func (h *AuthHandler) NewUserForm(c *gin.Context) {
+	// Debug: Let's see what's happening
+	fmt.Printf("DEBUG: NewUserForm called - URL: %s\n", c.Request.URL.Path)
+	
+	currentUser, exists := GetCurrentUser(c)
+	fmt.Printf("DEBUG: User exists: %v, User: %+v\n", exists, currentUser)
+	
+	if !exists || currentUser == nil {
+		fmt.Printf("DEBUG: No user found, redirecting to login\n")
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+	
+	fmt.Printf("DEBUG: Rendering user_form.html template\n")
 	c.HTML(http.StatusOK, "user_form.html", gin.H{
-		"title": "Create New User",
-		"user":  &models.User{},
+		"title":    "Create New User",
+		"formUser": &models.User{},
+		"user":     currentUser,
 	})
+	fmt.Printf("DEBUG: Template rendered successfully\n")
 }
 
 // CreateUserWeb handles user creation from web form
@@ -233,15 +280,17 @@ func (h *AuthHandler) CreateUserWeb(c *gin.Context) {
 	isActive := isActiveStr == "on" || isActiveStr == "true"
 
 	if username == "" || email == "" || password == "" {
+		currentUser, _ := GetCurrentUser(c)
 		c.HTML(http.StatusBadRequest, "user_form.html", gin.H{
 			"title": "Create New User",
-			"user": &models.User{
+			"formUser": &models.User{
 				Username:  username,
 				Email:     email,
 				FirstName: firstName,
 				LastName:  lastName,
 				IsActive:  isActive,
 			},
+			"user":  currentUser,
 			"error": "Username, email and password are required",
 		})
 		return
@@ -255,15 +304,17 @@ func (h *AuthHandler) CreateUserWeb(c *gin.Context) {
 			errorMsg = err.Error()
 		}
 		
+		currentUser, _ := GetCurrentUser(c)
 		c.HTML(http.StatusInternalServerError, "user_form.html", gin.H{
 			"title": "Create New User",
-			"user": &models.User{
+			"formUser": &models.User{
 				Username:  username,
 				Email:     email,
 				FirstName: firstName,
 				LastName:  lastName,
 				IsActive:  isActive,
 			},
+			"user":  currentUser,
 			"error": errorMsg,
 		})
 		return
@@ -277,14 +328,16 @@ func (h *AuthHandler) GetUser(c *gin.Context) {
 	userID := c.Param("id")
 	
 	var user models.User
-	if err := h.db.Where("user_id = ?", userID).First(&user).Error; err != nil {
+	if err := h.db.Where("userID = ?", userID).First(&user).Error; err != nil {
 		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "User not found"})
 		return
 	}
 
+	currentUser, _ := GetCurrentUser(c)
 	c.HTML(http.StatusOK, "user_detail.html", gin.H{
-		"title": "User Details",
-		"user":  user,
+		"title":    "User Details",
+		"viewUser": user,
+		"user":     currentUser,
 	})
 }
 
@@ -293,14 +346,16 @@ func (h *AuthHandler) EditUserForm(c *gin.Context) {
 	userID := c.Param("id")
 	
 	var user models.User
-	if err := h.db.Where("user_id = ?", userID).First(&user).Error; err != nil {
+	if err := h.db.Where("userID = ?", userID).First(&user).Error; err != nil {
 		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "User not found"})
 		return
 	}
 
+	currentUser, _ := GetCurrentUser(c)
 	c.HTML(http.StatusOK, "user_form.html", gin.H{
-		"title": "Edit User",
-		"user":  user,
+		"title":    "Edit User",
+		"formUser": user,
+		"user":     currentUser,
 	})
 }
 
@@ -309,7 +364,7 @@ func (h *AuthHandler) UpdateUser(c *gin.Context) {
 	userID := c.Param("id")
 	
 	var user models.User
-	if err := h.db.Where("user_id = ?", userID).First(&user).Error; err != nil {
+	if err := h.db.Where("userID = ?", userID).First(&user).Error; err != nil {
 		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "User not found"})
 		return
 	}
@@ -324,21 +379,25 @@ func (h *AuthHandler) UpdateUser(c *gin.Context) {
 	isActive := isActiveStr == "on" || isActiveStr == "true"
 
 	if username == "" || email == "" {
+		currentUser, _ := GetCurrentUser(c)
 		c.HTML(http.StatusBadRequest, "user_form.html", gin.H{
-			"title": "Edit User",
-			"user":  user,
-			"error": "Username and email are required",
+			"title":    "Edit User",
+			"formUser": user,
+			"user":     currentUser,
+			"error":    "Username and email are required",
 		})
 		return
 	}
 
 	// Check for duplicate username/email (excluding current user)
 	var existingUser models.User
-	if err := h.db.Where("(username = ? OR email = ?) AND user_id != ?", username, email, userID).First(&existingUser).Error; err == nil {
+	if err := h.db.Where("(username = ? OR email = ?) AND userID != ?", username, email, userID).First(&existingUser).Error; err == nil {
+		currentUser, _ := GetCurrentUser(c)
 		c.HTML(http.StatusBadRequest, "user_form.html", gin.H{
-			"title": "Edit User",
-			"user":  user,
-			"error": "User with this username or email already exists",
+			"title":    "Edit User",
+			"formUser": user,
+			"user":     currentUser,
+			"error":    "User with this username or email already exists",
 		})
 		return
 	}
@@ -355,10 +414,12 @@ func (h *AuthHandler) UpdateUser(c *gin.Context) {
 	if password != "" {
 		hashedPassword, err := HashPassword(password)
 		if err != nil {
+			currentUser, _ := GetCurrentUser(c)
 			c.HTML(http.StatusInternalServerError, "user_form.html", gin.H{
-				"title": "Edit User",
-				"user":  user,
-				"error": "Failed to hash password",
+				"title":    "Edit User",
+				"formUser": user,
+				"user":     currentUser,
+				"error":    "Failed to hash password",
 			})
 			return
 		}
@@ -366,10 +427,12 @@ func (h *AuthHandler) UpdateUser(c *gin.Context) {
 	}
 
 	if err := h.db.Save(&user).Error; err != nil {
+		currentUser, _ := GetCurrentUser(c)
 		c.HTML(http.StatusInternalServerError, "user_form.html", gin.H{
-			"title": "Edit User",
-			"user":  user,
-			"error": err.Error(),
+			"title":    "Edit User",
+			"formUser": user,
+			"user":     currentUser,
+			"error":    err.Error(),
 		})
 		return
 	}
@@ -388,7 +451,7 @@ func (h *AuthHandler) DeleteUser(c *gin.Context) {
 		return
 	}
 
-	if err := h.db.Where("user_id = ?", userID).Delete(&models.User{}).Error; err != nil {
+	if err := h.db.Where("userID = ?", userID).Delete(&models.User{}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -397,11 +460,15 @@ func (h *AuthHandler) DeleteUser(c *gin.Context) {
 }
 
 // Helper function to parse user ID
-func parseUserID(userIDStr string) uint64 {
-	// Simple conversion - you might want to add error handling
+func parseUserID(userIDStr string) uint {
 	if userIDStr == "" {
 		return 0
 	}
-	// This is a simplified version - add proper parsing if needed
+	
+	// Convert string to uint
+	if id, err := strconv.ParseUint(userIDStr, 10, 32); err == nil {
+		return uint(id)
+	}
+	
 	return 0
 }

@@ -33,9 +33,29 @@
                     </a>
                 </div>
                 <div class="navbar-nav">
-                    <button class="btn btn-outline-light btn-sm" onclick="toggleTheme()">
+                    <button class="btn btn-outline-light btn-sm me-2" onclick="toggleTheme()">
                         <i class="bi bi-moon-fill" id="theme-icon"></i>
                     </button>
+                    {{if .user}}
+                    <div class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle text-light" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i> {{.user.Username}}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><h6 class="dropdown-header">
+                                <i class="bi bi-person"></i> {{.user.FirstName}} {{.user.LastName}}
+                            </h6></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/users">
+                                <i class="bi bi-people-fill"></i> User Management
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/logout">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a></li>
+                        </ul>
+                    </div>
+                    {{end}}
                 </div>
             </div>
         </div>

@@ -1011,6 +1011,32 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0.25rem 0.5rem;
 }
 
+/* Enhanced Table Text Visibility */
+.table tbody td {
+    color: var(--text-bright) !important;
+    font-weight: 500;
+}
+
+.table tbody td strong {
+    color: var(--text-bright) !important;
+    font-weight: 700;
+}
+
+.table tbody tr td {
+    color: var(--text-bright) !important;
+}
+
+/* Ensure specific table text elements are visible */
+.table .text-muted {
+    color: var(--text-secondary) !important;
+    opacity: 0.8;
+}
+
+.table .badge {
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
 /* Home Page Specific Improvements */
 .management-card {
     height: 100%;

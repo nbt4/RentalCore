@@ -18,7 +18,13 @@ The application now uses a configuration file instead of environment variables. 
 ./deploy-production.sh
 ```
 
-### 3. Start Application
+### 3. Create Admin User
+```bash
+# Create the first admin user for production
+./create-production-user.sh
+```
+
+### 4. Start Application
 
 #### Option A: Manual Start
 ```bash
@@ -52,8 +58,35 @@ sudo journalctl -u jobscanner -f
 ## Application Access
 
 - **URL**: `http://your-server:8080`
+- **Login**: `http://your-server:8080/login`
+- **User Management**: `http://your-server:8080/users`
 - **Default Port**: 8080
 - **Logs**: `logs/production.log` or `journalctl -u jobscanner`
+
+## User Management
+
+### Initial Setup
+1. Create admin user: `./create-production-user.sh`
+2. Start application and log in
+3. Access user management at `/users`
+
+### Managing Users
+- **View Users**: `/users` - Lists all users with their status
+- **Create User**: `/user-management/new` - Add new users with roles
+- **Edit User**: `/user-management/:id/edit` - Modify user details  
+- **User Details**: `/user-management/:id/view` - View user information
+
+### URL Structure
+The user management uses a dedicated `/user-management/` path to avoid routing conflicts:
+- Main list: `http://your-server:8080/users`
+- Create new: `http://your-server:8080/user-management/new`
+- Edit user: `http://your-server:8080/user-management/123/edit`
+- View user: `http://your-server:8080/user-management/123/view`
+
+### User Roles & Permissions
+- All authenticated users can access the application
+- User management is available to logged-in users
+- Consider implementing role-based permissions for production use
 
 ## Configuration
 

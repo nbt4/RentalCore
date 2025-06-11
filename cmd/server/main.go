@@ -278,17 +278,23 @@ func setupRoutes(r *gin.Engine,
 			scan.DELETE("/:jobId/devices/:deviceId", scannerHandler.RemoveDevice)
 		}
 
-		// User Management routes
-		users := protected.Group("/users")
-		{
-			users.GET("", authHandler.ListUsers)
-			users.GET("/new", authHandler.NewUserForm)
-			users.POST("", authHandler.CreateUserWeb)
-			users.GET("/:id", authHandler.GetUser)
-			users.GET("/:id/edit", authHandler.EditUserForm)
-			users.PUT("/:id", authHandler.UpdateUser)
-			users.DELETE("/:id", authHandler.DeleteUser)
-		}
+		// User Management - Use explicit routing without parameter conflicts
+		
+		// Main user management routes
+		protected.GET("/users", authHandler.ListUsers)
+		protected.POST("/users", authHandler.CreateUserWeb)
+		
+		// User form and management routes with no parameter conflicts
+		protected.GET("/user-management/new", authHandler.NewUserForm)
+		protected.GET("/user-management/:id/edit", authHandler.EditUserForm)
+		protected.GET("/user-management/:id/view", authHandler.GetUser)
+		protected.PUT("/user-management/:id", authHandler.UpdateUser)
+		protected.DELETE("/user-management/:id", authHandler.DeleteUser)
+		
+		// Direct explicit routes for old paths - NO parameter routes under /users
+		protected.GET("/users/new", func(c *gin.Context) {
+			c.Redirect(http.StatusSeeOther, "/user-management/new")
+		})
 
 		// API routes
 		api := protected.Group("/api/v1")
