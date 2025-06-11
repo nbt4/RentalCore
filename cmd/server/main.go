@@ -2,12 +2,14 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"html/template"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"go-barcode-webapp/internal/config"
 	"go-barcode-webapp/internal/handlers"
@@ -89,6 +91,11 @@ func main() {
 	caseHandler := handlers.NewCaseHandler(caseRepo, deviceRepo)
 	analyticsHandler := handlers.NewAnalyticsHandler(db.DB)
 	searchHandler := handlers.NewSearchHandler(db.DB)
+	pwaHandler := handlers.NewPWAHandler(db.DB)
+	workflowHandler := handlers.NewWorkflowHandler(db.DB)
+	documentHandler := handlers.NewDocumentHandler(db.DB)
+	financialHandler := handlers.NewFinancialHandler(db.DB)
+	securityHandler := handlers.NewSecurityHandler(db.DB)
 
 	// Setup Gin router
 	r := gin.Default()
@@ -114,6 +121,48 @@ func main() {
 			}
 			return 0.0
 		},
+		"humanizeBytes": func(bytes int64) string {
+			if bytes == 0 {
+				return "0 B"
+			}
+			const unit = 1024
+			sizes := []string{"B", "KB", "MB", "GB", "TB"}
+			i := 0
+			for bytes >= unit && i < len(sizes)-1 {
+				bytes /= unit
+				i++
+			}
+			if i == 0 {
+				return fmt.Sprintf("%d %s", bytes, sizes[i])
+			}
+			return fmt.Sprintf("%.1f %s", float64(bytes), sizes[i])
+		},
+		"title": func(s string) string {
+			return strings.Title(s)
+		},
+		"getStatusColor": func(status string) string {
+			switch status {
+			case "completed":
+				return "success"
+			case "pending":
+				return "warning"
+			case "failed":
+				return "danger"
+			case "cancelled":
+				return "secondary"
+			default:
+				return "secondary"
+			}
+		},
+		"now": func() time.Time {
+			return time.Now()
+		},
+		"daysAgo": func(date time.Time) int {
+			return int(time.Since(date).Hours() / 24)
+		},
+		"daysUntil": func(date time.Time) int {
+			return int(time.Until(date).Hours() / 24)
+		},
 	}
 	r.SetFuncMap(funcMap)
 	r.LoadHTMLGlob("web/templates/*")
@@ -125,14 +174,24 @@ func main() {
 		c.File("web/static/sw.js")
 	})
 
+	// PWA public routes (no authentication required)
+	r.GET("/manifest.json", func(c *gin.Context) {
+		c.File("web/static/manifest.json")
+	})
+	
 	// Demo routes (no authentication required)
 	r.GET("/demo/case-management", caseHandler.CaseManagementDemo)
 	r.GET("/demo/case-management-minimal", caseHandler.CaseManagementDemoMinimal)
 	r.GET("/demo/case-management-real", caseHandler.CaseManagement)
 	r.GET("/demo/case-management-simple", caseHandler.CaseManagementSimple)
 
+	// Initialize default roles
+	if err := securityHandler.InitializeDefaultRoles(); err != nil {
+		log.Printf("Failed to initialize default roles: %v", err)
+	}
+
 	// Routes
-	setupRoutes(r, jobHandler, deviceHandler, customerHandler, statusHandler, productHandler, barcodeHandler, scannerHandler, authHandler, caseHandler, analyticsHandler, searchHandler)
+	setupRoutes(r, jobHandler, deviceHandler, customerHandler, statusHandler, productHandler, barcodeHandler, scannerHandler, authHandler, caseHandler, analyticsHandler, searchHandler, pwaHandler, workflowHandler, documentHandler, financialHandler, securityHandler)
 
 	// Start server
 	addr := cfg.Server.Host + ":" + strconv.Itoa(cfg.Server.Port)
@@ -175,7 +234,12 @@ func setupRoutes(r *gin.Engine,
 	authHandler *handlers.AuthHandler,
 	caseHandler *handlers.CaseHandler,
 	analyticsHandler *handlers.AnalyticsHandler,
-	searchHandler *handlers.SearchHandler) {
+	searchHandler *handlers.SearchHandler,
+	pwaHandler *handlers.PWAHandler,
+	workflowHandler *handlers.WorkflowHandler,
+	documentHandler *handlers.DocumentHandler,
+	financialHandler *handlers.FinancialHandler,
+	securityHandler *handlers.SecurityHandler) {
 
 	// Authentication routes (no auth required)
 	r.GET("/login", authHandler.LoginForm)
@@ -301,6 +365,162 @@ func setupRoutes(r *gin.Engine,
 			search.DELETE("/saved/:id", searchHandler.DeleteSavedSearch)
 		}
 
+		// PWA routes
+		pwa := protected.Group("/pwa")
+		{
+			pwa.POST("/subscribe", pwaHandler.SubscribePush)
+			pwa.POST("/unsubscribe", pwaHandler.UnsubscribePush)
+			pwa.POST("/sync", pwaHandler.SyncOfflineData)
+			pwa.GET("/manifest", pwaHandler.GetOfflineManifest)
+			pwa.GET("/install", pwaHandler.InstallPrompt)
+			pwa.GET("/status", pwaHandler.GetConnectionStatus)
+		}
+
+		// Workflow routes
+		workflow := protected.Group("/workflow")
+		{
+			// Job Templates
+			templates := workflow.Group("/templates")
+			{
+				templates.GET("", workflowHandler.ListJobTemplates)
+				templates.GET("/new", workflowHandler.NewJobTemplateForm)
+				templates.POST("", workflowHandler.CreateJobTemplate)
+				templates.GET("/:id", workflowHandler.GetJobTemplate)
+				templates.GET("/:id/edit", workflowHandler.EditJobTemplateForm)
+				templates.PUT("/:id", workflowHandler.UpdateJobTemplate)
+				templates.DELETE("/:id", workflowHandler.DeleteJobTemplate)
+				templates.POST("/:id/create-job", workflowHandler.CreateJobFromTemplate)
+			}
+
+			// Equipment Packages
+			packages := workflow.Group("/packages")
+			{
+				packages.GET("", workflowHandler.ListEquipmentPackages)
+				packages.GET("/new", workflowHandler.NewEquipmentPackageForm)
+				packages.POST("", workflowHandler.CreateEquipmentPackage)
+				packages.GET("/:id", workflowHandler.GetEquipmentPackage)
+			}
+
+			// Bulk Operations
+			bulk := workflow.Group("/bulk")
+			{
+				bulk.GET("", workflowHandler.BulkOperationsForm)
+				bulk.POST("/update-status", workflowHandler.BulkUpdateDeviceStatus)
+				bulk.POST("/assign-job", workflowHandler.BulkAssignToJob)
+				bulk.POST("/generate-qr", workflowHandler.BulkGenerateQRCodes)
+			}
+
+			// Workflow API
+			workflow.GET("/stats", workflowHandler.GetWorkflowStats)
+		}
+
+		// Document routes
+		documents := protected.Group("/documents")
+		{
+			documents.GET("", documentHandler.ListDocuments)
+			documents.GET("/upload", documentHandler.UploadDocumentForm)
+			documents.POST("/upload", documentHandler.UploadDocument)
+			documents.GET("/:id", documentHandler.GetDocument)
+			documents.GET("/:id/view", documentHandler.ViewDocument)
+			documents.GET("/:id/download", documentHandler.DownloadDocument)
+			documents.DELETE("/:id", documentHandler.DeleteDocument)
+			documents.GET("/:id/sign", documentHandler.SignatureForm)
+			documents.POST("/:id/sign", documentHandler.AddSignature)
+			documents.GET("/signatures/:id/verify", documentHandler.VerifySignature)
+		}
+
+		// Financial routes
+		financial := protected.Group("/financial")
+		{
+			financial.GET("", financialHandler.FinancialDashboard)
+			financial.GET("/transactions", financialHandler.ListTransactions)
+			financial.GET("/transactions/new", financialHandler.NewTransactionForm)
+			financial.POST("/transactions", financialHandler.CreateTransaction)
+			financial.GET("/transactions/:id", financialHandler.GetTransaction)
+			financial.PUT("/transactions/:id/status", financialHandler.UpdateTransactionStatus)
+			financial.POST("/jobs/:jobId/invoice", financialHandler.GenerateInvoice)
+			financial.GET("/reports", financialHandler.FinancialReports)
+			financial.GET("/api/revenue-report", financialHandler.GetRevenueReport)
+			financial.GET("/api/payment-report", financialHandler.GetPaymentReport)
+		}
+
+		// Security & Admin routes
+		security := protected.Group("/security")
+		{
+			// Web interface routes
+			security.GET("/roles", func(c *gin.Context) {
+				user, _ := handlers.GetCurrentUser(c)
+				c.HTML(http.StatusOK, "security_roles.html", gin.H{
+					"title": "Role Management",
+					"user":  user,
+				})
+			})
+			security.GET("/audit", func(c *gin.Context) {
+				user, _ := handlers.GetCurrentUser(c)
+				c.HTML(http.StatusOK, "security_audit.html", gin.H{
+					"title": "Audit Logs",
+					"user":  user,
+				})
+			})
+
+			// Role management API
+			rolesAPI := security.Group("/api/roles")
+			{
+				rolesAPI.GET("", securityHandler.GetRoles)
+				rolesAPI.GET("/:id", securityHandler.GetRole)
+				rolesAPI.POST("", securityHandler.CreateRole)
+				rolesAPI.PUT("/:id", securityHandler.UpdateRole)
+				rolesAPI.DELETE("/:id", securityHandler.DeleteRole)
+			}
+
+			// User role management API
+			userRolesAPI := security.Group("/api/users")
+			{
+				userRolesAPI.GET("/:userId/roles", securityHandler.GetUserRoles)
+				userRolesAPI.POST("/:userId/roles", securityHandler.AssignUserRole)
+				userRolesAPI.DELETE("/:userId/roles/:roleId", securityHandler.RevokeUserRole)
+			}
+
+			// Audit API
+			auditAPI := security.Group("/api/audit")
+			{
+				auditAPI.GET("", securityHandler.GetAuditLogs)
+				auditAPI.GET("/:id", securityHandler.GetAuditLog)
+			}
+
+			// Permissions API
+			permissionsAPI := security.Group("/api/permissions")
+			{
+				permissionsAPI.GET("", securityHandler.GetPermissions)
+				permissionsAPI.GET("/definitions", securityHandler.GetPermissionDefinitionsAPI)
+				permissionsAPI.GET("/check", securityHandler.CheckPermission)
+			}
+		}
+
+		// Mobile scanner routes
+		protected.GET("/mobile/scanner/:jobId", func(c *gin.Context) {
+			jobID := c.Param("jobId")
+			user, _ := handlers.GetCurrentUser(c)
+			c.HTML(http.StatusOK, "mobile_scanner.html", gin.H{
+				"title":   "Mobile Scanner",
+				"user":    user,
+				"jobID":   jobID,
+				"jobName": "Job #" + jobID,
+			})
+		})
+		
+		// Enhanced mobile scanner route
+		protected.GET("/mobile/scanner/:jobId/enhanced", func(c *gin.Context) {
+			jobID := c.Param("jobId")
+			user, _ := handlers.GetCurrentUser(c)
+			c.HTML(http.StatusOK, "mobile_scanner_enhanced.html", gin.H{
+				"title":   "Enhanced Mobile Scanner",
+				"user":    user,
+				"jobID":   jobID,
+				"jobName": "Job #" + jobID,
+			})
+		})
+
 		// User Management - Use explicit routing without parameter conflicts
 		
 		// Main user management routes
@@ -368,6 +588,56 @@ func setupRoutes(r *gin.Engine,
 				apiCases.GET("/:id", caseHandler.GetCaseAPI)
 				apiCases.PUT("/:id", caseHandler.UpdateCaseAPI)
 				apiCases.DELETE("/:id", caseHandler.DeleteCaseAPI)
+			}
+
+			// Workflow API
+			apiWorkflow := api.Group("/workflow")
+			{
+				apiWorkflow.GET("/templates", workflowHandler.ListJobTemplatesAPI)
+				apiWorkflow.GET("/packages", workflowHandler.ListEquipmentPackagesAPI)
+				apiWorkflow.GET("/stats", workflowHandler.GetWorkflowStats)
+			}
+
+			// Document API
+			apiDocuments := api.Group("/documents")
+			{
+				apiDocuments.GET("", documentHandler.ListDocumentsAPI)
+				apiDocuments.GET("/stats", documentHandler.GetDocumentStats)
+				apiDocuments.GET("/:id", documentHandler.GetDocument)
+				apiDocuments.DELETE("/:id", documentHandler.DeleteDocument)
+			}
+
+			// Financial API
+			apiFinancial := api.Group("/financial")
+			{
+				apiFinancial.GET("/transactions", financialHandler.ListTransactionsAPI)
+				apiFinancial.GET("/stats", financialHandler.GetFinancialStatsAPI)
+				apiFinancial.GET("/revenue-report", financialHandler.GetRevenueReport)
+				apiFinancial.GET("/payment-report", financialHandler.GetPaymentReport)
+			}
+
+			// Security API
+			apiSecurity := api.Group("/security")
+			{
+				// Roles API
+				apiSecurity.GET("/roles", securityHandler.GetRoles)
+				apiSecurity.GET("/roles/:id", securityHandler.GetRole)
+				apiSecurity.POST("/roles", securityHandler.CreateRole)
+				apiSecurity.PUT("/roles/:id", securityHandler.UpdateRole)
+				apiSecurity.DELETE("/roles/:id", securityHandler.DeleteRole)
+
+				// User roles API
+				apiSecurity.GET("/users/:userId/roles", securityHandler.GetUserRoles)
+				apiSecurity.POST("/users/:userId/roles", securityHandler.AssignUserRole)
+				apiSecurity.DELETE("/users/:userId/roles/:roleId", securityHandler.RevokeUserRole)
+
+				// Audit API
+				apiSecurity.GET("/audit", securityHandler.GetAuditLogs)
+				apiSecurity.GET("/audit/:id", securityHandler.GetAuditLog)
+
+				// Permissions API
+				apiSecurity.GET("/permissions", securityHandler.GetPermissions)
+				apiSecurity.GET("/check-permission", securityHandler.CheckPermission)
 			}
 		}
 	}

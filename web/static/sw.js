@@ -1,7 +1,8 @@
-// JobScanner Pro - Service Worker for Performance Optimization
-const CACHE_NAME = 'jobscanner-v1.2';
-const STATIC_CACHE = 'jobscanner-static-v1.2';
-const DYNAMIC_CACHE = 'jobscanner-dynamic-v1.2';
+// TS Equipment Manager - Enhanced Service Worker for PWA
+const CACHE_NAME = 'ts-equipment-v2.0';
+const STATIC_CACHE = 'ts-equipment-static-v2.0';
+const DYNAMIC_CACHE = 'ts-equipment-dynamic-v2.0';
+const OFFLINE_CACHE = 'ts-equipment-offline-v2.0';
 
 // Files to cache immediately
 const STATIC_FILES = [
@@ -10,18 +11,35 @@ const STATIC_FILES = [
     '/static/images/icon-192.png',
     '/static/images/icon-512.png',
     '/',
+    '/analytics',
     '/scan/select',
+    '/manifest.json',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css',
     'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css',
     'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js',
+    'https://cdn.jsdelivr.net/npm/chart.js',
     'https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js'
+];
+
+// Critical offline pages
+const OFFLINE_PAGES = [
+    '/',
+    '/analytics',
+    '/jobs',
+    '/devices',
+    '/customers',
+    '/scan/select'
 ];
 
 // API endpoints to cache with network-first strategy
 const API_ENDPOINTS = [
     '/api/v1/jobs',
-    '/api/v1/devices',
-    '/api/v1/customers'
+    '/api/v1/devices', 
+    '/api/v1/customers',
+    '/analytics/revenue',
+    '/analytics/equipment',
+    '/search/global',
+    '/search/suggestions'
 ];
 
 // Install event - cache static files

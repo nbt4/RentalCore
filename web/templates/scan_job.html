@@ -572,6 +572,28 @@
                             </button>
                         </div>
                         
+                        <!-- Mobile Scanner Options -->
+                        <div class="mobile-scanner-section mb-4">
+                            <h6><i class="bi bi-phone"></i> Mobile Scanner</h6>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <a href="/mobile/scanner/{{.job.JobID}}" class="btn btn-outline-primary w-100">
+                                        <i class="bi bi-camera"></i><br>
+                                        <small>Standard</small>
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    <a href="/mobile/scanner/{{.job.JobID}}/enhanced" class="btn btn-primary w-100">
+                                        <i class="bi bi-stars"></i><br>
+                                        <small>Enhanced</small>
+                                    </a>
+                                </div>
+                            </div>
+                            <small class="text-muted d-block mt-2">
+                                <i class="bi bi-info-circle"></i> Enhanced scanner includes vibration, flashlight, zoom, and focus controls
+                            </small>
+                        </div>
+
                         <!-- Manual Input -->
                         <div class="manual-input-section">
                             <h6><i class="bi bi-keyboard"></i> Manual Input</h6>
@@ -580,6 +602,7 @@
                                 <strong>Camera not working?</strong> Use manual input below or try:
                                 <br>• Access via <code>https://</code> URL
                                 <br>• Access via <code>localhost:9000</code> instead of IP
+                                <br>• Use mobile scanner for better camera support
                             </div>
                             <div class="input-group">
                                 <input type="text" id="manual-input" class="form-control" 

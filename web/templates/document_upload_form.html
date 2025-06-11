@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}} - TS Equipment Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/css/app.css" rel="stylesheet">
+    <style>
+        .upload-area {
+            border: 2px dashed #dee2e6;
+            border-radius: 0.5rem;
+            padding: 3rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: #0d6efd;
+            background-color: #f8f9fa;
+        }
+        
+        .upload-area.dragover {
+            border-color: #0d6efd;
+            background-color: #e7f1ff;
+        }
+        
+        .file-preview {
+            max-width: 200px;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 0.375rem;
+        }
+        
+        .progress-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-cube me-2"></i>TS Equipment Manager
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/jobs">Jobs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/devices">Devices</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customers">Customers</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown">
+                            Documents
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/documents">All Documents</a></li>
+                            <li><a class="dropdown-item" href="/documents/upload">Upload Document</a></li>
+                            <li><a class="dropdown-item" href="/documents/signatures">Digital Signatures</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i> {{.user.Username}}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/documents">Documents</a></li>
+                        <li class="breadcrumb-item active">Upload Document</li>
+                    </ol>
+                </nav>
+                <h1 class="h3 mb-1">
+                    <i class="fas fa-upload text-primary me-2"></i>Upload Document
+                </h1>
+                <p class="text-muted mb-0">
+                    {{if .entityType}}
+                        Upload a document for {{.entityType}} #{{.entityID}}
+                    {{else}}
+                        Upload a new document to the system
+                    {{end}}
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Upload Form -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Document Upload</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="uploadForm" enctype="multipart/form-data">
+                            <input type="hidden" name="entityType" value="{{.entityType}}">
+                            <input type="hidden" name="entityID" value="{{.entityID}}">
+                            
+                            <!-- File Upload Area -->
+                            <div class="mb-4">
+                                <label class="form-label">Select File *</label>
+                                <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                                    <div id="uploadPrompt">
+                                        <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                                        <h5>Drop files here or click to browse</h5>
+                                        <p class="text-muted mb-0">Supported formats: PDF, DOC, DOCX, XLS, XLSX, JPG, PNG, GIF, TXT</p>
+                                        <p class="text-muted">Maximum file size: 10 MB</p>
+                                    </div>
+                                    <div id="filePreview" style="display: none;">
+                                        <img id="previewImage" class="file-preview mb-3" style="display: none;">
+                                        <div id="fileInfo">
+                                            <h6 id="fileName"></h6>
+                                            <p class="text-muted mb-0" id="fileSize"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="file" id="fileInput" name="file" style="display: none;" required 
+                                       accept=".pdf,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.gif,.txt">
+                            </div>
+                            
+                            <!-- Document Details -->
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="documentType" class="form-label">Document Type *</label>
+                                    <select class="form-select" id="documentType" name="documentType" required>
+                                        <option value="">Select Type</option>
+                                        <option value="contract">Contract</option>
+                                        <option value="manual">Manual</option>
+                                        <option value="photo">Photo</option>
+                                        <option value="invoice">Invoice</option>
+                                        <option value="receipt">Receipt</option>
+                                        <option value="signature">Signature</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="isPublic" class="form-label">Visibility</label>
+                                    <select class="form-select" id="isPublic" name="isPublic">
+                                        <option value="false">Private</option>
+                                        <option value="true">Public</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="3" 
+                                          placeholder="Optional description of the document"></textarea>
+                            </div>
+                            
+                            <!-- Progress Bar -->
+                            <div class="progress-container mb-3">
+                                <label class="form-label">Upload Progress</label>
+                                <div class="progress">
+                                    <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Actions</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-primary" id="uploadBtn" disabled>
+                                <i class="fas fa-upload me-2"></i>Upload Document
+                            </button>
+                            <a href="/documents?entityType={{.entityType}}&entityID={{.entityID}}" class="btn btn-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Upload Guidelines</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Maximum file size: 10 MB
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Supported formats: PDF, Word, Excel, Images, Text
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Files are automatically scanned for security
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Version control is automatically managed
+                            </li>
+                            <li class="mb-0">
+                                <i class="fas fa-check text-success me-2"></i>
+                                Digital signatures supported for contracts
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                {{if .entityType}}
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">Entity Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-1"><strong>Type:</strong> {{.entityType | title}}</p>
+                        <p class="mb-0"><strong>ID:</strong> {{.entityID}}</p>
+                    </div>
+                </div>
+                {{end}}
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedFile = null;
+        
+        // File input change handler
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            handleFileSelect(e.target.files[0]);
+        });
+        
+        // Drag and drop handlers
+        const uploadArea = document.getElementById('uploadArea');
+        
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            if (e.dataTransfer.files.length > 0) {
+                handleFileSelect(e.dataTransfer.files[0]);
+            }
+        });
+        
+        function handleFileSelect(file) {
+            if (!file) return;
+            
+            // Validate file size (10MB)
+            const maxSize = 10 * 1024 * 1024;
+            if (file.size > maxSize) {
+                alert('File size exceeds 10MB limit. Please choose a smaller file.');
+                return;
+            }
+            
+            // Validate file type
+            const allowedTypes = [
+                'application/pdf',
+                'application/msword',
+                'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'image/jpeg',
+                'image/jpg',
+                'image/png',
+                'image/gif',
+                'text/plain'
+            ];
+            
+            if (!allowedTypes.includes(file.type)) {
+                alert('File type not allowed. Please choose a supported file format.');
+                return;
+            }
+            
+            selectedFile = file;
+            document.getElementById('uploadBtn').disabled = false;
+            
+            // Show file preview
+            showFilePreview(file);
+            
+            // Auto-detect document type based on file extension
+            autoDetectDocumentType(file.name);
+        }
+        
+        function showFilePreview(file) {
+            const uploadPrompt = document.getElementById('uploadPrompt');
+            const filePreview = document.getElementById('filePreview');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const previewImage = document.getElementById('previewImage');
+            
+            uploadPrompt.style.display = 'none';
+            filePreview.style.display = 'block';
+            
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            
+            // Show image preview if it's an image file
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImage.src = e.target.result;
+                    previewImage.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                previewImage.style.display = 'none';
+            }
+        }
+        
+        function autoDetectDocumentType(filename) {
+            const ext = filename.split('.').pop().toLowerCase();
+            const documentType = document.getElementById('documentType');
+            
+            switch (ext) {
+                case 'pdf':
+                    if (filename.toLowerCase().includes('contract')) {
+                        documentType.value = 'contract';
+                    } else if (filename.toLowerCase().includes('invoice')) {
+                        documentType.value = 'invoice';
+                    } else {
+                        documentType.value = 'other';
+                    }
+                    break;
+                case 'jpg':
+                case 'jpeg':
+                case 'png':
+                case 'gif':
+                    documentType.value = 'photo';
+                    break;
+                case 'doc':
+                case 'docx':
+                    if (filename.toLowerCase().includes('manual')) {
+                        documentType.value = 'manual';
+                    } else {
+                        documentType.value = 'other';
+                    }
+                    break;
+                default:
+                    documentType.value = 'other';
+            }
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 B';
+            const k = 1024;
+            const sizes = ['B', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Upload button click handler
+        document.getElementById('uploadBtn').addEventListener('click', function() {
+            if (!selectedFile) {
+                alert('Please select a file to upload.');
+                return;
+            }
+            
+            const form = document.getElementById('uploadForm');
+            const formData = new FormData(form);
+            formData.set('file', selectedFile);
+            
+            // Show progress bar
+            const progressContainer = document.querySelector('.progress-container');
+            const progressBar = document.querySelector('.progress-bar');
+            progressContainer.style.display = 'block';
+            
+            // Disable upload button
+            document.getElementById('uploadBtn').disabled = true;
+            document.getElementById('uploadBtn').innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Uploading...';
+            
+            // Upload file
+            const xhr = new XMLHttpRequest();
+            
+            xhr.upload.addEventListener('progress', function(e) {
+                if (e.lengthComputable) {
+                    const percentComplete = (e.loaded / e.total) * 100;
+                    progressBar.style.width = percentComplete + '%';
+                    progressBar.textContent = Math.round(percentComplete) + '%';
+                }
+            });
+            
+            xhr.addEventListener('load', function() {
+                if (xhr.status === 201) {
+                    const response = JSON.parse(xhr.responseText);
+                    alert('Document uploaded successfully!');
+                    
+                    // Redirect back to documents list
+                    const entityType = '{{.entityType}}';
+                    const entityID = '{{.entityID}}';
+                    const redirectUrl = entityType && entityID 
+                        ? `/documents?entityType=${entityType}&entityID=${entityID}`
+                        : '/documents';
+                    window.location.href = redirectUrl;
+                } else {
+                    const response = JSON.parse(xhr.responseText);
+                    alert('Upload failed: ' + (response.error || 'Unknown error'));
+                    
+                    // Re-enable upload button
+                    document.getElementById('uploadBtn').disabled = false;
+                    document.getElementById('uploadBtn').innerHTML = '<i class="fas fa-upload me-2"></i>Upload Document';
+                    progressContainer.style.display = 'none';
+                }
+            });
+            
+            xhr.addEventListener('error', function() {
+                alert('Upload failed due to network error.');
+                
+                // Re-enable upload button
+                document.getElementById('uploadBtn').disabled = false;
+                document.getElementById('uploadBtn').innerHTML = '<i class="fas fa-upload me-2"></i>Upload Document';
+                progressContainer.style.display = 'none';
+            });
+            
+            xhr.open('POST', '/documents/upload');
+            xhr.send(formData);
+        });
+    </script>
+</body>
+</html>

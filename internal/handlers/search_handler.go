@@ -28,6 +28,24 @@ func (h *SearchHandler) GlobalSearch(c *gin.Context) {
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
 	searchType := c.DefaultQuery("type", "global")
 
+	// Check if this is a browser request (Accept: text/html)
+	acceptHeader := c.GetHeader("Accept")
+	isBrowserRequest := strings.Contains(acceptHeader, "text/html")
+
+	// If no query and it's a browser request, show search page
+	if query == "" && isBrowserRequest {
+		user, _ := GetCurrentUser(c)
+		c.HTML(http.StatusOK, "search_results.html", gin.H{
+			"title":      "Global Search",
+			"user":       user,
+			"query":      "",
+			"searchType": searchType,
+			"results":    nil,
+		})
+		return
+	}
+
+	// If no query and it's an API request, return error
 	if query == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Search query is required"})
 		return
@@ -55,12 +73,24 @@ func (h *SearchHandler) GlobalSearch(c *gin.Context) {
 		results["cases"] = h.searchCases(query, page, pageSize)
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"query":   query,
-		"type":    searchType,
-		"page":    page,
-		"results": results,
-	})
+	// Return HTML for browser requests, JSON for API requests
+	if isBrowserRequest {
+		user, _ := GetCurrentUser(c)
+		c.HTML(http.StatusOK, "search_results.html", gin.H{
+			"title":      "Search Results",
+			"user":       user,
+			"query":      query,
+			"searchType": searchType,
+			"results":    results,
+		})
+	} else {
+		c.JSON(http.StatusOK, gin.H{
+			"query":   query,
+			"type":    searchType,
+			"page":    page,
+			"results": results,
+		})
+	}
 }
 
 // searchJobs searches in jobs table

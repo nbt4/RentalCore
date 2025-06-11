@@ -1,0 +1,406 @@
+{{ template "base.html" . }}
+
+{{ define "content" }}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2>
+                        <i class="fas fa-clipboard-list me-2"></i>
+                        Job Template: {{ .template.Name }}
+                    </h2>
+                    <p class="text-muted">{{ .template.Description }}</p>
+                </div>
+                <div>
+                    <a href="/workflow/templates/{{ .template.TemplateID }}/edit" class="btn btn-primary">
+                        <i class="fas fa-edit me-2"></i>Edit Template
+                    </a>
+                    <a href="/workflow/templates" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Templates
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Template Details -->
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Basic Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Template Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>Template ID:</strong> {{ .template.TemplateID }}</p>
+                            <p><strong>Name:</strong> {{ .template.Name }}</p>
+                            <p><strong>Category:</strong> 
+                                {{ if .template.JobCategory }}
+                                    {{ .template.JobCategory.CategoryName }}
+                                {{ else }}
+                                    Not specified
+                                {{ end }}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Default Duration:</strong> {{ .template.DefaultDurationDays }} days</p>
+                            <p><strong>Usage Count:</strong> {{ .template.UsageCount }}</p>
+                            <p><strong>Status:</strong> 
+                                {{ if .template.IsActive }}
+                                    <span class="badge bg-success">Active</span>
+                                {{ else }}
+                                    <span class="badge bg-danger">Inactive</span>
+                                {{ end }}
+                            </p>
+                        </div>
+                    </div>
+                    {{ if .template.DefaultNotes }}
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <p><strong>Default Notes:</strong></p>
+                            <div class="bg-light p-3 rounded">
+                                {{ .template.DefaultNotes }}
+                            </div>
+                        </div>
+                    </div>
+                    {{ end }}
+                </div>
+            </div>
+
+            <!-- Equipment List -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Equipment List</h5>
+                </div>
+                <div class="card-body">
+                    <div id="equipmentList">
+                        {{ if .template.EquipmentList }}
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Quantity</th>
+                                            <th>Required</th>
+                                            <th>Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="equipmentTableBody">
+                                        <!-- Equipment items will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        {{ else }}
+                            <p class="text-muted">No equipment specified for this template.</p>
+                        {{ end }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Required Documents -->
+            {{ if .template.RequiredDocuments }}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Required Documents</h5>
+                </div>
+                <div class="card-body">
+                    <div id="requiredDocuments">
+                        <!-- Documents will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            {{ end }}
+
+            <!-- Recent Jobs -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Jobs Created from This Template</h5>
+                </div>
+                <div class="card-body">
+                    {{ if .template.Jobs }}
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Job ID</th>
+                                        <th>Customer</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{ range .template.Jobs }}
+                                    <tr>
+                                        <td><a href="/jobs/{{ .JobID }}">#{{ .JobID }}</a></td>
+                                        <td>
+                                            {{ if .Customer }}
+                                                {{ .Customer.GetDisplayName }}
+                                            {{ else }}
+                                                Unknown
+                                            {{ end }}
+                                        </td>
+                                        <td>
+                                            {{ if .Status }}
+                                                <span class="badge bg-primary">{{ .Status.Status }}</span>
+                                            {{ else }}
+                                                <span class="badge bg-secondary">Unknown</span>
+                                            {{ end }}
+                                        </td>
+                                        <td>{{ .CreatedAt.Format "2006-01-02 15:04" }}</td>
+                                        <td>
+                                            <a href="/jobs/{{ .JobID }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {{ end }}
+                                </tbody>
+                            </table>
+                        </div>
+                    {{ else }}
+                        <p class="text-muted">No jobs have been created from this template yet.</p>
+                    {{ end }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-md-4">
+            <!-- Pricing Template -->
+            {{ if .template.PricingTemplate }}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Pricing Template</h6>
+                </div>
+                <div class="card-body">
+                    <div id="pricingTemplate">
+                        <!-- Pricing will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+            {{ end }}
+
+            <!-- Quick Actions -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Quick Actions</h6>
+                </div>
+                <div class="card-body">
+                    <form action="/workflow/templates/{{ .template.TemplateID }}/create-job" method="POST" class="mb-3">
+                        <div class="mb-3">
+                            <label for="customerId" class="form-label">Customer</label>
+                            <select class="form-select" id="customerId" name="customerId" required>
+                                <option value="">Select Customer</option>
+                                {{ range .customers }}
+                                <option value="{{ .CustomerID }}">{{ .GetDisplayName }}</option>
+                                {{ end }}
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-plus me-2"></i>Create Job from Template
+                        </button>
+                    </form>
+                    
+                    <a href="/workflow/templates/{{ .template.TemplateID }}/edit" class="btn btn-outline-primary w-100 mb-2">
+                        <i class="fas fa-edit me-2"></i>Edit Template
+                    </a>
+                    
+                    <button type="button" class="btn btn-outline-secondary w-100 mb-2" onclick="duplicateTemplate()">
+                        <i class="fas fa-copy me-2"></i>Duplicate Template
+                    </button>
+                    
+                    {{ if .template.IsActive }}
+                    <button type="button" class="btn btn-outline-warning w-100" onclick="deactivateTemplate()">
+                        <i class="fas fa-pause me-2"></i>Deactivate Template
+                    </button>
+                    {{ else }}
+                    <button type="button" class="btn btn-outline-success w-100" onclick="activateTemplate()">
+                        <i class="fas fa-play me-2"></i>Activate Template
+                    </button>
+                    {{ end }}
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">Statistics</h6>
+                </div>
+                <div class="card-body">
+                    <p><strong>Created:</strong><br>
+                    <small class="text-muted">{{ .template.CreatedAt.Format "Jan 2, 2006 at 15:04" }}</small></p>
+                    
+                    <p><strong>Last Updated:</strong><br>
+                    <small class="text-muted">{{ .template.UpdatedAt.Format "Jan 2, 2006 at 15:04" }}</small></p>
+                    
+                    <p><strong>Created By:</strong><br>
+                    <small class="text-muted">
+                        {{ if .template.Creator }}
+                            {{ .template.Creator.FirstName }} {{ .template.Creator.LastName }}
+                        {{ else }}
+                            System
+                        {{ end }}
+                    </small></p>
+                    
+                    <p><strong>Jobs Created:</strong><br>
+                    <span class="badge bg-info fs-6">{{ .template.UsageCount }}</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Parse and display equipment list
+    const equipmentList = {{ if .template.EquipmentList }}{{ .template.EquipmentList }}{{ else }}null{{ end }};
+    if (equipmentList) {
+        renderEquipmentList(equipmentList);
+    }
+
+    // Parse and display pricing template
+    const pricingTemplate = {{ if .template.PricingTemplate }}{{ .template.PricingTemplate }}{{ else }}null{{ end }};
+    if (pricingTemplate) {
+        renderPricingTemplate(pricingTemplate);
+    }
+
+    // Parse and display required documents
+    const requiredDocuments = {{ if .template.RequiredDocuments }}{{ .template.RequiredDocuments }}{{ else }}null{{ end }};
+    if (requiredDocuments) {
+        renderRequiredDocuments(requiredDocuments);
+    }
+});
+
+function renderEquipmentList(equipmentList) {
+    const tbody = document.getElementById('equipmentTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+    
+    try {
+        const equipment = typeof equipmentList === 'string' ? JSON.parse(equipmentList) : equipmentList;
+        
+        if (Array.isArray(equipment)) {
+            equipment.forEach(item => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${item.name || item.item || 'Unknown'}</td>
+                    <td>${item.quantity || 1}</td>
+                    <td>
+                        ${item.required ? 
+                            '<span class="badge bg-danger">Required</span>' : 
+                            '<span class="badge bg-secondary">Optional</span>'
+                        }
+                    </td>
+                    <td>${item.notes || ''}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-muted">Invalid equipment data</td></tr>';
+    }
+}
+
+function renderPricingTemplate(pricingTemplate) {
+    const container = document.getElementById('pricingTemplate');
+    if (!container) return;
+
+    try {
+        const pricing = typeof pricingTemplate === 'string' ? JSON.parse(pricingTemplate) : pricingTemplate;
+        
+        let html = '';
+        if (pricing.basePrice) {
+            html += `<p><strong>Base Price:</strong> €${pricing.basePrice}</p>`;
+        }
+        if (pricing.dailyRate) {
+            html += `<p><strong>Daily Rate:</strong> €${pricing.dailyRate}</p>`;
+        }
+        if (pricing.weeklyRate) {
+            html += `<p><strong>Weekly Rate:</strong> €${pricing.weeklyRate}</p>`;
+        }
+        if (pricing.discounts) {
+            html += '<p><strong>Discounts:</strong></p><ul>';
+            pricing.discounts.forEach(discount => {
+                html += `<li>${discount.condition}: ${discount.amount}${discount.type === 'percent' ? '%' : '€'}</li>`;
+            });
+            html += '</ul>';
+        }
+        
+        container.innerHTML = html || '<p class="text-muted">No pricing information</p>';
+    } catch (e) {
+        container.innerHTML = '<p class="text-muted">Invalid pricing data</p>';
+    }
+}
+
+function renderRequiredDocuments(requiredDocuments) {
+    const container = document.getElementById('requiredDocuments');
+    if (!container) return;
+
+    try {
+        const documents = typeof requiredDocuments === 'string' ? JSON.parse(requiredDocuments) : requiredDocuments;
+        
+        if (Array.isArray(documents)) {
+            let html = '<ul class="list-group list-group-flush">';
+            documents.forEach(doc => {
+                html += `<li class="list-group-item">${doc.name || doc}</li>`;
+            });
+            html += '</ul>';
+            container.innerHTML = html;
+        }
+    } catch (e) {
+        container.innerHTML = '<p class="text-muted">Invalid document data</p>';
+    }
+}
+
+function duplicateTemplate() {
+    if (confirm('Create a copy of this template?')) {
+        // Implement template duplication
+        window.location.href = '/workflow/templates/new?duplicate={{ .template.TemplateID }}';
+    }
+}
+
+function deactivateTemplate() {
+    if (confirm('Deactivate this template? It will no longer be available for creating new jobs.')) {
+        updateTemplateStatus(false);
+    }
+}
+
+function activateTemplate() {
+    if (confirm('Activate this template?')) {
+        updateTemplateStatus(true);
+    }
+}
+
+function updateTemplateStatus(isActive) {
+    fetch('/api/v1/workflow/templates/{{ .template.TemplateID }}', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            name: '{{ .template.Name }}',
+            description: '{{ .template.Description }}',
+            isActive: isActive
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+        } else {
+            location.reload();
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error updating template status');
+    });
+}
+</script>
+{{ end }}

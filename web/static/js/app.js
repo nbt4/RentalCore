@@ -382,33 +382,406 @@ window.addEventListener('error', function(e) {
     showAlert('An error occurred. Please refresh the page if problems persist.', 'warning');
 });
 
-// Enhanced Service worker registration (for PWA features and performance)
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/static/sw.js')
-            .then(registration => {
-                console.log('ServiceWorker registered successfully:', registration.scope);
+// PWA Management
+class PWAManager {
+    constructor() {
+        this.deferredPrompt = null;
+        this.isInstalled = false;
+        this.pushSubscription = null;
+        this.init();
+    }
+    
+    async init() {
+        // Check if already installed
+        this.isInstalled = window.matchMedia('(display-mode: standalone)').matches || 
+                           window.navigator.standalone === true;
+        
+        if (this.isInstalled) {
+            console.log('PWA is installed');
+            this.hidePWAPrompts();
+        }
+        
+        // Register service worker
+        await this.registerServiceWorker();
+        
+        // Setup install prompt
+        this.setupInstallPrompt();
+        
+        // Setup push notifications
+        this.setupPushNotifications();
+        
+        // Setup offline sync
+        this.setupOfflineSync();
+    }
+    
+    async registerServiceWorker() {
+        if ('serviceWorker' in navigator) {
+            try {
+                const registration = await navigator.serviceWorker.register('/sw.js');
+                console.log('ServiceWorker registered:', registration.scope);
                 
                 // Check for updates
                 registration.addEventListener('updatefound', () => {
                     const newWorker = registration.installing;
                     newWorker.addEventListener('statechange', () => {
                         if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                            // New content is available
-                            showAlert('New version available! Refresh to update.', 'info');
+                            this.showUpdateNotification();
                         }
                     });
                 });
-            })
-            .catch(error => {
-                console.log('ServiceWorker registration failed:', error);
-            });
-    });
+                
+                return registration;
+            } catch (error) {
+                console.error('ServiceWorker registration failed:', error);
+            }
+        }
+    }
     
+    setupInstallPrompt() {
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            this.deferredPrompt = e;
+            this.showInstallButton();
+        });
+        
+        window.addEventListener('appinstalled', () => {
+            console.log('PWA was installed');
+            this.isInstalled = true;
+            this.hidePWAPrompts();
+            this.showNotification('App Installed', 'TS Equipment Manager has been installed successfully!');
+        });
+    }
+    
+    async installPWA() {
+        if (!this.deferredPrompt) {
+            this.showInstallInstructions();
+            return;
+        }
+        
+        this.deferredPrompt.prompt();
+        const { outcome } = await this.deferredPrompt.userChoice;
+        
+        if (outcome === 'accepted') {
+            console.log('User accepted PWA install prompt');
+        } else {
+            console.log('User dismissed PWA install prompt');
+        }
+        
+        this.deferredPrompt = null;
+    }
+    
+    showInstallButton() {
+        // Create install button if it doesn't exist
+        let installBtn = document.getElementById('pwa-install-btn');
+        if (!installBtn && !this.isInstalled) {
+            installBtn = document.createElement('button');
+            installBtn.id = 'pwa-install-btn';
+            installBtn.className = 'btn btn-primary mobile-fab';
+            installBtn.innerHTML = '<i class="bi bi-download"></i>';
+            installBtn.title = 'Install App';
+            installBtn.onclick = () => this.installPWA();
+            
+            document.body.appendChild(installBtn);
+        }
+    }
+    
+    hidePWAPrompts() {
+        const installBtn = document.getElementById('pwa-install-btn');
+        if (installBtn) {
+            installBtn.remove();
+        }
+    }
+    
+    showInstallInstructions() {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+        const isAndroid = /Android/.test(navigator.userAgent);
+        
+        let instructions = 'To install this app:\n\n';
+        
+        if (isIOS) {
+            instructions += '1. Tap the Share button\n2. Select "Add to Home Screen"\n3. Tap "Add"';
+        } else if (isAndroid) {
+            instructions += '1. Tap the menu button (⋮)\n2. Select "Add to Home Screen"\n3. Tap "Add"';
+        } else {
+            instructions += '1. Click the install button in your browser\'s address bar\n2. Or use your browser\'s menu to "Install" or "Add to Home Screen"';
+        }
+        
+        alert(instructions);
+    }
+    
+    async setupPushNotifications() {
+        if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+            console.log('Push messaging is not supported');
+            return;
+        }
+        
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (!registration) return;
+        
+        // Check if already subscribed
+        this.pushSubscription = await registration.pushManager.getSubscription();
+        
+        if (this.pushSubscription) {
+            console.log('Already subscribed to push notifications');
+            await this.sendSubscriptionToServer(this.pushSubscription);
+        }
+    }
+    
+    async requestPushPermission() {
+        const permission = await Notification.requestPermission();
+        
+        if (permission === 'granted') {
+            await this.subscribeToPush();
+            return true;
+        } else {
+            console.log('Push notification permission denied');
+            return false;
+        }
+    }
+    
+    async subscribeToPush() {
+        try {
+            const registration = await navigator.serviceWorker.getRegistration();
+            if (!registration) throw new Error('No service worker registration');
+            
+            // You would need VAPID keys for production
+            const subscription = await registration.pushManager.subscribe({
+                userVisibleOnly: true,
+                applicationServerKey: null // Add your VAPID public key here
+            });
+            
+            this.pushSubscription = subscription;
+            await this.sendSubscriptionToServer(subscription);
+            
+            this.showNotification('Notifications Enabled', 'You will now receive important updates');
+            return subscription;
+        } catch (error) {
+            console.error('Push subscription failed:', error);
+            throw error;
+        }
+    }
+    
+    async sendSubscriptionToServer(subscription) {
+        try {
+            await API.post('/pwa/subscribe', subscription.toJSON());
+            console.log('Push subscription sent to server');
+        } catch (error) {
+            console.error('Failed to send subscription to server:', error);
+        }
+    }
+    
+    setupOfflineSync() {
+        // Handle online/offline events
+        window.addEventListener('online', () => {
+            console.log('App is online');
+            this.showConnectionStatus('online');
+            this.syncOfflineData();
+        });
+        
+        window.addEventListener('offline', () => {
+            console.log('App is offline');
+            this.showConnectionStatus('offline');
+        });
+        
+        // Sync on page load if online
+        if (navigator.onLine) {
+            this.syncOfflineData();
+        }
+    }
+    
+    async syncOfflineData() {
+        try {
+            const offlineActions = this.getOfflineActions();
+            if (offlineActions.length === 0) return;
+            
+            console.log(`Syncing ${offlineActions.length} offline actions`);
+            
+            const response = await API.post('/pwa/sync', { actions: offlineActions });
+            
+            if (response.results) {
+                this.processSyncResults(response.results);
+            }
+            
+            this.clearOfflineActions();
+            console.log('Offline data synced successfully');
+        } catch (error) {
+            console.error('Offline sync failed:', error);
+        }
+    }
+    
+    getOfflineActions() {
+        const stored = localStorage.getItem('offlineActions');
+        return stored ? JSON.parse(stored) : [];
+    }
+    
+    addOfflineAction(action) {
+        const actions = this.getOfflineActions();
+        actions.push({
+            id: Date.now(),
+            ...action,
+            timestamp: new Date().toISOString()
+        });
+        localStorage.setItem('offlineActions', JSON.stringify(actions));
+    }
+    
+    clearOfflineActions() {
+        localStorage.removeItem('offlineActions');
+    }
+    
+    processSyncResults(results) {
+        const failed = results.filter(r => r.status === 'error');
+        const success = results.filter(r => r.status === 'success');
+        
+        if (success.length > 0) {
+            this.showNotification('Sync Complete', `${success.length} actions synchronized`);
+        }
+        
+        if (failed.length > 0) {
+            console.error('Sync failures:', failed);
+            this.showNotification('Sync Warning', `${failed.length} actions failed to sync`);
+        }
+    }
+    
+    showConnectionStatus(status) {
+        const statusEl = document.getElementById('connection-status');
+        if (statusEl) {
+            statusEl.textContent = status === 'online' ? 'Connected' : 'Offline';
+            statusEl.className = status === 'online' ? 'text-success' : 'text-warning';
+        }
+        
+        // Show toast notification
+        const message = status === 'online' ? 'Connection restored' : 'Working offline';
+        this.showToast(message, status === 'online' ? 'success' : 'warning');
+    }
+    
+    showUpdateNotification() {
+        const updateBtn = document.createElement('button');
+        updateBtn.className = 'btn btn-success btn-sm';
+        updateBtn.innerHTML = '<i class="bi bi-arrow-clockwise"></i> Update Available';
+        updateBtn.onclick = () => window.location.reload();
+        
+        const navbar = document.querySelector('.navbar .container');
+        if (navbar) {
+            navbar.appendChild(updateBtn);
+        }
+    }
+    
+    showNotification(title, message, type = 'info') {
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification(title, {
+                body: message,
+                icon: '/static/images/icon-192.png',
+                badge: '/static/images/icon-192.png'
+            });
+        } else {
+            this.showToast(`${title}: ${message}`, type);
+        }
+    }
+    
+    showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `mobile-toast mobile-toast-${type}`;
+        toast.innerHTML = `
+            <div class="d-flex align-items-center">
+                <i class="bi bi-${this.getIconForType(type)} me-2"></i>
+                <span>${message}</span>
+                <button class="btn-close ms-auto" onclick="this.parentElement.parentElement.remove()"></button>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => toast.classList.add('show'), 100);
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+    
+    getIconForType(type) {
+        const icons = {
+            success: 'check-circle',
+            warning: 'exclamation-triangle',
+            error: 'x-circle',
+            info: 'info-circle'
+        };
+        return icons[type] || 'info-circle';
+    }
+    
+    // Public API methods
+    async enableNotifications() {
+        return await this.requestPushPermission();
+    }
+    
+    isOnline() {
+        return navigator.onLine;
+    }
+    
+    isAppInstalled() {
+        return this.isInstalled;
+    }
+}
+
+// Initialize PWA Manager
+const pwaManager = new PWAManager();
+
+// Enhanced Service worker registration (for PWA features and performance)
+if ('serviceWorker' in navigator) {
     // Listen for service worker messages
     navigator.serviceWorker.addEventListener('message', event => {
         if (event.data && event.data.type === 'CACHE_UPDATED') {
             console.log('Cache updated:', event.data.url);
+        }
+    });
+}
+
+// Add PWA install button to navbar if supported
+document.addEventListener('DOMContentLoaded', function() {
+    // Add install button to navbar
+    const navbarActions = document.querySelector('.navbar .header-actions, .navbar .navbar-nav');
+    if (navbarActions && !pwaManager.isInstalled) {
+        const installBtn = document.createElement('button');
+        installBtn.className = 'btn btn-outline-light btn-sm me-2';
+        installBtn.innerHTML = '<i class="bi bi-download"></i> Install';
+        installBtn.title = 'Install TS Equipment Manager';
+        installBtn.onclick = () => pwaManager.installPWA();
+        installBtn.id = 'navbar-install-btn';
+        
+        navbarActions.insertBefore(installBtn, navbarActions.firstChild);
+    }
+    
+    // Add notification permission button
+    if ('Notification' in window && Notification.permission === 'default') {
+        const notificationBtn = document.createElement('button');
+        notificationBtn.className = 'btn btn-outline-warning btn-sm me-2';
+        notificationBtn.innerHTML = '<i class="bi bi-bell"></i> Notifications';
+        notificationBtn.onclick = async () => {
+            const enabled = await pwaManager.enableNotifications();
+            if (enabled) {
+                notificationBtn.remove();
+            }
+        };
+        
+        if (navbarActions) {
+            navbarActions.insertBefore(notificationBtn, navbarActions.firstChild);
+        }
+    }
+});
+
+// Mobile-specific enhancements
+if (window.innerWidth <= 768) {
+    // Add mobile fab for quick scanner access
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.location.pathname !== '/mobile/scanner') {
+            const scanFab = document.createElement('button');
+            scanFab.className = 'mobile-fab';
+            scanFab.innerHTML = '<i class="bi bi-camera"></i>';
+            scanFab.title = 'Quick Scan';
+            scanFab.onclick = () => {
+                window.location.href = '/scan/select';
+            };
+            
+            document.body.appendChild(scanFab);
         }
     });
 }

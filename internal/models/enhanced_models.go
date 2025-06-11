@@ -186,7 +186,7 @@ type EquipmentPackage struct {
 // ================================================================
 
 type Role struct {
-	RoleID       uint            `gorm:"primaryKey;autoIncrement" json:"roleID"`
+	RoleID       uint            `gorm:"primaryKey;autoIncrement;column:roleID" json:"roleID"`
 	Name         string          `gorm:"uniqueIndex;not null" json:"name"`
 	DisplayName  string          `gorm:"not null" json:"displayName"`
 	Description  string          `json:"description"`
@@ -200,9 +200,14 @@ type Role struct {
 	UserRoles []UserRole `gorm:"foreignKey:RoleID" json:"userRoles,omitempty"`
 }
 
+// TableName specifies the table name for the Role model
+func (Role) TableName() string {
+	return "roles"
+}
+
 type UserRole struct {
-	UserID     uint       `gorm:"primaryKey" json:"userID"`
-	RoleID     uint       `gorm:"primaryKey" json:"roleID"`
+	UserID     uint       `gorm:"primaryKey;column:userID" json:"userID"`
+	RoleID     uint       `gorm:"primaryKey;column:roleID" json:"roleID"`
 	AssignedAt time.Time  `json:"assignedAt"`
 	AssignedBy *uint      `json:"assignedBy"`
 	ExpiresAt  *time.Time `json:"expiresAt"`
@@ -212,6 +217,11 @@ type UserRole struct {
 	User     *User `gorm:"foreignKey:UserID" json:"user,omitempty"`
 	Role     *Role `gorm:"foreignKey:RoleID" json:"role,omitempty"`
 	Assigner *User `gorm:"foreignKey:AssignedBy" json:"assigner,omitempty"`
+}
+
+// TableName specifies the table name for the UserRole model
+func (UserRole) TableName() string {
+	return "user_roles"
 }
 
 type AuditLog struct {

@@ -1,16 +1,17 @@
 {
-  "name": "JobScanner Pro",
-  "short_name": "JobScanner",
-  "description": "Professional equipment management and barcode scanning system",
-  "start_url": "/scan/select",
+  "name": "TS Equipment Manager",
+  "short_name": "TS Manager",
+  "description": "Professional equipment management, analytics, and barcode scanning system",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f1114",
-  "theme_color": "#6c757d",
-  "orientation": "portrait-primary",
+  "background_color": "#0d6efd",
+  "theme_color": "#0d6efd",
+  "orientation": "any",
   "scope": "/",
   "lang": "en",
   "dir": "ltr",
-  "categories": ["business", "productivity", "utilities"],
+  "categories": ["business", "productivity", "utilities", "finance"],
+  "prefer_related_applications": false,
   "icons": [
     {
       "src": "/static/images/icon-72.png",
@@ -57,6 +58,18 @@
   ],
   "shortcuts": [
     {
+      "name": "Analytics Dashboard",
+      "short_name": "Analytics",
+      "description": "View business analytics",
+      "url": "/analytics",
+      "icons": [
+        {
+          "src": "/static/images/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
       "name": "Start Scanning",
       "short_name": "Scan",
       "description": "Start barcode scanning",
@@ -69,10 +82,10 @@
       ]
     },
     {
-      "name": "View Jobs",
-      "short_name": "Jobs",
-      "description": "View all jobs",
-      "url": "/jobs",
+      "name": "Enhanced Scanner",
+      "short_name": "Enhanced Scan",
+      "description": "Advanced mobile scanner with vibration, zoom, and focus",
+      "url": "/scan/select",
       "icons": [
         {
           "src": "/static/images/icon-96.png",
@@ -81,10 +94,22 @@
       ]
     },
     {
-      "name": "View Devices",
-      "short_name": "Devices",
-      "description": "View device inventory",
-      "url": "/devices",
+      "name": "Search Everything",
+      "short_name": "Search",
+      "description": "Search across all entities",
+      "url": "/search/global",
+      "icons": [
+        {
+          "src": "/static/images/icon-96.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "View Jobs",
+      "short_name": "Jobs",
+      "description": "View all jobs",
+      "url": "/jobs",
       "icons": [
         {
           "src": "/static/images/icon-96.png",

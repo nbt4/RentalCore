@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}} - TS Equipment Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="/static/css/app.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-cube me-2"></i>TS Equipment Manager
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/jobs">Jobs</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/devices">Devices</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/customers">Customers</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown">
+                            Financial
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/financial">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="/financial/transactions">Transactions</a></li>
+                            <li><a class="dropdown-item" href="/financial/reports">Reports</a></li>
+                            <li><a class="dropdown-item" href="/financial/invoices">Invoices</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i> {{.user.Username}}
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h1 class="h3 mb-1">
+                            <i class="fas fa-chart-line text-primary me-2"></i>Financial Dashboard
+                        </h1>
+                        <p class="text-muted mb-0">Monitor revenue, expenses, and payment status</p>
+                    </div>
+                    <div>
+                        <a href="/financial/transactions/new" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>New Transaction
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="row mb-4">
+            <div class="col-md-3 mb-3">
+                <div class="card bg-primary text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title">Total Revenue</h6>
+                                <h3 class="mb-0">€{{printf "%.2f" .stats.totalRevenue}}</h3>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-euro-sign fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                        <small class="opacity-75">All completed transactions</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card bg-warning text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title">Pending Payments</h6>
+                                <h3 class="mb-0">€{{printf "%.2f" .stats.pendingPayments}}</h3>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-clock fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                        <small class="opacity-75">{{.stats.pendingTransactions}} pending transactions</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card bg-success text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title">This Month</h6>
+                                <h3 class="mb-0">€{{printf "%.2f" .stats.monthlyRevenue}}</h3>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-calendar-alt fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                        <small class="opacity-75">Current month revenue</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-3 mb-3">
+                <div class="card bg-danger text-white">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h6 class="card-title">Overdue</h6>
+                                <h3 class="mb-0">€{{printf "%.2f" .stats.overduePayments}}</h3>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
+                            </div>
+                        </div>
+                        <small class="opacity-75">Past due date</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row mb-4">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-chart-bar me-2"></i>Revenue Trend
+                            </h5>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <input type="radio" class="btn-check" name="revenueperiod" id="revenue-monthly" value="monthly" checked>
+                                <label class="btn btn-outline-primary" for="revenue-monthly">Monthly</label>
+                                
+                                <input type="radio" class="btn-check" name="revenueperiod" id="revenue-daily" value="daily">
+                                <label class="btn btn-outline-primary" for="revenue-daily">Daily</label>
+                                
+                                <input type="radio" class="btn-check" name="revenueperiod" id="revenue-yearly" value="yearly">
+                                <label class="btn btn-outline-primary" for="revenue-yearly">Yearly</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="revenueChart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-chart-pie me-2"></i>Payment Status
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="paymentStatusChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Transactions -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">
+                                <i class="fas fa-list me-2"></i>Recent Transactions
+                            </h5>
+                            <a href="/financial/transactions" class="btn btn-sm btn-outline-primary">
+                                View All <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="recentTransactionsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Customer</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Reference</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted">
+                                            <i class="fas fa-spinner fa-spin me-2"></i>Loading transactions...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Cards -->
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-file-invoice me-2"></i>Quick Actions
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="/financial/transactions/new" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>New Transaction
+                            </a>
+                            <button class="btn btn-success" onclick="generateInvoicesModal()">
+                                <i class="fas fa-file-invoice me-2"></i>Generate Invoices
+                            </button>
+                            <a href="/financial/reports" class="btn btn-info">
+                                <i class="fas fa-chart-bar me-2"></i>View Reports
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Alerts
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div id="financialAlerts">
+                            <div class="text-center text-muted">
+                                <i class="fas fa-spinner fa-spin me-2"></i>Loading alerts...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="card-title mb-0">
+                            <i class="fas fa-download me-2"></i>Export Data
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary" onclick="exportTransactions()">
+                                <i class="fas fa-file-csv me-2"></i>Export Transactions
+                            </button>
+                            <button class="btn btn-outline-success" onclick="exportRevenue()">
+                                <i class="fas fa-chart-line me-2"></i>Revenue Report
+                            </button>
+                            <button class="btn btn-outline-info" onclick="exportTaxReport()">
+                                <i class="fas fa-calculator me-2"></i>Tax Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let revenueChart, paymentStatusChart;
+        
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            loadRecentTransactions();
+            loadFinancialAlerts();
+            
+            // Period change handlers
+            document.querySelectorAll('input[name="revenueperiod"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    updateRevenueChart(this.value);
+                });
+            });
+        });
+        
+        function initializeCharts() {
+            // Revenue Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            revenueChart = new Chart(revenueCtx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [],
+                        borderColor: '#0d6efd',
+                        backgroundColor: 'rgba(13, 110, 253, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Expenses',
+                        data: [],
+                        borderColor: '#dc3545',
+                        backgroundColor: 'rgba(220, 53, 69, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '€' + value.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': €' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Payment Status Chart
+            const statusCtx = document.getElementById('paymentStatusChart').getContext('2d');
+            paymentStatusChart = new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'Pending', 'Failed', 'Cancelled'],
+                    datasets: [{
+                        data: [0, 0, 0, 0],
+                        backgroundColor: [
+                            '#28a745',
+                            '#ffc107',
+                            '#dc3545',
+                            '#6c757d'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            // Load initial data
+            updateRevenueChart('monthly');
+            updatePaymentStatusChart();
+        }
+        
+        function updateRevenueChart(period) {
+            fetch(`/financial/api/revenue-report?period=${period}`)
+                .then(response => response.json())
+                .then(data => {
+                    const labels = data.data.map(item => item.period);
+                    const revenue = data.data.map(item => item.revenue);
+                    const expenses = data.data.map(item => item.expenses);
+                    
+                    revenueChart.data.labels = labels;
+                    revenueChart.data.datasets[0].data = revenue;
+                    revenueChart.data.datasets[1].data = expenses;
+                    revenueChart.update();
+                })
+                .catch(error => console.error('Error loading revenue data:', error));
+        }
+        
+        function updatePaymentStatusChart() {
+            fetch('/financial/api/payment-report')
+                .then(response => response.json())
+                .then(data => {
+                    const statusData = [0, 0, 0, 0]; // completed, pending, failed, cancelled
+                    
+                    data.statusBreakdown.forEach(item => {
+                        switch(item.status) {
+                            case 'completed': statusData[0] = item.count; break;
+                            case 'pending': statusData[1] = item.count; break;
+                            case 'failed': statusData[2] = item.count; break;
+                            case 'cancelled': statusData[3] = item.count; break;
+                        }
+                    });
+                    
+                    paymentStatusChart.data.datasets[0].data = statusData;
+                    paymentStatusChart.update();
+                })
+                .catch(error => console.error('Error loading payment status data:', error));
+        }
+        
+        function loadRecentTransactions() {
+            fetch('/api/v1/financial/transactions?limit=10')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('#recentTransactionsTable tbody');
+                    tbody.innerHTML = '';
+                    
+                    if (data.transactions && data.transactions.length > 0) {
+                        data.transactions.slice(0, 10).forEach(transaction => {
+                            const row = `
+                                <tr>
+                                    <td>${new Date(transaction.transactionDate).toLocaleDateString()}</td>
+                                    <td><span class="badge bg-secondary">${transaction.type}</span></td>
+                                    <td>${transaction.customer ? transaction.customer.companyname || 'Individual' : 'N/A'}</td>
+                                    <td class="fw-bold">€${transaction.amount.toFixed(2)}</td>
+                                    <td>
+                                        <span class="badge bg-${getStatusColor(transaction.status)}">
+                                            ${transaction.status}
+                                        </span>
+                                    </td>
+                                    <td>${transaction.referenceNumber || '-'}</td>
+                                </tr>
+                            `;
+                            tbody.innerHTML += row;
+                        });
+                    } else {
+                        tbody.innerHTML = `
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No transactions found</td>
+                            </tr>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading transactions:', error);
+                    const tbody = document.querySelector('#recentTransactionsTable tbody');
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="text-center text-danger">Failed to load transactions</td>
+                        </tr>
+                    `;
+                });
+        }
+        
+        function loadFinancialAlerts() {
+            const alertsContainer = document.getElementById('financialAlerts');
+            
+            fetch('/api/v1/financial/stats')
+                .then(response => response.json())
+                .then(data => {
+                    let alerts = [];
+                    
+                    if (data.overduePayments > 0) {
+                        alerts.push({
+                            type: 'danger',
+                            icon: 'exclamation-triangle',
+                            message: `€${data.overduePayments.toFixed(2)} in overdue payments`
+                        });
+                    }
+                    
+                    if (data.pendingPayments > 10000) {
+                        alerts.push({
+                            type: 'warning',
+                            icon: 'clock',
+                            message: `High pending payments: €${data.pendingPayments.toFixed(2)}`
+                        });
+                    }
+                    
+                    if (data.monthlyRevenue < 1000) {
+                        alerts.push({
+                            type: 'info',
+                            icon: 'info-circle',
+                            message: 'Monthly revenue below target'
+                        });
+                    }
+                    
+                    if (alerts.length === 0) {
+                        alertsContainer.innerHTML = `
+                            <div class="text-center text-success">
+                                <i class="fas fa-check-circle me-2"></i>
+                                All financial metrics look good!
+                            </div>
+                        `;
+                    } else {
+                        alertsContainer.innerHTML = alerts.map(alert => `
+                            <div class="alert alert-${alert.type} alert-sm py-2 px-3 mb-2">
+                                <i class="fas fa-${alert.icon} me-2"></i>
+                                ${alert.message}
+                            </div>
+                        `).join('');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading alerts:', error);
+                    alertsContainer.innerHTML = `
+                        <div class="text-center text-danger">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Failed to load alerts
+                        </div>
+                    `;
+                });
+        }
+        
+        function getStatusColor(status) {
+            switch(status) {
+                case 'completed': return 'success';
+                case 'pending': return 'warning';
+                case 'failed': return 'danger';
+                case 'cancelled': return 'secondary';
+                default: return 'secondary';
+            }
+        }
+        
+        // Export functions
+        function exportTransactions() {
+            window.open('/financial/api/export/transactions?format=csv', '_blank');
+        }
+        
+        function exportRevenue() {
+            window.open('/financial/api/export/revenue?format=csv', '_blank');
+        }
+        
+        function exportTaxReport() {
+            window.open('/financial/api/export/tax-report?format=csv', '_blank');
+        }
+        
+        function generateInvoicesModal() {
+            // This would open a modal to select jobs for invoice generation
+            alert('Invoice generation feature - coming soon!');
+        }
+    </script>
+</body>
+</html>
