@@ -28,12 +28,8 @@ func (h *SearchHandler) GlobalSearch(c *gin.Context) {
 	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "20"))
 	searchType := c.DefaultQuery("type", "global")
 
-	// Check if this is a browser request (Accept: text/html)
-	acceptHeader := c.GetHeader("Accept")
-	isBrowserRequest := strings.Contains(acceptHeader, "text/html")
-
-	// If no query and it's a browser request, show search page
-	if query == "" && isBrowserRequest {
+	// For GET requests without query, always show search page (browser navigation)
+	if query == "" && c.Request.Method == "GET" {
 		user, _ := GetCurrentUser(c)
 		c.HTML(http.StatusOK, "search_results.html", gin.H{
 			"title":      "Global Search",
@@ -45,7 +41,7 @@ func (h *SearchHandler) GlobalSearch(c *gin.Context) {
 		return
 	}
 
-	// If no query and it's an API request, return error
+	// If no query for non-GET requests, return error
 	if query == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Search query is required"})
 		return
@@ -73,8 +69,9 @@ func (h *SearchHandler) GlobalSearch(c *gin.Context) {
 		results["cases"] = h.searchCases(query, page, pageSize)
 	}
 
-	// Return HTML for browser requests, JSON for API requests
-	if isBrowserRequest {
+	// For GET requests, always return HTML (browser navigation)
+	// For other methods, return JSON (API calls)
+	if c.Request.Method == "GET" {
 		user, _ := GetCurrentUser(c)
 		c.HTML(http.StatusOK, "search_results.html", gin.H{
 			"title":      "Search Results",

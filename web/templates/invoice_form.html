@@ -1,0 +1,513 @@
+{{template "base.html" .}}
+
+{{define "content"}}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">
+                        {{if .isEdit}}Edit Invoice{{else}}New Invoice{{end}}
+                    </h3>
+                    <a href="/invoices" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Invoices
+                    </a>
+                </div>
+                
+                <div class="card-body">
+                    <form id="invoiceForm">
+                        <div class="row">
+                            <!-- Left Column -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="customerId">Customer *</label>
+                                    <select id="customerId" name="customerId" class="form-control" required>
+                                        <option value="">Select Customer</option>
+                                        {{range .customers}}
+                                        <option value="{{.CustomerID}}" {{if eq $.invoice.CustomerID .CustomerID}}selected{{end}}>
+                                            {{.GetDisplayName}}
+                                        </option>
+                                        {{end}}
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="jobId">Job (Optional)</label>
+                                    <select id="jobId" name="jobId" class="form-control">
+                                        <option value="">Select Job</option>
+                                        {{range .jobs}}
+                                        <option value="{{.JobID}}" {{if and $.invoice.JobID (eq $.invoice.JobID .JobID)}}selected{{end}}>
+                                            {{.Description}}
+                                        </option>
+                                        {{end}}
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="templateId">Invoice Template</label>
+                                    <select id="templateId" name="templateId" class="form-control">
+                                        <option value="">Default Template</option>
+                                        {{range .templates}}
+                                        <option value="{{.TemplateID}}" {{if and $.invoice.TemplateID (eq $.invoice.TemplateID .TemplateID)}}selected{{end}}>
+                                            {{.Name}}
+                                        </option>
+                                        {{end}}
+                                    </select>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="issueDate">Issue Date *</label>
+                                            <input type="date" id="issueDate" name="issueDate" class="form-control" 
+                                                   value="{{if .invoice.IssueDate}}{{.invoice.IssueDate.Format "2006-01-02"}}{{else}}{{.defaultIssueDate}}{{end}}" required>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="dueDate">Due Date *</label>
+                                            <input type="date" id="dueDate" name="dueDate" class="form-control" 
+                                                   value="{{if .invoice.DueDate}}{{.invoice.DueDate.Format "2006-01-02"}}{{else}}{{.defaultDueDate}}{{end}}" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="paymentTerms">Payment Terms</label>
+                                    <input type="text" id="paymentTerms" name="paymentTerms" class="form-control" 
+                                           placeholder="Net 30 days" value="{{if .invoice.PaymentTerms}}{{.invoice.PaymentTerms}}{{end}}">
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="taxRate">Tax Rate (%)</label>
+                                            <input type="number" id="taxRate" name="taxRate" class="form-control" 
+                                                   step="0.01" min="0" max="100" 
+                                                   value="{{if .invoice.TaxRate}}{{.invoice.TaxRate}}{{else}}{{.settings.DefaultTaxRate}}{{end}}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="discountAmount">Discount ({{.settings.CurrencySymbol}})</label>
+                                            <input type="number" id="discountAmount" name="discountAmount" class="form-control" 
+                                                   step="0.01" min="0" value="{{.invoice.DiscountAmount}}">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="notes">Notes</label>
+                                    <textarea id="notes" name="notes" class="form-control" rows="3" 
+                                              placeholder="Additional notes for the customer">{{if .invoice.Notes}}{{.invoice.Notes}}{{end}}</textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="termsConditions">Terms & Conditions</label>
+                                    <textarea id="termsConditions" name="termsConditions" class="form-control" rows="3" 
+                                              placeholder="Terms and conditions">{{if .invoice.TermsConditions}}{{.invoice.TermsConditions}}{{end}}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Line Items Section -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h5>Invoice Items</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered" id="lineItemsTable">
+                                        <thead>
+                                            <tr>
+                                                <th width="15%">Type</th>
+                                                <th width="25%">Description</th>
+                                                <th width="10%">Quantity</th>
+                                                <th width="12%">Unit Price</th>
+                                                <th width="12%">Start Date</th>
+                                                <th width="12%">End Date</th>
+                                                <th width="10%">Total</th>
+                                                <th width="4%">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="lineItemsBody">
+                                            {{if .invoice.LineItems}}
+                                                {{range $index, $item := .invoice.LineItems}}
+                                                <tr class="line-item-row">
+                                                    <td>
+                                                        <select name="lineItems[{{$index}}][itemType]" class="form-control item-type-select" onchange="updateItemOptions(this)">
+                                                            <option value="custom" {{if eq $item.ItemType "custom"}}selected{{end}}>Custom</option>
+                                                            <option value="device" {{if eq $item.ItemType "device"}}selected{{end}}>Device</option>
+                                                            <option value="package" {{if eq $item.ItemType "package"}}selected{{end}}>Package</option>
+                                                            <option value="service" {{if eq $item.ItemType "service"}}selected{{end}}>Service</option>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text" name="lineItems[{{$index}}][description]" class="form-control" 
+                                                               value="{{$item.Description}}" required>
+                                                        <input type="hidden" name="lineItems[{{$index}}][deviceId]" value="{{if $item.DeviceID}}{{$item.DeviceID}}{{end}}">
+                                                        <input type="hidden" name="lineItems[{{$index}}][packageId]" value="{{if $item.PackageID}}{{$item.PackageID}}{{end}}">
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" name="lineItems[{{$index}}][quantity]" class="form-control quantity-input" 
+                                                               value="{{$item.Quantity}}" step="0.01" min="0.01" required onchange="calculateLineTotal(this)">
+                                                    </td>
+                                                    <td>
+                                                        <input type="number" name="lineItems[{{$index}}][unitPrice]" class="form-control unit-price-input" 
+                                                               value="{{$item.UnitPrice}}" step="0.01" min="0" required onchange="calculateLineTotal(this)">
+                                                    </td>
+                                                    <td>
+                                                        <input type="date" name="lineItems[{{$index}}][rentalStartDate]" class="form-control rental-start-input" 
+                                                               value="{{if $item.RentalStartDate}}{{$item.RentalStartDate.Format "2006-01-02"}}{{end}}" onchange="calculateRentalDays(this)">
+                                                    </td>
+                                                    <td>
+                                                        <input type="date" name="lineItems[{{$index}}][rentalEndDate]" class="form-control rental-end-input" 
+                                                               value="{{if $item.RentalEndDate}}{{$item.RentalEndDate.Format "2006-01-02"}}{{end}}" onchange="calculateRentalDays(this)">
+                                                    </td>
+                                                    <td>
+                                                        <span class="line-total">{{printf "%.2f" $item.TotalPrice}}</span>
+                                                    </td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-sm btn-danger" onclick="removeLineItem(this)">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                                {{end}}
+                                            {{end}}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                
+                                <button type="button" class="btn btn-secondary" onclick="addLineItem()">
+                                    <i class="fas fa-plus"></i> Add Item
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Invoice Totals -->
+                        <div class="row mt-4">
+                            <div class="col-md-8"></div>
+                            <div class="col-md-4">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td><strong>Subtotal:</strong></td>
+                                        <td class="text-right"><span id="subtotalAmount">{{.settings.CurrencySymbol}}0.00</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Discount:</strong></td>
+                                        <td class="text-right"><span id="discountDisplayAmount">{{.settings.CurrencySymbol}}0.00</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Tax:</strong></td>
+                                        <td class="text-right"><span id="taxDisplayAmount">{{.settings.CurrencySymbol}}0.00</span></td>
+                                    </tr>
+                                    <tr class="table-primary">
+                                        <td><strong>Total:</strong></td>
+                                        <td class="text-right"><strong><span id="totalAmount">{{.settings.CurrencySymbol}}0.00</span></strong></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <button type="submit" class="btn btn-primary">
+                                        {{if .isEdit}}Update Invoice{{else}}Create Invoice{{end}}
+                                    </button>
+                                    {{if .isEdit}}
+                                    <button type="button" class="btn btn-success" onclick="previewInvoice()">
+                                        <i class="fas fa-eye"></i> Preview
+                                    </button>
+                                    {{end}}
+                                    <a href="/invoices" class="btn btn-secondary">Cancel</a>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Device/Package Selection Modal -->
+<div class="modal fade" id="itemSelectionModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Select Item</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="deviceSelection" style="display: none;">
+                    <h6>Select Device:</h6>
+                    <div class="list-group">
+                        {{range .devices}}
+                        <button type="button" class="list-group-item list-group-item-action device-item" 
+                                data-id="{{.DeviceID}}" data-description="{{.Brand}} {{.Model}}" data-price="{{.DailyRentalPrice}}">
+                            <strong>{{.Brand}} {{.Model}}</strong><br>
+                            <small>{{.DeviceID}} - Daily Rate: {{$.settings.CurrencySymbol}}{{printf "%.2f" .DailyRentalPrice}}</small>
+                        </button>
+                        {{end}}
+                    </div>
+                </div>
+                
+                <div id="packageSelection" style="display: none;">
+                    <h6>Select Package:</h6>
+                    <div class="list-group">
+                        {{range .packages}}
+                        <button type="button" class="list-group-item list-group-item-action package-item" 
+                                data-id="{{.PackageID}}" data-description="{{.PackageName}}" data-price="{{.TotalValue}}">
+                            <strong>{{.PackageName}}</strong><br>
+                            <small>{{.Description}} - Value: {{$.settings.CurrencySymbol}}{{printf "%.2f" .TotalValue}}</small>
+                        </button>
+                        {{end}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+const currencySymbol = '{{.settings.CurrencySymbol}}';
+let lineItemCounter = {{if .invoice.LineItems}}{{len .invoice.LineItems}}{{else}}0{{end}};
+let currentSelectingRow = null;
+
+// Initialize form
+document.addEventListener('DOMContentLoaded', function() {
+    calculateTotals();
+    
+    // Set up form submission
+    document.getElementById('invoiceForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitInvoice();
+    });
+});
+
+function addLineItem() {
+    const tbody = document.getElementById('lineItemsBody');
+    const newRow = document.createElement('tr');
+    newRow.className = 'line-item-row';
+    newRow.innerHTML = `
+        <td>
+            <select name="lineItems[${lineItemCounter}][itemType]" class="form-control item-type-select" onchange="updateItemOptions(this)">
+                <option value="custom">Custom</option>
+                <option value="device">Device</option>
+                <option value="package">Package</option>
+                <option value="service">Service</option>
+            </select>
+        </td>
+        <td>
+            <input type="text" name="lineItems[${lineItemCounter}][description]" class="form-control" required>
+            <input type="hidden" name="lineItems[${lineItemCounter}][deviceId]">
+            <input type="hidden" name="lineItems[${lineItemCounter}][packageId]">
+        </td>
+        <td>
+            <input type="number" name="lineItems[${lineItemCounter}][quantity]" class="form-control quantity-input" 
+                   value="1" step="0.01" min="0.01" required onchange="calculateLineTotal(this)">
+        </td>
+        <td>
+            <input type="number" name="lineItems[${lineItemCounter}][unitPrice]" class="form-control unit-price-input" 
+                   value="0" step="0.01" min="0" required onchange="calculateLineTotal(this)">
+        </td>
+        <td>
+            <input type="date" name="lineItems[${lineItemCounter}][rentalStartDate]" class="form-control rental-start-input" onchange="calculateRentalDays(this)">
+        </td>
+        <td>
+            <input type="date" name="lineItems[${lineItemCounter}][rentalEndDate]" class="form-control rental-end-input" onchange="calculateRentalDays(this)">
+        </td>
+        <td>
+            <span class="line-total">0.00</span>
+        </td>
+        <td>
+            <button type="button" class="btn btn-sm btn-danger" onclick="removeLineItem(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </td>
+    `;
+    tbody.appendChild(newRow);
+    lineItemCounter++;
+}
+
+function removeLineItem(button) {
+    button.closest('tr').remove();
+    calculateTotals();
+}
+
+function updateItemOptions(select) {
+    const row = select.closest('tr');
+    const itemType = select.value;
+    
+    if (itemType === 'device' || itemType === 'package') {
+        currentSelectingRow = row;
+        document.getElementById('deviceSelection').style.display = itemType === 'device' ? 'block' : 'none';
+        document.getElementById('packageSelection').style.display = itemType === 'package' ? 'block' : 'none';
+        $('#itemSelectionModal').modal('show');
+    }
+}
+
+// Device/Package selection handlers
+document.querySelectorAll('.device-item').forEach(item => {
+    item.addEventListener('click', function() {
+        const row = currentSelectingRow;
+        const descInput = row.querySelector('input[name*="[description]"]');
+        const deviceIdInput = row.querySelector('input[name*="[deviceId]"]');
+        const priceInput = row.querySelector('input[name*="[unitPrice]"]');
+        
+        descInput.value = this.dataset.description;
+        deviceIdInput.value = this.dataset.id;
+        priceInput.value = this.dataset.price;
+        
+        calculateLineTotal(priceInput);
+        $('#itemSelectionModal').modal('hide');
+    });
+});
+
+document.querySelectorAll('.package-item').forEach(item => {
+    item.addEventListener('click', function() {
+        const row = currentSelectingRow;
+        const descInput = row.querySelector('input[name*="[description]"]');
+        const packageIdInput = row.querySelector('input[name*="[packageId]"]');
+        const priceInput = row.querySelector('input[name*="[unitPrice]"]');
+        
+        descInput.value = this.dataset.description;
+        packageIdInput.value = this.dataset.id;
+        priceInput.value = this.dataset.price;
+        
+        calculateLineTotal(priceInput);
+        $('#itemSelectionModal').modal('hide');
+    });
+});
+
+function calculateLineTotal(input) {
+    const row = input.closest('tr');
+    const quantity = parseFloat(row.querySelector('.quantity-input').value) || 0;
+    const unitPrice = parseFloat(row.querySelector('.unit-price-input').value) || 0;
+    const total = quantity * unitPrice;
+    
+    row.querySelector('.line-total').textContent = total.toFixed(2);
+    calculateTotals();
+}
+
+function calculateRentalDays(input) {
+    const row = input.closest('tr');
+    const startDate = row.querySelector('.rental-start-input').value;
+    const endDate = row.querySelector('.rental-end-input').value;
+    
+    if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        // Auto-calculate if both dates are set
+        const quantityInput = row.querySelector('.quantity-input');
+        if ({{.settings.AutoCalculateRentalDays}}) {
+            quantityInput.value = diffDays;
+            calculateLineTotal(quantityInput);
+        }
+    }
+}
+
+function calculateTotals() {
+    let subtotal = 0;
+    
+    document.querySelectorAll('.line-total').forEach(span => {
+        subtotal += parseFloat(span.textContent) || 0;
+    });
+    
+    const discountAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
+    const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
+    
+    const taxAmount = (subtotal - discountAmount) * (taxRate / 100);
+    const total = subtotal - discountAmount + taxAmount;
+    
+    document.getElementById('subtotalAmount').textContent = currencySymbol + subtotal.toFixed(2);
+    document.getElementById('discountDisplayAmount').textContent = currencySymbol + discountAmount.toFixed(2);
+    document.getElementById('taxDisplayAmount').textContent = currencySymbol + taxAmount.toFixed(2);
+    document.getElementById('totalAmount').textContent = currencySymbol + total.toFixed(2);
+}
+
+// Add event listeners for discount and tax rate changes
+document.getElementById('discountAmount').addEventListener('input', calculateTotals);
+document.getElementById('taxRate').addEventListener('input', calculateTotals);
+
+function submitInvoice() {
+    const formData = new FormData(document.getElementById('invoiceForm'));
+    const invoice = {
+        customerId: parseInt(formData.get('customerId')),
+        jobId: formData.get('jobId') ? parseInt(formData.get('jobId')) : null,
+        templateId: formData.get('templateId') ? parseInt(formData.get('templateId')) : null,
+        issueDate: formData.get('issueDate'),
+        dueDate: formData.get('dueDate'),
+        paymentTerms: formData.get('paymentTerms') || null,
+        taxRate: parseFloat(formData.get('taxRate')) || 0,
+        discountAmount: parseFloat(formData.get('discountAmount')) || 0,
+        notes: formData.get('notes') || null,
+        termsConditions: formData.get('termsConditions') || null,
+        lineItems: []
+    };
+    
+    // Collect line items
+    const rows = document.querySelectorAll('.line-item-row');
+    rows.forEach((row, index) => {
+        const itemType = row.querySelector(`select[name="lineItems[${index}][itemType]"]`).value;
+        const description = row.querySelector(`input[name="lineItems[${index}][description]"]`).value;
+        const quantity = parseFloat(row.querySelector(`input[name="lineItems[${index}][quantity]"]`).value);
+        const unitPrice = parseFloat(row.querySelector(`input[name="lineItems[${index}][unitPrice]"]`).value);
+        const deviceId = row.querySelector(`input[name="lineItems[${index}][deviceId]"]`).value || null;
+        const packageId = row.querySelector(`input[name="lineItems[${index}][packageId]"]`).value || null;
+        const rentalStartDate = row.querySelector(`input[name="lineItems[${index}][rentalStartDate]"]`).value || null;
+        const rentalEndDate = row.querySelector(`input[name="lineItems[${index}][rentalEndDate]"]`).value || null;
+        
+        invoice.lineItems.push({
+            itemType,
+            deviceId,
+            packageId: packageId ? parseInt(packageId) : null,
+            description,
+            quantity,
+            unitPrice,
+            rentalStartDate,
+            rentalEndDate
+        });
+    });
+    
+    const url = {{if .isEdit}}`/api/invoices/{{.invoice.InvoiceID}}`{{else}}'/api/invoices'{{end}};
+    const method = {{if .isEdit}}'PUT'{{else}}'POST'{{end}};
+    
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(invoice)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert('Error: ' + data.error);
+        } else {
+            alert('Invoice {{if .isEdit}}updated{{else}}created{{end}} successfully!');
+            window.location.href = '/invoices';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to {{if .isEdit}}update{{else}}create{{end}} invoice');
+    });
+}
+
+{{if .isEdit}}
+function previewInvoice() {
+    window.open('/invoices/{{.invoice.InvoiceID}}', '_blank');
+}
+{{end}}
+</script>
+{{end}}

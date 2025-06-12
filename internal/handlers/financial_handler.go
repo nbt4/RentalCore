@@ -33,6 +33,7 @@ func (h *FinancialHandler) FinancialDashboard(c *gin.Context) {
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
 			"title": "Error",
 			"error": "Failed to load financial data",
+			"user":  user,
 		})
 		return
 	}
@@ -51,6 +52,10 @@ func (h *FinancialHandler) FinancialDashboard(c *gin.Context) {
 // ListTransactions displays all financial transactions
 func (h *FinancialHandler) ListTransactions(c *gin.Context) {
 	var transactions []models.FinancialTransaction
+	var customers []models.Customer
+	
+	// Load customers for filter dropdown
+	h.db.Find(&customers)
 	
 	query := h.db.Preload("Job").Preload("Customer").Preload("Creator").
 		Order("transaction_date DESC")
@@ -70,9 +75,11 @@ func (h *FinancialHandler) ListTransactions(c *gin.Context) {
 	
 	result := query.Find(&transactions)
 	if result.Error != nil {
+		user, _ := GetCurrentUser(c)
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
 			"title": "Error",
 			"error": "Failed to load transactions",
+			"user":  user,
 		})
 		return
 	}
@@ -82,6 +89,7 @@ func (h *FinancialHandler) ListTransactions(c *gin.Context) {
 		"title":        "Financial Transactions",
 		"user":         user,
 		"transactions": transactions,
+		"customers":    customers,
 	})
 }
 
@@ -178,15 +186,18 @@ func (h *FinancialHandler) GetTransaction(c *gin.Context) {
 		First(&transaction, transactionID)
 
 	if result.Error != nil {
+		user, _ := GetCurrentUser(c)
 		if result.Error == gorm.ErrRecordNotFound {
 			c.HTML(http.StatusNotFound, "error.html", gin.H{
 				"title": "Transaction Not Found",
 				"error": "Financial transaction not found",
+				"user":  user,
 			})
 		} else {
 			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
 				"title": "Error",
 				"error": "Failed to load transaction",
+				"user":  user,
 			})
 		}
 		return

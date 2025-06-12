@@ -142,25 +142,29 @@ type SearchHistory struct {
 // ================================================================
 
 type JobTemplate struct {
-	TemplateID          uint            `gorm:"primaryKey;autoIncrement" json:"templateID"`
-	Name                string          `gorm:"not null" json:"name"`
-	Description         string          `json:"description"`
-	JobCategoryID       *uint           `json:"jobCategoryID"`
-	DefaultDurationDays int             `json:"defaultDurationDays"`
-	EquipmentList       json.RawMessage `gorm:"type:json" json:"equipmentList"`
-	DefaultNotes        string          `json:"defaultNotes"`
-	PricingTemplate     json.RawMessage `gorm:"type:json" json:"pricingTemplate"`
-	RequiredDocuments   json.RawMessage `gorm:"type:json" json:"requiredDocuments"`
-	CreatedBy           *uint           `json:"createdBy"`
-	CreatedAt           time.Time       `json:"createdAt"`
-	UpdatedAt           time.Time       `json:"updatedAt"`
-	IsActive            bool            `gorm:"default:true" json:"isActive"`
-	UsageCount          int             `gorm:"default:0" json:"usageCount"`
+	TemplateID          uint            `gorm:"primaryKey;autoIncrement;column:templateID" json:"templateID"`
+	Name                string          `gorm:"not null;column:name" json:"name" binding:"required,min=3,max=100"`
+	Description         string          `gorm:"column:description" json:"description" binding:"max=500"`
+	JobCategoryID       *uint           `gorm:"column:jobcategoryID" json:"jobCategoryID"`
+	DefaultDurationDays *int            `gorm:"column:default_duration_days" json:"defaultDurationDays" binding:"omitempty,min=1,max=365"`
+	EquipmentList       json.RawMessage `gorm:"type:json;column:equipment_list" json:"equipmentList"`
+	DefaultNotes        string          `gorm:"column:default_notes" json:"defaultNotes" binding:"max=1000"`
+	PricingTemplate     json.RawMessage `gorm:"type:json;column:pricing_template" json:"pricingTemplate"`
+	RequiredDocuments   json.RawMessage `gorm:"type:json;column:required_documents" json:"requiredDocuments"`
+	CreatedBy           *uint           `gorm:"column:created_by" json:"createdBy"`
+	CreatedAt           time.Time       `gorm:"column:created_at" json:"createdAt"`
+	UpdatedAt           time.Time       `gorm:"column:updated_at" json:"updatedAt"`
+	IsActive            bool            `gorm:"default:true;column:is_active" json:"isActive"`
+	UsageCount          int             `gorm:"default:0;column:usage_count" json:"usageCount"`
 
 	// Relationships
-	JobCategory *JobCategory `gorm:"foreignKey:JobCategoryID" json:"jobCategory,omitempty"`
-	Creator     *User        `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
-	Jobs        []Job        `gorm:"foreignKey:TemplateID" json:"jobs,omitempty"`
+	JobCategory *JobCategory `gorm:"foreignKey:JobCategoryID;references:JobCategoryID" json:"jobCategory,omitempty"`
+	Creator     *User        `gorm:"foreignKey:CreatedBy;references:UserID" json:"creator,omitempty"`
+	Jobs        []Job        `gorm:"foreignKey:TemplateID;references:TemplateID" json:"jobs,omitempty"`
+}
+
+func (JobTemplate) TableName() string {
+	return "job_templates"
 }
 
 type EquipmentPackage struct {
@@ -178,7 +182,32 @@ type EquipmentPackage struct {
 	UsageCount       int             `gorm:"default:0" json:"usageCount"`
 
 	// Relationships
-	Creator *User `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
+	Creator        *User           `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
+	PackageDevices []PackageDevice `gorm:"foreignKey:PackageID" json:"packageDevices,omitempty"`
+}
+
+func (EquipmentPackage) TableName() string {
+	return "equipment_packages"
+}
+
+type PackageDevice struct {
+	PackageID   uint     `gorm:"primaryKey;column:packageID" json:"packageID"`
+	DeviceID    string   `gorm:"primaryKey;column:deviceID" json:"deviceID"`
+	Quantity    uint     `gorm:"not null;default:1;column:quantity" json:"quantity"`
+	CustomPrice *float64 `gorm:"type:decimal(12,2);column:custom_price" json:"customPrice"`
+	IsRequired  bool     `gorm:"not null;default:false;column:is_required" json:"isRequired"`
+	Notes       string   `gorm:"column:notes" json:"notes"`
+	SortOrder   *uint    `gorm:"column:sort_order" json:"sortOrder"`
+	CreatedAt   time.Time `gorm:"column:created_at" json:"createdAt"`
+	UpdatedAt   time.Time `gorm:"column:updated_at" json:"updatedAt"`
+
+	// Relationships
+	Package *EquipmentPackage `gorm:"foreignKey:PackageID" json:"package,omitempty"`
+	Device  *Device           `gorm:"foreignKey:DeviceID" json:"device,omitempty"`
+}
+
+func (PackageDevice) TableName() string {
+	return "package_devices"
 }
 
 // ================================================================

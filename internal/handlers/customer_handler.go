@@ -19,15 +19,17 @@ func NewCustomerHandler(customerRepo *repository.CustomerRepository) *CustomerHa
 }
 
 func (h *CustomerHandler) ListCustomers(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	params := &models.FilterParams{}
 	if err := c.ShouldBindQuery(params); err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
 	customers, err := h.customerRepo.List(params)
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
@@ -35,13 +37,17 @@ func (h *CustomerHandler) ListCustomers(c *gin.Context) {
 		"title":     "Customers",
 		"customers": customers,
 		"params":    params,
+		"user":      user,
 	})
 }
 
 func (h *CustomerHandler) NewCustomerForm(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	c.HTML(http.StatusOK, "customer_form_new.html", gin.H{
 		"title":    "New Customer",
 		"customer": &models.Customer{},
+		"user":     user,
 	})
 }
 
@@ -77,10 +83,12 @@ func (h *CustomerHandler) CreateCustomer(c *gin.Context) {
 	}
 
 	if err := h.customerRepo.Create(&customer); err != nil {
+		user, _ := GetCurrentUser(c)
 		c.HTML(http.StatusInternalServerError, "customer_form_new.html", gin.H{
 			"title":    "New Customer",
 			"customer": &customer,
 			"error":    err.Error(),
+			"user":     user,
 		})
 		return
 	}
@@ -89,46 +97,54 @@ func (h *CustomerHandler) CreateCustomer(c *gin.Context) {
 }
 
 func (h *CustomerHandler) GetCustomer(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid customer ID"})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid customer ID", "user": user})
 		return
 	}
 
 	customer, err := h.customerRepo.GetByID(uint(id))
 	if err != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Customer not found"})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Customer not found", "user": user})
 		return
 	}
 
 	c.HTML(http.StatusOK, "customer_detail.html", gin.H{
 		"customer": customer,
+		"user":     user,
 	})
 }
 
 func (h *CustomerHandler) EditCustomerForm(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid customer ID"})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid customer ID", "user": user})
 		return
 	}
 
 	customer, err := h.customerRepo.GetByID(uint(id))
 	if err != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Customer not found"})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Customer not found", "user": user})
 		return
 	}
 
 	c.HTML(http.StatusOK, "customer_form_new.html", gin.H{
 		"title":    "Edit Customer",
 		"customer": customer,
+		"user":     user,
 	})
 }
 
 func (h *CustomerHandler) UpdateCustomer(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid customer ID"})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid customer ID", "user": user})
 		return
 	}
 
@@ -168,6 +184,7 @@ func (h *CustomerHandler) UpdateCustomer(c *gin.Context) {
 			"title":    "Edit Customer",
 			"customer": &customer,
 			"error":    err.Error(),
+			"user":     user,
 		})
 		return
 	}

@@ -58,36 +58,39 @@ func NewDocumentHandler(db *gorm.DB) *DocumentHandler {
 // DOCUMENT MANAGEMENT
 // ================================================================
 
-// ListDocuments displays documents for an entity
+// ListDocuments displays documents for an entity or all documents
 func (h *DocumentHandler) ListDocuments(c *gin.Context) {
 	entityType := c.Query("entityType")
 	entityID := c.Query("entityID")
 
-	if entityType == "" || entityID == "" {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{
-			"title": "Error",
-			"error": "Entity type and ID are required",
-		})
-		return
+	var documents []models.Document
+	query := h.db.Preload("Uploader").Preload("Signatures").Order("uploaded_at DESC")
+
+	// If entity parameters are provided, filter by them
+	if entityType != "" && entityID != "" {
+		query = query.Where("entity_type = ? AND entity_id = ?", entityType, entityID)
 	}
 
-	var documents []models.Document
-	result := h.db.Preload("Uploader").Preload("Signatures").
-		Where("entity_type = ? AND entity_id = ?", entityType, entityID).
-		Order("uploaded_at DESC").
-		Find(&documents)
+	result := query.Find(&documents)
 
 	if result.Error != nil {
+		user, _ := GetCurrentUser(c)
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
 			"title": "Error",
 			"error": "Failed to load documents",
+			"user":  user,
 		})
 		return
 	}
 
 	user, _ := GetCurrentUser(c)
+	title := "All Documents"
+	if entityType != "" && entityID != "" {
+		title = "Documents"
+	}
+
 	c.HTML(http.StatusOK, "documents_list.html", gin.H{
-		"title":      "Documents",
+		"title":      title,
 		"user":       user,
 		"documents":  documents,
 		"entityType": entityType,
@@ -101,9 +104,11 @@ func (h *DocumentHandler) UploadDocumentForm(c *gin.Context) {
 	entityID := c.Query("entityID")
 
 	if entityType == "" || entityID == "" {
+		user, _ := GetCurrentUser(c)
 		c.HTML(http.StatusBadRequest, "error.html", gin.H{
 			"title": "Error",
 			"error": "Entity type and ID are required",
+			"user":  user,
 		})
 		return
 	}
@@ -330,9 +335,11 @@ func (h *DocumentHandler) SignatureForm(c *gin.Context) {
 
 	var document models.Document
 	if err := h.db.First(&document, documentID).Error; err != nil {
+		user, _ := GetCurrentUser(c)
 		c.HTML(http.StatusNotFound, "error.html", gin.H{
 			"title": "Error",
 			"error": "Document not found",
+			"user":  user,
 		})
 		return
 	}

@@ -28,17 +28,19 @@ func NewScannerHandler(jobRepo *repository.JobRepository, deviceRepo *repository
 }
 
 func (h *ScannerHandler) ScanJobSelection(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	// Get active jobs for selection
 	jobs, err := h.jobRepo.List(&models.FilterParams{})
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
 	// Get device statistics for the dashboard
 	totalDevices, err := h.deviceRepo.List(&models.FilterParams{})
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
@@ -58,26 +60,29 @@ func (h *ScannerHandler) ScanJobSelection(c *gin.Context) {
 		"jobs":            jobs,
 		"totalDevices":    availableCount,
 		"assignedDevices": assignedCount,
+		"user":            user,
 	})
 }
 
 func (h *ScannerHandler) ScanJob(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	jobID, err := strconv.ParseUint(c.Param("jobId"), 10, 32)
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid job ID"})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid job ID", "user": user})
 		return
 	}
 
 	job, err := h.jobRepo.GetByID(uint(jobID))
 	if err != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Job not found"})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Job not found", "user": user})
 		return
 	}
 
 	// Get assigned devices for this job
 	assignedDevices, err := h.jobRepo.GetJobDevices(uint(jobID))
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
@@ -116,6 +121,7 @@ func (h *ScannerHandler) ScanJob(c *gin.Context) {
 		"productGroups":   productGroups,
 		"totalDevices":    totalDevices,
 		"cases":           cases,
+		"user":            user,
 	})
 }
 

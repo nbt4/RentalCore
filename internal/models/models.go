@@ -66,6 +66,7 @@ type Job struct {
 	FinalRevenue    *float64    `json:"final_revenue" gorm:"column:final_revenue"`
 	StartDate       *time.Time  `json:"startDate" gorm:"column:startDate;type:date"`
 	EndDate         *time.Time  `json:"endDate" gorm:"column:endDate;type:date"`
+	TemplateID      *uint       `json:"templateID" gorm:"column:templateID"`
 	JobDevices      []JobDevice `json:"job_devices,omitempty" gorm:"foreignKey:JobID;references:JobID"`
 }
 

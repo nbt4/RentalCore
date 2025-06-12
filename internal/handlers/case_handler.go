@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"strconv"
 
@@ -24,15 +25,17 @@ func NewCaseHandler(caseRepo *repository.CaseRepository, deviceRepo *repository.
 
 // Web interface handlers
 func (h *CaseHandler) ListCases(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	params := &models.FilterParams{}
 	if err := c.ShouldBindQuery(params); err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
 	cases, err := h.caseRepo.List(params)
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
@@ -40,21 +43,24 @@ func (h *CaseHandler) ListCases(c *gin.Context) {
 		"title": "Cases",
 		"cases": cases,
 		"params": params,
+		"user": user,
 	})
 }
 
 func (h *CaseHandler) CaseManagement(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	params := &models.FilterParams{}
 	cases, err := h.caseRepo.List(params)
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
 	// Get available devices for case management
 	devices, err := h.deviceRepo.GetAvailableDevicesForCaseManagement()
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
@@ -62,33 +68,42 @@ func (h *CaseHandler) CaseManagement(c *gin.Context) {
 		"title": "Case Management",
 		"cases": cases,
 		"devices": devices,
+		"user": user,
 	})
 }
 
 func (h *CaseHandler) CaseManagementDemo(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	c.HTML(http.StatusOK, "case_management_demo.html", gin.H{
 		"title": "Case Management Demo",
+		"user": user,
 	})
 }
 
 func (h *CaseHandler) CaseManagementDemoMinimal(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	c.HTML(http.StatusOK, "case_management_demo_minimal.html", gin.H{
 		"title": "Case Management Demo - Minimal",
+		"user": user,
 	})
 }
 
 func (h *CaseHandler) CaseManagementSimple(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	params := &models.FilterParams{}
 	cases, err := h.caseRepo.List(params)
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
 	// Get available devices for case management
 	devices, err := h.deviceRepo.GetAvailableDevicesForCaseManagement()
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
@@ -96,13 +111,17 @@ func (h *CaseHandler) CaseManagementSimple(c *gin.Context) {
 		"title": "Case Management Simple",
 		"cases": cases,
 		"devices": devices,
+		"user": user,
 	})
 }
 
 func (h *CaseHandler) NewCaseForm(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	c.HTML(http.StatusOK, "case_form.html", gin.H{
 		"title": "New Case",
 		"case":  &models.Case{},
+		"user": user,
 	})
 }
 
@@ -148,10 +167,12 @@ func (h *CaseHandler) CreateCase(c *gin.Context) {
 	}
 
 	if err := h.caseRepo.Create(&case_); err != nil {
+		user, _ := GetCurrentUser(c)
 		c.HTML(http.StatusInternalServerError, "case_form.html", gin.H{
 			"title": "New Case",
 			"case":  &case_,
 			"error": err.Error(),
+			"user": user,
 		})
 		return
 	}
@@ -160,49 +181,57 @@ func (h *CaseHandler) CreateCase(c *gin.Context) {
 }
 
 func (h *CaseHandler) GetCase(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	caseIDStr := c.Param("id")
 	caseID, err := strconv.ParseUint(caseIDStr, 10, 32)
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid case ID"})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid case ID", "user": user})
 		return
 	}
 
 	case_, err := h.caseRepo.GetByID(uint(caseID))
 	if err != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Case not found"})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Case not found", "user": user})
 		return
 	}
 
 	c.HTML(http.StatusOK, "case_detail.html", gin.H{
 		"case": case_,
+		"user": user,
 	})
 }
 
 func (h *CaseHandler) EditCaseForm(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	caseIDStr := c.Param("id")
 	caseID, err := strconv.ParseUint(caseIDStr, 10, 32)
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid case ID"})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid case ID", "user": user})
 		return
 	}
 
 	case_, err := h.caseRepo.GetByID(uint(caseID))
 	if err != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Case not found"})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Case not found", "user": user})
 		return
 	}
 
 	c.HTML(http.StatusOK, "case_form.html", gin.H{
 		"title": "Edit Case",
 		"case":  case_,
+		"user": user,
 	})
 }
 
 func (h *CaseHandler) UpdateCase(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	caseIDStr := c.Param("id")
 	caseID, err := strconv.ParseUint(caseIDStr, 10, 32)
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid case ID"})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid case ID", "user": user})
 		return
 	}
 
@@ -249,6 +278,7 @@ func (h *CaseHandler) UpdateCase(c *gin.Context) {
 			"title": "Edit Case",
 			"case":  &case_,
 			"error": err.Error(),
+			"user": user,
 		})
 		return
 	}
@@ -274,22 +304,24 @@ func (h *CaseHandler) DeleteCase(c *gin.Context) {
 
 // Device mapping handlers
 func (h *CaseHandler) CaseDeviceMapping(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	caseIDStr := c.Param("id")
 	caseID, err := strconv.ParseUint(caseIDStr, 10, 32)
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid case ID"})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid case ID", "user": user})
 		return
 	}
 
 	case_, err := h.caseRepo.GetByID(uint(caseID))
 	if err != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Case not found"})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Case not found", "user": user})
 		return
 	}
 
 	deviceCases, err := h.caseRepo.GetDevicesInCase(uint(caseID))
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
@@ -297,6 +329,7 @@ func (h *CaseHandler) CaseDeviceMapping(c *gin.Context) {
 		"title":       "Case Device Mapping",
 		"case":        case_,
 		"deviceCases": deviceCases,
+		"user": user,
 	})
 }
 
@@ -458,4 +491,32 @@ func (h *CaseHandler) DeleteCaseAPI(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Case deleted successfully"})
+}
+
+// GetCaseDevicesAPI returns devices in a case as JSON
+func (h *CaseHandler) GetCaseDevicesAPI(c *gin.Context) {
+	caseIDStr := c.Param("id")
+	log.Printf("GetCaseDevicesAPI: Getting devices for case ID: %s", caseIDStr)
+	
+	caseID, err := strconv.ParseUint(caseIDStr, 10, 32)
+	if err != nil {
+		log.Printf("GetCaseDevicesAPI: Invalid case ID: %s, error: %v", caseIDStr, err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid case ID"})
+		return
+	}
+
+	deviceCases, err := h.caseRepo.GetDevicesInCase(uint(caseID))
+	if err != nil {
+		log.Printf("GetCaseDevicesAPI: Database error for case %d: %v", caseID, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Ensure we always return an array, never null
+	if deviceCases == nil {
+		deviceCases = []models.DeviceCase{}
+	}
+
+	log.Printf("GetCaseDevicesAPI: Found %d devices for case %d", len(deviceCases), caseID)
+	c.JSON(http.StatusOK, gin.H{"devices": deviceCases})
 }

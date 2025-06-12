@@ -186,6 +186,8 @@ func (r *DeviceRepository) GetAvailableDevicesForCaseManagement() ([]models.Devi
 		Preload("Product").
 		Preload("Product.Category").
 		Preload("Product.Subcategory").
+		Preload("Product.Brand").
+		Preload("Product.Manufacturer").
 		Find(&devices).Error
 	
 	// Log device count for monitoring

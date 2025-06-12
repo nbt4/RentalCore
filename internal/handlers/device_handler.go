@@ -27,15 +27,17 @@ func NewDeviceHandler(deviceRepo *repository.DeviceRepository, barcodeService *s
 
 // Web interface handlers
 func (h *DeviceHandler) ListDevices(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	params := &models.FilterParams{}
 	if err := c.ShouldBindQuery(params); err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
 	devices, err := h.deviceRepo.List(params)
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
@@ -43,13 +45,16 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 		"title":   "Devices",
 		"devices": devices,
 		"params":  params,
+		"user":    user,
 	})
 }
 
 func (h *DeviceHandler) NewDeviceForm(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	products, err := h.productRepo.List(&models.FilterParams{})
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
@@ -57,6 +62,7 @@ func (h *DeviceHandler) NewDeviceForm(c *gin.Context) {
 		"title":    "New Device",
 		"device":   &models.Device{},
 		"products": products,
+		"user":     user,
 	})
 }
 
@@ -84,12 +90,14 @@ func (h *DeviceHandler) CreateDevice(c *gin.Context) {
 	}
 
 	if err := h.deviceRepo.Create(&device); err != nil {
+		user, _ := GetCurrentUser(c)
 		products, _ := h.productRepo.List(&models.FilterParams{})
 		c.HTML(http.StatusInternalServerError, "device_form_new.html", gin.H{
 			"title":    "New Device",
 			"device":   &device,
 			"products": products,
 			"error":    err.Error(),
+			"user":     user,
 		})
 		return
 	}
@@ -98,31 +106,36 @@ func (h *DeviceHandler) CreateDevice(c *gin.Context) {
 }
 
 func (h *DeviceHandler) GetDevice(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	deviceID := c.Param("id")
 
 	device, err := h.deviceRepo.GetByID(deviceID)
 	if err != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Device not found"})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Device not found", "user": user})
 		return
 	}
 
 	c.HTML(http.StatusOK, "device_detail.html", gin.H{
 		"device": device,
+		"user":   user,
 	})
 }
 
 func (h *DeviceHandler) EditDeviceForm(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	deviceID := c.Param("id")
 
 	device, err := h.deviceRepo.GetByID(deviceID)
 	if err != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Device not found"})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Device not found", "user": user})
 		return
 	}
 
 	products, err := h.productRepo.List(&models.FilterParams{})
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
@@ -130,6 +143,7 @@ func (h *DeviceHandler) EditDeviceForm(c *gin.Context) {
 		"title":    "Edit Device",
 		"device":   device,
 		"products": products,
+		"user":     user,
 	})
 }
 
@@ -154,12 +168,14 @@ func (h *DeviceHandler) UpdateDevice(c *gin.Context) {
 	}
 
 	if err := h.deviceRepo.Update(&device); err != nil {
+		user, _ := GetCurrentUser(c)
 		products, _ := h.productRepo.List(&models.FilterParams{})
 		c.HTML(http.StatusInternalServerError, "device_form_new.html", gin.H{
 			"title":    "Edit Device",
 			"device":   &device,
 			"products": products,
 			"error":    err.Error(),
+			"user":     user,
 		})
 		return
 	}
@@ -179,11 +195,13 @@ func (h *DeviceHandler) DeleteDevice(c *gin.Context) {
 }
 
 func (h *DeviceHandler) GetDeviceQR(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	deviceID := c.Param("id")
 
 	device, err := h.deviceRepo.GetByID(deviceID)
 	if err != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Device not found"})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Device not found", "user": user})
 		return
 	}
 
@@ -195,7 +213,7 @@ func (h *DeviceHandler) GetDeviceQR(c *gin.Context) {
 	
 	qrCode, err := h.barcodeService.GenerateQRCode(identifier, 256)
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
@@ -203,11 +221,13 @@ func (h *DeviceHandler) GetDeviceQR(c *gin.Context) {
 }
 
 func (h *DeviceHandler) GetDeviceBarcode(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	deviceID := c.Param("id")
 
 	device, err := h.deviceRepo.GetByID(deviceID)
 	if err != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Device not found"})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Device not found", "user": user})
 		return
 	}
 
@@ -219,7 +239,7 @@ func (h *DeviceHandler) GetDeviceBarcode(c *gin.Context) {
 	
 	barcode, err := h.barcodeService.GenerateBarcode(identifier)
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 

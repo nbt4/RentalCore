@@ -66,6 +66,9 @@ func main() {
 	productRepo := repository.NewProductRepository(db)
 	jobCategoryRepo := repository.NewJobCategoryRepository(db)
 	caseRepo := repository.NewCaseRepository(db)
+	jobTemplateRepo := repository.NewJobTemplateRepository(db)
+	equipmentPackageRepo := repository.NewEquipmentPackageRepository(db)
+	invoiceRepo := repository.NewInvoiceRepository(db)
 
 	// Initialize services
 	barcodeService := services.NewBarcodeService()
@@ -77,6 +80,10 @@ func main() {
 	
 	if err := db.AutoMigrate(&models.Session{}); err != nil {
 		log.Printf("Failed to auto-migrate sessions table: %v", err)
+	}
+	
+	if err := db.AutoMigrate(&models.EquipmentPackage{}); err != nil {
+		log.Printf("Failed to auto-migrate equipment_packages table: %v", err)
 	}
 
 	// Initialize handlers
@@ -92,13 +99,18 @@ func main() {
 	analyticsHandler := handlers.NewAnalyticsHandler(db.DB)
 	searchHandler := handlers.NewSearchHandler(db.DB)
 	pwaHandler := handlers.NewPWAHandler(db.DB)
-	workflowHandler := handlers.NewWorkflowHandler(db.DB)
+	workflowHandler := handlers.NewWorkflowHandler(jobTemplateRepo, jobRepo, customerRepo, equipmentPackageRepo, deviceRepo)
 	documentHandler := handlers.NewDocumentHandler(db.DB)
 	financialHandler := handlers.NewFinancialHandler(db.DB)
 	securityHandler := handlers.NewSecurityHandler(db.DB)
+	invoiceHandler := handlers.NewInvoiceHandler(invoiceRepo, customerRepo, jobRepo, deviceRepo, equipmentPackageRepo)
 
-	// Setup Gin router
-	r := gin.Default()
+	// Setup Gin router with error handling
+	r := gin.New()
+	
+	// Add comprehensive error handling middleware
+	r.Use(gin.Logger())
+	r.Use(handlers.GlobalErrorHandler()) // Custom recovery with proper error pages
 
 
 	// Load HTML templates with custom functions
@@ -136,6 +148,12 @@ func main() {
 				return fmt.Sprintf("%d %s", bytes, sizes[i])
 			}
 			return fmt.Sprintf("%.1f %s", float64(bytes), sizes[i])
+		},
+		"add": func(a, b int) int {
+			return a + b
+		},
+		"sub": func(a, b int) int {
+			return a - b
 		},
 		"title": func(s string) string {
 			return strings.Title(s)
@@ -191,7 +209,10 @@ func main() {
 	}
 
 	// Routes
-	setupRoutes(r, jobHandler, deviceHandler, customerHandler, statusHandler, productHandler, barcodeHandler, scannerHandler, authHandler, caseHandler, analyticsHandler, searchHandler, pwaHandler, workflowHandler, documentHandler, financialHandler, securityHandler)
+	setupRoutes(r, jobHandler, deviceHandler, customerHandler, statusHandler, productHandler, barcodeHandler, scannerHandler, authHandler, caseHandler, analyticsHandler, searchHandler, pwaHandler, workflowHandler, documentHandler, financialHandler, securityHandler, invoiceHandler)
+	
+	// Add 404 handler as the last route
+	r.NoRoute(handlers.NotFoundHandler())
 
 	// Start server
 	addr := cfg.Server.Host + ":" + strconv.Itoa(cfg.Server.Port)
@@ -239,7 +260,8 @@ func setupRoutes(r *gin.Engine,
 	workflowHandler *handlers.WorkflowHandler,
 	documentHandler *handlers.DocumentHandler,
 	financialHandler *handlers.FinancialHandler,
-	securityHandler *handlers.SecurityHandler) {
+	securityHandler *handlers.SecurityHandler,
+	invoiceHandler *handlers.InvoiceHandler) {
 
 	// Authentication routes (no auth required)
 	r.GET("/login", authHandler.LoginForm)
@@ -397,6 +419,7 @@ func setupRoutes(r *gin.Engine,
 			{
 				packages.GET("", workflowHandler.ListEquipmentPackages)
 				packages.GET("/new", workflowHandler.NewEquipmentPackageForm)
+				packages.GET("/debug", workflowHandler.DebugPackageForm)
 				packages.POST("", workflowHandler.CreateEquipmentPackage)
 				packages.GET("/:id", workflowHandler.GetEquipmentPackage)
 			}
@@ -442,6 +465,31 @@ func setupRoutes(r *gin.Engine,
 			financial.GET("/reports", financialHandler.FinancialReports)
 			financial.GET("/api/revenue-report", financialHandler.GetRevenueReport)
 			financial.GET("/api/payment-report", financialHandler.GetPaymentReport)
+		}
+
+		// Invoice routes
+		invoices := protected.Group("/invoices")
+		{
+			invoices.GET("", invoiceHandler.ListInvoices)
+			invoices.GET("/new", invoiceHandler.NewInvoiceForm)
+			invoices.POST("", invoiceHandler.CreateInvoice)
+			invoices.GET("/:id", invoiceHandler.GetInvoice)
+			invoices.GET("/:id/edit", invoiceHandler.EditInvoiceForm)
+			invoices.PUT("/:id", invoiceHandler.UpdateInvoice)
+			invoices.DELETE("/:id", invoiceHandler.DeleteInvoice)
+			invoices.PUT("/:id/status", invoiceHandler.UpdateInvoiceStatus)
+			invoices.GET("/:id/pdf", invoiceHandler.GenerateInvoicePDF)
+			invoices.GET("/:id/preview", invoiceHandler.PreviewInvoicePDF)
+			invoices.POST("/:id/email", invoiceHandler.EmailInvoice)
+		}
+
+		// Invoice settings routes
+		settings := protected.Group("/settings")
+		{
+			settings.GET("/company", invoiceHandler.CompanySettingsForm)
+			settings.PUT("/company", invoiceHandler.UpdateCompanySettings)
+			settings.GET("/invoices", invoiceHandler.InvoiceSettingsForm)
+			settings.PUT("/invoices", invoiceHandler.UpdateInvoiceSettings)
 		}
 
 		// Security & Admin routes
@@ -588,14 +636,24 @@ func setupRoutes(r *gin.Engine,
 				apiCases.GET("/:id", caseHandler.GetCaseAPI)
 				apiCases.PUT("/:id", caseHandler.UpdateCaseAPI)
 				apiCases.DELETE("/:id", caseHandler.DeleteCaseAPI)
+				apiCases.GET("/:id/devices", caseHandler.GetCaseDevicesAPI)
 			}
 
 			// Workflow API
 			apiWorkflow := api.Group("/workflow")
 			{
-				apiWorkflow.GET("/templates", workflowHandler.ListJobTemplatesAPI)
-				apiWorkflow.GET("/packages", workflowHandler.ListEquipmentPackagesAPI)
-				apiWorkflow.GET("/stats", workflowHandler.GetWorkflowStats)
+				// Job Templates API
+				templates := apiWorkflow.Group("/templates")
+				{
+					templates.GET("", workflowHandler.ListJobTemplatesAPI)
+					templates.POST("", workflowHandler.CreateJobTemplate)
+					templates.GET("/most-used", workflowHandler.GetMostUsedTemplatesAPI)
+					templates.GET("/category/:categoryId", workflowHandler.GetTemplatesByCategoryAPI)
+					templates.GET("/:id", workflowHandler.GetJobTemplate)
+					templates.PUT("/:id", workflowHandler.UpdateJobTemplate)
+					templates.DELETE("/:id", workflowHandler.DeleteJobTemplate)
+					templates.POST("/:id/create-job", workflowHandler.CreateJobFromTemplate)
+				}
 			}
 
 			// Document API
@@ -615,6 +673,42 @@ func setupRoutes(r *gin.Engine,
 				apiFinancial.GET("/revenue-report", financialHandler.GetRevenueReport)
 				apiFinancial.GET("/payment-report", financialHandler.GetPaymentReport)
 			}
+
+			// Invoice API
+			apiInvoices := api.Group("/invoices")
+			{
+				apiInvoices.GET("", invoiceHandler.GetInvoicesAPI)
+				apiInvoices.POST("", invoiceHandler.CreateInvoice)
+				apiInvoices.GET("/:id", invoiceHandler.GetInvoice)
+				apiInvoices.PUT("/:id", invoiceHandler.UpdateInvoice)
+				apiInvoices.DELETE("/:id", invoiceHandler.DeleteInvoice)
+				apiInvoices.PUT("/:id/status", invoiceHandler.UpdateInvoiceStatus)
+				apiInvoices.GET("/stats", invoiceHandler.GetInvoiceStatsAPI)
+			}
+		}
+
+		// Additional API routes (outside v1 group for legacy compatibility)
+		api := protected.Group("/api")
+		{
+			// Invoice API
+			api.GET("/invoices", invoiceHandler.GetInvoicesAPI)
+			api.POST("/invoices", invoiceHandler.CreateInvoice)
+			api.GET("/invoices/:id", invoiceHandler.GetInvoice)
+			api.PUT("/invoices/:id", invoiceHandler.UpdateInvoice)
+			api.DELETE("/invoices/:id", invoiceHandler.DeleteInvoice)
+			api.PUT("/invoices/:id/status", invoiceHandler.UpdateInvoiceStatus)
+			api.GET("/invoices/stats", invoiceHandler.GetInvoiceStatsAPI)
+			
+			// Company settings API
+			api.GET("/company-settings", invoiceHandler.CompanySettingsForm)
+			api.PUT("/company-settings", invoiceHandler.UpdateCompanySettings)
+			
+			// Invoice settings API
+			api.GET("/invoice-settings", invoiceHandler.InvoiceSettingsForm)
+			api.PUT("/invoice-settings", invoiceHandler.UpdateInvoiceSettings)
+			
+			// Email API
+			api.POST("/test-email", invoiceHandler.TestEmailSettings)
 
 			// Security API
 			apiSecurity := api.Group("/security")

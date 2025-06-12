@@ -229,7 +229,8 @@ func (h *AuthHandler) ListUsers(c *gin.Context) {
 	var users []models.User
 	if err := h.db.Order("created_at DESC").Find(&users).Error; err != nil {
 		fmt.Printf("DEBUG: Database error: %v\n", err)
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		currentUser, _ := GetCurrentUser(c)
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": currentUser})
 		return
 	}
 
@@ -329,7 +330,8 @@ func (h *AuthHandler) GetUser(c *gin.Context) {
 	
 	var user models.User
 	if err := h.db.Where("userID = ?", userID).First(&user).Error; err != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "User not found"})
+		currentUser, _ := GetCurrentUser(c)
+	c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "User not found", "user": currentUser})
 		return
 	}
 
@@ -347,7 +349,8 @@ func (h *AuthHandler) EditUserForm(c *gin.Context) {
 	
 	var user models.User
 	if err := h.db.Where("userID = ?", userID).First(&user).Error; err != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "User not found"})
+		currentUser, _ := GetCurrentUser(c)
+	c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "User not found", "user": currentUser})
 		return
 	}
 
@@ -365,7 +368,8 @@ func (h *AuthHandler) UpdateUser(c *gin.Context) {
 	
 	var user models.User
 	if err := h.db.Where("userID = ?", userID).First(&user).Error; err != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "User not found"})
+		currentUser, _ := GetCurrentUser(c)
+	c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "User not found", "user": currentUser})
 		return
 	}
 

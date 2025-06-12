@@ -31,15 +31,17 @@ func NewJobHandler(jobRepo *repository.JobRepository, deviceRepo *repository.Dev
 
 // Web interface handlers
 func (h *JobHandler) ListJobs(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	params := &models.FilterParams{}
 	if err := c.ShouldBindQuery(params); err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
 	jobs, err := h.jobRepo.List(params)
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
@@ -47,25 +49,28 @@ func (h *JobHandler) ListJobs(c *gin.Context) {
 		"title":  "Jobs",
 		"jobs":   jobs,
 		"params": params,
+		"user":   user,
 	})
 }
 
 func (h *JobHandler) NewJobForm(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	customers, err := h.customerRepo.List(&models.FilterParams{})
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
 	statuses, err := h.statusRepo.List()
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
 	jobCategories, err := h.jobCategoryRepo.List()
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
@@ -75,6 +80,7 @@ func (h *JobHandler) NewJobForm(c *gin.Context) {
 		"customers":    customers,
 		"statuses":     statuses,
 		"jobCategories": jobCategories,
+		"user":         user,
 	})
 }
 
@@ -129,6 +135,7 @@ func (h *JobHandler) CreateJob(c *gin.Context) {
 	}
 
 	if err := h.jobRepo.Create(&job); err != nil {
+		user, _ := GetCurrentUser(c)
 		customers, _ := h.customerRepo.List(&models.FilterParams{})
 		statuses, _ := h.statusRepo.List()
 		jobCategories, _ := h.jobCategoryRepo.List()
@@ -139,6 +146,7 @@ func (h *JobHandler) CreateJob(c *gin.Context) {
 			"statuses":     statuses,
 			"jobCategories": jobCategories,
 			"error":        err.Error(),
+			"user":         user,
 		})
 		return
 	}
@@ -147,21 +155,23 @@ func (h *JobHandler) CreateJob(c *gin.Context) {
 }
 
 func (h *JobHandler) GetJob(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid job ID"})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid job ID", "user": user})
 		return
 	}
 
 	job, err := h.jobRepo.GetByID(uint(id))
 	if err != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Job not found"})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Job not found", "user": user})
 		return
 	}
 
 	jobDevices, err := h.jobRepo.GetJobDevices(uint(id))
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
@@ -206,37 +216,40 @@ func (h *JobHandler) GetJob(c *gin.Context) {
 		"productGroups": productGroups,
 		"totalDevices":  totalDevices,
 		"totalValue":    totalValue,
+		"user":          user,
 	})
 }
 
 func (h *JobHandler) EditJobForm(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid job ID"})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid job ID", "user": user})
 		return
 	}
 
 	job, err := h.jobRepo.GetByID(uint(id))
 	if err != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Job not found"})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Job not found", "user": user})
 		return
 	}
 
 	customers, err := h.customerRepo.List(&models.FilterParams{})
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
 	statuses, err := h.statusRepo.List()
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
 	jobCategories, err := h.jobCategoryRepo.List()
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error()})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
 
@@ -246,20 +259,23 @@ func (h *JobHandler) EditJobForm(c *gin.Context) {
 		"customers":    customers,
 		"statuses":     statuses,
 		"jobCategories": jobCategories,
+		"user":         user,
 	})
 }
 
 func (h *JobHandler) UpdateJob(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
 	id, err := strconv.ParseUint(c.Param("id"), 10, 32)
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid job ID"})
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid job ID", "user": user})
 		return
 	}
 
 	// Load existing job first
 	job, err := h.jobRepo.GetByID(uint(id))
 	if err != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Job not found"})
+		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Job not found", "user": user})
 		return
 	}
 
@@ -322,6 +338,7 @@ func (h *JobHandler) UpdateJob(c *gin.Context) {
 			"statuses":     statuses,
 			"jobCategories": jobCategories,
 			"error":        err.Error(),
+			"user":         user,
 		})
 		return
 	}

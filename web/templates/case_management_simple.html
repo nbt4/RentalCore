@@ -522,9 +522,10 @@
         // Load devices assigned to a case (for modal)
         async function loadCaseDevices(caseId) {
             try {
-                const response = await fetch(`/cases/${caseId}/devices`);
+                const response = await fetch(`/api/v1/cases/${caseId}/devices`);
                 if (response.ok) {
-                    const devices = await response.json();
+                    const data = await response.json();
+                    const devices = data.devices || [];
                     displayAssignedDevices(devices);
                     document.getElementById('case-modal-device-count').textContent = devices.length;
                 } else {
@@ -540,9 +541,10 @@
         // Load devices assigned to a case (for main management section)
         async function loadMainCaseDevices(caseId) {
             try {
-                const response = await fetch(`/cases/${caseId}/devices`);
+                const response = await fetch(`/api/v1/cases/${caseId}/devices`);
                 if (response.ok) {
-                    const devices = await response.json();
+                    const data = await response.json();
+                    const devices = data.devices || [];
                     displayMainAssignedDevices(devices);
                 } else {
                     console.error('Failed to load case devices');
@@ -605,6 +607,13 @@
                     await loadCaseDevices(caseId);
                     await loadMainCaseDevices(caseId);
                     
+                    // Update device count in case card
+                    const countElement = document.getElementById(`device-count-${caseId}`);
+                    if (countElement) {
+                        const currentCount = parseInt(countElement.textContent) || 0;
+                        countElement.textContent = currentCount + 1;
+                    }
+                    
                     // Hide the device from available devices
                     const deviceElement = document.querySelector(`[data-device-id="${deviceId}"]`);
                     if (deviceElement) {
@@ -638,6 +647,13 @@
                     await loadCaseDevices(caseId);
                     await loadMainCaseDevices(caseId);
                     
+                    // Update device count in case card
+                    const countElement = document.getElementById(`device-count-${caseId}`);
+                    if (countElement) {
+                        const currentCount = parseInt(countElement.textContent) || 0;
+                        countElement.textContent = Math.max(0, currentCount - 1);
+                    }
+                    
                     // Show the device back in available devices
                     const deviceElement = document.querySelector(`[data-device-id="${deviceId}"]`);
                     if (deviceElement) {
@@ -670,6 +686,13 @@
                     // Refresh main case devices and reload available devices
                     await loadMainCaseDevices(caseId);
                     await loadDevicesByCategory();
+                    
+                    // Update device count in case card
+                    const countElement = document.getElementById(`device-count-${caseId}`);
+                    if (countElement) {
+                        const currentCount = parseInt(countElement.textContent) || 0;
+                        countElement.textContent = Math.max(0, currentCount - 1);
+                    }
                     
                 } else {
                     const error = await response.json();
@@ -892,8 +915,29 @@
             }
         }
 
-        // Search functionality
+        // Load device counts for all cases
+        async function loadAllCaseDeviceCounts() {
+            const caseCards = document.querySelectorAll('[id^="device-count-"]');
+            for (const countElement of caseCards) {
+                const caseId = countElement.id.replace('device-count-', '');
+                try {
+                    const response = await fetch(`/api/v1/cases/${caseId}/devices`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        const devices = data.devices || [];
+                        countElement.textContent = devices.length;
+                    }
+                } catch (error) {
+                    console.error(`Error loading device count for case ${caseId}:`, error);
+                }
+            }
+        }
+
+        // Search functionality and initialization
         document.addEventListener('DOMContentLoaded', function() {
+            // Load device counts for all cases on page load
+            loadAllCaseDeviceCounts();
+            
             const searchInput = document.getElementById('device-search');
             if (searchInput) {
                 searchInput.addEventListener('input', function(e) {

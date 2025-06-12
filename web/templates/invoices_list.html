@@ -1,0 +1,292 @@
+{{template "base.html" .}}
+
+{{define "content"}}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">Invoices</h3>
+                    <a href="/invoices/new" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> New Invoice
+                    </a>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Filter Form -->
+                    <form method="GET" class="mb-4">
+                        <div class="row">
+                            <div class="col-md-2">
+                                <select name="status" class="form-control" onchange="this.form.submit()">
+                                    <option value="">All Status</option>
+                                    <option value="draft" {{if eq .filter.Status "draft"}}selected{{end}}>Draft</option>
+                                    <option value="sent" {{if eq .filter.Status "sent"}}selected{{end}}>Sent</option>
+                                    <option value="paid" {{if eq .filter.Status "paid"}}selected{{end}}>Paid</option>
+                                    <option value="overdue" {{if eq .filter.Status "overdue"}}selected{{end}}>Overdue</option>
+                                    <option value="cancelled" {{if eq .filter.Status "cancelled"}}selected{{end}}>Cancelled</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <select name="customer_id" class="form-control" onchange="this.form.submit()">
+                                    <option value="">All Customers</option>
+                                    {{range .customers}}
+                                    <option value="{{.CustomerID}}" {{if eq $.filter.CustomerID .CustomerID}}selected{{end}}>
+                                        {{.GetDisplayName}}
+                                    </option>
+                                    {{end}}
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <select name="job_id" class="form-control" onchange="this.form.submit()">
+                                    <option value="">All Jobs</option>
+                                    {{range .jobs}}
+                                    <option value="{{.JobID}}" {{if eq $.filter.JobID .JobID}}selected{{end}}>
+                                        {{.Description}}
+                                    </option>
+                                    {{end}}
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="input-group">
+                                    <input type="text" name="search" class="form-control" placeholder="Search invoices..." value="{{.filter.SearchTerm}}">
+                                    <div class="input-group-append">
+                                        <button type="submit" class="btn btn-outline-secondary">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-1">
+                                <label class="form-check-label">
+                                    <input type="checkbox" name="overdue_only" value="true" {{if .filter.OverdueOnly}}checked{{end}} onchange="this.form.submit()">
+                                    Overdue Only
+                                </label>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="/invoices" class="btn btn-secondary">Clear Filters</a>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!-- Invoice Table -->
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Invoice #</th>
+                                    <th>Customer</th>
+                                    <th>Job</th>
+                                    <th>Issue Date</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Total</th>
+                                    <th>Balance Due</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{if .invoices}}
+                                    {{range .invoices}}
+                                    <tr class="{{if .IsOverdue}}table-danger{{end}}">
+                                        <td>
+                                            <a href="/invoices/{{.InvoiceID}}" class="text-decoration-none">
+                                                {{.InvoiceNumber}}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            {{if .Customer}}
+                                                {{.Customer.GetDisplayName}}
+                                            {{else}}
+                                                <span class="text-muted">No Customer</span>
+                                            {{end}}
+                                        </td>
+                                        <td>
+                                            {{if .Job}}
+                                                {{.Job.Description}}
+                                            {{else}}
+                                                <span class="text-muted">-</span>
+                                            {{end}}
+                                        </td>
+                                        <td>{{.IssueDate.Format "02.01.2006"}}</td>
+                                        <td>
+                                            {{.DueDate.Format "02.01.2006"}}
+                                            {{if .IsOverdue}}
+                                                <span class="badge badge-danger ml-1">Overdue</span>
+                                            {{end}}
+                                        </td>
+                                        <td>
+                                            <span class="badge 
+                                                {{if eq .Status "draft"}}badge-secondary{{end}}
+                                                {{if eq .Status "sent"}}badge-info{{end}}
+                                                {{if eq .Status "paid"}}badge-success{{end}}
+                                                {{if eq .Status "overdue"}}badge-danger{{end}}
+                                                {{if eq .Status "cancelled"}}badge-dark{{end}}">
+                                                {{.Status | title}}
+                                            </span>
+                                        </td>
+                                        <td>€{{printf "%.2f" .TotalAmount}}</td>
+                                        <td>
+                                            {{if eq .Status "paid"}}
+                                                <span class="text-success">€0.00</span>
+                                            {{else}}
+                                                €{{printf "%.2f" .BalanceDue}}
+                                            {{end}}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <a href="/invoices/{{.InvoiceID}}" class="btn btn-sm btn-outline-primary" title="View">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                {{if eq .Status "draft"}}
+                                                <a href="/invoices/{{.InvoiceID}}/edit" class="btn btn-sm btn-outline-secondary" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                {{end}}
+                                                {{if ne .Status "paid"}}
+                                                <button class="btn btn-sm btn-outline-success" onclick="updateStatus({{.InvoiceID}}, 'paid')" title="Mark as Paid">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                {{end}}
+                                                {{if eq .Status "draft"}}
+                                                <button class="btn btn-sm btn-outline-info" onclick="updateStatus({{.InvoiceID}}, 'sent')" title="Mark as Sent">
+                                                    <i class="fas fa-paper-plane"></i>
+                                                </button>
+                                                {{end}}
+                                                <button class="btn btn-sm btn-outline-danger" onclick="deleteInvoice({{.InvoiceID}})" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {{end}}
+                                {{else}}
+                                    <tr>
+                                        <td colspan="9" class="text-center text-muted py-4">
+                                            No invoices found. <a href="/invoices/new">Create your first invoice</a>
+                                        </td>
+                                    </tr>
+                                {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {{if gt .totalPages 1}}
+                    <nav aria-label="Invoice pagination">
+                        <ul class="pagination justify-content-center">
+                            {{if gt .filter.Page 1}}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{sub .filter.Page 1}}&page_size={{.filter.PageSize}}&status={{.filter.Status}}&customer_id={{.filter.CustomerID}}&job_id={{.filter.JobID}}&search={{.filter.SearchTerm}}&overdue_only={{.filter.OverdueOnly}}">Previous</a>
+                            </li>
+                            {{end}}
+                            
+                            {{range $i := .totalPages}}
+                            {{if eq $i $.filter.Page}}
+                            <li class="page-item active">
+                                <span class="page-link">{{$i}}</span>
+                            </li>
+                            {{else}}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{$i}}&page_size={{$.filter.PageSize}}&status={{$.filter.Status}}&customer_id={{$.filter.CustomerID}}&job_id={{$.filter.JobID}}&search={{$.filter.SearchTerm}}&overdue_only={{$.filter.OverdueOnly}}">{{$i}}</a>
+                            </li>
+                            {{end}}
+                            {{end}}
+                            
+                            {{if lt .filter.Page .totalPages}}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{add .filter.Page 1}}&page_size={{.filter.PageSize}}&status={{.filter.Status}}&customer_id={{.filter.CustomerID}}&job_id={{.filter.JobID}}&search={{.filter.SearchTerm}}&overdue_only={{.filter.OverdueOnly}}">Next</a>
+                            </li>
+                            {{end}}
+                        </ul>
+                    </nav>
+                    {{end}}
+
+                    <div class="mt-3 text-muted">
+                        Showing {{len .invoices}} of {{.totalCount}} invoices
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status Update Modal -->
+<div class="modal fade" id="statusModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Update Invoice Status</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to update this invoice status?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmStatusUpdate">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentInvoiceId = null;
+let currentStatus = null;
+
+function updateStatus(invoiceId, status) {
+    currentInvoiceId = invoiceId;
+    currentStatus = status;
+    $('#statusModal').modal('show');
+}
+
+function deleteInvoice(invoiceId) {
+    if (confirm('Are you sure you want to delete this invoice? This action cannot be undone.')) {
+        fetch(`/api/invoices/${invoiceId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Error: ' + data.error);
+            } else {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to delete invoice');
+        });
+    }
+}
+
+document.getElementById('confirmStatusUpdate').addEventListener('click', function() {
+    if (currentInvoiceId && currentStatus) {
+        fetch(`/api/invoices/${currentInvoiceId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ status: currentStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert('Error: ' + data.error);
+            } else {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to update status');
+        });
+    }
+    $('#statusModal').modal('hide');
+});
+</script>
+{{end}}
