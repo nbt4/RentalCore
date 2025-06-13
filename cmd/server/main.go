@@ -94,7 +94,11 @@ func main() {
 	productHandler := handlers.NewProductHandler(productRepo)
 	barcodeHandler := handlers.NewBarcodeHandler(barcodeService, deviceRepo)
 	scannerHandler := handlers.NewScannerHandler(jobRepo, deviceRepo, customerRepo, caseRepo)
-	authHandler := handlers.NewAuthHandler(db.DB)
+	authHandler := handlers.NewAuthHandler(db.DB, cfg)
+	
+	// Start session cleanup background process
+	authHandler.StartSessionCleanup()
+	
 	caseHandler := handlers.NewCaseHandler(caseRepo, deviceRepo)
 	analyticsHandler := handlers.NewAnalyticsHandler(db.DB)
 	searchHandler := handlers.NewSearchHandler(db.DB)
@@ -103,7 +107,7 @@ func main() {
 	documentHandler := handlers.NewDocumentHandler(db.DB)
 	financialHandler := handlers.NewFinancialHandler(db.DB)
 	securityHandler := handlers.NewSecurityHandler(db.DB)
-	invoiceHandler := handlers.NewInvoiceHandler(invoiceRepo, customerRepo, jobRepo, deviceRepo, equipmentPackageRepo)
+	invoiceHandler := handlers.NewInvoiceHandler(invoiceRepo, customerRepo, jobRepo, deviceRepo, equipmentPackageRepo, &cfg.Email, &cfg.PDF)
 
 	// Setup Gin router with error handling
 	r := gin.New()
@@ -197,11 +201,6 @@ func main() {
 		c.File("web/static/manifest.json")
 	})
 	
-	// Demo routes (no authentication required)
-	r.GET("/demo/case-management", caseHandler.CaseManagementDemo)
-	r.GET("/demo/case-management-minimal", caseHandler.CaseManagementDemoMinimal)
-	r.GET("/demo/case-management-real", caseHandler.CaseManagement)
-	r.GET("/demo/case-management-simple", caseHandler.CaseManagementSimple)
 
 	// Initialize default roles
 	if err := securityHandler.InitializeDefaultRoles(); err != nil {
@@ -483,6 +482,18 @@ func setupRoutes(r *gin.Engine,
 			invoices.POST("/:id/email", invoiceHandler.EmailInvoice)
 		}
 
+		// Invoice template routes
+		templates := protected.Group("/invoice-templates")
+		{
+			templates.GET("", invoiceHandler.ListInvoiceTemplates)
+			templates.GET("/new", invoiceHandler.NewInvoiceTemplateForm)
+			templates.POST("", invoiceHandler.CreateInvoiceTemplate)
+			templates.GET("/:id", invoiceHandler.GetInvoiceTemplate)
+			templates.GET("/:id/edit", invoiceHandler.EditInvoiceTemplateForm)
+			templates.PUT("/:id", invoiceHandler.UpdateInvoiceTemplate)
+			templates.DELETE("/:id", invoiceHandler.DeleteInvoiceTemplate)
+		}
+
 		// Invoice settings routes
 		settings := protected.Group("/settings")
 		{
@@ -688,30 +699,30 @@ func setupRoutes(r *gin.Engine,
 		}
 
 		// Additional API routes (outside v1 group for legacy compatibility)
-		api := protected.Group("/api")
+		legacyAPI := protected.Group("/api")
 		{
 			// Invoice API
-			api.GET("/invoices", invoiceHandler.GetInvoicesAPI)
-			api.POST("/invoices", invoiceHandler.CreateInvoice)
-			api.GET("/invoices/:id", invoiceHandler.GetInvoice)
-			api.PUT("/invoices/:id", invoiceHandler.UpdateInvoice)
-			api.DELETE("/invoices/:id", invoiceHandler.DeleteInvoice)
-			api.PUT("/invoices/:id/status", invoiceHandler.UpdateInvoiceStatus)
-			api.GET("/invoices/stats", invoiceHandler.GetInvoiceStatsAPI)
+			legacyAPI.GET("/invoices", invoiceHandler.GetInvoicesAPI)
+			legacyAPI.POST("/invoices", invoiceHandler.CreateInvoice)
+			legacyAPI.GET("/invoices/:id", invoiceHandler.GetInvoice)
+			legacyAPI.PUT("/invoices/:id", invoiceHandler.UpdateInvoice)
+			legacyAPI.DELETE("/invoices/:id", invoiceHandler.DeleteInvoice)
+			legacyAPI.PUT("/invoices/:id/status", invoiceHandler.UpdateInvoiceStatus)
+			legacyAPI.GET("/invoices/stats", invoiceHandler.GetInvoiceStatsAPI)
 			
 			// Company settings API
-			api.GET("/company-settings", invoiceHandler.CompanySettingsForm)
-			api.PUT("/company-settings", invoiceHandler.UpdateCompanySettings)
+			legacyAPI.GET("/company-settings", invoiceHandler.CompanySettingsForm)
+			legacyAPI.PUT("/company-settings", invoiceHandler.UpdateCompanySettings)
 			
 			// Invoice settings API
-			api.GET("/invoice-settings", invoiceHandler.InvoiceSettingsForm)
-			api.PUT("/invoice-settings", invoiceHandler.UpdateInvoiceSettings)
+			legacyAPI.GET("/invoice-settings", invoiceHandler.InvoiceSettingsForm)
+			legacyAPI.PUT("/invoice-settings", invoiceHandler.UpdateInvoiceSettings)
 			
 			// Email API
-			api.POST("/test-email", invoiceHandler.TestEmailSettings)
+			legacyAPI.POST("/test-email", invoiceHandler.TestEmailSettings)
 
 			// Security API
-			apiSecurity := api.Group("/security")
+			apiSecurity := legacyAPI.Group("/security")
 			{
 				// Roles API
 				apiSecurity.GET("/roles", securityHandler.GetRoles)

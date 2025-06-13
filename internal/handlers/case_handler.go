@@ -72,48 +72,6 @@ func (h *CaseHandler) CaseManagement(c *gin.Context) {
 	})
 }
 
-func (h *CaseHandler) CaseManagementDemo(c *gin.Context) {
-	user, _ := GetCurrentUser(c)
-	
-	c.HTML(http.StatusOK, "case_management_demo.html", gin.H{
-		"title": "Case Management Demo",
-		"user": user,
-	})
-}
-
-func (h *CaseHandler) CaseManagementDemoMinimal(c *gin.Context) {
-	user, _ := GetCurrentUser(c)
-	
-	c.HTML(http.StatusOK, "case_management_demo_minimal.html", gin.H{
-		"title": "Case Management Demo - Minimal",
-		"user": user,
-	})
-}
-
-func (h *CaseHandler) CaseManagementSimple(c *gin.Context) {
-	user, _ := GetCurrentUser(c)
-	
-	params := &models.FilterParams{}
-	cases, err := h.caseRepo.List(params)
-	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
-		return
-	}
-
-	// Get available devices for case management
-	devices, err := h.deviceRepo.GetAvailableDevicesForCaseManagement()
-	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
-		return
-	}
-
-	c.HTML(http.StatusOK, "case_management_simple.html", gin.H{
-		"title": "Case Management Simple",
-		"cases": cases,
-		"devices": devices,
-		"user": user,
-	})
-}
 
 func (h *CaseHandler) NewCaseForm(c *gin.Context) {
 	user, _ := GetCurrentUser(c)

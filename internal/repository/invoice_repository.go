@@ -506,6 +506,93 @@ func (r *InvoiceRepository) GetDefaultInvoiceTemplate() (*models.InvoiceTemplate
 	return &template, nil
 }
 
+// GetInvoiceTemplateByID returns a specific invoice template by ID
+func (r *InvoiceRepository) GetInvoiceTemplateByID(templateID uint) (*models.InvoiceTemplate, error) {
+	var template models.InvoiceTemplate
+
+	if err := r.db.DB.Where("template_id = ?", templateID).
+		Preload("Creator").
+		First(&template).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("invoice template not found")
+		}
+		return nil, fmt.Errorf("failed to get invoice template: %v", err)
+	}
+
+	return &template, nil
+}
+
+// CreateInvoiceTemplate creates a new invoice template
+func (r *InvoiceRepository) CreateInvoiceTemplate(template *models.InvoiceTemplate) error {
+	// If this template is set as default, unset other defaults
+	if template.IsDefault {
+		if err := r.db.DB.Model(&models.InvoiceTemplate{}).
+			Where("is_default = ?", true).
+			Update("is_default", false).Error; err != nil {
+			return fmt.Errorf("failed to unset other default templates: %v", err)
+		}
+	}
+
+	if err := r.db.DB.Create(template).Error; err != nil {
+		return fmt.Errorf("failed to create invoice template: %v", err)
+	}
+
+	return nil
+}
+
+// UpdateInvoiceTemplate updates an existing invoice template
+func (r *InvoiceRepository) UpdateInvoiceTemplate(template *models.InvoiceTemplate) error {
+	// If this template is set as default, unset other defaults
+	if template.IsDefault {
+		if err := r.db.DB.Model(&models.InvoiceTemplate{}).
+			Where("template_id != ? AND is_default = ?", template.TemplateID, true).
+			Update("is_default", false).Error; err != nil {
+			return fmt.Errorf("failed to unset other default templates: %v", err)
+		}
+	}
+
+	if err := r.db.DB.Save(template).Error; err != nil {
+		return fmt.Errorf("failed to update invoice template: %v", err)
+	}
+
+	return nil
+}
+
+// DeleteInvoiceTemplate deletes an invoice template
+func (r *InvoiceRepository) DeleteInvoiceTemplate(templateID uint) error {
+	// Check if template is being used by any invoices
+	var count int64
+	if err := r.db.DB.Model(&models.Invoice{}).
+		Where("template_id = ?", templateID).
+		Count(&count).Error; err != nil {
+		return fmt.Errorf("failed to check template usage: %v", err)
+	}
+
+	if count > 0 {
+		return fmt.Errorf("cannot delete template: it is being used by %d invoice(s)", count)
+	}
+
+	// Check if this is the default template
+	var template models.InvoiceTemplate
+	if err := r.db.DB.First(&template, templateID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return fmt.Errorf("template not found")
+		}
+		return fmt.Errorf("failed to get template: %v", err)
+	}
+
+	if template.IsDefault {
+		return fmt.Errorf("cannot delete the default template")
+	}
+
+	// Delete the template
+	if err := r.db.DB.Delete(&models.InvoiceTemplate{}, templateID).Error; err != nil {
+		return fmt.Errorf("failed to delete invoice template: %v", err)
+	}
+
+	return nil
+}
+
 // ================================================================
 // STATISTICS AND REPORTING
 // ================================================================

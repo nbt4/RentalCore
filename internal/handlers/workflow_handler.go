@@ -72,7 +72,7 @@ func (h *WorkflowHandler) ListJobTemplates(c *gin.Context) {
 func (h *WorkflowHandler) NewJobTemplateForm(c *gin.Context) {
 	user, _ := GetCurrentUser(c)
 	
-	c.HTML(http.StatusOK, "job_template_form_simple.html", gin.H{
+	c.HTML(http.StatusOK, "job_template_form.html", gin.H{
 		"title":    "New Job Template",
 		"template": &models.JobTemplate{},
 		"isEdit":   false,
@@ -85,7 +85,7 @@ func (h *WorkflowHandler) CreateJobTemplate(c *gin.Context) {
 	// Get current user
 	currentUser, exists := GetCurrentUser(c)
 	if !exists {
-		c.HTML(http.StatusUnauthorized, "job_template_form_simple.html", gin.H{
+		c.HTML(http.StatusUnauthorized, "job_template_form.html", gin.H{
 			"title":    "New Job Template",
 			"template": &models.JobTemplate{},
 			"isEdit":   false,
@@ -108,7 +108,7 @@ func (h *WorkflowHandler) CreateJobTemplate(c *gin.Context) {
 
 	// Validate required fields
 	if name == "" {
-		c.HTML(http.StatusBadRequest, "job_template_form_simple.html", gin.H{
+		c.HTML(http.StatusBadRequest, "job_template_form.html", gin.H{
 			"title":    "New Job Template",
 			"template": &models.JobTemplate{},
 			"isEdit":   false,
@@ -151,7 +151,7 @@ func (h *WorkflowHandler) CreateJobTemplate(c *gin.Context) {
 	if equipmentList != "" && equipmentList != "[]" {
 		template.EquipmentList = []byte(equipmentList)
 		if err := h.templateRepo.ValidateEquipmentList(template.EquipmentList); err != nil {
-			c.HTML(http.StatusBadRequest, "job_template_form_simple.html", gin.H{
+			c.HTML(http.StatusBadRequest, "job_template_form.html", gin.H{
 				"title":    "New Job Template",
 				"template": &template,
 				"isEdit":   false,
@@ -165,7 +165,7 @@ func (h *WorkflowHandler) CreateJobTemplate(c *gin.Context) {
 	if pricingTemplate != "" && pricingTemplate != "{}" {
 		template.PricingTemplate = []byte(pricingTemplate)
 		if err := h.templateRepo.ValidatePricingTemplate(template.PricingTemplate); err != nil {
-			c.HTML(http.StatusBadRequest, "job_template_form_simple.html", gin.H{
+			c.HTML(http.StatusBadRequest, "job_template_form.html", gin.H{
 				"title":    "New Job Template",
 				"template": &template,
 				"isEdit":   false,
@@ -183,7 +183,7 @@ func (h *WorkflowHandler) CreateJobTemplate(c *gin.Context) {
 	// Create template
 	if err := h.templateRepo.Create(&template); err != nil {
 		log.Printf("CreateJobTemplate: Database error: %v", err)
-		c.HTML(http.StatusInternalServerError, "job_template_form_simple.html", gin.H{
+		c.HTML(http.StatusInternalServerError, "job_template_form.html", gin.H{
 			"title":    "New Job Template",
 			"template": &template,
 			"isEdit":   false,
@@ -581,7 +581,7 @@ func (h *WorkflowHandler) NewEquipmentPackageForm(c *gin.Context) {
 			func() string { if availableDevices[0].Product != nil { return availableDevices[0].Product.Name } else { return "nil" } }())
 	}
 
-	c.HTML(http.StatusOK, "equipment_package_form_simple.html", gin.H{
+	c.HTML(http.StatusOK, "equipment_package_form.html", gin.H{
 		"title":            "New Equipment Package",
 		"package":          nil,
 		"isEdit":           false,
@@ -596,7 +596,7 @@ func (h *WorkflowHandler) CreateEquipmentPackage(c *gin.Context) {
 	currentUser, exists := GetCurrentUser(c)
 	if !exists {
 		availableDevices, _ := h.packageRepo.GetAvailableDevices()
-		c.HTML(http.StatusUnauthorized, "equipment_package_form_simple.html", gin.H{
+		c.HTML(http.StatusUnauthorized, "equipment_package_form.html", gin.H{
 			"title":            "New Equipment Package",
 			"package":          &models.EquipmentPackage{},
 			"isEdit":           false,
@@ -689,7 +689,7 @@ func (h *WorkflowHandler) CreateEquipmentPackage(c *gin.Context) {
 	// Validate required fields
 	if pkg.Name == "" {
 		availableDevices, _ := h.packageRepo.GetAvailableDevices()
-		c.HTML(http.StatusBadRequest, "equipment_package_form_simple.html", gin.H{
+		c.HTML(http.StatusBadRequest, "equipment_package_form.html", gin.H{
 			"title":            "New Equipment Package",
 			"package":          &pkg,
 			"isEdit":           false,
@@ -707,7 +707,7 @@ func (h *WorkflowHandler) CreateEquipmentPackage(c *gin.Context) {
 	if err := h.packageRepo.CreateWithDevices(&pkg, deviceMappings); err != nil {
 		log.Printf("CreateEquipmentPackage: Database error: %v", err)
 		availableDevices, _ := h.packageRepo.GetAvailableDevices()
-		c.HTML(http.StatusInternalServerError, "equipment_package_form_simple.html", gin.H{
+		c.HTML(http.StatusInternalServerError, "equipment_package_form.html", gin.H{
 			"title":            "New Equipment Package",
 			"package":          &pkg,
 			"isEdit":           false,

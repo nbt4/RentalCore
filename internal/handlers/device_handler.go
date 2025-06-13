@@ -41,7 +41,7 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "devices_new.html", gin.H{
+	c.HTML(http.StatusOK, "devices.html", gin.H{
 		"title":   "Devices",
 		"devices": devices,
 		"params":  params,
@@ -58,7 +58,7 @@ func (h *DeviceHandler) NewDeviceForm(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "device_form_new.html", gin.H{
+	c.HTML(http.StatusOK, "device_form.html", gin.H{
 		"title":    "New Device",
 		"device":   &models.Device{},
 		"products": products,
@@ -92,7 +92,7 @@ func (h *DeviceHandler) CreateDevice(c *gin.Context) {
 	if err := h.deviceRepo.Create(&device); err != nil {
 		user, _ := GetCurrentUser(c)
 		products, _ := h.productRepo.List(&models.FilterParams{})
-		c.HTML(http.StatusInternalServerError, "device_form_new.html", gin.H{
+		c.HTML(http.StatusInternalServerError, "device_form.html", gin.H{
 			"title":    "New Device",
 			"device":   &device,
 			"products": products,
@@ -139,7 +139,7 @@ func (h *DeviceHandler) EditDeviceForm(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "device_form_new.html", gin.H{
+	c.HTML(http.StatusOK, "device_form.html", gin.H{
 		"title":    "Edit Device",
 		"device":   device,
 		"products": products,
@@ -170,7 +170,7 @@ func (h *DeviceHandler) UpdateDevice(c *gin.Context) {
 	if err := h.deviceRepo.Update(&device); err != nil {
 		user, _ := GetCurrentUser(c)
 		products, _ := h.productRepo.List(&models.FilterParams{})
-		c.HTML(http.StatusInternalServerError, "device_form_new.html", gin.H{
+		c.HTML(http.StatusInternalServerError, "device_form.html", gin.H{
 			"title":    "Edit Device",
 			"device":   &device,
 			"products": products,

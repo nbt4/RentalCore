@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}} - RentalCore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/app.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-gear-wide-connected"></i> RentalCore
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h2>New Equipment Package</h2>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <form method="POST" action="/workflow/packages">
+                            
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Package Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="packagePrice" class="form-label">Package Price (€)</label>
+                                <input type="number" class="form-control" id="packagePrice" name="packagePrice" step="0.01" min="0">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="discountPercent" class="form-label">Discount Percentage (%)</label>
+                                <input type="number" class="form-control" id="discountPercent" name="discountPercent" step="0.01" min="0" max="100">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="minRentalDays" class="form-label">Minimum Rental Days</label>
+                                <input type="number" class="form-control" id="minRentalDays" name="minRentalDays" min="1" value="1">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="isActive" name="isActive" checked>
+                                    <label class="form-check-label" for="isActive">
+                                        Active (available for selection)
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Device Selection Section -->
+                            <div class="mb-4">
+                                <h5>Package Devices</h5>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="deviceSelect" class="form-label">Add Device</label>
+                                            <select class="form-select" id="deviceSelect">
+                                                <option value="">Select a device to add...</option>
+                                                {{if .availableDevices}}
+                                                    {{range .availableDevices}}
+                                                    <option value="{{.DeviceID}}" data-product="{{if .Product}}{{.Product.Name}}{{else}}Unknown Product{{end}}" data-price="{{if .Product}}{{.Product.ItemCostPerDay}}{{else}}0{{end}}">
+                                                        {{.DeviceID}} - {{if .Product}}{{.Product.Name}}{{else}}Unknown Product{{end}}
+                                                    </option>
+                                                    {{end}}
+                                                {{else}}
+                                                    <option value="" disabled>No devices available</option>
+                                                {{end}}
+                                            </select>
+                                            
+                                            <!-- Debug info -->
+                                            <small class="text-muted">
+                                                Available devices: {{if .availableDevices}}{{len .availableDevices}}{{else}}0{{end}}
+                                            </small>
+                                        </div>
+                                        <button type="button" class="btn btn-success btn-sm" onclick="addDevice()">
+                                            <i class="bi bi-plus"></i> Add Device
+                                        </button>
+                                        
+                                        <div class="mt-3">
+                                            <h6>Selected Devices:</h6>
+                                            <div id="selectedDevices" class="list-group">
+                                                <!-- Selected devices will be added here dynamically -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <input type="hidden" name="packageItems" value="[]">
+                            
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="/workflow/packages" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Create Package</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        let selectedDevices = [];
+        
+        function addDevice() {
+            const select = document.getElementById('deviceSelect');
+            const selectedOption = select.options[select.selectedIndex];
+            
+            if (!selectedOption.value) {
+                alert('Please select a device to add.');
+                return;
+            }
+            
+            const deviceID = selectedOption.value;
+            const productName = selectedOption.getAttribute('data-product');
+            const defaultPrice = parseFloat(selectedOption.getAttribute('data-price')) || 0;
+            
+            // Check if device already added
+            if (selectedDevices.find(d => d.deviceID === deviceID)) {
+                alert('This device is already added to the package.');
+                return;
+            }
+            
+            const device = {
+                deviceID: deviceID,
+                productName: productName,
+                quantity: 1,
+                customPrice: null,
+                isRequired: false,
+                notes: ''
+            };
+            
+            selectedDevices.push(device);
+            renderSelectedDevices();
+            
+            // Remove from select options
+            selectedOption.remove();
+        }
+        
+        function removeDevice(deviceID) {
+            const deviceIndex = selectedDevices.findIndex(d => d.deviceID === deviceID);
+            if (deviceIndex > -1) {
+                const device = selectedDevices[deviceIndex];
+                selectedDevices.splice(deviceIndex, 1);
+                
+                // Add back to select options
+                const select = document.getElementById('deviceSelect');
+                const option = document.createElement('option');
+                option.value = device.deviceID;
+                option.textContent = device.deviceID + ' - ' + device.productName;
+                option.setAttribute('data-product', device.productName);
+                option.setAttribute('data-price', '0');
+                select.appendChild(option);
+                
+                renderSelectedDevices();
+            }
+        }
+        
+        function updateDevice(deviceID, field, value) {
+            const device = selectedDevices.find(d => d.deviceID === deviceID);
+            if (device) {
+                if (field === 'quantity') {
+                    device.quantity = parseInt(value) || 1;
+                } else if (field === 'customPrice') {
+                    device.customPrice = value ? parseFloat(value) : null;
+                } else if (field === 'isRequired') {
+                    device.isRequired = value;
+                } else if (field === 'notes') {
+                    device.notes = value;
+                }
+            }
+        }
+        
+        function renderSelectedDevices() {
+            const container = document.getElementById('selectedDevices');
+            
+            if (selectedDevices.length === 0) {
+                container.innerHTML = '<p class="text-muted">No devices selected yet.</p>';
+                return;
+            }
+            
+            let html = '';
+            selectedDevices.forEach((device, index) => {
+                html += '<div class="list-group-item">';
+                html += '<div class="d-flex justify-content-between align-items-start">';
+                html += '<div class="flex-grow-1">';
+                html += '<h6 class="mb-1">' + device.deviceID + '</h6>';
+                html += '<p class="mb-1 text-muted">' + device.productName + '</p>';
+                html += '</div>';
+                html += '<button type="button" class="btn btn-danger btn-sm" onclick="removeDevice(\'' + device.deviceID + '\')">';
+                html += '<i class="bi bi-trash"></i>';
+                html += '</button>';
+                html += '</div>';
+                
+                // Device configuration options
+                html += '<div class="row mt-2">';
+                html += '<div class="col-md-3">';
+                html += '<label class="form-label">Quantity</label>';
+                html += '<input type="number" class="form-control form-control-sm" value="' + device.quantity + '" min="1" onchange="updateDevice(\'' + device.deviceID + '\', \'quantity\', this.value)">';
+                html += '</div>';
+                html += '<div class="col-md-3">';
+                html += '<label class="form-label">Custom Price (€)</label>';
+                html += '<input type="number" class="form-control form-control-sm" value="' + (device.customPrice || '') + '" step="0.01" min="0" onchange="updateDevice(\'' + device.deviceID + '\', \'customPrice\', this.value)" placeholder="Default price">';
+                html += '</div>';
+                html += '<div class="col-md-3">';
+                html += '<div class="form-check mt-4">';
+                html += '<input class="form-check-input" type="checkbox" ' + (device.isRequired ? 'checked' : '') + ' onchange="updateDevice(\'' + device.deviceID + '\', \'isRequired\', this.checked)">';
+                html += '<label class="form-check-label">Required</label>';
+                html += '</div>';
+                html += '</div>';
+                html += '<div class="col-md-3">';
+                html += '<label class="form-label">Notes</label>';
+                html += '<input type="text" class="form-control form-control-sm" value="' + device.notes + '" onchange="updateDevice(\'' + device.deviceID + '\', \'notes\', this.value)" placeholder="Optional notes">';
+                html += '</div>';
+                html += '</div>';
+                html += '</div>';
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Update form submission to include selected devices
+        document.querySelector('form').addEventListener('submit', function(e) {
+            // Create hidden inputs for each selected device
+            selectedDevices.forEach((device, index) => {
+                const fields = ['deviceID', 'quantity', 'customPrice', 'isRequired', 'notes'];
+                fields.forEach(field => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'devices[' + index + '][' + field + ']';
+                    input.value = device[field] || '';
+                    this.appendChild(input);
+                });
+            });
+        });
+        
+        // Initialize
+        renderSelectedDevices();
+    </script>
+</body>
+</html>

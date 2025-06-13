@@ -9,6 +9,12 @@ type Config struct {
 	Database DatabaseConfig `json:"database"`
 	Server   ServerConfig   `json:"server"`
 	UI       UIConfig       `json:"ui"`
+	Email    EmailConfig    `json:"email"`
+	Invoice  InvoiceConfig  `json:"invoice"`
+	PDF      PDFConfig      `json:"pdf"`
+	Security SecurityConfig `json:"security"`
+	Logging  LoggingConfig  `json:"logging"`
+	Backup   BackupConfig   `json:"backup"`
 }
 
 type DatabaseConfig struct {
@@ -35,6 +41,56 @@ type UIConfig struct {
 	CacheTimeout   int               `json:"cache_timeout"`
 	WindowWidth    int               `json:"window_width"`
 	WindowHeight   int               `json:"window_height"`
+}
+
+type EmailConfig struct {
+	SMTPHost     string `json:"smtp_host"`
+	SMTPPort     int    `json:"smtp_port"`
+	SMTPUsername string `json:"smtp_username"`
+	SMTPPassword string `json:"smtp_password"`
+	FromEmail    string `json:"from_email"`
+	FromName     string `json:"from_name"`
+	UseTLS       bool   `json:"use_tls"`
+}
+
+type InvoiceConfig struct {
+	DefaultTaxRate          float64 `json:"default_tax_rate"`
+	DefaultPaymentTerms     int     `json:"default_payment_terms"`
+	AutoCalculateRentalDays bool    `json:"auto_calculate_rental_days"`
+	ShowLogoOnInvoice       bool    `json:"show_logo_on_invoice"`
+	InvoiceNumberPrefix     string  `json:"invoice_number_prefix"`
+	InvoiceNumberFormat     string  `json:"invoice_number_format"`
+	CurrencySymbol          string  `json:"currency_symbol"`
+	CurrencyCode            string  `json:"currency_code"`
+	DateFormat              string  `json:"date_format"`
+}
+
+type PDFConfig struct {
+	Generator string            `json:"generator"`
+	PaperSize string            `json:"paper_size"`
+	Margins   map[string]string `json:"margins"`
+}
+
+type SecurityConfig struct {
+	SessionTimeout    int `json:"session_timeout"`
+	PasswordMinLength int `json:"password_min_length"`
+	MaxLoginAttempts  int `json:"max_login_attempts"`
+	LockoutDuration   int `json:"lockout_duration"`
+}
+
+type LoggingConfig struct {
+	Level      string `json:"level"`
+	File       string `json:"file"`
+	MaxSize    int    `json:"max_size"`
+	MaxBackups int    `json:"max_backups"`
+	MaxAge     int    `json:"max_age"`
+}
+
+type BackupConfig struct {
+	Enabled       bool   `json:"enabled"`
+	Interval      int    `json:"interval"`
+	RetentionDays int    `json:"retention_days"`
+	Path          string `json:"path"`
 }
 
 func LoadConfig(path string) (*Config, error) {
@@ -99,6 +155,55 @@ func getDefaultConfig() *Config {
 				"dark_bg":     "#2b2b2b",
 				"dark_text":   "#ffffff",
 			},
+		},
+		Email: EmailConfig{
+			SMTPHost:     "localhost",
+			SMTPPort:     587,
+			SMTPUsername: "",
+			SMTPPassword: "",
+			FromEmail:    "noreply@rentalcore.com",
+			FromName:     "RentalCore",
+			UseTLS:       true,
+		},
+		Invoice: InvoiceConfig{
+			DefaultTaxRate:          19.0,
+			DefaultPaymentTerms:     30,
+			AutoCalculateRentalDays: true,
+			ShowLogoOnInvoice:       true,
+			InvoiceNumberPrefix:     "INV-",
+			InvoiceNumberFormat:     "{prefix}{year}{month}{sequence:4}",
+			CurrencySymbol:          "€",
+			CurrencyCode:            "EUR",
+			DateFormat:              "DD.MM.YYYY",
+		},
+		PDF: PDFConfig{
+			Generator: "auto",
+			PaperSize: "A4",
+			Margins: map[string]string{
+				"top":    "1cm",
+				"bottom": "1cm",
+				"left":   "1cm",
+				"right":  "1cm",
+			},
+		},
+		Security: SecurityConfig{
+			SessionTimeout:    3600,
+			PasswordMinLength: 8,
+			MaxLoginAttempts:  5,
+			LockoutDuration:   900,
+		},
+		Logging: LoggingConfig{
+			Level:      "info",
+			File:       "logs/app.log",
+			MaxSize:    100,
+			MaxBackups: 5,
+			MaxAge:     30,
+		},
+		Backup: BackupConfig{
+			Enabled:       true,
+			Interval:      86400,
+			RetentionDays: 30,
+			Path:          "backups/",
 		},
 	}
 }

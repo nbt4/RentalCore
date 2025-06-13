@@ -3,12 +3,12 @@
     "host": "tsunami-events.de",
     "port": 3306,
     "database": "TS-Lager",
-    "username": "root",
-    "password": "goQhQTACjH2cwx657fdNDes6SicLWI",
-    "pool_size": 5
+    "username": "tsweb",
+    "password": "N1KO4cCYnp3Tyf",
+    "pool_size": 10
   },
   "server": {
-    "port": 9000,
+    "port": 8080,
     "host": "0.0.0.0"
   },
   "ui": {
@@ -31,5 +31,54 @@
     "cache_timeout": 300,
     "window_width": 1400,
     "window_height": 800
+  },
+  "email": {
+    "smtp_host": "mail.tsunami-events.de",
+    "smtp_port": 587,
+    "smtp_username": "noreply@tsunami-events.de",
+    "smtp_password": "XGKsQ7hudqxD7M",
+    "from_email": "no-reply@tsunami-events.de",
+    "from_name": "TS RentalCore",
+    "use_tls": true
+  },
+  "invoice": {
+    "default_tax_rate": 19.0,
+    "default_payment_terms": 30,
+    "auto_calculate_rental_days": true,
+    "show_logo_on_invoice": true,
+    "invoice_number_prefix": "INV-",
+    "invoice_number_format": "{prefix}{year}{month}{sequence:4}",
+    "currency_symbol": "€",
+    "currency_code": "EUR",
+    "date_format": "DD.MM.YYYY"
+  },
+  "pdf": {
+    "generator": "auto",
+    "paper_size": "A4",
+    "margins": {
+      "top": "1cm",
+      "bottom": "1cm",
+      "left": "1cm",
+      "right": "1cm"
+    }
+  },
+  "security": {
+    "session_timeout": 3600,
+    "password_min_length": 8,
+    "max_login_attempts": 5,
+    "lockout_duration": 900
+  },
+  "logging": {
+    "level": "info",
+    "file": "logs/app.log",
+    "max_size": 100,
+    "max_backups": 5,
+    "max_age": 30
+  },
+  "backup": {
+    "enabled": true,
+    "interval": 86400,
+    "retention_days": 30,
+    "path": "backups/"
   }
 }

@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"time"
 
+	"go-barcode-webapp/internal/config"
 	"go-barcode-webapp/internal/models"
 
 	"github.com/gin-gonic/gin"
@@ -16,11 +17,12 @@ import (
 )
 
 type AuthHandler struct {
-	db *gorm.DB
+	db     *gorm.DB
+	config *config.Config
 }
 
-func NewAuthHandler(db *gorm.DB) *AuthHandler {
-	return &AuthHandler{db: db}
+func NewAuthHandler(db *gorm.DB, cfg *config.Config) *AuthHandler {
+	return &AuthHandler{db: db, config: cfg}
 }
 
 // LoginForm displays the login page
@@ -74,10 +76,11 @@ func (h *AuthHandler) Login(c *gin.Context) {
 
 	// Create session
 	sessionID := h.generateSessionID()
+	sessionTimeout := time.Duration(h.config.Security.SessionTimeout) * time.Second
 	session := models.Session{
 		SessionID: sessionID,
 		UserID:    user.UserID,
-		ExpiresAt: time.Now().Add(24 * time.Hour), // 24 hour session
+		ExpiresAt: time.Now().Add(sessionTimeout),
 		CreatedAt: time.Now(),
 	}
 
@@ -97,7 +100,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 	h.db.Save(&user)
 
 	// Set cookie
-	c.SetCookie("session_id", sessionID, 86400, "/", "", false, true)
+	c.SetCookie("session_id", sessionID, h.config.Security.SessionTimeout, "/", "", false, true)
 	fmt.Printf("DEBUG: Login successful, session created: %s\n", sessionID)
 
 	// Redirect to home
@@ -137,21 +140,30 @@ func (h *AuthHandler) AuthMiddleware() gin.HandlerFunc {
 		var session models.Session
 		if err := h.db.Where("session_id = ? AND expires_at > ?", sessionID, time.Now()).First(&session).Error; err != nil {
 			fmt.Printf("DEBUG: Session validation failed: %v\n", err)
+			// Clean up invalid session cookie
 			c.SetCookie("session_id", "", -1, "/", "", false, true)
 			c.Redirect(http.StatusSeeOther, "/login")
 			c.Abort()
 			return
 		}
 
-		// Load the user manually since Preload doesn't work
+		// Load the user and verify they are still active
 		var user models.User
-		if err := h.db.Where("userID = ?", session.UserID).First(&user).Error; err != nil {
-			fmt.Printf("DEBUG: User not found for session: %v\n", err)
+		if err := h.db.Where("userID = ? AND is_active = ?", session.UserID, true).First(&user).Error; err != nil {
+			fmt.Printf("DEBUG: User not found or inactive for session: %v\n", err)
+			// Delete the session since user is inactive/deleted
+			h.db.Where("session_id = ?", sessionID).Delete(&models.Session{})
 			c.SetCookie("session_id", "", -1, "/", "", false, true)
 			c.Redirect(http.StatusSeeOther, "/login")
 			c.Abort()
 			return
 		}
+
+		// Optional: Extend session on activity (sliding expiration)
+		// Uncomment if you want sessions to extend on each request
+		// sessionTimeout := time.Duration(h.config.Security.SessionTimeout) * time.Second
+		// session.ExpiresAt = time.Now().Add(sessionTimeout)
+		// h.db.Save(&session)
 
 		fmt.Printf("DEBUG: Session valid for user: %s (ID: %d)\n", user.Username, user.UserID)
 
@@ -162,10 +174,16 @@ func (h *AuthHandler) AuthMiddleware() gin.HandlerFunc {
 	}
 }
 
-// validateSession checks if a session is valid
+// validateSession checks if a session is valid and the user is active
 func (h *AuthHandler) validateSession(sessionID string) bool {
 	var session models.Session
-	return h.db.Where("session_id = ? AND expires_at > ?", sessionID, time.Now()).First(&session).Error == nil
+	if err := h.db.Where("session_id = ? AND expires_at > ?", sessionID, time.Now()).First(&session).Error; err != nil {
+		return false
+	}
+	
+	// Also check if the user is still active
+	var user models.User
+	return h.db.Where("userID = ? AND is_active = ?", session.UserID, true).First(&user).Error == nil
 }
 
 // generateSessionID creates a new session ID
@@ -173,6 +191,37 @@ func (h *AuthHandler) generateSessionID() string {
 	bytes := make([]byte, 32)
 	rand.Read(bytes)
 	return hex.EncodeToString(bytes)
+}
+
+// CleanupExpiredSessions removes expired sessions from the database
+func (h *AuthHandler) CleanupExpiredSessions() error {
+	result := h.db.Where("expires_at < ?", time.Now()).Delete(&models.Session{})
+	if result.Error != nil {
+		return result.Error
+	}
+	
+	if result.RowsAffected > 0 {
+		fmt.Printf("DEBUG: Cleaned up %d expired sessions\n", result.RowsAffected)
+	}
+	
+	return nil
+}
+
+// StartSessionCleanup starts a background goroutine to periodically clean up expired sessions
+func (h *AuthHandler) StartSessionCleanup() {
+	go func() {
+		ticker := time.NewTicker(30 * time.Minute) // Clean up every 30 minutes
+		defer ticker.Stop()
+		
+		for {
+			select {
+			case <-ticker.C:
+				if err := h.CleanupExpiredSessions(); err != nil {
+					fmt.Printf("ERROR: Failed to cleanup expired sessions: %v\n", err)
+				}
+			}
+		}
+	}()
 }
 
 // HashPassword hashes a password using bcrypt

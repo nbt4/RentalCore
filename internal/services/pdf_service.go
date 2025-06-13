@@ -9,20 +9,22 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 	"time"
 
+	"go-barcode-webapp/internal/config"
 	"go-barcode-webapp/internal/models"
 )
 
 type PDFService struct {
-	tempDir string
+	tempDir   string
+	pdfConfig *config.PDFConfig
 }
 
-func NewPDFService() *PDFService {
+func NewPDFService(pdfConfig *config.PDFConfig) *PDFService {
 	tempDir := os.TempDir()
 	return &PDFService{
-		tempDir: tempDir,
+		tempDir:   tempDir,
+		pdfConfig: pdfConfig,
 	}
 }
 
@@ -292,9 +294,9 @@ func (s *PDFService) generateInvoiceHTML(invoice *models.Invoice, company *model
             <div class="address-box">
                 <strong>{{.Invoice.Customer.GetDisplayName}}</strong><br>
                 {{if .Invoice.Customer.Email}}{{.Invoice.Customer.Email}}<br>{{end}}
-                {{if .Invoice.Customer.Phone}}{{.Invoice.Customer.Phone}}<br>{{end}}
-                {{if .Invoice.Customer.Address}}{{.Invoice.Customer.Address}}<br>{{end}}
-                {{if .Invoice.Customer.ZipCode}}{{.Invoice.Customer.ZipCode}} {{end}}{{.Invoice.Customer.City}}
+                {{if .Invoice.Customer.PhoneNumber}}{{.Invoice.Customer.PhoneNumber}}<br>{{end}}
+                {{if .Invoice.Customer.Street}}{{.Invoice.Customer.Street}}{{if .Invoice.Customer.HouseNumber}} {{.Invoice.Customer.HouseNumber}}{{end}}<br>{{end}}
+                {{if .Invoice.Customer.ZIP}}{{.Invoice.Customer.ZIP}} {{end}}{{if .Invoice.Customer.City}}{{.Invoice.Customer.City}}{{end}}
             </div>
             {{else}}
             <div class="address-box">Customer information not available</div>
@@ -381,32 +383,18 @@ func (s *PDFService) generateInvoiceHTML(invoice *models.Invoice, company *model
                     <td><strong>Subtotal:</strong></td>
                     <td class="text-right">{{.Settings.CurrencySymbol}}{{printf "%.2f" .Invoice.Subtotal}}</td>
                 </tr>
-                {{if gt .Invoice.DiscountAmount 0}}
-                <tr>
-                    <td><strong>Discount:</strong></td>
-                    <td class="text-right">-{{.Settings.CurrencySymbol}}{{printf "%.2f" .Invoice.DiscountAmount}}</td>
-                </tr>
-                {{end}}
-                {{if gt .Invoice.TaxRate 0}}
                 <tr>
                     <td><strong>Tax ({{printf "%.1f" .Invoice.TaxRate}}%):</strong></td>
                     <td class="text-right">{{.Settings.CurrencySymbol}}{{printf "%.2f" .Invoice.TaxAmount}}</td>
                 </tr>
-                {{end}}
                 <tr class="total-row">
                     <td><strong>Total Amount:</strong></td>
                     <td class="text-right"><strong>{{.Settings.CurrencySymbol}}{{printf "%.2f" .Invoice.TotalAmount}}</strong></td>
-                </tr>
-                {{if gt .Invoice.PaidAmount 0}}
-                <tr style="background-color: #28a745; color: white;">
-                    <td><strong>Paid Amount:</strong></td>
-                    <td class="text-right">{{.Settings.CurrencySymbol}}{{printf "%.2f" .Invoice.PaidAmount}}</td>
                 </tr>
                 <tr style="background-color: #ffc107; color: black;">
                     <td><strong>Balance Due:</strong></td>
                     <td class="text-right"><strong>{{.Settings.CurrencySymbol}}{{printf "%.2f" .Invoice.BalanceDue}}</strong></td>
                 </tr>
-                {{end}}
             </table>
         </div>
     </div>
@@ -497,13 +485,38 @@ func (s *PDFService) convertWithWKHTMLToPDF(htmlContent string) ([]byte, error) 
 	pdfFile := filepath.Join(s.tempDir, fmt.Sprintf("invoice_%d.pdf", time.Now().UnixNano()))
 	defer os.Remove(pdfFile)
 
-	// Execute wkhtmltopdf
+	// Execute wkhtmltopdf with config values
+	paperSize := s.pdfConfig.PaperSize
+	if paperSize == "" {
+		paperSize = "A4"
+	}
+	
+	marginTop := s.pdfConfig.Margins["top"]
+	if marginTop == "" {
+		marginTop = "1cm"
+	}
+	
+	marginBottom := s.pdfConfig.Margins["bottom"]
+	if marginBottom == "" {
+		marginBottom = "1cm"
+	}
+	
+	marginLeft := s.pdfConfig.Margins["left"]
+	if marginLeft == "" {
+		marginLeft = "1cm"
+	}
+	
+	marginRight := s.pdfConfig.Margins["right"]
+	if marginRight == "" {
+		marginRight = "1cm"
+	}
+	
 	cmd := exec.Command("wkhtmltopdf", 
-		"--page-size", "A4",
-		"--margin-top", "1cm",
-		"--margin-bottom", "1cm",
-		"--margin-left", "1cm",
-		"--margin-right", "1cm",
+		"--page-size", paperSize,
+		"--margin-top", marginTop,
+		"--margin-bottom", marginBottom,
+		"--margin-left", marginLeft,
+		"--margin-right", marginRight,
 		"--enable-local-file-access",
 		htmlFile, pdfFile)
 

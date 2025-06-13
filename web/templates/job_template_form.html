@@ -1,454 +1,79 @@
-{{ template "base.html" . }}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}} - TS Jobscanner</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/app.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-upc-scan"></i> TS Jobscanner
+            </a>
+        </div>
+    </nav>
 
-{{ define "content" }}
-<div class="container-fluid">
-    <!-- Header -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <h2>
-                        <i class="bi bi-clipboard-list me-2"></i>
-                        {{ if .isEdit }}Edit Job Template{{ else }}New Job Template{{ end }}
-                    </h2>
-                    <p class="text-muted">{{ if .isEdit }}Update the job template details{{ else }}Create a new job template for streamlined job creation{{ end }}</p>
-                </div>
-                <div>
-                    <a href="/workflow/templates" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left me-2"></i>Back to Templates
-                    </a>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h2>{{ if .isEdit }}Edit Job Template{{ else }}New Job Template{{ end }}</h2>
+                
+                {{ if .error }}
+                <div class="alert alert-danger">{{ .error }}</div>
+                {{ end }}
+                
+                <div class="card">
+                    <div class="card-body">
+                        <form method="POST" action="{{ if .isEdit }}/workflow/templates/{{ .template.TemplateID }}{{ else }}/workflow/templates{{ end }}">
+                            {{ if .isEdit }}
+                                <input type="hidden" name="_method" value="PUT">
+                            {{ end }}
+                            
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Template Name *</label>
+                                <input type="text" class="form-control" id="name" name="name" 
+                                       value="{{ .template.Name }}" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" 
+                                          rows="3">{{ .template.Description }}</textarea>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="defaultDurationDays" class="form-label">Default Duration (Days)</label>
+                                <input type="number" class="form-control" id="defaultDurationDays" name="defaultDurationDays" 
+                                       value="{{ if .template.DefaultDurationDays }}{{ .template.DefaultDurationDays }}{{ end }}">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="defaultNotes" class="form-label">Default Notes</label>
+                                <textarea class="form-control" id="defaultNotes" name="defaultNotes" 
+                                          rows="3">{{ .template.DefaultNotes }}</textarea>
+                            </div>
+                            
+                            <input type="hidden" name="equipmentList" value="[]">
+                            <input type="hidden" name="pricingTemplate" value="{}">
+                            <input type="hidden" name="requiredDocuments" value="[]">
+                            
+                            <div class="d-flex justify-content-end gap-2">
+                                <a href="/workflow/templates" class="btn btn-secondary">Cancel</a>
+                                <button type="submit" class="btn btn-primary">
+                                    {{ if .isEdit }}Update Template{{ else }}Create Template{{ end }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Template Form -->
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title mb-0">Template Information</h5>
-                </div>
-                <div class="card-body">
-                    {{ if .error }}
-                    <div class="alert alert-danger" role="alert">
-                        <i class="bi bi-exclamation-triangle me-2"></i>{{ .error }}
-                    </div>
-                    {{ end }}
-                    
-                    <form id="templateForm" method="POST" action="{{ if .isEdit }}/workflow/templates/{{ .template.TemplateID }}{{ else }}/workflow/templates{{ end }}">
-                        {{ if .isEdit }}
-                            <input type="hidden" name="_method" value="PUT">
-                        {{ end }}
-                        
-                        <!-- Basic Information -->
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="name" class="form-label">Template Name *</label>
-                                    <input type="text" class="form-control" id="name" name="name" 
-                                           value="{{ .template.Name }}" 
-                                           required maxlength="100" 
-                                           placeholder="Enter template name">
-                                    <div class="form-text">A descriptive name for this job template</div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="jobCategoryID" class="form-label">Job Category</label>
-                                    <select class="form-select" id="jobCategoryID" name="jobCategoryID">
-                                        <option value="">Select a category...</option>
-                                        <!-- Categories will be populated by JavaScript -->
-                                    </select>
-                                    <div class="form-text">Optional: categorize this template</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description" 
-                                      rows="3" maxlength="500" 
-                                      placeholder="Describe what this template is used for">{{ .template.Description }}</textarea>
-                            <div class="form-text">Optional description of the template's purpose</div>
-                        </div>
-
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="defaultDurationDays" class="form-label">Default Duration (Days)</label>
-                                    <input type="number" class="form-control" id="defaultDurationDays" name="defaultDurationDays" 
-                                           value="{{ if .template.DefaultDurationDays }}{{ .template.DefaultDurationDays }}{{ end }}" 
-                                           min="1" max="365" 
-                                           placeholder="7">
-                                    <div class="form-text">Default job duration in days</div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="isActive" class="form-label">Status</label>
-                                    <select class="form-select" id="isActive" name="isActive">
-                                        <option value="true" {{ if .template.IsActive }}selected{{ end }}>Active</option>
-                                        <option value="false" {{ if not .template.IsActive }}selected{{ end }}>Inactive</option>
-                                    </select>
-                                    <div class="form-text">Whether this template is available for use</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Default Notes -->
-                        <div class="mb-3">
-                            <label for="defaultNotes" class="form-label">Default Notes</label>
-                            <textarea class="form-control" id="defaultNotes" name="defaultNotes" 
-                                      rows="3" maxlength="1000" 
-                                      placeholder="Default notes that will be added to jobs created from this template">{{ .template.DefaultNotes }}</textarea>
-                            <div class="form-text">These notes will be pre-filled when creating jobs from this template</div>
-                        </div>
-
-                        <!-- Equipment List -->
-                        <div class="card mt-4">
-                            <div class="card-header">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="card-title mb-0">Equipment List</h6>
-                                    <button type="button" class="btn btn-sm btn-primary" onclick="addEquipmentItem()">
-                                        <i class="bi bi-plus me-1"></i>Add Equipment
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div id="equipmentList">
-                                    <p class="text-muted" id="noEquipmentMessage">No equipment added yet. Click "Add Equipment" to get started.</p>
-                                </div>
-                                <input type="hidden" id="equipmentListData" name="equipmentList" value="{{ .template.EquipmentList }}">
-                            </div>
-                        </div>
-
-                        <!-- Pricing Template -->
-                        <div class="card mt-4">
-                            <div class="card-header">
-                                <h6 class="card-title mb-0">Pricing Template</h6>
-                            </div>
-                            <div class="card-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="basePrice" class="form-label">Base Price (€)</label>
-                                            <input type="number" class="form-control" id="basePrice" 
-                                                   step="0.01" min="0" placeholder="0.00">
-                                            <div class="form-text">Base price for jobs using this template</div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="mb-3">
-                                            <label for="pricePerDay" class="form-label">Price per Day (€)</label>
-                                            <input type="number" class="form-control" id="pricePerDay" 
-                                                   step="0.01" min="0" placeholder="0.00">
-                                            <div class="form-text">Additional price per day</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <input type="hidden" id="pricingTemplateData" name="pricingTemplate" value="{{ .template.PricingTemplate }}">
-                            </div>
-                        </div>
-
-                        <!-- Required Documents -->
-                        <div class="card mt-4">
-                            <div class="card-header">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="card-title mb-0">Required Documents</h6>
-                                    <button type="button" class="btn btn-sm btn-primary" onclick="addRequiredDocument()">
-                                        <i class="bi bi-plus me-1"></i>Add Document
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="card-body">
-                                <div id="requiredDocuments">
-                                    <p class="text-muted" id="noDocumentsMessage">No required documents specified.</p>
-                                </div>
-                                <input type="hidden" id="requiredDocumentsData" name="requiredDocuments" value="{{ .template.RequiredDocuments }}">
-                            </div>
-                        </div>
-
-                        <!-- Form Actions -->
-                        <div class="row mt-4">
-                            <div class="col-12">
-                                <div class="d-flex justify-content-end gap-2">
-                                    <a href="/workflow/templates" class="btn btn-secondary">Cancel</a>
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="bi bi-check me-2"></i>{{ if .isEdit }}Update Template{{ else }}Create Template{{ end }}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Sidebar -->
-        <div class="col-lg-4">
-            <div class="card">
-                <div class="card-header">
-                    <h6 class="card-title mb-0">Template Guidelines</h6>
-                </div>
-                <div class="card-body">
-                    <div class="alert alert-info">
-                        <h6><i class="bi bi-info-circle me-2"></i>Tips for Creating Templates</h6>
-                        <ul class="mb-0 small">
-                            <li>Use descriptive names that clearly identify the template's purpose</li>
-                            <li>Set realistic default durations based on typical job requirements</li>
-                            <li>Include commonly used equipment to streamline job creation</li>
-                            <li>Define pricing templates for consistent estimates</li>
-                            <li>Specify required documents to ensure compliance</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-
-            {{ if .isEdit }}
-            <div class="card mt-3">
-                <div class="card-header">
-                    <h6 class="card-title mb-0">Template Statistics</h6>
-                </div>
-                <div class="card-body">
-                    <p class="mb-2"><strong>Usage Count:</strong> {{ .template.UsageCount }} jobs</p>
-                    <p class="mb-2"><strong>Created:</strong> {{ .template.CreatedAt.Format "Jan 2, 2006" }}</p>
-                    <p class="mb-0"><strong>Last Updated:</strong> {{ .template.UpdatedAt.Format "Jan 2, 2006" }}</p>
-                </div>
-            </div>
-            {{ end }}
-        </div>
-    </div>
-</div>
-
-<!-- Equipment Item Modal -->
-<div class="modal fade" id="equipmentModal" tabindex="-1" aria-labelledby="equipmentModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="equipmentModalLabel">Add Equipment Item</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="equipmentItemForm">
-                    <div class="mb-3">
-                        <label for="equipmentDeviceID" class="form-label">Device ID</label>
-                        <input type="text" class="form-control" id="equipmentDeviceID" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="equipmentQuantity" class="form-label">Quantity</label>
-                        <input type="number" class="form-control" id="equipmentQuantity" min="1" value="1" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="equipmentNotes" class="form-label">Notes</label>
-                        <textarea class="form-control" id="equipmentNotes" rows="2"></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="saveEquipmentItem()">Add Equipment</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-let equipmentItems = [];
-let requiredDocs = [];
-let editingEquipmentIndex = -1;
-
-// Initialize form data
-document.addEventListener('DOMContentLoaded', function() {
-    // Load existing equipment list
-    try {
-        const equipmentData = document.getElementById('equipmentListData').value;
-        if (equipmentData && equipmentData !== '{}' && equipmentData !== '') {
-            equipmentItems = JSON.parse(equipmentData);
-            updateEquipmentDisplay();
-        }
-    } catch (e) {
-        console.log('No existing equipment data to load');
-    }
-
-    // Load existing required documents
-    try {
-        const docsData = document.getElementById('requiredDocumentsData').value;
-        if (docsData && docsData !== '{}' && docsData !== '') {
-            requiredDocs = JSON.parse(docsData);
-            updateRequiredDocumentsDisplay();
-        }
-    } catch (e) {
-        console.log('No existing documents data to load');
-    }
-
-    // Load existing pricing data
-    try {
-        const pricingData = document.getElementById('pricingTemplateData').value;
-        if (pricingData && pricingData !== '{}' && pricingData !== '') {
-            const pricing = JSON.parse(pricingData);
-            if (pricing.basePrice) document.getElementById('basePrice').value = pricing.basePrice;
-            if (pricing.pricePerDay) document.getElementById('pricePerDay').value = pricing.pricePerDay;
-        }
-    } catch (e) {
-        console.log('No existing pricing data to load');
-    }
-
-    // Update pricing template when fields change
-    document.getElementById('basePrice').addEventListener('change', updatePricingTemplate);
-    document.getElementById('pricePerDay').addEventListener('change', updatePricingTemplate);
-});
-
-// Equipment management functions
-function addEquipmentItem() {
-    editingEquipmentIndex = -1;
-    document.getElementById('equipmentItemForm').reset();
-    document.getElementById('equipmentModalLabel').textContent = 'Add Equipment Item';
-    new bootstrap.Modal(document.getElementById('equipmentModal')).show();
-}
-
-function editEquipmentItem(index) {
-    editingEquipmentIndex = index;
-    const item = equipmentItems[index];
-    document.getElementById('equipmentDeviceID').value = item.deviceID || '';
-    document.getElementById('equipmentQuantity').value = item.quantity || 1;
-    document.getElementById('equipmentNotes').value = item.notes || '';
-    document.getElementById('equipmentModalLabel').textContent = 'Edit Equipment Item';
-    new bootstrap.Modal(document.getElementById('equipmentModal')).show();
-}
-
-function saveEquipmentItem() {
-    const deviceID = document.getElementById('equipmentDeviceID').value;
-    const quantity = parseInt(document.getElementById('equipmentQuantity').value);
-    const notes = document.getElementById('equipmentNotes').value;
-
-    if (!deviceID || quantity < 1) {
-        alert('Please provide valid device ID and quantity');
-        return;
-    }
-
-    const item = { deviceID, quantity, notes };
-
-    if (editingEquipmentIndex >= 0) {
-        equipmentItems[editingEquipmentIndex] = item;
-    } else {
-        equipmentItems.push(item);
-    }
-
-    updateEquipmentDisplay();
-    bootstrap.Modal.getInstance(document.getElementById('equipmentModal')).hide();
-}
-
-function removeEquipmentItem(index) {
-    if (confirm('Remove this equipment item?')) {
-        equipmentItems.splice(index, 1);
-        updateEquipmentDisplay();
-    }
-}
-
-function updateEquipmentDisplay() {
-    const container = document.getElementById('equipmentList');
-    const noMessage = document.getElementById('noEquipmentMessage');
-    
-    if (equipmentItems.length === 0) {
-        noMessage.style.display = 'block';
-        container.innerHTML = '';
-        container.appendChild(noMessage);
-    } else {
-        noMessage.style.display = 'none';
-        container.innerHTML = equipmentItems.map((item, index) => `
-            <div class="d-flex justify-content-between align-items-center p-2 border rounded mb-2">
-                <div>
-                    <strong>${item.deviceID}</strong> 
-                    <span class="badge bg-secondary">Qty: ${item.quantity}</span>
-                    ${item.notes ? `<br><small class="text-muted">${item.notes}</small>` : ''}
-                </div>
-                <div>
-                    <button type="button" class="btn btn-sm btn-outline-primary me-1" onclick="editEquipmentItem(${index})">
-                        <i class="bi bi-pencil"></i>
-                    </button>
-                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeEquipmentItem(${index})">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </div>
-            </div>
-        `).join('');
-    }
-    
-    // Update hidden field
-    document.getElementById('equipmentListData').value = JSON.stringify(equipmentItems);
-}
-
-// Required documents management
-function addRequiredDocument() {
-    const docType = prompt('Enter required document type (e.g., "Contract", "Insurance Certificate"):');
-    if (docType && docType.trim()) {
-        requiredDocs.push(docType.trim());
-        updateRequiredDocumentsDisplay();
-    }
-}
-
-function removeRequiredDocument(index) {
-    if (confirm('Remove this required document?')) {
-        requiredDocs.splice(index, 1);
-        updateRequiredDocumentsDisplay();
-    }
-}
-
-function updateRequiredDocumentsDisplay() {
-    const container = document.getElementById('requiredDocuments');
-    const noMessage = document.getElementById('noDocumentsMessage');
-    
-    if (requiredDocs.length === 0) {
-        noMessage.style.display = 'block';
-        container.innerHTML = '';
-        container.appendChild(noMessage);
-    } else {
-        noMessage.style.display = 'none';
-        container.innerHTML = requiredDocs.map((doc, index) => `
-            <div class="d-flex justify-content-between align-items-center p-2 border rounded mb-2">
-                <span>${doc}</span>
-                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeRequiredDocument(${index})">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </div>
-        `).join('');
-    }
-    
-    // Update hidden field
-    document.getElementById('requiredDocumentsData').value = JSON.stringify(requiredDocs);
-}
-
-// Pricing template management
-function updatePricingTemplate() {
-    const basePrice = parseFloat(document.getElementById('basePrice').value) || 0;
-    const pricePerDay = parseFloat(document.getElementById('pricePerDay').value) || 0;
-    
-    const pricingTemplate = {
-        basePrice: basePrice,
-        pricePerDay: pricePerDay
-    };
-    
-    document.getElementById('pricingTemplateData').value = JSON.stringify(pricingTemplate);
-}
-
-// Form submission
-document.getElementById('templateForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    // Update all hidden fields
-    updatePricingTemplate();
-    
-    // Validate required fields
-    const name = document.getElementById('name').value.trim();
-    if (!name) {
-        alert('Template name is required');
-        return;
-    }
-    
-    // Submit the form
-    this.submit();
-});
-</script>
-
-{{ end }}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

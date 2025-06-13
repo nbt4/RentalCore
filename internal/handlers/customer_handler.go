@@ -33,7 +33,7 @@ func (h *CustomerHandler) ListCustomers(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "customers_new.html", gin.H{
+	c.HTML(http.StatusOK, "customers.html", gin.H{
 		"title":     "Customers",
 		"customers": customers,
 		"params":    params,
@@ -44,7 +44,7 @@ func (h *CustomerHandler) ListCustomers(c *gin.Context) {
 func (h *CustomerHandler) NewCustomerForm(c *gin.Context) {
 	user, _ := GetCurrentUser(c)
 	
-	c.HTML(http.StatusOK, "customer_form_new.html", gin.H{
+	c.HTML(http.StatusOK, "customer_form.html", gin.H{
 		"title":    "New Customer",
 		"customer": &models.Customer{},
 		"user":     user,
@@ -84,7 +84,7 @@ func (h *CustomerHandler) CreateCustomer(c *gin.Context) {
 
 	if err := h.customerRepo.Create(&customer); err != nil {
 		user, _ := GetCurrentUser(c)
-		c.HTML(http.StatusInternalServerError, "customer_form_new.html", gin.H{
+		c.HTML(http.StatusInternalServerError, "customer_form.html", gin.H{
 			"title":    "New Customer",
 			"customer": &customer,
 			"error":    err.Error(),
@@ -132,7 +132,7 @@ func (h *CustomerHandler) EditCustomerForm(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "customer_form_new.html", gin.H{
+	c.HTML(http.StatusOK, "customer_form.html", gin.H{
 		"title":    "Edit Customer",
 		"customer": customer,
 		"user":     user,
@@ -180,7 +180,7 @@ func (h *CustomerHandler) UpdateCustomer(c *gin.Context) {
 	}
 
 	if err := h.customerRepo.Update(&customer); err != nil {
-		c.HTML(http.StatusInternalServerError, "customer_form_new.html", gin.H{
+		c.HTML(http.StatusInternalServerError, "customer_form.html", gin.H{
 			"title":    "Edit Customer",
 			"customer": &customer,
 			"error":    err.Error(),

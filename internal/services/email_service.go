@@ -6,50 +6,21 @@ import (
 	"fmt"
 	"html/template"
 	"net/smtp"
-	"os"
 	"strconv"
 	"strings"
 	"time"
 
+	"go-barcode-webapp/internal/config"
 	"go-barcode-webapp/internal/models"
 )
 
 type EmailService struct {
-	smtpHost     string
-	smtpPort     int
-	smtpUsername string
-	smtpPassword string
-	fromEmail    string
-	fromName     string
+	config *config.EmailConfig
 }
 
-type EmailConfig struct {
-	SMTPHost     string
-	SMTPPort     int
-	SMTPUsername string
-	SMTPPassword string
-	FromEmail    string
-	FromName     string
-}
-
-func NewEmailService() *EmailService {
-	// Get configuration from environment variables
-	config := EmailConfig{
-		SMTPHost:     getEnvWithDefault("SMTP_HOST", "localhost"),
-		SMTPPort:     getEnvIntWithDefault("SMTP_PORT", 587),
-		SMTPUsername: getEnvWithDefault("SMTP_USERNAME", ""),
-		SMTPPassword: getEnvWithDefault("SMTP_PASSWORD", ""),
-		FromEmail:    getEnvWithDefault("FROM_EMAIL", "noreply@rentalcore.com"),
-		FromName:     getEnvWithDefault("FROM_NAME", "RentalCore"),
-	}
-
+func NewEmailService(emailConfig *config.EmailConfig) *EmailService {
 	return &EmailService{
-		smtpHost:     config.SMTPHost,
-		smtpPort:     config.SMTPPort,
-		smtpUsername: config.SMTPUsername,
-		smtpPassword: config.SMTPPassword,
-		fromEmail:    config.FromEmail,
-		fromName:     config.FromName,
+		config: emailConfig,
 	}
 }
 
@@ -66,7 +37,7 @@ type EmailData struct {
 
 // SendInvoiceEmail sends an invoice via email
 func (s *EmailService) SendInvoiceEmail(emailData *EmailData, pdfAttachment []byte) error {
-	if emailData.Customer == nil || emailData.Customer.Email == "" {
+	if emailData.Customer == nil || emailData.Customer.Email == nil || *emailData.Customer.Email == "" {
 		return fmt.Errorf("customer email not available")
 	}
 
@@ -88,7 +59,7 @@ func (s *EmailService) SendInvoiceEmail(emailData *EmailData, pdfAttachment []by
 
 	// Send email
 	return s.sendEmail(
-		[]string{emailData.Customer.Email},
+		[]string{*emailData.Customer.Email},
 		subject,
 		textBody,
 		htmlBody,
@@ -117,9 +88,9 @@ func (s *EmailService) SendTestEmail(toEmail string, testData *EmailData) error 
         <div style="background-color: #f8f9fa; border-left: 4px solid #007bff; padding: 15px; margin: 20px 0;">
             <h3>Email Configuration Status</h3>
             <ul>
-                <li><strong>SMTP Host:</strong> ` + s.smtpHost + `</li>
-                <li><strong>SMTP Port:</strong> ` + strconv.Itoa(s.smtpPort) + `</li>
-                <li><strong>From Email:</strong> ` + s.fromEmail + `</li>
+                <li><strong>SMTP Host:</strong> ` + s.config.SMTPHost + `</li>
+                <li><strong>SMTP Port:</strong> ` + strconv.Itoa(s.config.SMTPPort) + `</li>
+                <li><strong>From Email:</strong> ` + s.config.FromEmail + `</li>
                 <li><strong>Sent At:</strong> ` + time.Now().Format("2006-01-02 15:04:05") + `</li>
             </ul>
         </div>
@@ -129,7 +100,7 @@ func (s *EmailService) SendTestEmail(toEmail string, testData *EmailData) error 
         <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;">
         <p style="font-size: 12px; color: #666;">
             This email was sent from RentalCore - The core of your rental business<br>
-            <a href="mailto:` + s.fromEmail + `">` + s.fromEmail + `</a>
+            <a href="mailto:` + s.config.FromEmail + `">` + s.config.FromEmail + `</a>
         </p>
     </div>
 </body>
@@ -142,16 +113,16 @@ Test Email - RentalCore Invoice System
 This is a test email from your RentalCore invoice system.
 
 Email Configuration Status:
-- SMTP Host: ` + s.smtpHost + `
-- SMTP Port: ` + strconv.Itoa(s.smtpPort) + `
-- From Email: ` + s.fromEmail + `
+- SMTP Host: ` + s.config.SMTPHost + `
+- SMTP Port: ` + strconv.Itoa(s.config.SMTPPort) + `
+- From Email: ` + s.config.FromEmail + `
 - Sent At: ` + time.Now().Format("2006-01-02 15:04:05") + `
 
 If you received this email, your email configuration is working correctly!
 
 ---
 RentalCore - The core of your rental business
-` + s.fromEmail
+` + s.config.FromEmail
 
 	return s.sendEmail([]string{toEmail}, subject, textBody, htmlBody, nil, "")
 }
@@ -380,22 +351,22 @@ Best regards,
 // sendEmail sends an email with optional PDF attachment
 func (s *EmailService) sendEmail(to []string, subject, textBody, htmlBody string, attachment []byte, attachmentName string) error {
 	// Check if SMTP is configured
-	if s.smtpHost == "localhost" && s.smtpUsername == "" {
-		return fmt.Errorf("SMTP not configured - please set environment variables: SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD")
+	if s.config.SMTPHost == "localhost" && s.config.SMTPUsername == "" {
+		return fmt.Errorf("SMTP not configured - please set email configuration in config.json: smtp_host, smtp_port, smtp_username, smtp_password")
 	}
 
 	// Create SMTP connection
-	addr := fmt.Sprintf("%s:%d", s.smtpHost, s.smtpPort)
+	addr := fmt.Sprintf("%s:%d", s.config.SMTPHost, s.config.SMTPPort)
 	
 	// Setup authentication
 	var auth smtp.Auth
-	if s.smtpUsername != "" && s.smtpPassword != "" {
-		auth = smtp.PlainAuth("", s.smtpUsername, s.smtpPassword, s.smtpHost)
+	if s.config.SMTPUsername != "" && s.config.SMTPPassword != "" {
+		auth = smtp.PlainAuth("", s.config.SMTPUsername, s.config.SMTPPassword, s.config.SMTPHost)
 	}
 
 	// Create TLS config
 	tlsConfig := &tls.Config{
-		ServerName: s.smtpHost,
+		ServerName: s.config.SMTPHost,
 	}
 
 	// Connect to server
@@ -406,7 +377,7 @@ func (s *EmailService) sendEmail(to []string, subject, textBody, htmlBody string
 	}
 	defer conn.Close()
 
-	client, err := smtp.NewClient(conn, s.smtpHost)
+	client, err := smtp.NewClient(conn, s.config.SMTPHost)
 	if err != nil {
 		return fmt.Errorf("failed to create SMTP client: %v", err)
 	}
@@ -420,7 +391,7 @@ func (s *EmailService) sendEmail(to []string, subject, textBody, htmlBody string
 	}
 
 	// Set sender
-	if err := client.Mail(s.fromEmail); err != nil {
+	if err := client.Mail(s.config.FromEmail); err != nil {
 		return fmt.Errorf("failed to set sender: %v", err)
 	}
 
@@ -453,12 +424,12 @@ func (s *EmailService) sendEmailPlain(to []string, subject, textBody, htmlBody s
 	message := s.createMIMEMessage(to, subject, textBody, htmlBody, attachment, attachmentName)
 	
 	var auth smtp.Auth
-	if s.smtpUsername != "" && s.smtpPassword != "" {
-		auth = smtp.PlainAuth("", s.smtpUsername, s.smtpPassword, s.smtpHost)
+	if s.config.SMTPUsername != "" && s.config.SMTPPassword != "" {
+		auth = smtp.PlainAuth("", s.config.SMTPUsername, s.config.SMTPPassword, s.config.SMTPHost)
 	}
 
-	addr := fmt.Sprintf("%s:%d", s.smtpHost, s.smtpPort)
-	return smtp.SendMail(addr, auth, s.fromEmail, to, []byte(message))
+	addr := fmt.Sprintf("%s:%d", s.config.SMTPHost, s.config.SMTPPort)
+	return smtp.SendMail(addr, auth, s.config.FromEmail, to, []byte(message))
 }
 
 // createMIMEMessage creates a MIME message with optional attachment
@@ -468,7 +439,7 @@ func (s *EmailService) createMIMEMessage(to []string, subject, textBody, htmlBod
 	var message strings.Builder
 	
 	// Headers
-	message.WriteString(fmt.Sprintf("From: %s <%s>\r\n", s.fromName, s.fromEmail))
+	message.WriteString(fmt.Sprintf("From: %s <%s>\r\n", s.config.FromName, s.config.FromEmail))
 	message.WriteString(fmt.Sprintf("To: %s\r\n", strings.Join(to, ", ")))
 	message.WriteString(fmt.Sprintf("Subject: %s\r\n", subject))
 	message.WriteString("MIME-Version: 1.0\r\n")
@@ -549,19 +520,3 @@ func (s *EmailService) encodeBase64(data []byte) string {
 	return encoded
 }
 
-// Helper functions
-func getEnvWithDefault(key, defaultValue string) string {
-	if value := os.Getenv(key); value != "" {
-		return value
-	}
-	return defaultValue
-}
-
-func getEnvIntWithDefault(key string, defaultValue int) int {
-	if value := os.Getenv(key); value != "" {
-		if intValue, err := strconv.Atoi(value); err == nil {
-			return intValue
-		}
-	}
-	return defaultValue
-}
