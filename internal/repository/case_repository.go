@@ -23,7 +23,7 @@ func (r *CaseRepository) GetAll() ([]models.Case, error) {
 // GetByID returns a case by ID
 func (r *CaseRepository) GetByID(id uint) (*models.Case, error) {
 	var case_ models.Case
-	err := r.db.DB.Preload("Devices").First(&case_, id).Error
+	err := r.db.DB.Preload("Devices.Device.Product").First(&case_, id).Error
 	if err != nil {
 		return nil, err
 	}

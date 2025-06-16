@@ -182,16 +182,14 @@ func (r *DeviceRepository) GetDeviceJobHistory(deviceID uint) ([]models.JobDevic
 
 func (r *DeviceRepository) GetAvailableDevicesForCaseManagement() ([]models.Device, error) {
 	var devices []models.Device
-	err := r.db.Where("status = 'free'").
-		Preload("Product").
+	
+	// Get all devices with product information, regardless of status or case assignment
+	err := r.db.Preload("Product").
 		Preload("Product.Category").
 		Preload("Product.Subcategory").
 		Preload("Product.Brand").
 		Preload("Product.Manufacturer").
 		Find(&devices).Error
-	
-	// Log device count for monitoring
-	log.Printf("Found %d devices with status='free' for case management", len(devices))
 	
 	return devices, err
 }

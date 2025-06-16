@@ -4,6 +4,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"go-barcode-webapp/internal/models"
 	"go-barcode-webapp/internal/repository"
@@ -47,30 +48,6 @@ func (h *CaseHandler) ListCases(c *gin.Context) {
 	})
 }
 
-func (h *CaseHandler) CaseManagement(c *gin.Context) {
-	user, _ := GetCurrentUser(c)
-	
-	params := &models.FilterParams{}
-	cases, err := h.caseRepo.List(params)
-	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
-		return
-	}
-
-	// Get available devices for case management
-	devices, err := h.deviceRepo.GetAvailableDevicesForCaseManagement()
-	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
-		return
-	}
-
-	c.HTML(http.StatusOK, "case_management_simple.html", gin.H{
-		"title": "Case Management",
-		"cases": cases,
-		"devices": devices,
-		"user": user,
-	})
-}
 
 
 func (h *CaseHandler) NewCaseForm(c *gin.Context) {
@@ -176,9 +153,17 @@ func (h *CaseHandler) EditCaseForm(c *gin.Context) {
 		return
 	}
 
+	// Get available devices for case management
+	availableDevices, err := h.deviceRepo.GetAvailableDevicesForCaseManagement()
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
+		return
+	}
+
 	c.HTML(http.StatusOK, "case_form.html", gin.H{
 		"title": "Edit Case",
 		"case":  case_,
+		"availableDevices": availableDevices,
 		"user": user,
 	})
 }
@@ -231,14 +216,70 @@ func (h *CaseHandler) UpdateCase(c *gin.Context) {
 		Status:      status,
 	}
 
+	// Update the case
 	if err := h.caseRepo.Update(&case_); err != nil {
+		// Get available devices for error display
+		availableDevices, _ := h.deviceRepo.GetAvailableDevicesForCaseManagement()
 		c.HTML(http.StatusInternalServerError, "case_form.html", gin.H{
 			"title": "Edit Case",
 			"case":  &case_,
+			"availableDevices": availableDevices,
 			"error": err.Error(),
 			"user": user,
 		})
 		return
+	}
+
+	// Process device associations
+	var deviceIDs []string
+	
+	// Parse device form data
+	for key, values := range c.Request.PostForm {
+		if strings.HasPrefix(key, "devices[") && strings.HasSuffix(key, "]") {
+			for _, deviceID := range values {
+				if deviceID != "" {
+					deviceIDs = append(deviceIDs, deviceID)
+				}
+			}
+		}
+	}
+
+	// Get current devices in case
+	currentDevices, err := h.caseRepo.GetDevicesInCase(uint(caseID))
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
+		return
+	}
+
+	// Create maps for easier lookup
+	currentDeviceMap := make(map[string]bool)
+	for _, dc := range currentDevices {
+		currentDeviceMap[dc.DeviceID] = true
+	}
+
+	newDeviceMap := make(map[string]bool)
+	for _, deviceID := range deviceIDs {
+		newDeviceMap[deviceID] = true
+	}
+
+	// Remove devices that are no longer selected
+	for _, dc := range currentDevices {
+		if !newDeviceMap[dc.DeviceID] {
+			if err := h.caseRepo.RemoveDeviceFromCase(uint(caseID), dc.DeviceID); err != nil {
+				c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
+				return
+			}
+		}
+	}
+
+	// Add new devices
+	for _, deviceID := range deviceIDs {
+		if !currentDeviceMap[deviceID] {
+			if err := h.caseRepo.AddDeviceToCase(uint(caseID), deviceID); err != nil {
+				c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
+				return
+			}
+		}
 	}
 
 	c.Redirect(http.StatusFound, "/cases")

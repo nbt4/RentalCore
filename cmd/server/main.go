@@ -274,7 +274,7 @@ func setupRoutes(r *gin.Engine,
 		// Web interface routes
 		protected.GET("/", func(c *gin.Context) {
 			user, _ := handlers.GetCurrentUser(c)
-			c.HTML(http.StatusOK, "home_new.html", gin.H{
+			c.HTML(http.StatusOK, "home.html", gin.H{
 				"title": "Home",
 				"user":  user,
 			})
@@ -339,7 +339,6 @@ func setupRoutes(r *gin.Engine,
 		cases := protected.Group("/cases")
 		{
 			cases.GET("", caseHandler.ListCases)
-			cases.GET("/management", caseHandler.CaseManagement)
 			cases.GET("/new", caseHandler.NewCaseForm)
 			cases.POST("", caseHandler.CreateCase)
 			cases.GET("/:id", caseHandler.GetCase)

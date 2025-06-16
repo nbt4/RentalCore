@@ -109,6 +109,42 @@
                                 </div>
                             </div>
                             
+                            <!-- Device Selection Section -->
+                            {{if .case.CaseID}}
+                            <div class="mb-4">
+                                <h5>Case Devices</h5>
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="deviceSelect" class="form-label">Add Device</label>
+                                            <select class="form-select" id="deviceSelect">
+                                                <option value="">Select a device to add...</option>
+                                                {{if .availableDevices}}
+                                                    {{range .availableDevices}}
+                                                    <option value="{{.DeviceID}}" data-product="{{if .Product}}{{.Product.Name}}{{else}}Unknown Product{{end}}" data-serial="{{derefString .SerialNumber}}">
+                                                        {{.DeviceID}}{{if .SerialNumber}} - {{derefString .SerialNumber}}{{end}} - {{if .Product}}{{.Product.Name}}{{else}}Unknown Product{{end}}
+                                                    </option>
+                                                    {{end}}
+                                                {{else}}
+                                                    <option value="" disabled>No devices available</option>
+                                                {{end}}
+                                            </select>
+                                        </div>
+                                        <button type="button" class="btn btn-success btn-sm" onclick="addDevice()">
+                                            <i class="bi bi-plus"></i> Add Device
+                                        </button>
+                                        
+                                        <div class="mt-3">
+                                            <h6>Current Devices:</h6>
+                                            <div id="selectedDevices" class="list-group">
+                                                <!-- Selected devices will be added here dynamically -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            {{end}}
+                            
                             <div class="d-flex justify-content-between">
                                 <a href="/cases" class="btn btn-secondary">Cancel</a>
                                 <button type="submit" class="btn btn-primary">
@@ -134,6 +170,131 @@
         {{range .scripts}}
             <script src="{{.}}"></script>
         {{end}}
+    {{end}}
+    
+    {{if .case.CaseID}}
+    <script>
+        let selectedDevices = [];
+        
+        // Initialize with existing devices
+        {{if .case.Devices}}
+        {{range .case.Devices}}
+        selectedDevices.push({
+            deviceID: '{{.DeviceID}}',
+            productName: '{{if .Device.Product}}{{.Device.Product.Name}}{{else}}Unknown Product{{end}}',
+            serialNumber: '{{derefString .Device.SerialNumber}}'
+        });
+        {{end}}
+        {{end}}
+        
+        function addDevice() {
+            const select = document.getElementById('deviceSelect');
+            const selectedOption = select.options[select.selectedIndex];
+            
+            if (!selectedOption.value) {
+                alert('Please select a device to add.');
+                return;
+            }
+            
+            const deviceID = selectedOption.value;
+            const productName = selectedOption.getAttribute('data-product');
+            const serialNumber = selectedOption.getAttribute('data-serial');
+            
+            // Check if device already added
+            if (selectedDevices.find(d => d.deviceID === deviceID)) {
+                alert('This device is already added to the case.');
+                return;
+            }
+            
+            const device = {
+                deviceID: deviceID,
+                productName: productName,
+                serialNumber: serialNumber
+            };
+            
+            selectedDevices.push(device);
+            renderSelectedDevices();
+            
+            // Remove from select options
+            selectedOption.remove();
+        }
+        
+        function removeDevice(deviceID) {
+            const deviceIndex = selectedDevices.findIndex(d => d.deviceID === deviceID);
+            if (deviceIndex > -1) {
+                const device = selectedDevices[deviceIndex];
+                selectedDevices.splice(deviceIndex, 1);
+                
+                // Add back to select options
+                const select = document.getElementById('deviceSelect');
+                const option = document.createElement('option');
+                option.value = device.deviceID;
+                option.textContent = device.deviceID + (device.serialNumber ? ' - ' + device.serialNumber : '') + ' - ' + device.productName;
+                option.setAttribute('data-product', device.productName);
+                option.setAttribute('data-serial', device.serialNumber);
+                select.appendChild(option);
+                
+                renderSelectedDevices();
+            }
+        }
+        
+        function renderSelectedDevices() {
+            const container = document.getElementById('selectedDevices');
+            
+            if (selectedDevices.length === 0) {
+                container.innerHTML = '<p class="text-muted">No devices in this case yet.</p>';
+                return;
+            }
+            
+            let html = '';
+            selectedDevices.forEach((device, index) => {
+                html += '<div class="list-group-item">';
+                html += '<div class="d-flex justify-content-between align-items-center">';
+                html += '<div class="flex-grow-1">';
+                html += '<h6 class="mb-1">' + device.deviceID + '</h6>';
+                html += '<p class="mb-1 text-muted">' + device.productName + '</p>';
+                if (device.serialNumber) {
+                    html += '<small class="text-muted">Serial: ' + device.serialNumber + '</small>';
+                }
+                html += '</div>';
+                html += '<button type="button" class="btn btn-danger btn-sm" onclick="removeDevice(\'' + device.deviceID + '\')">';
+                html += '<i class="bi bi-trash"></i>';
+                html += '</button>';
+                html += '</div>';
+                html += '</div>';
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // Update form submission to include selected devices
+        document.querySelector('form').addEventListener('submit', function(e) {
+            // Remove existing device inputs
+            const existingInputs = this.querySelectorAll('input[name^="devices["]');
+            existingInputs.forEach(input => input.remove());
+            
+            // Create hidden inputs for each selected device
+            selectedDevices.forEach((device, index) => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'devices[' + index + ']';
+                input.value = device.deviceID;
+                this.appendChild(input);
+            });
+        });
+        
+        // Initialize
+        renderSelectedDevices();
+        
+        // Remove already selected devices from the dropdown
+        selectedDevices.forEach(device => {
+            const select = document.getElementById('deviceSelect');
+            const option = select.querySelector('option[value="' + device.deviceID + '"]');
+            if (option) {
+                option.remove();
+            }
+        });
+    </script>
     {{end}}
 </body>
 </html>
