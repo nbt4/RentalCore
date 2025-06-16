@@ -580,3 +580,202 @@ func (h *FinancialHandler) GetFinancialStatsAPI(c *gin.Context) {
 	
 	c.JSON(http.StatusOK, stats)
 }
+
+// ================================================================
+// EXPORT FUNCTIONS
+// ================================================================
+
+// ExportTransactions exports financial transactions to CSV
+func (h *FinancialHandler) ExportTransactions(c *gin.Context) {
+	format := c.DefaultQuery("format", "csv")
+	startDate := c.Query("startDate")
+	endDate := c.Query("endDate")
+	transactionType := c.Query("type")
+	status := c.Query("status")
+
+	if format != "csv" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Only CSV format is supported"})
+		return
+	}
+
+	c.Header("Content-Type", "text/csv")
+	c.Header("Content-Disposition", `attachment; filename="transactions_`+time.Now().Format("2006-01-02")+`.csv"`)
+
+	// Build query
+	query := h.db.Model(&models.FinancialTransaction{})
+	
+	if startDate != "" {
+		query = query.Where("transaction_date >= ?", startDate)
+	}
+	if endDate != "" {
+		query = query.Where("transaction_date <= ?", endDate)
+	}
+	if transactionType != "" {
+		query = query.Where("type = ?", transactionType)
+	}
+	if status != "" {
+		query = query.Where("status = ?", status)
+	}
+
+	var transactions []models.FinancialTransaction
+	if err := query.Order("transaction_date DESC").Find(&transactions).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch transactions"})
+		return
+	}
+
+	// Generate CSV
+	csvContent := "Date,Type,Amount,Status,Customer,Description,Reference,Job ID\n"
+	
+	for _, transaction := range transactions {
+		customerName := ""
+		if transaction.CustomerID != nil {
+			var customer models.Customer
+			if err := h.db.First(&customer, *transaction.CustomerID).Error; err == nil {
+				if customer.CompanyName != nil && *customer.CompanyName != "" {
+					customerName = *customer.CompanyName
+				} else if customer.FirstName != nil && customer.LastName != nil {
+					firstName := ""
+					lastName := ""
+					if customer.FirstName != nil {
+						firstName = *customer.FirstName
+					}
+					if customer.LastName != nil {
+						lastName = *customer.LastName
+					}
+					customerName = firstName + " " + lastName
+				}
+			}
+		}
+
+		jobID := ""
+		if transaction.JobID != nil {
+			jobID = fmt.Sprintf("%d", *transaction.JobID)
+		}
+
+		csvContent += fmt.Sprintf("%s,%s,%.2f,%s,\"%s\",\"%s\",\"%s\",%s\n",
+			transaction.TransactionDate.Format("2006-01-02"),
+			transaction.Type,
+			transaction.Amount,
+			transaction.Status,
+			customerName,
+			transaction.Notes,
+			transaction.ReferenceNumber,
+			jobID,
+		)
+	}
+
+	c.String(http.StatusOK, csvContent)
+}
+
+// ExportRevenue exports revenue report to CSV
+func (h *FinancialHandler) ExportRevenue(c *gin.Context) {
+	format := c.DefaultQuery("format", "csv")
+	period := c.DefaultQuery("period", "monthly")
+	startDate := c.Query("startDate")
+	endDate := c.Query("endDate")
+
+	if format != "csv" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Only CSV format is supported"})
+		return
+	}
+
+	c.Header("Content-Type", "text/csv")
+	c.Header("Content-Disposition", `attachment; filename="revenue_report_`+time.Now().Format("2006-01-02")+`.csv"`)
+
+	var results []struct {
+		Period       string  `json:"period"`
+		Revenue      float64 `json:"revenue"`
+		Expenses     float64 `json:"expenses"`
+		NetProfit    float64 `json:"netProfit"`
+		Transactions int     `json:"transactions"`
+	}
+
+	query := h.db.Model(&models.FinancialTransaction{}).
+		Where("status = ?", "completed")
+
+	if startDate != "" {
+		query = query.Where("transaction_date >= ?", startDate)
+	}
+	if endDate != "" {
+		query = query.Where("transaction_date <= ?", endDate)
+	}
+
+	// Group by period
+	var groupBy string
+	switch period {
+	case "daily":
+		groupBy = "DATE(transaction_date)"
+	case "monthly":
+		groupBy = "DATE_FORMAT(transaction_date, '%Y-%m')"
+	case "yearly":
+		groupBy = "YEAR(transaction_date)"
+	default:
+		groupBy = "DATE_FORMAT(transaction_date, '%Y-%m')"
+	}
+
+	query.Select(`
+		` + groupBy + ` as period,
+		SUM(CASE WHEN type IN ('rental', 'payment') THEN amount ELSE 0 END) as revenue,
+		SUM(CASE WHEN type IN ('fee', 'expense') THEN amount ELSE 0 END) as expenses,
+		SUM(CASE WHEN type IN ('rental', 'payment') THEN amount ELSE -amount END) as net_profit,
+		COUNT(*) as transactions
+	`).Group(groupBy).Order("period DESC").Scan(&results)
+
+	// Generate CSV
+	csvContent := "Period,Revenue,Expenses,Net Profit,Transactions\n"
+	
+	totalRevenue := 0.0
+	totalExpenses := 0.0
+	totalTransactions := 0
+
+	for _, result := range results {
+		csvContent += fmt.Sprintf("%s,%.2f,%.2f,%.2f,%d\n",
+			result.Period,
+			result.Revenue,
+			result.Expenses,
+			result.NetProfit,
+			result.Transactions,
+		)
+		totalRevenue += result.Revenue
+		totalExpenses += result.Expenses
+		totalTransactions += result.Transactions
+	}
+
+	// Add summary
+	csvContent += fmt.Sprintf("\nTOTAL,%.2f,%.2f,%.2f,%d\n",
+		totalRevenue,
+		totalExpenses,
+		totalRevenue-totalExpenses,
+		totalTransactions,
+	)
+
+	c.String(http.StatusOK, csvContent)
+}
+
+// ExportTaxReportCSV exports tax report to CSV
+func (h *FinancialHandler) ExportTaxReportCSV(c *gin.Context) {
+	// Implementation for tax report export
+	c.Header("Content-Type", "text/csv")
+	c.Header("Content-Disposition", "attachment; filename=tax_report.csv")
+	
+	// Get tax data
+	var transactions []models.FinancialTransaction
+	if err := h.db.Find(&transactions).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve tax data"})
+		return
+	}
+
+	// Generate CSV content
+	csvContent := "Date,Type,Amount,Status,Reference\n"
+	for _, transaction := range transactions {
+		csvContent += fmt.Sprintf("%s,%s,%.2f,%s,%s\n",
+			transaction.TransactionDate.Format("2006-01-02"),
+			transaction.Type,
+			transaction.Amount,
+			transaction.Status,
+			transaction.ReferenceNumber,
+		)
+	}
+
+	c.String(http.StatusOK, csvContent)
+}

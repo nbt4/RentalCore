@@ -1,0 +1,490 @@
+{{define "content"}}
+<!-- Hero Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card bg-gradient-primary text-white border-0 shadow-lg">
+            <div class="card-body p-5">
+                <div class="row align-items-center">
+                    <div class="col-lg-8">
+                        <h1 class="display-4 fw-bold mb-3">
+                            Welcome back{{if .user}}, {{.user.FirstName}}{{end}}!
+                        </h1>
+                        <p class="lead mb-4">
+                            <i class="bi bi-gear-wide-connected me-2"></i>
+                            The core of your rental business - streamlined, efficient, professional.
+                        </p>
+                        <div class="d-flex gap-3 flex-wrap">
+                            <a href="/scan/select" class="btn btn-light btn-lg px-4">
+                                <i class="bi bi-qr-code-scan me-2"></i>
+                                Launch Scanner
+                            </a>
+                            <a href="/jobs/new" class="btn btn-outline-light btn-lg px-4">
+                                <i class="bi bi-plus-circle me-2"></i>
+                                New Job
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 text-center">
+                        <i class="bi bi-gear-wide-connected display-1 opacity-25"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Stats -->
+{{if .stats}}
+<div class="row mb-5">
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <div class="text-primary mb-2">
+                    <i class="bi bi-briefcase display-6"></i>
+                </div>
+                <h3 class="fw-bold text-primary">{{.stats.TotalJobs}}</h3>
+                <p class="text-muted mb-0">Active Jobs</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <div class="text-success mb-2">
+                    <i class="bi bi-cpu display-6"></i>
+                </div>
+                <h3 class="fw-bold text-success">{{.stats.TotalDevices}}</h3>
+                <p class="text-muted mb-0">Devices</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <div class="text-info mb-2">
+                    <i class="bi bi-people display-6"></i>
+                </div>
+                <h3 class="fw-bold text-info">{{.stats.TotalCustomers}}</h3>
+                <p class="text-muted mb-0">Customers</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body text-center">
+                <div class="text-warning mb-2">
+                    <i class="bi bi-box display-6"></i>
+                </div>
+                <h3 class="fw-bold text-warning">{{.stats.TotalCases}}</h3>
+                <p class="text-muted mb-0">Cases</p>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
+
+<!-- Core Management -->
+<div class="section-header mb-4">
+    <h2 class="fw-bold">
+        <i class="bi bi-grid-3x3-gap me-2 text-primary"></i>
+        Core Management
+    </h2>
+    <p class="text-muted">Manage your rental business essentials</p>
+</div>
+
+<div class="row mb-5 g-4 feature-cards-row">
+    <div class="col-lg-3 col-md-6">
+        <div class="card h-100 border-0 shadow-sm feature-card">
+            <div class="card-body text-center p-4">
+                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <i class="bi bi-briefcase display-6 text-primary"></i>
+                </div>
+                <h5 class="fw-semibold mb-2">Jobs</h5>
+                <p class="text-muted mb-3">Manage projects and equipment assignments</p>
+                <div class="d-grid gap-2">
+                    <a href="/jobs" class="btn btn-primary">
+                        <i class="bi bi-eye me-1"></i> View All Jobs
+                    </a>
+                    <a href="/jobs/new" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle me-1"></i> Create New
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="card h-100 border-0 shadow-sm feature-card">
+            <div class="card-body text-center p-4">
+                <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <i class="bi bi-cpu display-6 text-success"></i>
+                </div>
+                <h5 class="fw-semibold mb-2">Devices</h5>
+                <p class="text-muted mb-3">Equipment inventory and tracking</p>
+                <div class="d-grid gap-2">
+                    <a href="/devices" class="btn btn-success">
+                        <i class="bi bi-eye me-1"></i> View All Devices
+                    </a>
+                    <a href="/devices/new" class="btn btn-outline-success">
+                        <i class="bi bi-plus-circle me-1"></i> Add Device
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="card h-100 border-0 shadow-sm feature-card">
+            <div class="card-body text-center p-4">
+                <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <i class="bi bi-people display-6 text-info"></i>
+                </div>
+                <h5 class="fw-semibold mb-2">Customers</h5>
+                <p class="text-muted mb-3">Customer database management</p>
+                <div class="d-grid gap-2">
+                    <a href="/customers" class="btn btn-info">
+                        <i class="bi bi-eye me-1"></i> View All Customers
+                    </a>
+                    <a href="/customers/new" class="btn btn-outline-info">
+                        <i class="bi bi-plus-circle me-1"></i> Add Customer
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-3 col-md-6">
+        <div class="card h-100 border-0 shadow-sm feature-card">
+            <div class="card-body text-center p-4">
+                <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                    <i class="bi bi-box display-6 text-warning"></i>
+                </div>
+                <h5 class="fw-semibold mb-2">Cases</h5>
+                <p class="text-muted mb-3">Case management and device mapping</p>
+                <div class="d-grid gap-2">
+                    <a href="/cases" class="btn btn-warning">
+                        <i class="bi bi-eye me-1"></i> View All Cases
+                    </a>
+                    <a href="/cases/new" class="btn btn-outline-warning">
+                        <i class="bi bi-plus-circle me-1"></i> Create Case
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="section-header mb-4">
+    <h2 class="fw-bold">
+        <i class="bi bi-lightning-fill me-2 text-primary"></i>
+        Quick Actions
+    </h2>
+    <p class="text-muted">Frequently used operations at your fingertips</p>
+</div>
+
+<div class="row mb-5 g-3">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center p-4">
+                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-qr-code-scan display-6 text-primary"></i>
+                </div>
+                <h6 class="fw-semibold">Equipment Scanner</h6>
+                <p class="text-muted small mb-3">Quickly scan and manage equipment</p>
+                <a href="/scan/select" class="btn btn-primary w-100">
+                    <i class="bi bi-qr-code-scan me-1"></i> Launch Scanner
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center p-4">
+                <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-plus-circle display-6 text-success"></i>
+                </div>
+                <h6 class="fw-semibold">New Job Creation</h6>
+                <p class="text-muted small mb-3">Create and configure new jobs</p>
+                <a href="/jobs/new" class="btn btn-success w-100">
+                    <i class="bi bi-plus-circle me-1"></i> Create Job
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center p-4">
+                <div class="bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+                    <i class="bi bi-search display-6 text-secondary"></i>
+                </div>
+                <h6 class="fw-semibold">Global Search</h6>
+                <p class="text-muted small mb-3">Search across all system data</p>
+                <a href="/search/global" class="btn btn-secondary w-100">
+                    <i class="bi bi-search me-1"></i> Advanced Search
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Business Tools -->
+<div class="section-header mb-4">
+    <h2 class="fw-bold">
+        <i class="bi bi-briefcase-fill me-2 text-primary"></i>
+        Business Tools
+    </h2>
+    <p class="text-muted">Advanced features for business management</p>
+</div>
+
+<div class="row mb-5 g-4">
+    <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                        <i class="bi bi-file-text text-primary"></i>
+                    </div>
+                    <h6 class="fw-semibold mb-0">Invoicing</h6>
+                </div>
+                <p class="text-muted small mb-3">Generate and manage professional invoices</p>
+                <div class="d-flex gap-2">
+                    <a href="/invoices" class="btn btn-primary btn-sm flex-fill">
+                        <i class="bi bi-eye me-1"></i> View
+                    </a>
+                    <a href="/invoices/new" class="btn btn-outline-primary btn-sm flex-fill">
+                        <i class="bi bi-plus me-1"></i> Create
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                        <i class="bi bi-graph-up text-success"></i>
+                    </div>
+                    <h6 class="fw-semibold mb-0">Analytics</h6>
+                </div>
+                <p class="text-muted small mb-3">Business insights and performance metrics</p>
+                <div class="d-flex gap-2">
+                    <a href="/analytics" class="btn btn-success btn-sm flex-fill">
+                        <i class="bi bi-graph-up me-1"></i> Dashboard
+                    </a>
+                    <a href="/financial" class="btn btn-outline-success btn-sm flex-fill">
+                        <i class="bi bi-calculator me-1"></i> Financial
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                        <i class="bi bi-file-earmark text-info"></i>
+                    </div>
+                    <h6 class="fw-semibold mb-0">Documents</h6>
+                </div>
+                <p class="text-muted small mb-3">Document management and storage</p>
+                <div class="d-flex gap-2">
+                    <a href="/documents" class="btn btn-info btn-sm flex-fill">
+                        <i class="bi bi-folder me-1"></i> Browse
+                    </a>
+                    <a href="/documents/upload" class="btn btn-outline-info btn-sm flex-fill">
+                        <i class="bi bi-upload me-1"></i> Upload
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                        <i class="bi bi-file-earmark-text text-warning"></i>
+                    </div>
+                    <h6 class="fw-semibold mb-0">Templates</h6>
+                </div>
+                <p class="text-muted small mb-3">Job templates and equipment packages</p>
+                <div class="d-flex gap-2">
+                    <a href="/workflow/templates" class="btn btn-warning btn-sm flex-fill">
+                        <i class="bi bi-file-earmark-text me-1"></i> Jobs
+                    </a>
+                    <a href="/workflow/packages" class="btn btn-outline-warning btn-sm flex-fill">
+                        <i class="bi bi-box-seam me-1"></i> Packages
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-secondary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                        <i class="bi bi-tools text-secondary"></i>
+                    </div>
+                    <h6 class="fw-semibold mb-0">System Tools</h6>
+                </div>
+                <p class="text-muted small mb-3">Bulk operations and system utilities</p>
+                <div class="d-flex gap-2">
+                    <a href="/workflow/bulk" class="btn btn-secondary btn-sm flex-fill">
+                        <i class="bi bi-gear me-1"></i> Bulk Ops
+                    </a>
+                    <a href="/users" class="btn btn-outline-secondary btn-sm flex-fill">
+                        <i class="bi bi-people me-1"></i> Users
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                        <i class="bi bi-shield-check text-danger"></i>
+                    </div>
+                    <h6 class="fw-semibold mb-0">Security</h6>
+                </div>
+                <p class="text-muted small mb-3">Access control and audit logs</p>
+                <div class="d-flex gap-2">
+                    <a href="/security/audit" class="btn btn-danger btn-sm flex-fill">
+                        <i class="bi bi-shield-check me-1"></i> Audit
+                    </a>
+                    <a href="/security/roles" class="btn btn-outline-danger btn-sm flex-fill">
+                        <i class="bi bi-person-badge me-1"></i> Roles
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Activity -->
+{{if .recentJobs}}
+<div class="section-header mb-4">
+    <h2 class="fw-bold">
+        <i class="bi bi-clock-history me-2 text-primary"></i>
+        Recent Activity
+    </h2>
+    <p class="text-muted">Latest updates and activities</p>
+</div>
+
+<div class="card border-0 shadow-sm mb-5">
+    <div class="card-header bg-light border-0">
+        <h6 class="fw-semibold mb-0">Recent Jobs</h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+            {{range .recentJobs}}
+            <div class="list-group-item border-0">
+                <div class="d-flex align-items-center">
+                    <div class="status-indicator status-{{.Status}} me-3"></div>
+                    <div class="flex-grow-1">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">{{.Title}}</h6>
+                                <p class="text-muted mb-1 small">{{.CustomerName}}</p>
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar me-1"></i>
+                                    {{.CreatedAt.Format "Jan 02, 2006"}}
+                                </small>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-{{.Status}} bg-opacity-10 text-{{.Status}} mb-2">{{.Status}}</span>
+                                <br>
+                                <a href="/jobs/{{.ID}}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-eye me-1"></i> View
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {{end}}
+        </div>
+    </div>
+    <div class="card-footer bg-light border-0 text-center">
+        <a href="/jobs" class="btn btn-outline-primary">
+            <i class="bi bi-arrow-right me-1"></i> View All Jobs
+        </a>
+    </div>
+</div>
+{{end}}
+
+<style>
+.feature-card {
+    transition: all var(--transition-normal);
+    border-radius: var(--radius-xl) !important;
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl) !important;
+}
+
+.section-header {
+    border-left: 4px solid var(--accent-color);
+    padding-left: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.bg-gradient-primary {
+    background: var(--gradient-primary) !important;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.status-active {
+    background-color: var(--success-color);
+}
+
+.status-pending {
+    background-color: var(--warning-color);
+}
+
+.status-completed {
+    background-color: var(--info-color);
+}
+
+.status-cancelled {
+    background-color: var(--danger-color);
+}
+</style>
+
+<script>
+// Add smooth animations on load
+document.addEventListener('DOMContentLoaded', function() {
+    // Animate cards on scroll
+    const cards = document.querySelectorAll('.feature-card');
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('animate-bounce-in');
+            }
+        });
+    });
+    
+    cards.forEach(card => {
+        observer.observe(card);
+    });
+});
+</script>
+{{end}}

@@ -13,6 +13,8 @@ import (
 
 	"go-barcode-webapp/internal/config"
 	"go-barcode-webapp/internal/models"
+	
+	"github.com/jung-kurt/gofpdf"
 )
 
 type PDFService struct {
@@ -448,11 +450,11 @@ func (s *PDFService) generateInvoiceHTML(invoice *models.Invoice, company *model
 	return buf.String(), nil
 }
 
-// convertHTMLToPDF converts HTML to PDF using wkhtmltopdf or similar
+// convertHTMLToPDF converts HTML to PDF using available methods
 func (s *PDFService) convertHTMLToPDF(htmlContent string) ([]byte, error) {
 	// Try different PDF generation methods
 	
-	// Method 1: Try wkhtmltopdf (most reliable)
+	// Method 1: Try wkhtmltopdf (if available)
 	if pdfBytes, err := s.convertWithWKHTMLToPDF(htmlContent); err == nil {
 		return pdfBytes, nil
 	}
@@ -462,7 +464,12 @@ func (s *PDFService) convertHTMLToPDF(htmlContent string) ([]byte, error) {
 		return pdfBytes, nil
 	}
 
-	// Method 3: Fallback to simple HTML generation (not PDF, but functional)
+	// Method 3: Generate a simple PDF with gofpdf (fallback)
+	if pdfBytes, err := s.convertWithGofpdf(htmlContent); err == nil {
+		return pdfBytes, nil
+	}
+
+	// Method 4: Fallback to simple HTML generation (not PDF, but functional)
 	log.Println("Warning: No PDF converter available, returning HTML content")
 	return []byte(htmlContent), nil
 }
@@ -582,6 +589,41 @@ func (s *PDFService) convertWithChrome(htmlContent string) ([]byte, error) {
 	}
 
 	return pdfBytes, nil
+}
+
+// convertWithRod uses Rod (Chrome DevTools Protocol) to convert HTML to PDF
+// TODO: Fix Rod API usage - currently commented out due to API changes
+/*
+func (s *PDFService) convertWithRod(htmlContent string) ([]byte, error) {
+	// Implementation temporarily disabled
+	return nil, fmt.Errorf("Rod PDF conversion temporarily disabled")
+}
+*/
+
+// convertWithGofpdf creates a simple PDF using gofpdf library
+func (s *PDFService) convertWithGofpdf(htmlContent string) ([]byte, error) {
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+	pdf.SetFont("Arial", "B", 16)
+	
+	// This is a very basic fallback - just creates a simple PDF with basic text
+	pdf.Cell(40, 10, "Invoice Document")
+	pdf.Ln(10)
+	
+	pdf.SetFont("Arial", "", 12)
+	pdf.Cell(40, 10, "PDF generation fallback mode")
+	pdf.Ln(5)
+	pdf.Cell(40, 10, "Original HTML content could not be converted to PDF")
+	pdf.Ln(5)
+	pdf.Cell(40, 10, "Please contact support for assistance")
+	
+	var buf bytes.Buffer
+	err := pdf.Output(&buf)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate PDF with gofpdf: %v", err)
+	}
+	
+	return buf.Bytes(), nil
 }
 
 // SavePDF saves PDF content to a file

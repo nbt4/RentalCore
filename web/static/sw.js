@@ -1,12 +1,12 @@
-// TS Equipment Manager - Enhanced Service Worker for PWA
-const CACHE_NAME = 'ts-equipment-v2.0';
-const STATIC_CACHE = 'ts-equipment-static-v2.0';
-const DYNAMIC_CACHE = 'ts-equipment-dynamic-v2.0';
-const OFFLINE_CACHE = 'ts-equipment-offline-v2.0';
+// RentalCore Professional - Enhanced Service Worker for PWA
+const CACHE_NAME = 'rentalcore-professional-v3.0';
+const STATIC_CACHE = 'rentalcore-static-v3.0';
+const DYNAMIC_CACHE = 'rentalcore-dynamic-v3.0';
+const OFFLINE_CACHE = 'rentalcore-offline-v3.0';
 
 // Files to cache immediately
 const STATIC_FILES = [
-    '/static/css/app.css',
+    '/static/css/app-new.css',
     '/static/js/app.js',
     '/static/images/icon-192.png',
     '/static/images/icon-512.png',
@@ -14,9 +14,10 @@ const STATIC_FILES = [
     '/analytics',
     '/scan/select',
     '/manifest.json',
-    'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css',
-    'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css',
-    'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js',
+    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css',
+    'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css',
+    'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap',
+    'https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js',
     'https://cdn.jsdelivr.net/npm/chart.js',
     'https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js'
 ];

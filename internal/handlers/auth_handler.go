@@ -512,6 +512,25 @@ func (h *AuthHandler) DeleteUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 }
 
+// ListUsersAPI returns users in JSON format for API calls
+func (h *AuthHandler) ListUsersAPI(c *gin.Context) {
+	var users []models.User
+	if err := h.db.Order("created_at DESC").Find(&users).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve users"})
+		return
+	}
+
+	// Remove sensitive information (passwords) before returning
+	for i := range users {
+		users[i].PasswordHash = "" // Don't expose password hashes
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"users": users,
+		"total": len(users),
+	})
+}
+
 // Helper function to parse user ID
 func parseUserID(userIDStr string) uint {
 	if userIDStr == "" {

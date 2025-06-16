@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -476,10 +477,60 @@ func (h *AnalyticsHandler) exportToCSV(c *gin.Context, startDate, endDate time.T
 	// Write CSV headers and data
 	csvData := "Metric,Value\n"
 	
+	// Revenue metrics
 	if revenue, ok := analytics["revenue"].(map[string]interface{}); ok {
 		csvData += "Total Revenue," + strconv.FormatFloat(revenue["totalRevenue"].(float64), 'f', 2, 64) + "\n"
 		csvData += "Total Jobs," + strconv.FormatInt(revenue["totalJobs"].(int64), 10) + "\n"
 		csvData += "Average Job Value," + strconv.FormatFloat(revenue["avgJobValue"].(float64), 'f', 2, 64) + "\n"
+		if growth, ok := revenue["revenueGrowth"].(float64); ok {
+			csvData += "Revenue Growth %," + strconv.FormatFloat(growth, 'f', 1, 64) + "\n"
+		}
+	}
+	
+	// Equipment metrics
+	if equipment, ok := analytics["equipment"].(map[string]interface{}); ok {
+		csvData += "Total Devices," + strconv.FormatInt(equipment["totalDevices"].(int64), 10) + "\n"
+		csvData += "Active Devices," + strconv.FormatInt(equipment["activeDevices"].(int64), 10) + "\n"
+		csvData += "Utilization Rate %," + strconv.FormatFloat(equipment["utilizationRate"].(float64), 'f', 1, 64) + "\n"
+		if revenue, ok := equipment["revenuePerDevice"].(float64); ok {
+			csvData += "Revenue per Device," + strconv.FormatFloat(revenue, 'f', 2, 64) + "\n"
+		}
+	}
+	
+	// Customer metrics
+	if customers, ok := analytics["customers"].(map[string]interface{}); ok {
+		csvData += "Total Customers," + strconv.FormatInt(customers["totalCustomers"].(int64), 10) + "\n"
+		csvData += "Active Customers," + strconv.FormatInt(customers["activeCustomers"].(int64), 10) + "\n"
+		if retention, ok := customers["retentionRate"].(float64); ok {
+			csvData += "Customer Retention %," + strconv.FormatFloat(retention, 'f', 1, 64) + "\n"
+		}
+	}
+	
+	// Top equipment section
+	csvData += "\nTop Equipment by Revenue\n"
+	csvData += "Device ID,Product Name,Rental Count,Total Revenue\n"
+	if topEquipment, ok := analytics["topEquipment"].([]map[string]interface{}); ok {
+		for _, equipment := range topEquipment {
+			csvData += fmt.Sprintf("%s,%s,%v,%.2f\n",
+				equipment["deviceID"].(string),
+				equipment["productName"].(string),
+				equipment["rentalCount"],
+				equipment["totalRevenue"].(float64),
+			)
+		}
+	}
+	
+	// Top customers section
+	csvData += "\nTop Customers by Revenue\n"
+	csvData += "Customer Name,Job Count,Total Revenue\n"
+	if topCustomers, ok := analytics["topCustomers"].([]map[string]interface{}); ok {
+		for _, customer := range topCustomers {
+			csvData += fmt.Sprintf("%s,%v,%.2f\n",
+				customer["customerName"].(string),
+				customer["jobCount"],
+				customer["totalRevenue"].(float64),
+			)
+		}
 	}
 
 	c.String(http.StatusOK, csvData)

@@ -53,9 +53,17 @@ func (h *CaseHandler) ListCases(c *gin.Context) {
 func (h *CaseHandler) NewCaseForm(c *gin.Context) {
 	user, _ := GetCurrentUser(c)
 	
+	// Get available devices for new case
+	availableDevices, err := h.caseRepo.GetAvailableDevices()
+	if err != nil {
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
+		return
+	}
+	
 	c.HTML(http.StatusOK, "case_form.html", gin.H{
 		"title": "New Case",
 		"case":  &models.Case{},
+		"availableDevices": availableDevices,
 		"user": user,
 	})
 }
@@ -154,10 +162,22 @@ func (h *CaseHandler) EditCaseForm(c *gin.Context) {
 	}
 
 	// Get available devices for case management
-	availableDevices, err := h.deviceRepo.GetAvailableDevicesForCaseManagement()
+	availableDevices, err := h.caseRepo.GetAvailableDevicesForCase(uint(caseID))
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
+	}
+
+	// Debug: Log the number of available devices
+	log.Printf("EditCaseForm: Found %d available devices for case %d", len(availableDevices), caseID)
+	for i, device := range availableDevices {
+		if i < 3 { // Only show first 3 for debugging
+			productName := "No Product"
+			if device.Product != nil {
+				productName = device.Product.Name
+			}
+			log.Printf("  Device %d: ID='%s', Status='%s', Product='%s'", i+1, device.DeviceID, device.Status, productName)
+		}
 	}
 
 	c.HTML(http.StatusOK, "case_form.html", gin.H{

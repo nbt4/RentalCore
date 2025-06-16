@@ -523,6 +523,87 @@ func (h *SecurityHandler) GetAuditLog(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"auditLog": auditLog})
 }
 
+// ExportAuditLogs exports audit logs to CSV format
+func (h *SecurityHandler) ExportAuditLogs(c *gin.Context) {
+	format := c.DefaultQuery("format", "csv")
+	userID := c.Query("userId")
+	action := c.Query("action")
+	entityType := c.Query("entityType")
+	startDate := c.Query("startDate")
+	endDate := c.Query("endDate")
+
+	if format != "csv" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Only CSV format is supported"})
+		return
+	}
+
+	c.Header("Content-Type", "text/csv")
+	c.Header("Content-Disposition", `attachment; filename="audit_logs_`+time.Now().Format("2006-01-02")+`.csv"`)
+
+	// Build query
+	query := h.db.Model(&models.AuditLog{}).Preload("User")
+
+	if userID != "" {
+		query = query.Where("user_id = ?", userID)
+	}
+	if action != "" {
+		query = query.Where("action = ?", action)
+	}
+	if entityType != "" {
+		query = query.Where("entity_type = ?", entityType)
+	}
+	if startDate != "" {
+		query = query.Where("timestamp >= ?", startDate)
+	}
+	if endDate != "" {
+		query = query.Where("timestamp <= ?", endDate)
+	}
+
+	var auditLogs []models.AuditLog
+	if err := query.Order("timestamp DESC").Find(&auditLogs).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch audit logs"})
+		return
+	}
+
+	// Generate CSV
+	csvContent := "Timestamp,User,Action,Entity Type,Entity ID,IP Address,User Agent,Description\n"
+
+	for _, log := range auditLogs {
+		username := ""
+		if log.User != nil {
+			username = log.User.Username
+		}
+
+		description := log.Action
+		if description == "" {
+			description = "N/A"
+		}
+
+		ipAddress := log.IPAddress
+		if ipAddress == "" {
+			ipAddress = "N/A"
+		}
+
+		userAgent := log.UserAgent
+		if userAgent == "" {
+			userAgent = "N/A"
+		}
+
+		csvContent += fmt.Sprintf("%s,\"%s\",%s,%s,%s,\"%s\",\"%s\",\"%s\"\n",
+			log.Timestamp.Format("2006-01-02 15:04:05"),
+			username,
+			log.Action,
+			log.EntityType,
+			log.EntityID,
+			ipAddress,
+			userAgent,
+			description,
+		)
+	}
+
+	c.String(http.StatusOK, csvContent)
+}
+
 // ================================================================
 // PERMISSION MANAGEMENT
 // ================================================================

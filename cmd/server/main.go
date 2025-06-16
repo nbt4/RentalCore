@@ -463,6 +463,11 @@ func setupRoutes(r *gin.Engine,
 			financial.GET("/reports", financialHandler.FinancialReports)
 			financial.GET("/api/revenue-report", financialHandler.GetRevenueReport)
 			financial.GET("/api/payment-report", financialHandler.GetPaymentReport)
+			
+			// Export routes
+			financial.GET("/api/export/transactions", financialHandler.ExportTransactions)
+			financial.GET("/api/export/revenue", financialHandler.ExportRevenue)
+			financial.GET("/api/export/tax-report", financialHandler.ExportTaxReportCSV)
 		}
 
 		// Invoice routes
@@ -544,6 +549,7 @@ func setupRoutes(r *gin.Engine,
 			{
 				auditAPI.GET("", securityHandler.GetAuditLogs)
 				auditAPI.GET("/:id", securityHandler.GetAuditLog)
+				auditAPI.GET("/export", securityHandler.ExportAuditLogs)
 			}
 
 			// Permissions API
@@ -695,6 +701,24 @@ func setupRoutes(r *gin.Engine,
 				apiInvoices.PUT("/:id/status", invoiceHandler.UpdateInvoiceStatus)
 				apiInvoices.GET("/stats", invoiceHandler.GetInvoiceStatsAPI)
 			}
+
+			// Security API
+			apiSecurity := api.Group("/security")
+			{
+				// Audit API
+				auditAPI := apiSecurity.Group("/audit")
+				{
+					auditAPI.GET("", securityHandler.GetAuditLogs)
+					auditAPI.GET("/:id", securityHandler.GetAuditLog)
+					auditAPI.GET("/export", securityHandler.ExportAuditLogs)
+				}
+
+				// Auth API
+				authAPI := apiSecurity.Group("/auth")
+				{
+					authAPI.GET("/users", authHandler.ListUsersAPI)
+				}
+			}
 		}
 
 		// Additional API routes (outside v1 group for legacy compatibility)
@@ -738,6 +762,7 @@ func setupRoutes(r *gin.Engine,
 				// Audit API
 				apiSecurity.GET("/audit", securityHandler.GetAuditLogs)
 				apiSecurity.GET("/audit/:id", securityHandler.GetAuditLog)
+				apiSecurity.GET("/audit/export", securityHandler.ExportAuditLogs)
 
 				// Permissions API
 				apiSecurity.GET("/permissions", securityHandler.GetPermissions)

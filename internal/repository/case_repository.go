@@ -101,6 +101,16 @@ func (r *CaseRepository) GetAvailableDevices() ([]models.Device, error) {
 	return devices, err
 }
 
+// GetAvailableDevicesForCase returns devices that are either not assigned to any case
+// or are assigned to the specified case (for editing purposes)
+func (r *CaseRepository) GetAvailableDevicesForCase(caseID uint) ([]models.Device, error) {
+	var devices []models.Device
+	err := r.db.DB.Preload("Product").
+		Where("deviceID NOT IN (SELECT deviceID FROM devicescases WHERE caseID != ?)", caseID).
+		Find(&devices).Error
+	return devices, err
+}
+
 // GetCasesByCustomer returns all cases for a specific customer (cases don't have customer relationships)
 func (r *CaseRepository) GetCasesByCustomer(customerID uint) ([]models.Case, error) {
 	var cases []models.Case
