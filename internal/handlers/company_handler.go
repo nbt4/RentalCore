@@ -1,0 +1,356 @@
+package handlers
+
+import (
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
+	"time"
+
+	"go-barcode-webapp/internal/models"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+)
+
+type CompanyHandler struct {
+	db *gorm.DB
+}
+
+func NewCompanyHandler(db *gorm.DB) *CompanyHandler {
+	return &CompanyHandler{
+		db: db,
+	}
+}
+
+// CompanySettingsForm displays the company settings form
+func (h *CompanyHandler) CompanySettingsForm(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+
+	// Get current company settings
+	company, err := h.getCompanySettings()
+	if err != nil {
+		log.Printf("CompanySettingsForm: Error fetching company settings: %v", err)
+		// Create default empty company settings
+		company = &models.CompanySettings{
+			CompanyName: "Ihre Firma GmbH",
+		}
+	}
+
+	log.Printf("DEBUG: CompanySettingsForm handler called successfully")
+	c.HTML(http.StatusOK, "company_settings_FIXED.html", gin.H{
+		"title":   "Company Settings",
+		"user":    user,
+		"company": company,
+	})
+}
+
+// GetCompanySettings returns company settings as JSON
+func (h *CompanyHandler) GetCompanySettings(c *gin.Context) {
+	company, err := h.getCompanySettings()
+	if err != nil {
+		log.Printf("GetCompanySettings: Error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load company settings"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"company": company,
+	})
+}
+
+// UpdateCompanySettings updates company settings
+func (h *CompanyHandler) UpdateCompanySettings(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	var request models.CompanySettings
+	if err := c.ShouldBindJSON(&request); err != nil {
+		log.Printf("UpdateCompanySettings: Validation error: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid input data",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// Validate required fields
+	if strings.TrimSpace(request.CompanyName) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Company name is required",
+		})
+		return
+	}
+
+	// Get existing company settings or create new
+	company, err := h.getCompanySettings()
+	if err != nil {
+		// Create new company settings
+		company = &models.CompanySettings{}
+	}
+
+	// Update fields
+	company.CompanyName = strings.TrimSpace(request.CompanyName)
+	company.AddressLine1 = h.trimStringPointer(request.AddressLine1)
+	company.AddressLine2 = h.trimStringPointer(request.AddressLine2)
+	company.City = h.trimStringPointer(request.City)
+	company.State = h.trimStringPointer(request.State)
+	company.PostalCode = h.trimStringPointer(request.PostalCode)
+	company.Country = h.trimStringPointer(request.Country)
+	company.Phone = h.trimStringPointer(request.Phone)
+	company.Email = h.trimStringPointer(request.Email)
+	company.Website = h.trimStringPointer(request.Website)
+	company.TaxNumber = h.trimStringPointer(request.TaxNumber)
+	company.VATNumber = h.trimStringPointer(request.VATNumber)
+	company.UpdatedAt = time.Now()
+
+	// If updating existing record, preserve logo path if not provided
+	if request.LogoPath != nil && *request.LogoPath != "" {
+		company.LogoPath = request.LogoPath
+	}
+
+	// Save to database
+	var result *gorm.DB
+	if company.ID == 0 {
+		company.CreatedAt = time.Now()
+		result = h.db.Create(company)
+	} else {
+		result = h.db.Save(company)
+	}
+
+	if result.Error != nil {
+		log.Printf("UpdateCompanySettings: Database error: %v", result.Error)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to save company settings",
+			"details": result.Error.Error(),
+		})
+		return
+	}
+
+	log.Printf("Company settings updated successfully by user %s", user.Username)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Company settings updated successfully",
+		"company": company,
+	})
+}
+
+// UploadCompanyLogo handles company logo upload
+func (h *CompanyHandler) UploadCompanyLogo(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	// Parse multipart form with 2MB max memory
+	if err := c.Request.ParseMultipartForm(2 << 20); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse form data"})
+		return
+	}
+
+	file, header, err := c.Request.FormFile("logo")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No logo file provided"})
+		return
+	}
+	defer file.Close()
+
+	// Validate file type
+	contentType := header.Header.Get("Content-Type")
+	if !strings.HasPrefix(contentType, "image/") {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "File must be an image"})
+		return
+	}
+
+	// Validate file size (max 2MB)
+	if header.Size > 2<<20 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "File size must be less than 2MB"})
+		return
+	}
+
+	// Create uploads directory if it doesn't exist
+	uploadsDir := "uploads/logos"
+	if err := os.MkdirAll(uploadsDir, 0755); err != nil {
+		log.Printf("UploadCompanyLogo: Failed to create uploads directory: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create upload directory"})
+		return
+	}
+
+	// Generate unique filename
+	timestamp := time.Now().Unix()
+	ext := filepath.Ext(header.Filename)
+	if ext == "" {
+		ext = ".png" // Default extension
+	}
+	filename := fmt.Sprintf("company_logo_%d_%s%s", timestamp, user.Username, ext)
+	filePath := filepath.Join(uploadsDir, filename)
+
+	// Create destination file
+	dst, err := os.Create(filePath)
+	if err != nil {
+		log.Printf("UploadCompanyLogo: Failed to create destination file: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
+		return
+	}
+	defer dst.Close()
+
+	// Copy file content
+	if _, err := io.Copy(dst, file); err != nil {
+		log.Printf("UploadCompanyLogo: Failed to copy file: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save file"})
+		return
+	}
+
+	// Generate web-accessible path
+	webPath := "/" + strings.ReplaceAll(filePath, "\\", "/")
+
+	// Update company settings with new logo path
+	company, err := h.getCompanySettings()
+	if err != nil {
+		// Create new company settings if none exist
+		company = &models.CompanySettings{
+			CompanyName: "Ihre Firma GmbH",
+			CreatedAt:   time.Now(),
+		}
+	}
+
+	// Remove old logo file if exists
+	if company.LogoPath != nil && *company.LogoPath != "" {
+		oldPath := strings.TrimPrefix(*company.LogoPath, "/")
+		if _, err := os.Stat(oldPath); err == nil {
+			if err := os.Remove(oldPath); err != nil {
+				log.Printf("UploadCompanyLogo: Failed to remove old logo: %v", err)
+			}
+		}
+	}
+
+	company.LogoPath = &webPath
+	company.UpdatedAt = time.Now()
+
+	// Save to database
+	var result *gorm.DB
+	if company.ID == 0 {
+		result = h.db.Create(company)
+	} else {
+		result = h.db.Save(company)
+	}
+
+	if result.Error != nil {
+		log.Printf("UploadCompanyLogo: Database error: %v", result.Error)
+		// Clean up uploaded file on database error
+		os.Remove(filePath)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to save logo path",
+			"details": result.Error.Error(),
+		})
+		return
+	}
+
+	log.Printf("Company logo uploaded successfully by user %s: %s", user.Username, filename)
+	c.JSON(http.StatusOK, gin.H{
+		"success":  true,
+		"message":  "Logo uploaded successfully",
+		"logoPath": webPath,
+	})
+}
+
+// DeleteCompanyLogo removes the company logo
+func (h *CompanyHandler) DeleteCompanyLogo(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	// Get current company settings
+	company, err := h.getCompanySettings()
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Company settings not found"})
+		return
+	}
+
+	// Check if logo exists
+	if company.LogoPath == nil || *company.LogoPath == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No logo to delete"})
+		return
+	}
+
+	// Remove logo file
+	oldPath := strings.TrimPrefix(*company.LogoPath, "/")
+	if _, err := os.Stat(oldPath); err == nil {
+		if err := os.Remove(oldPath); err != nil {
+			log.Printf("DeleteCompanyLogo: Failed to remove logo file: %v", err)
+		}
+	}
+
+	// Update database
+	company.LogoPath = nil
+	company.UpdatedAt = time.Now()
+
+	if err := h.db.Save(company).Error; err != nil {
+		log.Printf("DeleteCompanyLogo: Database error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to update company settings",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	log.Printf("Company logo deleted successfully by user %s", user.Username)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Logo deleted successfully",
+	})
+}
+
+// Helper methods
+
+func (h *CompanyHandler) getCompanySettings() (*models.CompanySettings, error) {
+	var company models.CompanySettings
+	
+	// Try to get the first (and should be only) company settings record
+	result := h.db.First(&company)
+	if result.Error != nil {
+		if result.Error == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("company settings not found")
+		}
+		return nil, result.Error
+	}
+	
+	return &company, nil
+}
+
+func (h *CompanyHandler) trimStringPointer(s *string) *string {
+	if s == nil {
+		return nil
+	}
+	trimmed := strings.TrimSpace(*s)
+	if trimmed == "" {
+		return nil
+	}
+	return &trimmed
+}
+
+// CompanySettingsAPI provides API access to company settings
+func (h *CompanyHandler) CompanySettingsAPI(c *gin.Context) {
+	switch c.Request.Method {
+	case "GET":
+		h.GetCompanySettings(c)
+	case "PUT":
+		h.UpdateCompanySettings(c)
+	default:
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Method not allowed"})
+	}
+}

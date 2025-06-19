@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"html/template"
@@ -11,11 +12,16 @@ import (
 	"strings"
 	"time"
 
+	"go-barcode-webapp/internal/cache"
 	"go-barcode-webapp/internal/config"
 	"go-barcode-webapp/internal/handlers"
+	"go-barcode-webapp/internal/logger"
+	"go-barcode-webapp/internal/middleware"
 	"go-barcode-webapp/internal/models"
+	"go-barcode-webapp/internal/monitoring"
 	"go-barcode-webapp/internal/repository"
 	"go-barcode-webapp/internal/services"
+	"go-barcode-webapp/internal/compliance"
 
 	"github.com/gin-gonic/gin"
 )
@@ -58,6 +64,57 @@ func main() {
 		log.Fatalf("Failed to ping database: %v", err)
 	}
 
+	// Initialize structured logger
+	environment := "development"
+	if os.Getenv("GIN_MODE") == "release" {
+		environment = "production"
+	}
+	
+	loggerConfig := logger.LoggerConfig{
+		Level:        logger.INFO,
+		Service:      "go-barcode-webapp",
+		Version:      "1.0.0",
+		Environment:  environment,
+		OutputPath:   "", // stdout
+		EnableCaller: true,
+	}
+	
+	if err := logger.InitializeLogger(loggerConfig); err != nil {
+		log.Fatalf("Failed to initialize logger: %v", err)
+	}
+	defer logger.GlobalLogger.Close()
+	
+	// Initialize error tracker
+	monitoring.InitializeErrorTracker(1000, 7*24*time.Hour) // 1000 errors, 7 days retention
+	
+	// Initialize cache manager
+	cacheManager := cache.NewCacheManager()
+	
+	// Initialize performance monitor
+	perfMonitor := middleware.NewPerformanceMonitor(500 * time.Millisecond) // 500ms slow threshold
+	
+	// Initialize compliance system
+	complianceMiddleware, err := compliance.NewComplianceMiddleware(
+		db.DB, 
+		"./archives", 
+		cfg.Security.EncryptionKey,
+	)
+	if err != nil {
+		log.Printf("Warning: Failed to create compliance middleware: %v", err)
+		// Use a dummy middleware for development
+		complianceMiddleware = nil
+	} else {
+		// Initialize compliance database tables
+		if err := complianceMiddleware.InitializeCompliance(); err != nil {
+			log.Printf("Warning: Failed to initialize compliance system: %v", err)
+		}
+	}
+	
+	// Start compliance background tasks
+	if complianceMiddleware != nil {
+		go complianceMiddleware.PeriodicComplianceCheck(context.Background())
+	}
+
 	// Initialize repositories
 	jobRepo := repository.NewJobRepository(db)
 	deviceRepo := repository.NewDeviceRepository(db)
@@ -68,7 +125,7 @@ func main() {
 	caseRepo := repository.NewCaseRepository(db)
 	jobTemplateRepo := repository.NewJobTemplateRepository(db)
 	equipmentPackageRepo := repository.NewEquipmentPackageRepository(db)
-	invoiceRepo := repository.NewInvoiceRepository(db)
+	invoiceRepo := repository.NewInvoiceRepositoryNew(db) // Using NEW fixed repository
 
 	// Initialize services
 	barcodeService := services.NewBarcodeService()
@@ -85,6 +142,18 @@ func main() {
 	if err := db.AutoMigrate(&models.EquipmentPackage{}); err != nil {
 		log.Printf("Failed to auto-migrate equipment_packages table: %v", err)
 	}
+	
+	if err := db.AutoMigrate(&models.InvoiceTemplate{}); err != nil {
+		log.Printf("Failed to auto-migrate invoice_templates table: %v", err)
+	}
+	
+	if err := db.AutoMigrate(&models.CompanySettings{}); err != nil {
+		log.Printf("Failed to auto-migrate company_settings table: %v", err)
+	}
+	
+	if err := db.AutoMigrate(&models.EmailTemplate{}); err != nil {
+		log.Printf("Failed to auto-migrate email_templates table: %v", err)
+	}
 
 	// Initialize handlers
 	jobHandler := handlers.NewJobHandler(jobRepo, deviceRepo, customerRepo, statusRepo, jobCategoryRepo)
@@ -95,6 +164,7 @@ func main() {
 	barcodeHandler := handlers.NewBarcodeHandler(barcodeService, deviceRepo)
 	scannerHandler := handlers.NewScannerHandler(jobRepo, deviceRepo, customerRepo, caseRepo)
 	authHandler := handlers.NewAuthHandler(db.DB, cfg)
+	homeHandler := handlers.NewHomeHandler(jobRepo, deviceRepo, customerRepo, caseRepo, db.DB)
 	
 	// Start session cleanup background process
 	authHandler.StartSessionCleanup()
@@ -103,19 +173,40 @@ func main() {
 	analyticsHandler := handlers.NewAnalyticsHandler(db.DB)
 	searchHandler := handlers.NewSearchHandler(db.DB)
 	pwaHandler := handlers.NewPWAHandler(db.DB)
-	workflowHandler := handlers.NewWorkflowHandler(jobTemplateRepo, jobRepo, customerRepo, equipmentPackageRepo, deviceRepo)
+	workflowHandler := handlers.NewWorkflowHandler(jobTemplateRepo, jobRepo, customerRepo, equipmentPackageRepo, deviceRepo, db.DB, barcodeService)
 	documentHandler := handlers.NewDocumentHandler(db.DB)
 	financialHandler := handlers.NewFinancialHandler(db.DB)
 	securityHandler := handlers.NewSecurityHandler(db.DB)
-	invoiceHandler := handlers.NewInvoiceHandler(invoiceRepo, customerRepo, jobRepo, deviceRepo, equipmentPackageRepo, &cfg.Email, &cfg.PDF)
+	invoiceHandler := handlers.NewInvoiceHandlerNew(invoiceRepo, customerRepo, jobRepo, deviceRepo, equipmentPackageRepo, productRepo, &cfg.PDF)
+	templateHandler := handlers.NewInvoiceTemplateHandler(invoiceRepo)
+	companyHandler := handlers.NewCompanyHandler(db.DB)
+	emailTemplateHandler := handlers.NewEmailTemplateHandler(db.DB)
+	monitoringHandler := handlers.NewMonitoringHandler(db.DB, monitoring.GlobalErrorTracker, perfMonitor, cacheManager)
+
+	// Create default invoice template if none exists
+	if err := createDefaultTemplate(templateHandler, invoiceRepo); err != nil {
+		log.Printf("Warning: Failed to create default template: %v", err)
+	}
 
 	// Setup Gin router with error handling
 	r := gin.New()
 	
-	// Add comprehensive error handling middleware
-	r.Use(gin.Logger())
+	// Add monitoring, logging and compliance middleware
+	r.Use(logger.GlobalLogger.LoggingMiddleware())
+	r.Use(monitoring.GlobalErrorTracker.ErrorTrackingMiddleware())
+	r.Use(perfMonitor.PerformanceMiddleware())
+	
+	// Add route debugging middleware
+	r.Use(func(c *gin.Context) {
+		log.Printf("Route Debug: %s %s", c.Request.Method, c.Request.URL.Path)
+		c.Next()
+	})
+	
+	if complianceMiddleware != nil {
+		r.Use(complianceMiddleware.AuditMiddleware())
+		r.Use(complianceMiddleware.ComplianceStatusMiddleware())
+	}
 	r.Use(handlers.GlobalErrorHandler()) // Custom recovery with proper error pages
-
 
 	// Load HTML templates with custom functions
 	funcMap := template.FuncMap{
@@ -185,10 +276,56 @@ func main() {
 		"daysUntil": func(date time.Time) int {
 			return int(time.Until(date).Hours() / 24)
 		},
+		"split": func(s, sep string) []string {
+			if s == "" {
+				return []string{}
+			}
+			return strings.Split(s, sep)
+		},
+		"trim": func(s string) string {
+			return strings.TrimSpace(s)
+		},
+		"truncate": func(s string, length int) string {
+			if len(s) <= length {
+				return s
+			}
+			return s[:length] + "..."
+		},
+		"timeAgo": func(t *time.Time) string {
+			if t == nil {
+				return "Never"
+			}
+			duration := time.Since(*t)
+			if duration < time.Minute {
+				return "Just now"
+			} else if duration < time.Hour {
+				minutes := int(duration.Minutes())
+				return fmt.Sprintf("%d min ago", minutes)
+			} else if duration < 24*time.Hour {
+				hours := int(duration.Hours())
+				return fmt.Sprintf("%d hours ago", hours)
+			} else {
+				days := int(duration.Hours() / 24)
+				if days == 1 {
+					return "Yesterday"
+				}
+				return fmt.Sprintf("%d days ago", days)
+			}
+		},
 	}
 	r.SetFuncMap(funcMap)
 	r.LoadHTMLGlob("web/templates/*")
-	r.Static("/static", "web/static")
+	
+	// Add caching for static files
+	r.StaticFS("/static", http.Dir("web/static"))
+	r.StaticFS("/uploads", http.Dir("uploads"))
+	r.Use(func(c *gin.Context) {
+		if strings.HasPrefix(c.Request.URL.Path, "/static/") {
+			c.Header("Cache-Control", "public, max-age=3600")
+			c.Header("ETag", fmt.Sprintf(`"%x"`, time.Now().Unix()))
+		}
+		c.Next()
+	})
 	
 	// PWA Service Worker route
 	r.GET("/sw.js", func(c *gin.Context) {
@@ -202,13 +339,14 @@ func main() {
 	})
 	
 
+
 	// Initialize default roles
 	if err := securityHandler.InitializeDefaultRoles(); err != nil {
 		log.Printf("Failed to initialize default roles: %v", err)
 	}
 
 	// Routes
-	setupRoutes(r, jobHandler, deviceHandler, customerHandler, statusHandler, productHandler, barcodeHandler, scannerHandler, authHandler, caseHandler, analyticsHandler, searchHandler, pwaHandler, workflowHandler, documentHandler, financialHandler, securityHandler, invoiceHandler)
+	setupRoutes(r, jobHandler, deviceHandler, customerHandler, statusHandler, productHandler, barcodeHandler, scannerHandler, authHandler, homeHandler, caseHandler, analyticsHandler, searchHandler, pwaHandler, workflowHandler, documentHandler, financialHandler, securityHandler, invoiceHandler, templateHandler, companyHandler, emailTemplateHandler, monitoringHandler, complianceMiddleware)
 	
 	// Add 404 handler as the last route
 	r.NoRoute(handlers.NotFoundHandler())
@@ -252,6 +390,7 @@ func setupRoutes(r *gin.Engine,
 	barcodeHandler *handlers.BarcodeHandler,
 	scannerHandler *handlers.ScannerHandler,
 	authHandler *handlers.AuthHandler,
+	homeHandler *handlers.HomeHandler,
 	caseHandler *handlers.CaseHandler,
 	analyticsHandler *handlers.AnalyticsHandler,
 	searchHandler *handlers.SearchHandler,
@@ -260,25 +399,53 @@ func setupRoutes(r *gin.Engine,
 	documentHandler *handlers.DocumentHandler,
 	financialHandler *handlers.FinancialHandler,
 	securityHandler *handlers.SecurityHandler,
-	invoiceHandler *handlers.InvoiceHandler) {
+	invoiceHandler *handlers.InvoiceHandlerNew,
+	templateHandler *handlers.InvoiceTemplateHandler,
+	companyHandler *handlers.CompanyHandler,
+	emailTemplateHandler *handlers.EmailTemplateHandler,
+	monitoringHandler *handlers.MonitoringHandler,
+	complianceMiddleware *compliance.ComplianceMiddleware) {
+
+	// Root route - redirect to dashboard if authenticated, login if not
+	r.GET("/", func(c *gin.Context) {
+		// Check if user is authenticated by looking for session
+		sessionID, err := c.Cookie("session_id")
+		if err != nil || sessionID == "" {
+			c.Redirect(http.StatusTemporaryRedirect, "/login")
+			return
+		}
+		c.Redirect(http.StatusTemporaryRedirect, "/dashboard")
+	})
 
 	// Authentication routes (no auth required)
 	r.GET("/login", authHandler.LoginForm)
 	r.POST("/login", authHandler.Login)
 	r.GET("/logout", authHandler.Logout)
+	
+	// Debug route (no auth required)
+	r.GET("/debug/invoice-test", func(c *gin.Context) {
+		c.String(http.StatusOK, "Invoice test route is working! Time: %s", time.Now().Format("2006-01-02 15:04:05"))
+	})
+	
+	// Debug route for customer selection
+	r.GET("/debug/customer-selection", func(c *gin.Context) {
+		c.Header("Content-Type", "text/plain")
+		c.String(http.StatusOK, "Customer selection debug route working!")
+	})
+	
+	// Debug route for route testing
+	r.GET("/debug/routes", func(c *gin.Context) {
+		c.Header("Content-Type", "text/plain")
+		c.String(http.StatusOK, "Route Debug:\n/settings/company -> Company Settings\n/monitoring -> Monitoring Dashboard\nTime: %s", time.Now().Format("2006-01-02 15:04:05"))
+	})
+	
 
 	// Protected routes - require authentication
 	protected := r.Group("/")
 	protected.Use(authHandler.AuthMiddleware())
 	{
 		// Web interface routes
-		protected.GET("/", func(c *gin.Context) {
-			user, _ := handlers.GetCurrentUser(c)
-			c.HTML(http.StatusOK, "home.html", gin.H{
-				"title": "Home",
-				"user":  user,
-			})
-		})
+		protected.GET("/dashboard", homeHandler.Dashboard)
 
 		// Job routes
 		jobs := protected.Group("/jobs")
@@ -400,16 +567,16 @@ func setupRoutes(r *gin.Engine,
 		workflow := protected.Group("/workflow")
 		{
 			// Job Templates
-			templates := workflow.Group("/templates")
+			jobTemplates := workflow.Group("/templates")
 			{
-				templates.GET("", workflowHandler.ListJobTemplates)
-				templates.GET("/new", workflowHandler.NewJobTemplateForm)
-				templates.POST("", workflowHandler.CreateJobTemplate)
-				templates.GET("/:id", workflowHandler.GetJobTemplate)
-				templates.GET("/:id/edit", workflowHandler.EditJobTemplateForm)
-				templates.PUT("/:id", workflowHandler.UpdateJobTemplate)
-				templates.DELETE("/:id", workflowHandler.DeleteJobTemplate)
-				templates.POST("/:id/create-job", workflowHandler.CreateJobFromTemplate)
+				jobTemplates.GET("", workflowHandler.ListJobTemplates)
+				jobTemplates.GET("/new", workflowHandler.NewJobTemplateForm)
+				jobTemplates.POST("", workflowHandler.CreateJobTemplate)
+				jobTemplates.GET("/:id", workflowHandler.GetJobTemplate)
+				jobTemplates.GET("/:id/edit", workflowHandler.EditJobTemplateForm)
+				jobTemplates.PUT("/:id", workflowHandler.UpdateJobTemplate)
+				jobTemplates.DELETE("/:id", workflowHandler.DeleteJobTemplate)
+				jobTemplates.POST("/:id/create-job", workflowHandler.CreateJobFromTemplate)
 			}
 
 			// Equipment Packages
@@ -470,41 +637,67 @@ func setupRoutes(r *gin.Engine,
 			financial.GET("/api/export/tax-report", financialHandler.ExportTaxReportCSV)
 		}
 
-		// Invoice routes
+		// Invoice routes (using NEW fixed invoice system with GoBD compliance)
 		invoices := protected.Group("/invoices")
+		if complianceMiddleware != nil {
+			invoices.Use(complianceMiddleware.InvoiceComplianceMiddleware())
+			invoices.Use(complianceMiddleware.DataProcessingMiddleware(compliance.FinancialData, "invoice_management", "Contract performance and accounting", "Art. 6(1)(b) GDPR"))
+		}
 		{
+			// All routes now use the NEW FIXED handler
 			invoices.GET("", invoiceHandler.ListInvoices)
 			invoices.GET("/new", invoiceHandler.NewInvoiceForm)
 			invoices.POST("", invoiceHandler.CreateInvoice)
 			invoices.GET("/:id", invoiceHandler.GetInvoice)
 			invoices.GET("/:id/edit", invoiceHandler.EditInvoiceForm)
+			invoices.GET("/:id/preview", invoiceHandler.PreviewInvoice)
 			invoices.PUT("/:id", invoiceHandler.UpdateInvoice)
-			invoices.DELETE("/:id", invoiceHandler.DeleteInvoice)
 			invoices.PUT("/:id/status", invoiceHandler.UpdateInvoiceStatus)
+			invoices.DELETE("/:id", invoiceHandler.DeleteInvoice)
+			// FIXED PDF generation - always returns PDF, never HTML
 			invoices.GET("/:id/pdf", invoiceHandler.GenerateInvoicePDF)
-			invoices.GET("/:id/preview", invoiceHandler.PreviewInvoicePDF)
-			invoices.POST("/:id/email", invoiceHandler.EmailInvoice)
 		}
 
-		// Invoice template routes
-		templates := protected.Group("/invoice-templates")
+		// Invoice template routes - full implementation
+		invoiceTemplates := protected.Group("/invoice-templates")
 		{
-			templates.GET("", invoiceHandler.ListInvoiceTemplates)
-			templates.GET("/new", invoiceHandler.NewInvoiceTemplateForm)
-			templates.POST("", invoiceHandler.CreateInvoiceTemplate)
-			templates.GET("/:id", invoiceHandler.GetInvoiceTemplate)
-			templates.GET("/:id/edit", invoiceHandler.EditInvoiceTemplateForm)
-			templates.PUT("/:id", invoiceHandler.UpdateInvoiceTemplate)
-			templates.DELETE("/:id", invoiceHandler.DeleteInvoiceTemplate)
+			invoiceTemplates.GET("", templateHandler.ListTemplates)
+			invoiceTemplates.GET("/new", templateHandler.NewTemplateForm)
+			invoiceTemplates.POST("", templateHandler.CreateTemplate)
+			invoiceTemplates.GET("/:id/edit", templateHandler.EditTemplateForm)
+			invoiceTemplates.PUT("/:id", templateHandler.UpdateTemplate)
+			invoiceTemplates.DELETE("/:id", templateHandler.DeleteTemplate)
+			invoiceTemplates.GET("/:id/preview", templateHandler.PreviewTemplate)
+			invoiceTemplates.POST("/:id/set-default", templateHandler.SetDefaultTemplate)
 		}
 
-		// Invoice settings routes
+		// Company Settings routes - NOW ACTIVE
 		settings := protected.Group("/settings")
 		{
-			settings.GET("/company", invoiceHandler.CompanySettingsForm)
-			settings.PUT("/company", invoiceHandler.UpdateCompanySettings)
-			settings.GET("/invoices", invoiceHandler.InvoiceSettingsForm)
-			settings.PUT("/invoices", invoiceHandler.UpdateInvoiceSettings)
+			// Company settings form route with enhanced debugging
+			settings.GET("/company", func(c *gin.Context) {
+				log.Printf("DEBUG: /settings/company route called directly - URL: %s, Method: %s", c.Request.URL.Path, c.Request.Method)
+				companyHandler.CompanySettingsForm(c)
+			})
+			settings.GET("/company/api", companyHandler.GetCompanySettings)
+			settings.PUT("/company/api", companyHandler.UpdateCompanySettings)
+			settings.POST("/company/logo", companyHandler.UploadCompanyLogo)
+			settings.DELETE("/company/logo", companyHandler.DeleteCompanyLogo)
+			
+			// Email Template Management
+			emailTemplates := settings.Group("/email-templates")
+			{
+				emailTemplates.GET("", emailTemplateHandler.ListEmailTemplates)
+				emailTemplates.GET("/new", emailTemplateHandler.NewEmailTemplateForm)
+				emailTemplates.POST("", emailTemplateHandler.CreateEmailTemplate)
+				emailTemplates.GET("/:id", emailTemplateHandler.GetEmailTemplate)
+				emailTemplates.GET("/:id/edit", emailTemplateHandler.EditEmailTemplateForm)
+				emailTemplates.PUT("/:id", emailTemplateHandler.UpdateEmailTemplate)
+				emailTemplates.DELETE("/:id", emailTemplateHandler.DeleteEmailTemplate)
+				emailTemplates.GET("/:id/preview", emailTemplateHandler.PreviewEmailTemplate)
+				emailTemplates.POST("/:id/set-default", emailTemplateHandler.SetDefaultEmailTemplate)
+				emailTemplates.POST("/:id/test", emailTemplateHandler.TestEmailTemplate)
+			}
 		}
 
 		// Security & Admin routes
@@ -558,6 +751,33 @@ func setupRoutes(r *gin.Engine,
 				permissionsAPI.GET("", securityHandler.GetPermissions)
 				permissionsAPI.GET("/definitions", securityHandler.GetPermissionDefinitionsAPI)
 				permissionsAPI.GET("/check", securityHandler.CheckPermission)
+			}
+		}
+
+		// System Monitoring routes
+		monitoring := protected.Group("/monitoring")
+		{
+			monitoring.GET("", func(c *gin.Context) {
+				log.Printf("DEBUG: /monitoring route called - URL: %s, Method: %s", c.Request.URL.Path, c.Request.Method)
+				monitoringHandler.Dashboard(c)
+			})
+			monitoring.GET("/health", monitoringHandler.GetApplicationHealth)
+			monitoring.GET("/metrics", monitoringHandler.GetSystemMetrics)
+			monitoring.GET("/metrics/prometheus", monitoringHandler.ExportMetrics)
+			monitoring.GET("/performance", monitoringHandler.GetPerformanceMetrics)
+			monitoring.GET("/errors", monitoringHandler.GetErrorDetails)
+			monitoring.POST("/errors/:fingerprint/resolve", monitoringHandler.ResolveError)
+			monitoring.POST("/test-error", monitoringHandler.TriggerTestError)
+			monitoring.GET("/logs", monitoringHandler.GetLogStream)
+		}
+
+		// Compliance routes (GoBD & GDPR)
+		if complianceMiddleware != nil {
+			compliance := protected.Group("/compliance")
+			{
+				compliance.GET("/status", complianceMiddleware.GetComplianceStatus())
+				compliance.POST("/retention/cleanup", complianceMiddleware.RetentionCleanupMiddleware())
+				compliance.POST("/gdpr/request", complianceMiddleware.GDPRRequestMiddleware())
 			}
 		}
 
@@ -659,16 +879,16 @@ func setupRoutes(r *gin.Engine,
 			apiWorkflow := api.Group("/workflow")
 			{
 				// Job Templates API
-				templates := apiWorkflow.Group("/templates")
+				apiJobTemplates := apiWorkflow.Group("/templates")
 				{
-					templates.GET("", workflowHandler.ListJobTemplatesAPI)
-					templates.POST("", workflowHandler.CreateJobTemplate)
-					templates.GET("/most-used", workflowHandler.GetMostUsedTemplatesAPI)
-					templates.GET("/category/:categoryId", workflowHandler.GetTemplatesByCategoryAPI)
-					templates.GET("/:id", workflowHandler.GetJobTemplate)
-					templates.PUT("/:id", workflowHandler.UpdateJobTemplate)
-					templates.DELETE("/:id", workflowHandler.DeleteJobTemplate)
-					templates.POST("/:id/create-job", workflowHandler.CreateJobFromTemplate)
+					apiJobTemplates.GET("", workflowHandler.ListJobTemplatesAPI)
+					apiJobTemplates.POST("", workflowHandler.CreateJobTemplate)
+					apiJobTemplates.GET("/most-used", workflowHandler.GetMostUsedTemplatesAPI)
+					apiJobTemplates.GET("/category/:categoryId", workflowHandler.GetTemplatesByCategoryAPI)
+					apiJobTemplates.GET("/:id", workflowHandler.GetJobTemplate)
+					apiJobTemplates.PUT("/:id", workflowHandler.UpdateJobTemplate)
+					apiJobTemplates.DELETE("/:id", workflowHandler.DeleteJobTemplate)
+					apiJobTemplates.POST("/:id/create-job", workflowHandler.CreateJobFromTemplate)
 				}
 			}
 
@@ -690,16 +910,20 @@ func setupRoutes(r *gin.Engine,
 				apiFinancial.GET("/payment-report", financialHandler.GetPaymentReport)
 			}
 
-			// Invoice API
+			// Invoice API (using NEW fixed invoice system)
 			apiInvoices := api.Group("/invoices")
 			{
+				// All operations use NEW FIXED handler
 				apiInvoices.GET("", invoiceHandler.GetInvoicesAPI)
 				apiInvoices.POST("", invoiceHandler.CreateInvoice)
 				apiInvoices.GET("/:id", invoiceHandler.GetInvoice)
 				apiInvoices.PUT("/:id", invoiceHandler.UpdateInvoice)
-				apiInvoices.DELETE("/:id", invoiceHandler.DeleteInvoice)
 				apiInvoices.PUT("/:id/status", invoiceHandler.UpdateInvoiceStatus)
+				apiInvoices.DELETE("/:id", invoiceHandler.DeleteInvoice)
 				apiInvoices.GET("/stats", invoiceHandler.GetInvoiceStatsAPI)
+				// New API endpoints for product/device selection
+				apiInvoices.GET("/products/:productId", invoiceHandler.GetProductDetails)
+				apiInvoices.GET("/products/:productId/devices", invoiceHandler.GetDevicesByProduct)
 			}
 
 			// Security API
@@ -724,25 +948,29 @@ func setupRoutes(r *gin.Engine,
 		// Additional API routes (outside v1 group for legacy compatibility)
 		legacyAPI := protected.Group("/api")
 		{
-			// Invoice API
+			// Legacy Invoice API (using NEW fixed invoice system)
 			legacyAPI.GET("/invoices", invoiceHandler.GetInvoicesAPI)
 			legacyAPI.POST("/invoices", invoiceHandler.CreateInvoice)
 			legacyAPI.GET("/invoices/:id", invoiceHandler.GetInvoice)
 			legacyAPI.PUT("/invoices/:id", invoiceHandler.UpdateInvoice)
-			legacyAPI.DELETE("/invoices/:id", invoiceHandler.DeleteInvoice)
 			legacyAPI.PUT("/invoices/:id/status", invoiceHandler.UpdateInvoiceStatus)
+			legacyAPI.DELETE("/invoices/:id", invoiceHandler.DeleteInvoice)
 			legacyAPI.GET("/invoices/stats", invoiceHandler.GetInvoiceStatsAPI)
 			
-			// Company settings API
-			legacyAPI.GET("/company-settings", invoiceHandler.CompanySettingsForm)
-			legacyAPI.PUT("/company-settings", invoiceHandler.UpdateCompanySettings)
+			// Company settings API - NOW ACTIVE
+			legacyAPI.GET("/company-settings", companyHandler.GetCompanySettings)
+			legacyAPI.PUT("/company-settings", companyHandler.UpdateCompanySettings)
+			legacyAPI.POST("/company-settings/logo", companyHandler.UploadCompanyLogo)
+			legacyAPI.DELETE("/company-settings/logo", companyHandler.DeleteCompanyLogo)
 			
-			// Invoice settings API
-			legacyAPI.GET("/invoice-settings", invoiceHandler.InvoiceSettingsForm)
-			legacyAPI.PUT("/invoice-settings", invoiceHandler.UpdateInvoiceSettings)
+			// TODO: Invoice settings API - temporarily disabled
+			// Will be re-implemented in new system when needed  
+			// legacyAPI.GET("/invoice-settings", invoiceHandler.InvoiceSettingsForm)
+			// legacyAPI.PUT("/invoice-settings", invoiceHandler.UpdateInvoiceSettings)
 			
-			// Email API
-			legacyAPI.POST("/test-email", invoiceHandler.TestEmailSettings)
+			// TODO: Email API - temporarily disabled
+			// Will be re-implemented in new system when needed
+			// legacyAPI.POST("/test-email", invoiceHandler.TestEmailSettings)
 
 			// Security API
 			apiSecurity := legacyAPI.Group("/security")
@@ -770,4 +998,143 @@ func setupRoutes(r *gin.Engine,
 			}
 		}
 	}
+}
+
+// createDefaultTemplate creates a default invoice template if none exists
+func createDefaultTemplate(templateHandler *handlers.InvoiceTemplateHandler, repo *repository.InvoiceRepositoryNew) error {
+	// Check if any templates exist
+	templates, err := repo.GetAllTemplates()
+	if err != nil {
+		return fmt.Errorf("failed to check existing templates: %v", err)
+	}
+
+	// If templates exist, skip creation
+	if len(templates) > 0 {
+		log.Printf("Templates already exist (%d), skipping default template creation", len(templates))
+		return nil
+	}
+
+	// Create a default German standard template
+	description := "Standard German invoice template compliant with DIN 5008"
+	cssStyles := `{"templateType":"german-din","primaryFont":"Arial","headerFontSize":"18","bodyFontSize":"12","primaryColor":"#2563eb","textColor":"#000000","backgroundColor":"#ffffff","pageMargins":"20","elementSpacing":"15","borderStyle":"solid"}`
+	
+	defaultTemplate := &models.InvoiceTemplate{
+		Name:         "German Standard (DIN 5008)",
+		Description:  &description,
+		HTMLTemplate: getDefaultTemplateHTML(),
+		CSSStyles:    &cssStyles,
+		IsDefault:    true,
+		IsActive:     true,
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
+	}
+
+	err = repo.CreateTemplate(defaultTemplate)
+	if err != nil {
+		return fmt.Errorf("failed to create default template: %v", err)
+	}
+
+	log.Printf("Successfully created default invoice template")
+	return nil
+}
+
+// getDefaultTemplateHTML returns the HTML for the default German standard template
+func getDefaultTemplateHTML() string {
+	return `<div style="padding: 20mm; font-family: Arial, sans-serif; font-size: 12px;">
+    <!-- Company Header -->
+    <div style="text-align: right; margin-bottom: 30px;">
+        <div style="font-weight: bold; font-size: 16px;">{{.company.CompanyName}}</div>
+        <div>{{if .company.AddressLine1}}{{.company.AddressLine1}}{{end}}</div>
+        <div>{{if .company.PostalCode}}{{.company.PostalCode}} {{end}}{{if .company.City}}{{.company.City}}{{end}}</div>
+        <div>{{if .company.Phone}}Tel: {{.company.Phone}}{{end}}</div>
+        <div>{{if .company.Email}}E-Mail: {{.company.Email}}{{end}}</div>
+    </div>
+
+    <!-- Sender Address Line -->
+    <div style="font-size: 8px; margin-bottom: 10px; border-bottom: 1px solid #000; padding-bottom: 5px;">
+        {{.company.CompanyName}}, {{if .company.AddressLine1}}{{.company.AddressLine1}}, {{end}}{{if .company.PostalCode}}{{.company.PostalCode}} {{end}}{{if .company.City}}{{.company.City}}{{end}}
+    </div>
+
+    <!-- Customer Address -->
+    <div style="margin-bottom: 30px;">
+        <div style="font-weight: bold;">{{.customer.GetDisplayName}}</div>
+        <div>{{if .customer.Street}}{{.customer.Street}}{{if .customer.HouseNumber}} {{.customer.HouseNumber}}{{end}}{{end}}</div>
+        <div>{{if .customer.ZIP}}{{.customer.ZIP}} {{end}}{{if .customer.City}}{{.customer.City}}{{end}}</div>
+    </div>
+
+    <!-- Invoice Header -->
+    <h1 style="font-size: 24px; font-weight: bold; margin-bottom: 20px;">RECHNUNG</h1>
+
+    <!-- Invoice Details -->
+    <table style="width: 100%; margin-bottom: 20px; border-collapse: collapse;">
+        <tr>
+            <td style="width: 30%; padding: 5px 0;">Rechnungsnummer:</td>
+            <td style="font-weight: bold;">{{.invoice.InvoiceNumber}}</td>
+        </tr>
+        <tr>
+            <td style="padding: 5px 0;">Rechnungsdatum:</td>
+            <td>{{.invoice.IssueDate.Format "02.01.2006"}}</td>
+        </tr>
+        <tr>
+            <td style="padding: 5px 0;">Fälligkeitsdatum:</td>
+            <td>{{.invoice.DueDate.Format "02.01.2006"}}</td>
+        </tr>
+        <tr>
+            <td style="padding: 5px 0;">Kundennummer:</td>
+            <td>{{.customer.CustomerID}}</td>
+        </tr>
+    </table>
+
+    <!-- Line Items -->
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+        <thead>
+            <tr style="background: #f5f5f5;">
+                <th style="border: 1px solid #000; padding: 8px; text-align: left;">Pos.</th>
+                <th style="border: 1px solid #000; padding: 8px; text-align: left;">Beschreibung</th>
+                <th style="border: 1px solid #000; padding: 8px; text-align: center;">Menge</th>
+                <th style="border: 1px solid #000; padding: 8px; text-align: right;">Einzelpreis</th>
+                <th style="border: 1px solid #000; padding: 8px; text-align: right;">Gesamtpreis</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{range $index, $item := .invoice.LineItems}}
+            <tr>
+                <td style="border: 1px solid #000; padding: 8px;">{{add $index 1}}</td>
+                <td style="border: 1px solid #000; padding: 8px;">{{$item.Description}}</td>
+                <td style="border: 1px solid #000; padding: 8px; text-align: center;">{{$item.Quantity}}</td>
+                <td style="border: 1px solid #000; padding: 8px; text-align: right;">{{printf "%.2f" $item.UnitPrice}} €</td>
+                <td style="border: 1px solid #000; padding: 8px; text-align: right;">{{printf "%.2f" $item.TotalPrice}} €</td>
+            </tr>
+            {{end}}
+        </tbody>
+    </table>
+
+    <!-- Totals -->
+    <div style="text-align: right; margin-bottom: 30px;">
+        <table style="width: 200px; margin-left: auto; border-collapse: collapse;">
+            <tr>
+                <td style="padding: 5px 10px; border-bottom: 1px solid #ddd;">Nettobetrag:</td>
+                <td style="text-align: right; padding: 5px 10px; border-bottom: 1px solid #ddd;">{{printf "%.2f" .invoice.Subtotal}} €</td>
+            </tr>
+            <tr>
+                <td style="padding: 5px 10px; border-bottom: 1px solid #ddd;">MwSt. ({{.invoice.TaxRate}}%):</td>
+                <td style="text-align: right; padding: 5px 10px; border-bottom: 1px solid #ddd;">{{printf "%.2f" .invoice.TaxAmount}} €</td>
+            </tr>
+            <tr style="font-weight: bold; border-top: 2px solid #000;">
+                <td style="padding: 8px 10px;">Gesamtbetrag:</td>
+                <td style="text-align: right; padding: 8px 10px;">{{printf "%.2f" .invoice.TotalAmount}} €</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Footer -->
+    <div style="font-size: 10px; margin-top: 40px; border-top: 1px solid #ddd; padding-top: 20px;">
+        <div style="text-align: center;">
+            <div>{{if .company.TaxNumber}}Steuernummer: {{.company.TaxNumber}}{{end}}{{if and .company.TaxNumber .company.VATNumber}} | {{end}}{{if .company.VATNumber}}USt-IdNr.: {{.company.VATNumber}}{{end}}</div>
+            <div style="margin-top: 10px;">
+                Zahlungsziel: 14 Tage netto | Vielen Dank für Ihr Vertrauen!
+            </div>
+        </div>
+    </div>
+</div>`
 }
