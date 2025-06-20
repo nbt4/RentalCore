@@ -40,6 +40,13 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeInteractiveElements();
     initializeAnimations();
     initializeFormEnhancements();
+    
+    // Apply auto-enhancements after page load
+    setTimeout(() => {
+        autoEnhanceButtons();
+        autoEnhanceBadges();
+        autoEnhanceCards();
+    }, 100);
 });
 
 // Interactive Elements Enhancement
@@ -67,18 +74,8 @@ function initializeInteractiveElements() {
             }, 600);
         });
         
-        // Ensure proper visibility and styling
-        if (!button.classList.contains('btn-outline-') && 
-            !button.classList.contains('btn-primary') && 
-            !button.classList.contains('btn-secondary') &&
-            !button.classList.contains('btn-success') &&
-            !button.classList.contains('btn-danger') &&
-            !button.classList.contains('btn-warning') &&
-            !button.classList.contains('btn-info') &&
-            !button.classList.contains('btn-light') &&
-            !button.classList.contains('btn-dark')) {
-            button.classList.add('btn-primary');
-        }
+        // Automatically enhance button visibility
+        enhanceButtonVisibility(button);
     });
     
     // Enhanced card hover effects
@@ -335,13 +332,10 @@ class API {
 class Scanner {
     static async initialize() {
         try {
-            // Check if scanner is available
-            const response = await API.request('/api/scanner/status');
-            if (response.available) {
-                this.setupScannerInterface();
-            }
+            // Scanner interface is always available - skip API check for now
+            this.setupScannerInterface();
         } catch (error) {
-            console.warn('Scanner not available:', error);
+            console.warn('Scanner interface setup failed:', error);
         }
     }
     
@@ -555,6 +549,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize scanner
     Scanner.initialize();
     
+    // Initialize device categories
+    DeviceCategories.initialize();
+    
     // Enhance existing tables
     document.querySelectorAll('table.table').forEach(table => {
         DataTable.enhance(`#${table.id || 'table'}`);
@@ -572,11 +569,363 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Device Category Management
+class DeviceCategories {
+    static initialize() {
+        // Add enhanced collapse behavior for device categories
+        this.initializeCategoryCollapse();
+        this.addExpandCollapseAllButtons();
+        this.enhanceCollapseButtons();
+    }
+    
+    static initializeCategoryCollapse() {
+        // Add event listeners for category collapse events
+        document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(button => {
+            const target = document.querySelector(button.getAttribute('data-bs-target'));
+            if (target) {
+                target.addEventListener('show.bs.collapse', () => {
+                    const icon = button.querySelector('i');
+                    if (icon) {
+                        icon.classList.remove('bi-chevron-down');
+                        icon.classList.add('bi-chevron-up');
+                    }
+                });
+                
+                target.addEventListener('hide.bs.collapse', () => {
+                    const icon = button.querySelector('i');
+                    if (icon) {
+                        icon.classList.remove('bi-chevron-up');
+                        icon.classList.add('bi-chevron-down');
+                    }
+                });
+            }
+        });
+    }
+    
+    static addExpandCollapseAllButtons() {
+        // Check if we're on the categorized devices page
+        const categorizedContent = document.querySelector('.card-header.bg-primary');
+        if (!categorizedContent) return;
+        
+        // Create expand/collapse all buttons
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.className = 'mb-3 d-flex gap-2';
+        buttonsContainer.innerHTML = `
+            <button type="button" class="btn btn-sm btn-outline-primary" id="expand-all-categories">
+                <i class="bi bi-arrows-expand"></i> Expand All
+            </button>
+            <button type="button" class="btn btn-sm btn-outline-secondary" id="collapse-all-categories">
+                <i class="bi bi-arrows-collapse"></i> Collapse All
+            </button>
+        `;
+        
+        // Insert before the first category card
+        const firstCard = document.querySelector('.card.mb-3');
+        if (firstCard) {
+            firstCard.parentNode.insertBefore(buttonsContainer, firstCard);
+        }
+        
+        // Add event listeners
+        document.getElementById('expand-all-categories')?.addEventListener('click', () => {
+            this.expandAllCategories();
+        });
+        
+        document.getElementById('collapse-all-categories')?.addEventListener('click', () => {
+            this.collapseAllCategories();
+        });
+    }
+    
+    static expandAllCategories() {
+        // Expand all category and subcategory collapses
+        document.querySelectorAll('.collapse').forEach(collapse => {
+            const bsCollapse = new bootstrap.Collapse(collapse, { show: true });
+        });
+    }
+    
+    static collapseAllCategories() {
+        // Collapse all category and subcategory collapses
+        document.querySelectorAll('.collapse.show').forEach(collapse => {
+            const bsCollapse = new bootstrap.Collapse(collapse, { hide: true });
+        });
+    }
+    
+    static enhanceCollapseButtons() {
+        // Add smooth animations and better visual feedback
+        document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(button => {
+            button.addEventListener('click', function() {
+                // Add click animation
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+    }
+    
+    static addDeviceCountAnimations() {
+        // Animate device count badges when categories are expanded
+        const countBadges = document.querySelectorAll('.badge');
+        countBadges.forEach(badge => {
+            if (badge.textContent.includes('devices')) {
+                badge.style.transition = 'all 0.3s ease';
+                badge.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.1)';
+                });
+                badge.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            }
+        });
+    }
+}
+
 // Export utilities for use in other scripts
+// Auto-Enhancement Functions
+function enhanceButtonVisibility(button) {
+    // Skip if already enhanced
+    if (button.classList.contains('btn-enhanced-visibility') || 
+        button.classList.contains('btn-outline-primary-enhanced') ||
+        button.classList.contains('btn-outline-secondary-enhanced') ||
+        button.classList.contains('btn-outline-success-enhanced') ||
+        button.classList.contains('btn-outline-danger-enhanced') ||
+        button.classList.contains('btn-outline-warning-enhanced') ||
+        button.classList.contains('btn-outline-info-enhanced')) {
+        return;
+    }
+    
+    // Add enhanced visibility class
+    button.classList.add('btn-enhanced-visibility');
+    
+    // Enhance outline buttons specifically
+    if (button.classList.contains('btn-outline-primary')) {
+        button.classList.remove('btn-outline-primary');
+        button.classList.add('btn-outline-primary-enhanced');
+    } else if (button.classList.contains('btn-outline-secondary')) {
+        button.classList.remove('btn-outline-secondary');
+        button.classList.add('btn-outline-secondary-enhanced');
+    } else if (button.classList.contains('btn-outline-success')) {
+        button.classList.remove('btn-outline-success');
+        button.classList.add('btn-outline-success-enhanced');
+    } else if (button.classList.contains('btn-outline-danger')) {
+        button.classList.remove('btn-outline-danger');
+        button.classList.add('btn-outline-danger-enhanced');
+    } else if (button.classList.contains('btn-outline-warning')) {
+        button.classList.remove('btn-outline-warning');
+        button.classList.add('btn-outline-warning-enhanced');
+    } else if (button.classList.contains('btn-outline-info')) {
+        button.classList.remove('btn-outline-info');
+        button.classList.add('btn-outline-info-enhanced');
+    }
+    
+    // Ensure proper base styling for non-outlined buttons
+    if (!button.classList.toString().includes('btn-outline-') && 
+        !button.classList.contains('btn-primary') && 
+        !button.classList.contains('btn-secondary') &&
+        !button.classList.contains('btn-success') &&
+        !button.classList.contains('btn-danger') &&
+        !button.classList.contains('btn-warning') &&
+        !button.classList.contains('btn-info') &&
+        !button.classList.contains('btn-light') &&
+        !button.classList.contains('btn-dark') &&
+        button.classList.contains('btn')) {
+        button.classList.add('btn-primary');
+    }
+}
+
+function autoEnhanceButtons() {
+    // Find all buttons that need enhancement
+    const buttons = document.querySelectorAll('.btn, button, input[type="submit"], input[type="button"]');
+    buttons.forEach(button => {
+        enhanceButtonVisibility(button);
+    });
+}
+
+function autoEnhanceBadges() {
+    // Enhance all badges for better visibility
+    const badges = document.querySelectorAll('.badge');
+    badges.forEach(badge => {
+        if (!badge.classList.contains('status-badge')) {
+            // Add status badge class for enhanced styling
+            if (badge.textContent.toLowerCase().includes('free') || 
+                badge.textContent.toLowerCase().includes('available')) {
+                badge.classList.add('status-free');
+            } else if (badge.textContent.toLowerCase().includes('rented') ||
+                      badge.textContent.toLowerCase().includes('assigned')) {
+                badge.classList.add('status-rented');
+            } else if (badge.textContent.toLowerCase().includes('maintenance')) {
+                badge.classList.add('status-maintenance');
+            }
+        }
+    });
+}
+
+function autoEnhanceCards() {
+    // Enhance all cards for better interactivity
+    const cards = document.querySelectorAll('.card');
+    cards.forEach(card => {
+        if (!card.classList.contains('feature-card')) {
+            // Add hover effects
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+                this.style.transition = 'all 0.3s ease';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        }
+    });
+}
+
+// Enhanced search functionality
+function enhanceSearchInputs() {
+    const searchInputs = document.querySelectorAll('input[type="search"], input[placeholder*="search"], input[placeholder*="Search"]');
+    searchInputs.forEach(input => {
+        if (!input.parentElement.classList.contains('search-enhanced')) {
+            input.parentElement.classList.add('search-enhanced');
+        }
+    });
+}
+
+// Navigation active state management
+function updateNavigationActiveState() {
+    const currentPath = window.location.pathname;
+    const navLinks = document.querySelectorAll('.navbar-nav .nav-link');
+    
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        const href = link.getAttribute('href');
+        
+        // Exact match or path starts with href (except root)
+        if (href === currentPath || 
+            (currentPath.startsWith(href) && href !== '/' && href.length > 1)) {
+            link.classList.add('active');
+        }
+        
+        // Special handling for home page
+        if (currentPath === '/' && href === '/') {
+            link.classList.add('active');
+        }
+    });
+}
+
+// Light theme optimizations
+function optimizeLightTheme() {
+    const theme = document.documentElement.getAttribute('data-theme');
+    if (theme === 'light') {
+        // Apply light theme specific enhancements
+        document.body.style.setProperty('--text-primary-override', '#2d3748');
+        document.body.style.setProperty('--text-secondary-override', '#4a5568');
+        document.body.style.setProperty('--bg-primary-override', '#ffffff');
+        document.body.style.setProperty('--bg-secondary-override', '#f7fafc');
+    } else {
+        // Reset overrides for dark theme
+        document.body.style.removeProperty('--text-primary-override');
+        document.body.style.removeProperty('--text-secondary-override');
+        document.body.style.removeProperty('--bg-primary-override');
+        document.body.style.removeProperty('--bg-secondary-override');
+    }
+}
+
+// Performance optimizations
+function performanceOptimizations() {
+    // Lazy load images
+    const images = document.querySelectorAll('img[data-src]');
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.src = img.dataset.src;
+                img.removeAttribute('data-src');
+                imageObserver.unobserve(img);
+            }
+        });
+    });
+    
+    images.forEach(img => imageObserver.observe(img));
+    
+    // Optimize table rendering for large datasets
+    const largeTables = document.querySelectorAll('table tbody tr:nth-child(n+50)');
+    if (largeTables.length > 0) {
+        // Implement virtual scrolling for large tables
+        console.log('Large table detected, consider implementing virtual scrolling');
+    }
+}
+
+// Force Theme Consistency across all pages
+function forceThemeConsistency() {
+    // Ensure data-theme attribute exists
+    if (!document.documentElement.hasAttribute('data-theme')) {
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    }
+    
+    // Update theme icon if it exists
+    const themeIcon = document.getElementById('theme-icon');
+    if (themeIcon) {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        themeIcon.className = currentTheme === 'light' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+    }
+    
+    // Force enhance all elements immediately
+    setTimeout(() => {
+        autoEnhanceButtons();
+        autoEnhanceBadges();
+        autoEnhanceCards();
+        updateNavigationActiveState();
+        enhanceSearchInputs();
+    }, 50);
+}
+
+// Page Load Handler - Multiple attempts to ensure consistency
+document.addEventListener('DOMContentLoaded', function() {
+    forceThemeConsistency();
+    optimizeLightTheme();
+    performanceOptimizations();
+    
+    // Re-apply enhancements multiple times to catch dynamic content
+    setTimeout(forceThemeConsistency, 100);
+    setTimeout(forceThemeConsistency, 300);
+    setTimeout(forceThemeConsistency, 500);
+    
+    // Watch for theme changes
+    const observer = new MutationObserver(mutations => {
+        mutations.forEach(mutation => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'data-theme') {
+                optimizeLightTheme();
+                forceThemeConsistency();
+            }
+        });
+    });
+    
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme']
+    });
+});
+
+// Page visibility change handler
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        setTimeout(forceThemeConsistency, 100);
+    }
+});
+
+// Window focus handler
+window.addEventListener('focus', function() {
+    setTimeout(forceThemeConsistency, 100);
+});
+
 window.RentalCore = {
     API,
     Scanner,
     DataTable,
     Performance,
-    toggleTheme
+    toggleTheme,
+    enhanceButtonVisibility,
+    autoEnhanceButtons,
+    autoEnhanceBadges,
+    autoEnhanceCards,
+    forceThemeConsistency,
+    updateNavigationActiveState
 };

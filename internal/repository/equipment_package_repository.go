@@ -27,7 +27,7 @@ func (r *EquipmentPackageRepository) List(params *models.FilterParams) ([]models
 	// Apply filters
 	if params != nil {
 		if params.SearchTerm != "" {
-			query = query.Where("name ILIKE ? OR description ILIKE ?", 
+			query = query.Where("name LIKE ? OR description LIKE ?", 
 				"%"+params.SearchTerm+"%", "%"+params.SearchTerm+"%")
 		}
 		
@@ -125,7 +125,7 @@ func (r *EquipmentPackageRepository) GetTotalCount(params *models.FilterParams) 
 	// Apply same filters as List for consistent counting
 	if params != nil {
 		if params.SearchTerm != "" {
-			query = query.Where("name ILIKE ? OR description ILIKE ?", 
+			query = query.Where("name LIKE ? OR description LIKE ?", 
 				"%"+params.SearchTerm+"%", "%"+params.SearchTerm+"%")
 		}
 		
@@ -233,69 +233,186 @@ func (r *EquipmentPackageRepository) UpdateDeviceAssociations(packageID uint, de
 func (r *EquipmentPackageRepository) GetAvailableDevices() ([]models.Device, error) {
 	var devices []models.Device
 	
-	// First, let's check if there are ANY devices at all
-	var totalCount int64
-	if err := r.db.DB.Model(&models.Device{}).Count(&totalCount).Error; err != nil {
-		return nil, fmt.Errorf("failed to count devices: %v", err)
-	}
-	
-	fmt.Printf("DEBUG: Total devices in database: %d\n", totalCount)
-	
-	if totalCount == 0 {
-		fmt.Printf("DEBUG: No devices found in database at all\n")
-		return []models.Device{}, nil
-	}
-	
-	// Check what status values exist
-	var statusCounts []struct {
-		Status string
-		Count  int64
-	}
-	if err := r.db.DB.Model(&models.Device{}).
-		Select("status, COUNT(*) as count").
-		Group("status").
-		Scan(&statusCounts).Error; err != nil {
-		fmt.Printf("DEBUG: Error checking status counts: %v\n", err)
-	} else {
-		fmt.Printf("DEBUG: Device status counts:\n")
-		for _, sc := range statusCounts {
-			fmt.Printf("  Status '%s': %d devices\n", sc.Status, sc.Count)
-		}
-	}
-	
-	// Try to get devices with common status values
-	if err := r.db.DB.Where("status IN (?)", []string{"free", "available", "ready", ""}).
+	// Get devices with common available status values
+	if err := r.db.DB.Where("status IN (?)", []string{"free", "available", "ready"}).
 		Preload("Product").
 		Order("deviceID ASC").
 		Find(&devices).Error; err != nil {
-		fmt.Printf("DEBUG: Error querying devices with status filter: %v\n", err)
 		return nil, fmt.Errorf("failed to get available devices: %v", err)
 	}
 	
-	fmt.Printf("DEBUG: Found %d devices with filtered status\n", len(devices))
-	
-	// If still no devices found, get ALL devices (for debugging)
-	if len(devices) == 0 {
-		fmt.Printf("DEBUG: No devices found with status filter, getting all devices...\n")
-		if err := r.db.DB.Preload("Product").
-			Order("deviceID ASC").
-			Limit(10). // Limit to first 10 for debugging
-			Find(&devices).Error; err != nil {
-			fmt.Printf("DEBUG: Error getting all devices: %v\n", err)
-			return nil, fmt.Errorf("failed to get any devices: %v", err)
-		}
-		fmt.Printf("DEBUG: Found %d total devices (ignoring status)\n", len(devices))
-	}
-	
-	// Show sample devices
-	for i, device := range devices {
-		if i >= 3 { break } // Only show first 3
-		productName := "No Product"
-		if device.Product != nil {
-			productName = device.Product.Name
-		}
-		fmt.Printf("DEBUG: Device %d: ID='%s', Status='%s', Product='%s'\n", i+1, device.DeviceID, device.Status, productName)
-	}
-	
 	return devices, nil
+}
+
+// GetPackagesByCategory returns packages filtered by category
+func (r *EquipmentPackageRepository) GetPackagesByCategory(category string) ([]models.EquipmentPackage, error) {
+	var packages []models.EquipmentPackage
+	
+	query := r.db.DB.Where("is_active = ?", true)
+	if category != "" {
+		query = query.Where("category = ?", category)
+	}
+	
+	if err := query.Order("name ASC").Find(&packages).Error; err != nil {
+		return nil, fmt.Errorf("failed to get packages by category: %v", err)
+	}
+	
+	return packages, nil
+}
+
+// GetPopularPackages returns most used packages
+func (r *EquipmentPackageRepository) GetPopularPackages(limit int) ([]models.EquipmentPackage, error) {
+	var packages []models.EquipmentPackage
+	
+	if err := r.db.DB.Where("is_active = ? AND usage_count > 0", true).
+		Order("usage_count DESC, name ASC").
+		Limit(limit).
+		Find(&packages).Error; err != nil {
+		return nil, fmt.Errorf("failed to get popular packages: %v", err)
+	}
+	
+	return packages, nil
+}
+
+// IncrementUsageCount increments the usage count for a package
+func (r *EquipmentPackageRepository) IncrementUsageCount(packageID uint) error {
+	now := time.Now()
+	
+	if err := r.db.DB.Model(&models.EquipmentPackage{}).
+		Where("package_id = ?", packageID).
+		Updates(map[string]interface{}{
+			"usage_count": gorm.Expr("usage_count + 1"),
+			"last_used_at": now,
+		}).Error; err != nil {
+		return fmt.Errorf("failed to increment usage count: %v", err)
+	}
+	
+	return nil
+}
+
+// UpdateRevenue updates the total revenue for a package
+func (r *EquipmentPackageRepository) UpdateRevenue(packageID uint, revenue float64) error {
+	if err := r.db.DB.Model(&models.EquipmentPackage{}).
+		Where("package_id = ?", packageID).
+		Update("total_revenue", gorm.Expr("total_revenue + ?", revenue)).Error; err != nil {
+		return fmt.Errorf("failed to update package revenue: %v", err)
+	}
+	
+	return nil
+}
+
+// GetPackageStats returns statistics for a package
+func (r *EquipmentPackageRepository) GetPackageStats(packageID uint) (map[string]interface{}, error) {
+	var stats struct {
+		DeviceCount     int64   `json:"deviceCount"`
+		RequiredDevices int64   `json:"requiredDevices"`
+		TotalQuantity   int64   `json:"totalQuantity"`
+		CalculatedPrice float64 `json:"calculatedPrice"`
+	}
+	
+	// Get device statistics
+	if err := r.db.DB.Model(&models.PackageDevice{}).
+		Select(`
+			COUNT(*) as device_count,
+			SUM(CASE WHEN is_required THEN 1 ELSE 0 END) as required_devices,
+			SUM(quantity) as total_quantity
+		`).
+		Where("package_id = ?", packageID).
+		Scan(&stats).Error; err != nil {
+		return nil, fmt.Errorf("failed to get package device stats: %v", err)
+	}
+	
+	// Calculate estimated price
+	var priceData []struct {
+		CustomPrice *float64
+		ProductPrice *float64
+		Quantity uint
+	}
+	
+	if err := r.db.DB.Model(&models.PackageDevice{}).
+		Select("package_devices.custom_price, products.item_cost_per_day as product_price, package_devices.quantity").
+		Joins("LEFT JOIN devices ON package_devices.device_id = devices.device_id").
+		Joins("LEFT JOIN products ON devices.product_id = products.product_id").
+		Where("package_devices.package_id = ?", packageID).
+		Scan(&priceData).Error; err != nil {
+		return nil, fmt.Errorf("failed to get price data: %v", err)
+	}
+	
+	for _, pd := range priceData {
+		price := 0.0
+		if pd.CustomPrice != nil {
+			price = *pd.CustomPrice
+		} else if pd.ProductPrice != nil {
+			price = *pd.ProductPrice
+		}
+		stats.CalculatedPrice += price * float64(pd.Quantity)
+	}
+	
+	return map[string]interface{}{
+		"deviceCount":     stats.DeviceCount,
+		"requiredDevices": stats.RequiredDevices,
+		"totalQuantity":   stats.TotalQuantity,
+		"calculatedPrice": stats.CalculatedPrice,
+	}, nil
+}
+
+// ValidatePackageDevices validates that all devices in a package are still available
+func (r *EquipmentPackageRepository) ValidatePackageDevices(packageID uint) (bool, []string, error) {
+	var invalidDevices []string
+	
+	var packageDevices []models.PackageDevice
+	if err := r.db.DB.Where("package_id = ?", packageID).Find(&packageDevices).Error; err != nil {
+		return false, nil, fmt.Errorf("failed to get package devices: %v", err)
+	}
+	
+	for _, pd := range packageDevices {
+		var device models.Device
+		if err := r.db.DB.First(&device, "device_id = ?", pd.DeviceID).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				invalidDevices = append(invalidDevices, pd.DeviceID+" (not found)")
+			} else {
+				return false, nil, fmt.Errorf("failed to check device %s: %v", pd.DeviceID, err)
+			}
+		} else if device.Status != "free" && device.Status != "available" && device.Status != "ready" {
+			invalidDevices = append(invalidDevices, pd.DeviceID+" (status: "+device.Status+")")
+		}
+	}
+	
+	return len(invalidDevices) == 0, invalidDevices, nil
+}
+
+// Search searches packages by name, description, category, or tags
+func (r *EquipmentPackageRepository) Search(query string, params *models.FilterParams) ([]models.EquipmentPackage, error) {
+	var packages []models.EquipmentPackage
+	
+	dbQuery := r.db.DB.Model(&models.EquipmentPackage{}).
+		Where("name LIKE ? OR description LIKE ? OR category LIKE ? OR tags LIKE ?",
+			"%"+query+"%", "%"+query+"%", "%"+query+"%", "%"+query+"%")
+	
+	// Apply additional filters
+	if params != nil {
+		if params.Category != "" {
+			if params.Category == "active" {
+				dbQuery = dbQuery.Where("is_active = ?", true)
+			} else if params.Category == "inactive" {
+				dbQuery = dbQuery.Where("is_active = ?", false)
+			} else {
+				dbQuery = dbQuery.Where("category = ?", params.Category)
+			}
+		}
+		
+		// Pagination
+		if params.Limit > 0 {
+			dbQuery = dbQuery.Limit(params.Limit)
+		}
+		if params.Offset > 0 {
+			dbQuery = dbQuery.Offset(params.Offset)
+		}
+	}
+	
+	if err := dbQuery.Order("name ASC").Find(&packages).Error; err != nil {
+		return nil, fmt.Errorf("failed to search packages: %v", err)
+	}
+	
+	return packages, nil
 }

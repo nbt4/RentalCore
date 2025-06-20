@@ -3,6 +3,9 @@ package config
 import (
 	"encoding/json"
 	"os"
+	"time"
+	
+	"gorm.io/gorm/logger"
 )
 
 type Config struct {
@@ -18,12 +21,21 @@ type Config struct {
 }
 
 type DatabaseConfig struct {
-	Host     string `json:"host"`
-	Port     int    `json:"port"`
-	Database string `json:"database"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	PoolSize int    `json:"pool_size"`
+	Host                  string        `json:"host"`
+	Port                  int           `json:"port"`
+	Database              string        `json:"database"`
+	Username              string        `json:"username"`
+	Password              string        `json:"password"`
+	PoolSize              int           `json:"pool_size"` // Kept for backwards compatibility
+	MaxOpenConns          int           `json:"max_open_conns"`
+	MaxIdleConns          int           `json:"max_idle_conns"`
+	ConnMaxLifetime       time.Duration `json:"conn_max_lifetime"`
+	ConnMaxIdleTime       time.Duration `json:"conn_max_idle_time"`
+	SlowQueryThreshold    time.Duration `json:"slow_query_threshold"`
+	EnableQueryLogging    bool          `json:"enable_query_logging"`
+	LogLevel              logger.LogLevel `json:"-"` // Not serializable
+	PrepareStmt           bool          `json:"prepare_stmt"`
+	DisableForeignKeyConstraintWhenMigrating bool `json:"disable_fk_when_migrating"`
 }
 
 type ServerConfig struct {
@@ -72,10 +84,11 @@ type PDFConfig struct {
 }
 
 type SecurityConfig struct {
-	SessionTimeout    int `json:"session_timeout"`
-	PasswordMinLength int `json:"password_min_length"`
-	MaxLoginAttempts  int `json:"max_login_attempts"`
-	LockoutDuration   int `json:"lockout_duration"`
+	SessionTimeout    int    `json:"session_timeout"`
+	PasswordMinLength int    `json:"password_min_length"`
+	MaxLoginAttempts  int    `json:"max_login_attempts"`
+	LockoutDuration   int    `json:"lockout_duration"`
+	EncryptionKey     string `json:"encryption_key"`
 }
 
 type LoggingConfig struct {
@@ -124,12 +137,21 @@ func (c *Config) Save(path string) error {
 func getDefaultConfig() *Config {
 	return &Config{
 		Database: DatabaseConfig{
-			Host:     "localhost",
-			Port:     3306,
-			Database: "jobscanner",
-			Username: "root",
-			Password: "",
-			PoolSize: 5,
+			Host:                  "localhost",
+			Port:                  3306,
+			Database:              "jobscanner",
+			Username:              "root",
+			Password:              "",
+			PoolSize:              5,
+			MaxOpenConns:          25,
+			MaxIdleConns:          5,
+			ConnMaxLifetime:       5 * time.Minute,
+			ConnMaxIdleTime:       5 * time.Minute,
+			SlowQueryThreshold:    500 * time.Millisecond,
+			EnableQueryLogging:    false,
+			LogLevel:              logger.Warn,
+			PrepareStmt:           true,
+			DisableForeignKeyConstraintWhenMigrating: true,
 		},
 		Server: ServerConfig{
 			Port: 8080,
@@ -191,6 +213,7 @@ func getDefaultConfig() *Config {
 			PasswordMinLength: 8,
 			MaxLoginAttempts:  5,
 			LockoutDuration:   900,
+			EncryptionKey:     "TS-Lager-Default-Encryption-Key-Change-In-Production",
 		},
 		Logging: LoggingConfig{
 			Level:      "info",

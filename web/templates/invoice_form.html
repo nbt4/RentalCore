@@ -45,7 +45,12 @@
                                 <label for="customerId">Customer *</label>
                                 <select id="customerId" name="customerId" class="form-control" required>
                                     <option value="">Select Customer</option>
-                                    <!-- Customers will be loaded here -->
+                                    {{range .customers}}
+                                    <option value="{{.CustomerID}}"{{if and $.invoice (eq $.invoice.CustomerID .CustomerID)}} selected{{end}}>
+                                        {{if .CompanyName}}{{.CompanyName}}{{else}}{{if .FirstName}}{{.FirstName}} {{end}}{{if .LastName}}{{.LastName}}{{end}}{{end}}
+                                        (ID: {{.CustomerID}})
+                                    </option>
+                                    {{end}}
                                 </select>
                             </div>
 
@@ -53,7 +58,19 @@
                                 <label for="jobId">Job (Optional)</label>
                                 <select id="jobId" name="jobId" class="form-control">
                                     <option value="">Select Job</option>
-                                    <!-- Jobs will be loaded here -->
+                                    {{range .jobs}}
+                                    <option value="{{.JobID}}"{{if and $.invoice $.invoice.JobID (eq $.invoice.JobID .JobID)}} selected{{end}}>{{.Description}} - {{.CustomerName}}</option>
+                                    {{end}}
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="templateId">Invoice Template</label>
+                                <select id="templateId" name="templateId" class="form-control">
+                                    <option value="">Select Template (Optional)</option>
+                                    {{range .templates}}
+                                    <option value="{{.TemplateID}}"{{if and $.invoice $.invoice.TemplateID (eq $.invoice.TemplateID .TemplateID)}} selected{{else if and (not $.invoice) .IsDefault}} selected{{end}}>{{.Name}}{{if .IsDefault}} (Default){{end}}</option>
+                                    {{end}}
                                 </select>
                             </div>
 
@@ -102,6 +119,9 @@
                             <button type="submit" class="btn btn-primary">
                                 {{if .isEdit}}Update Invoice{{else}}Create Invoice{{end}}
                             </button>
+                            <button type="button" class="btn btn-info me-2" onclick="previewInvoice()">
+                                <i class="bi bi-eye"></i> Preview
+                            </button>
                             <a href="/invoices" class="btn btn-secondary">Cancel</a>
                         </div>
                     </div>
@@ -112,5 +132,109 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/js/app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('invoiceForm');
+            
+            // Handle form submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Collect form data
+                const formData = {
+                    customerId: parseInt(document.getElementById('customerId').value) || 0,
+                    jobId: parseInt(document.getElementById('jobId').value) || null,
+                    templateId: parseInt(document.getElementById('templateId').value) || null,
+                    issueDate: document.getElementById('issueDate').value + 'T00:00:00Z',
+                    dueDate: document.getElementById('dueDate').value + 'T00:00:00Z',
+                    paymentTerms: "Net 30", // String value
+                    taxRate: 0.19, // Default 19%
+                    discountAmount: 0,
+                    notes: document.getElementById('notes').value || null,
+                    termsConditions: null,
+                    lineItems: [
+                        {
+                            itemType: "custom",
+                            description: "Standard charge",
+                            quantity: 1,
+                            unitPrice: 0.01
+                        }
+                    ] // Provide a default line item to satisfy validation
+                };
+                
+                // Validate required fields
+                if (!formData.customerId) {
+                    alert('Please select a customer');
+                    return;
+                }
+                
+                if (!document.getElementById('invoiceNumber').value) {
+                    alert('Please enter an invoice number');
+                    return;
+                }
+                
+                // Submit form
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.textContent;
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Creating...';
+                
+                const url = {{if .isEdit}}'/api/invoices/{{.invoice.InvoiceID}}'{{else}}'/api/invoices'{{end}};
+                const method = {{if .isEdit}}'PUT'{{else}}'POST'{{end}};
+                
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        throw new Error(data.error);
+                    }
+                    alert({{if .isEdit}}'Invoice updated successfully!'{{else}}'Invoice created successfully!'{{end}});
+                    window.location.href = '/invoices';
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error: ' + error.message);
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                });
+            });
+        });
+
+        function previewInvoice() {
+            // Collect form data
+            const formData = {
+                customerId: document.getElementById('customerId').value,
+                jobId: document.getElementById('jobId').value,
+                invoiceNumber: document.getElementById('invoiceNumber').value,
+                issueDate: document.getElementById('issueDate').value,
+                dueDate: document.getElementById('dueDate').value,
+                status: document.getElementById('status').value,
+                notes: document.getElementById('notes').value
+            };
+            
+            // Validate required fields
+            if (!formData.customerId) {
+                alert('Please select a customer before previewing');
+                return;
+            }
+            
+            if (!formData.invoiceNumber) {
+                alert('Please enter an invoice number before previewing');
+                return;
+            }
+            
+            // Open preview in new window
+            const previewUrl = '/invoices/preview?' + new URLSearchParams(formData).toString();
+            window.open(previewUrl, '_blank', 'width=800,height=600,scrollbars=yes');
+        }
+    </script>
 </body>
 </html>

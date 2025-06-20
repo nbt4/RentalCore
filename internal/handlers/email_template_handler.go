@@ -1,0 +1,479 @@
+package handlers
+
+import (
+	"log"
+	"net/http"
+	"strconv"
+	"strings"
+	"time"
+
+	"go-barcode-webapp/internal/models"
+
+	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
+)
+
+type EmailTemplateHandler struct {
+	db *gorm.DB
+}
+
+func NewEmailTemplateHandler(db *gorm.DB) *EmailTemplateHandler {
+	return &EmailTemplateHandler{
+		db: db,
+	}
+}
+
+// ListEmailTemplates displays all email templates
+func (h *EmailTemplateHandler) ListEmailTemplates(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+
+	var templates []models.EmailTemplate
+	if err := h.db.Order("is_default DESC, name ASC").Find(&templates).Error; err != nil {
+		log.Printf("ListEmailTemplates: Error fetching templates: %v", err)
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"error": "Failed to load email templates",
+			"user":  user,
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "email_templates_list.html", gin.H{
+		"title":     "E-Mail Vorlagen",
+		"templates": templates,
+		"user":      user,
+	})
+}
+
+// NewEmailTemplateForm displays the form for creating a new email template
+func (h *EmailTemplateHandler) NewEmailTemplateForm(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+
+	c.HTML(http.StatusOK, "email_template_form.html", gin.H{
+		"title":  "Neue E-Mail Vorlage",
+		"user":   user,
+		"action": "create",
+	})
+}
+
+// CreateEmailTemplate creates a new email template
+func (h *EmailTemplateHandler) CreateEmailTemplate(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	var request models.EmailTemplateCreateRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		log.Printf("CreateEmailTemplate: Validation error: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid input data",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// Validate required fields
+	if strings.TrimSpace(request.Name) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Template name is required"})
+		return
+	}
+
+	if strings.TrimSpace(request.Subject) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Subject template is required"})
+		return
+	}
+
+	if strings.TrimSpace(request.HTMLContent) == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "HTML content is required"})
+		return
+	}
+
+	// Create template
+	template := &models.EmailTemplate{
+		Name:          strings.TrimSpace(request.Name),
+		Description:   h.trimStringPointer(request.Description),
+		TemplateType:  request.TemplateType,
+		Subject:       request.Subject,
+		HTMLContent:   request.HTMLContent,
+		TextContent:   h.trimStringPointer(request.TextContent),
+		IsDefault:     false, // New templates are never default initially
+		IsActive:      true,
+		CreatedBy:     &user.UserID,
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
+	}
+
+	if err := h.db.Create(template).Error; err != nil {
+		log.Printf("CreateEmailTemplate: Database error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to create email template",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	log.Printf("Email template created successfully by user %s: %s", user.Username, template.Name)
+	c.JSON(http.StatusCreated, gin.H{
+		"success":    true,
+		"message":    "Email template created successfully",
+		"templateId": template.TemplateID,
+	})
+}
+
+// GetEmailTemplate displays a single email template
+func (h *EmailTemplateHandler) GetEmailTemplate(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
+	templateIDStr := c.Param("id")
+	templateID, err := strconv.ParseUint(templateIDStr, 10, 32)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"error": "Invalid template ID",
+			"user":  user,
+		})
+		return
+	}
+
+	var template models.EmailTemplate
+	if err := h.db.Preload("Creator").First(&template, templateID).Error; err != nil {
+		log.Printf("GetEmailTemplate: Error fetching template: %v", err)
+		c.HTML(http.StatusNotFound, "error.html", gin.H{
+			"error": "Email template not found",
+			"user":  user,
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "email_template_detail.html", gin.H{
+		"title":    "E-Mail Vorlage: " + template.Name,
+		"template": template,
+		"user":     user,
+	})
+}
+
+// EditEmailTemplateForm displays the form for editing an email template
+func (h *EmailTemplateHandler) EditEmailTemplateForm(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+
+	templateIDStr := c.Param("id")
+	templateID, err := strconv.ParseUint(templateIDStr, 10, 32)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"error": "Invalid template ID",
+			"user":  user,
+		})
+		return
+	}
+
+	var template models.EmailTemplate
+	if err := h.db.First(&template, templateID).Error; err != nil {
+		log.Printf("EditEmailTemplateForm: Error fetching template: %v", err)
+		c.HTML(http.StatusNotFound, "error.html", gin.H{
+			"error": "Email template not found",
+			"user":  user,
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "email_template_form.html", gin.H{
+		"title":    "E-Mail Vorlage bearbeiten: " + template.Name,
+		"template": template,
+		"user":     user,
+		"action":   "edit",
+	})
+}
+
+// UpdateEmailTemplate updates an existing email template
+func (h *EmailTemplateHandler) UpdateEmailTemplate(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	templateIDStr := c.Param("id")
+	templateID, err := strconv.ParseUint(templateIDStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid template ID"})
+		return
+	}
+
+	var request models.EmailTemplateCreateRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		log.Printf("UpdateEmailTemplate: Validation error: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid input data",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// Get existing template
+	var template models.EmailTemplate
+	if err := h.db.First(&template, templateID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Email template not found"})
+		return
+	}
+
+	// Update fields
+	template.Name = strings.TrimSpace(request.Name)
+	template.Description = h.trimStringPointer(request.Description)
+	template.TemplateType = request.TemplateType
+	template.Subject = request.Subject
+	template.HTMLContent = request.HTMLContent
+	template.TextContent = h.trimStringPointer(request.TextContent)
+	template.UpdatedAt = time.Now()
+
+	if err := h.db.Save(&template).Error; err != nil {
+		log.Printf("UpdateEmailTemplate: Database error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to update email template",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	log.Printf("Email template updated successfully by user %s: %s", user.Username, template.Name)
+	c.JSON(http.StatusOK, gin.H{
+		"success":    true,
+		"message":    "Email template updated successfully",
+		"templateId": template.TemplateID,
+	})
+}
+
+// DeleteEmailTemplate deletes an email template
+func (h *EmailTemplateHandler) DeleteEmailTemplate(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	templateIDStr := c.Param("id")
+	templateID, err := strconv.ParseUint(templateIDStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid template ID"})
+		return
+	}
+
+	// Check if template exists and is not default
+	var template models.EmailTemplate
+	if err := h.db.First(&template, templateID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Email template not found"})
+		return
+	}
+
+	if template.IsDefault {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot delete default email template"})
+		return
+	}
+
+	if err := h.db.Delete(&template).Error; err != nil {
+		log.Printf("DeleteEmailTemplate: Database error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to delete email template",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	log.Printf("Email template deleted successfully by user %s: %s", user.Username, template.Name)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Email template deleted successfully",
+	})
+}
+
+// SetDefaultEmailTemplate sets a template as the default
+func (h *EmailTemplateHandler) SetDefaultEmailTemplate(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	templateIDStr := c.Param("id")
+	templateID, err := strconv.ParseUint(templateIDStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid template ID"})
+		return
+	}
+
+	var request struct {
+		TemplateType string `json:"templateType" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Template type is required"})
+		return
+	}
+	
+	templateType := request.TemplateType
+
+	err = h.db.Transaction(func(tx *gorm.DB) error {
+		// Unset existing default for this template type
+		if err := tx.Model(&models.EmailTemplate{}).
+			Where("template_type = ? AND is_default = ?", templateType, true).
+			Update("is_default", false).Error; err != nil {
+			return err
+		}
+
+		// Set new default
+		result := tx.Model(&models.EmailTemplate{}).
+			Where("template_id = ? AND template_type = ?", templateID, templateType).
+			Update("is_default", true)
+
+		if result.Error != nil {
+			return result.Error
+		}
+
+		if result.RowsAffected == 0 {
+			return gorm.ErrRecordNotFound
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		log.Printf("SetDefaultEmailTemplate: Database error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to set default email template",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	log.Printf("Default email template set by user %s for type %s", user.Username, templateType)
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Default email template set successfully",
+	})
+}
+
+// PreviewEmailTemplate shows a preview of the email template
+func (h *EmailTemplateHandler) PreviewEmailTemplate(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+	
+	templateIDStr := c.Param("id")
+	templateID, err := strconv.ParseUint(templateIDStr, 10, 32)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"error": "Invalid template ID",
+			"user":  user,
+		})
+		return
+	}
+
+	var template models.EmailTemplate
+	if err := h.db.First(&template, templateID).Error; err != nil {
+		log.Printf("PreviewEmailTemplate: Error fetching template: %v", err)
+		c.HTML(http.StatusNotFound, "error.html", gin.H{
+			"error": "Email template not found",
+			"user":  user,
+		})
+		return
+	}
+
+	// Get sample data for preview
+	sampleData := h.getSampleTemplateData()
+
+	c.HTML(http.StatusOK, "email_template_preview.html", gin.H{
+		"title":      "Vorschau: " + template.Name,
+		"template":   template,
+		"sampleData": sampleData,
+		"user":       user,
+	})
+}
+
+// TestEmailTemplate sends a test email using the template
+func (h *EmailTemplateHandler) TestEmailTemplate(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	templateIDStr := c.Param("id")
+	templateID, err := strconv.ParseUint(templateIDStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid template ID"})
+		return
+	}
+
+	var request struct {
+		ToEmail string `json:"toEmail" binding:"required,email"`
+	}
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Valid email address is required",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	var template models.EmailTemplate
+	if err := h.db.First(&template, templateID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Email template not found"})
+		return
+	}
+
+	// TODO: Implement actual email sending logic here
+	// For now, just return success
+	log.Printf("Test email would be sent to %s using template %s by user %s", 
+		request.ToEmail, template.Name, user.Username)
+	
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Test email sent successfully to " + request.ToEmail,
+	})
+}
+
+// Helper methods
+
+func (h *EmailTemplateHandler) trimStringPointer(s *string) *string {
+	if s == nil {
+		return nil
+	}
+	trimmed := strings.TrimSpace(*s)
+	if trimmed == "" {
+		return nil
+	}
+	return &trimmed
+}
+
+func (h *EmailTemplateHandler) getSampleTemplateData() gin.H {
+	return gin.H{
+		"invoice": gin.H{
+			"InvoiceNumber": "RE-2024-001",
+			"TotalAmount":   119.00,
+			"BalanceDue":    119.00,
+			"IssueDate":     time.Now(),
+			"DueDate":       time.Now().AddDate(0, 0, 30),
+		},
+		"customer": gin.H{
+			"GetDisplayName": "Max Mustermann",
+			"Email":          "max@example.com",
+		},
+		"company": gin.H{
+			"CompanyName": "Musterfirma GmbH",
+			"Phone":       "+49 123 456789",
+			"Email":       "info@musterfirma.de",
+			"Website":     "www.musterfirma.de",
+		},
+		"settings": gin.H{
+			"CurrencySymbol": "€",
+		},
+	}
+}

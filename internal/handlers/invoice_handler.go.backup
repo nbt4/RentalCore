@@ -1,0 +1,1490 @@
+package handlers
+
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"strconv"
+	"time"
+
+	"go-barcode-webapp/internal/config"
+	"go-barcode-webapp/internal/models"
+	"go-barcode-webapp/internal/repository"
+	"go-barcode-webapp/internal/services"
+
+	"github.com/gin-gonic/gin"
+)
+
+type InvoiceHandler struct {
+	invoiceRepo  *repository.InvoiceRepository
+	customerRepo *repository.CustomerRepository
+	jobRepo      *repository.JobRepository
+	deviceRepo   *repository.DeviceRepository
+	packageRepo  *repository.EquipmentPackageRepository
+	pdfService   *services.PDFService
+	emailService *services.EmailService
+}
+
+func NewInvoiceHandler(
+	invoiceRepo *repository.InvoiceRepository,
+	customerRepo *repository.CustomerRepository,
+	jobRepo *repository.JobRepository,
+	deviceRepo *repository.DeviceRepository,
+	packageRepo *repository.EquipmentPackageRepository,
+	emailConfig *config.EmailConfig,
+	pdfConfig *config.PDFConfig,
+) *InvoiceHandler {
+	return &InvoiceHandler{
+		invoiceRepo:  invoiceRepo,
+		customerRepo: customerRepo,
+		jobRepo:      jobRepo,
+		deviceRepo:   deviceRepo,
+		packageRepo:  packageRepo,
+		pdfService:   services.NewPDFService(pdfConfig),
+		emailService: services.NewEmailService(emailConfig),
+	}
+}
+
+// ================================================================
+// WEB HANDLERS
+// ================================================================
+
+// ListInvoices displays all invoices
+func (h *InvoiceHandler) ListInvoices(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+
+	// Parse filter parameters
+	var filter models.InvoiceFilter
+	if err := c.ShouldBindQuery(&filter); err != nil {
+		log.Printf("ListInvoices: Filter binding error: %v", err)
+	}
+
+	// Set default pagination
+	if filter.PageSize <= 0 {
+		filter.PageSize = 20
+	}
+	if filter.Page <= 0 {
+		filter.Page = 1
+	}
+
+	// Get invoices
+	invoices, _, err := h.invoiceRepo.GetInvoices(&filter)
+	if err != nil {
+		log.Printf("ListInvoices: Error fetching invoices: %v", err)
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"error": "Failed to load invoices",
+			"user":  user,
+		})
+		return
+	}
+	
+
+	// Note: Removed unused customers, jobsWithDetails, and totalPages variables
+	// that were causing build failures. These can be re-added when filtering
+	// functionality is implemented.
+
+	c.HTML(http.StatusOK, "invoices_list.html", gin.H{
+		"title":    "Invoices",
+		"invoices": invoices,
+		"user":     user,
+	})
+}
+
+// NewInvoiceForm displays the form for creating a new invoice
+func (h *InvoiceHandler) NewInvoiceForm(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+
+	// Fetch customers for dropdown (reduced limit for performance)
+	customers, err := h.customerRepo.List(&models.FilterParams{Limit: 100})
+	if err != nil {
+		log.Printf("NewInvoiceForm: Error fetching customers: %v", err)
+		customers = []models.Customer{}
+	}
+
+	// Fetch active jobs for dropdown (reduced limit for performance)
+	jobs, err := h.jobRepo.List(&models.FilterParams{Limit: 100})
+	if err != nil {
+		log.Printf("NewInvoiceForm: Error fetching jobs: %v", err)
+		jobs = []models.JobWithDetails{}
+	}
+
+	// Fetch templates for dropdown
+	templates, err := h.invoiceRepo.GetInvoiceTemplates()
+	if err != nil {
+		log.Printf("NewInvoiceForm: Error fetching templates: %v", err)
+		templates = []models.InvoiceTemplate{}
+	}
+
+	// Generate next invoice number in RE#### format
+	nextInvoiceNumber, err := h.generateREInvoiceNumber()
+	if err != nil {
+		log.Printf("NewInvoiceForm: Error generating invoice number: %v", err)
+		nextInvoiceNumber = "RE1001" // fallback
+	}
+
+	now := time.Now()
+	dueDate := now.AddDate(0, 0, 30) // Default 30 days
+
+	c.HTML(http.StatusOK, "invoice_form.html", gin.H{
+		"title":            "New Invoice",
+		"invoice":          &models.Invoice{InvoiceNumber: nextInvoiceNumber},
+		"customers":        customers,
+		"jobs":             jobs,
+		"templates":        templates,
+		"defaultIssueDate": now.Format("2006-01-02"),
+		"defaultDueDate":   dueDate.Format("2006-01-02"),
+		"isEdit":           false,
+		"user":             user,
+	})
+}
+
+// CreateInvoice creates a new invoice
+func (h *InvoiceHandler) CreateInvoice(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	var request models.InvoiceCreateRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		log.Printf("CreateInvoice: Validation error: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid input data",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// Create invoice from request
+	invoice := models.Invoice{
+		CustomerID:      request.CustomerID,
+		JobID:           request.JobID,
+		TemplateID:      request.TemplateID,
+		Status:          "draft",
+		IssueDate:       request.IssueDate,
+		DueDate:         request.DueDate,
+		PaymentTerms:    request.PaymentTerms,
+		TaxRate:         request.TaxRate,
+		DiscountAmount:  request.DiscountAmount,
+		Notes:           request.Notes,
+		TermsConditions: request.TermsConditions,
+		CreatedBy:       &user.UserID,
+	}
+
+	// Create line items (with default item if none provided)
+	if len(request.LineItems) == 0 {
+		// Add a default line item so the invoice isn't empty
+		defaultItem := models.InvoiceLineItem{
+			ItemType:    "service",
+			Description: "Default Service Item",
+			Quantity:    1.0,
+			UnitPrice:   0.01,
+			SortOrder:   func() *uint { order := uint(0); return &order }(),
+		}
+		defaultItem.CalculateTotal()
+		invoice.LineItems = append(invoice.LineItems, defaultItem)
+	} else {
+		for i, item := range request.LineItems {
+			lineItem := models.InvoiceLineItem{
+				ItemType:        item.ItemType,
+				DeviceID:        item.DeviceID,
+				PackageID:       item.PackageID,
+				Description:     item.Description,
+				Quantity:        item.Quantity,
+				UnitPrice:       item.UnitPrice,
+				RentalStartDate: item.RentalStartDate,
+				RentalEndDate:   item.RentalEndDate,
+				RentalDays:      item.RentalDays,
+				SortOrder:       func() *uint { order := uint(i); return &order }(),
+			}
+			lineItem.CalculateTotal()
+			invoice.LineItems = append(invoice.LineItems, lineItem)
+		}
+	}
+
+	// Create the invoice
+	if err := h.invoiceRepo.CreateInvoice(&invoice); err != nil {
+		log.Printf("CreateInvoice: Database error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create invoice"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message":   "Invoice created successfully",
+		"invoiceId": invoice.InvoiceID,
+		"invoiceNumber": invoice.InvoiceNumber,
+	})
+}
+
+// GetInvoice displays a specific invoice
+func (h *InvoiceHandler) GetInvoice(c *gin.Context) {
+	user, _ := GetCurrentUser(c)
+
+	invoiceIDStr := c.Param("id")
+	invoiceID, err := strconv.ParseUint(invoiceIDStr, 10, 64)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"error": "Invalid invoice ID",
+			"user":  user,
+		})
+		return
+	}
+
+	invoice, err := h.invoiceRepo.GetInvoiceByID(invoiceID)
+	if err != nil {
+		c.HTML(http.StatusNotFound, "error.html", gin.H{
+			"error": "Invoice not found",
+			"user":  user,
+		})
+		return
+	}
+
+	// Get company settings for display
+	company, err := h.invoiceRepo.GetCompanySettings()
+	if err != nil {
+		log.Printf("GetInvoice: Error fetching company settings: %v", err)
+		company = &models.CompanySettings{CompanyName: "RentalCore Company"}
+	}
+
+	// Get invoice settings
+	settings, err := h.invoiceRepo.GetAllInvoiceSettings()
+	if err != nil {
+		log.Printf("GetInvoice: Error fetching settings: %v", err)
+		settings = &models.InvoiceSettings{CurrencySymbol: "€"}
+	}
+
+	c.HTML(http.StatusOK, "invoice_detail.html", gin.H{
+		"title":    "Invoice " + invoice.InvoiceNumber,
+		"invoice":  invoice,
+		"company":  company,
+		"settings": settings,
+		"user":     user,
+	})
+}
+
+// EditInvoiceForm displays the form for editing an invoice
+func (h *InvoiceHandler) EditInvoiceForm(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+
+	invoiceIDStr := c.Param("id")
+	invoiceID, err := strconv.ParseUint(invoiceIDStr, 10, 64)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"error": "Invalid invoice ID",
+			"user":  user,
+		})
+		return
+	}
+
+	invoice, err := h.invoiceRepo.GetInvoiceByID(invoiceID)
+	if err != nil {
+		c.HTML(http.StatusNotFound, "error.html", gin.H{
+			"error": "Invoice not found",
+			"user":  user,
+		})
+		return
+	}
+
+	// Only allow editing of draft invoices
+	if invoice.Status != "draft" {
+		c.HTML(http.StatusForbidden, "error.html", gin.H{
+			"error": "Only draft invoices can be edited",
+			"user":  user,
+		})
+		return
+	}
+
+	// Get necessary data for form (optimized limits for performance)
+	customers, err := h.customerRepo.List(&models.FilterParams{Limit: 100})
+	if err != nil {
+		log.Printf("EditInvoiceForm: Error fetching customers: %v", err)
+		customers = []models.Customer{}
+	}
+	
+	jobsWithDetails, err := h.jobRepo.List(&models.FilterParams{Limit: 100})
+	if err != nil {
+		log.Printf("EditInvoiceForm: Error fetching jobs: %v", err)
+		jobsWithDetails = []models.JobWithDetails{}
+	}
+	
+	// Skip devices and packages for better performance - they're not needed for basic invoice editing
+	var devices []models.Device
+	var packages []models.EquipmentPackage
+	
+	templates, err := h.invoiceRepo.GetInvoiceTemplates()
+	if err != nil {
+		log.Printf("EditInvoiceForm: Error fetching templates: %v", err)
+		templates = []models.InvoiceTemplate{}
+	}
+	
+	settings, err := h.invoiceRepo.GetAllInvoiceSettings()
+	if err != nil {
+		log.Printf("EditInvoiceForm: Error fetching settings: %v", err)
+		settings = &models.InvoiceSettings{CurrencySymbol: "€"}
+	}
+
+	log.Printf("EditInvoiceForm: Invoice CustomerID: %d, Loading %d customers", invoice.CustomerID, len(customers))
+	
+	// Debug customer matching
+	if len(customers) > 0 {
+		log.Printf("EditInvoiceForm: First customer ID: %d, Name: %s", customers[0].CustomerID, customers[0].GetDisplayName())
+		if len(customers) > 1 {
+			log.Printf("EditInvoiceForm: Second customer ID: %d, Name: %s", customers[1].CustomerID, customers[1].GetDisplayName())
+		}
+	}
+	
+	// Find and log the matching customer
+	var foundCustomer *models.Customer
+	for i, customer := range customers {
+		if customer.CustomerID == invoice.CustomerID {
+			foundCustomer = &customers[i]
+			log.Printf("EditInvoiceForm: Found matching customer at index %d: ID=%d, Name=%s", i, customer.CustomerID, customer.GetDisplayName())
+			break
+		}
+	}
+	
+	if foundCustomer == nil {
+		log.Printf("EditInvoiceForm: WARNING - No matching customer found for ID %d", invoice.CustomerID)
+		// Try to load the specific customer if not in the list
+		if invoice.CustomerID > 0 {
+			specificCustomer, err := h.customerRepo.GetByID(uint(invoice.CustomerID))
+			if err == nil {
+				log.Printf("EditInvoiceForm: Loaded specific customer: ID=%d, Name=%s", specificCustomer.CustomerID, specificCustomer.GetDisplayName())
+				customers = append([]models.Customer{*specificCustomer}, customers...)
+			} else {
+				log.Printf("EditInvoiceForm: Failed to load specific customer %d: %v", invoice.CustomerID, err)
+			}
+		}
+	}
+
+	c.HTML(http.StatusOK, "invoice_form.html", gin.H{
+		"title":     "Edit Invoice",
+		"invoice":   invoice,
+		"customers": customers,
+		"jobs":      jobsWithDetails,
+		"devices":   devices,
+		"packages":  packages,
+		"templates": templates,
+		"settings":  settings,
+		"isEdit":    true,
+		"user":      user,
+	})
+}
+
+// UpdateInvoice updates an existing invoice
+func (h *InvoiceHandler) UpdateInvoice(c *gin.Context) {
+	_, exists := GetCurrentUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	invoiceIDStr := c.Param("id")
+	invoiceID, err := strconv.ParseUint(invoiceIDStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid invoice ID"})
+		return
+	}
+
+	// Get existing invoice
+	existingInvoice, err := h.invoiceRepo.GetInvoiceByID(invoiceID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Invoice not found"})
+		return
+	}
+
+	// Only allow editing of draft invoices
+	if existingInvoice.Status != "draft" {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Only draft invoices can be edited"})
+		return
+	}
+
+	var request models.InvoiceCreateRequest
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid input data",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// Update invoice fields
+	existingInvoice.CustomerID = request.CustomerID
+	existingInvoice.JobID = request.JobID
+	existingInvoice.TemplateID = request.TemplateID
+	existingInvoice.IssueDate = request.IssueDate
+	existingInvoice.DueDate = request.DueDate
+	existingInvoice.PaymentTerms = request.PaymentTerms
+	existingInvoice.TaxRate = request.TaxRate
+	existingInvoice.DiscountAmount = request.DiscountAmount
+	existingInvoice.Notes = request.Notes
+	existingInvoice.TermsConditions = request.TermsConditions
+
+	// Replace line items
+	existingInvoice.LineItems = []models.InvoiceLineItem{}
+	for i, item := range request.LineItems {
+		lineItem := models.InvoiceLineItem{
+			InvoiceID:       invoiceID,
+			ItemType:        item.ItemType,
+			DeviceID:        item.DeviceID,
+			PackageID:       item.PackageID,
+			Description:     item.Description,
+			Quantity:        item.Quantity,
+			UnitPrice:       item.UnitPrice,
+			RentalStartDate: item.RentalStartDate,
+			RentalEndDate:   item.RentalEndDate,
+			RentalDays:      item.RentalDays,
+			SortOrder:       func() *uint { order := uint(i); return &order }(),
+		}
+		lineItem.CalculateTotal()
+		existingInvoice.LineItems = append(existingInvoice.LineItems, lineItem)
+	}
+
+	// Update the invoice
+	if err := h.invoiceRepo.UpdateInvoice(existingInvoice); err != nil {
+		log.Printf("UpdateInvoice: Database error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update invoice"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Invoice updated successfully",
+		"invoiceId": existingInvoice.InvoiceID,
+	})
+}
+
+// DeleteInvoice deletes an invoice
+func (h *InvoiceHandler) DeleteInvoice(c *gin.Context) {
+	invoiceIDStr := c.Param("id")
+	invoiceID, err := strconv.ParseUint(invoiceIDStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid invoice ID"})
+		return
+	}
+
+	if err := h.invoiceRepo.DeleteInvoice(invoiceID); err != nil {
+		log.Printf("DeleteInvoice: Database error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete invoice"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": true, "message": "Invoice deleted successfully"})
+}
+
+// UpdateInvoiceStatus updates the status of an invoice
+func (h *InvoiceHandler) UpdateInvoiceStatus(c *gin.Context) {
+	invoiceIDStr := c.Param("id")
+	invoiceID, err := strconv.ParseUint(invoiceIDStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid invoice ID"})
+		return
+	}
+
+	var request struct {
+		Status string `json:"status" binding:"required,oneof=draft sent paid overdue cancelled"`
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid status",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	if err := h.invoiceRepo.UpdateInvoiceStatus(invoiceID, request.Status); err != nil {
+		log.Printf("UpdateInvoiceStatus: Database error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update invoice status"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Invoice status updated successfully",
+		"status":  request.Status,
+	})
+}
+
+// ================================================================
+// COMPANY SETTINGS
+// ================================================================
+
+// CompanySettingsForm displays the company settings form
+func (h *InvoiceHandler) CompanySettingsForm(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+
+	company, err := h.invoiceRepo.GetCompanySettings()
+	if err != nil {
+		log.Printf("CompanySettingsForm: Error fetching settings: %v", err)
+		company = &models.CompanySettings{CompanyName: "RentalCore Company"}
+	}
+
+	c.HTML(http.StatusOK, "company_settings_form.html", gin.H{
+		"title":   "Company Settings",
+		"company": company,
+		"user":    user,
+	})
+}
+
+// UpdateCompanySettings updates company settings
+func (h *InvoiceHandler) UpdateCompanySettings(c *gin.Context) {
+	_, exists := GetCurrentUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	var company models.CompanySettings
+	if err := c.ShouldBindJSON(&company); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid input data",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// Preserve ID if updating existing settings
+	existingCompany, err := h.invoiceRepo.GetCompanySettings()
+	if err == nil {
+		company.ID = existingCompany.ID
+	}
+
+	if err := h.invoiceRepo.UpdateCompanySettings(&company); err != nil {
+		log.Printf("UpdateCompanySettings: Database error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update company settings"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Company settings updated successfully"})
+}
+
+// ================================================================
+// INVOICE SETTINGS
+// ================================================================
+
+// InvoiceSettingsForm displays the invoice settings form
+func (h *InvoiceHandler) InvoiceSettingsForm(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+
+	settings, err := h.invoiceRepo.GetAllInvoiceSettings()
+	if err != nil {
+		log.Printf("InvoiceSettingsForm: Error fetching settings: %v", err)
+		settings = &models.InvoiceSettings{}
+	}
+
+	c.HTML(http.StatusOK, "invoice_settings_form.html", gin.H{
+		"title":    "Invoice Settings",
+		"settings": settings,
+		"user":     user,
+	})
+}
+
+// UpdateInvoiceSettings updates invoice settings
+func (h *InvoiceHandler) UpdateInvoiceSettings(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	var settings models.InvoiceSettings
+	if err := c.ShouldBindJSON(&settings); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid input data",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// Update each setting
+	settingsMap := map[string]string{
+		"invoice_number_prefix":      settings.InvoiceNumberPrefix,
+		"invoice_number_format":      settings.InvoiceNumberFormat,
+		"default_payment_terms":      strconv.Itoa(settings.DefaultPaymentTerms),
+		"default_tax_rate":           strconv.FormatFloat(settings.DefaultTaxRate, 'f', 2, 64),
+		"auto_calculate_rental_days": strconv.FormatBool(settings.AutoCalculateRentalDays),
+		"show_logo_on_invoice":       strconv.FormatBool(settings.ShowLogoOnInvoice),
+		"currency_symbol":            settings.CurrencySymbol,
+		"currency_code":              settings.CurrencyCode,
+		"date_format":                settings.DateFormat,
+	}
+
+	for key, value := range settingsMap {
+		if err := h.invoiceRepo.UpdateInvoiceSetting(key, value, &user.UserID); err != nil {
+			log.Printf("UpdateInvoiceSettings: Error updating %s: %v", key, err)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "Failed to update invoice settings",
+			})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Invoice settings updated successfully"})
+}
+
+// ================================================================
+// API HANDLERS
+// ================================================================
+
+// GetInvoicesAPI returns invoices as JSON
+func (h *InvoiceHandler) GetInvoicesAPI(c *gin.Context) {
+	var filter models.InvoiceFilter
+	if err := c.ShouldBindQuery(&filter); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	invoices, totalCount, err := h.invoiceRepo.GetInvoices(&filter)
+	if err != nil {
+		log.Printf("GetInvoicesAPI: Error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load invoices"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"invoices":   invoices,
+		"totalCount": totalCount,
+		"filter":     filter,
+	})
+}
+
+// GetInvoiceStatsAPI returns invoice statistics
+func (h *InvoiceHandler) GetInvoiceStatsAPI(c *gin.Context) {
+	stats, err := h.invoiceRepo.GetInvoiceStats()
+	if err != nil {
+		log.Printf("GetInvoiceStatsAPI: Error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get invoice statistics"})
+		return
+	}
+
+	c.JSON(http.StatusOK, stats)
+}
+
+// ================================================================
+// PDF AND EMAIL HANDLERS
+// ================================================================
+
+// GenerateInvoicePDF generates and downloads a PDF for an invoice
+func (h *InvoiceHandler) GenerateInvoicePDF(c *gin.Context) {
+	invoiceIDStr := c.Param("id")
+	invoiceID, err := strconv.ParseUint(invoiceIDStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid invoice ID"})
+		return
+	}
+
+	// Get invoice
+	invoice, err := h.invoiceRepo.GetInvoiceByID(invoiceID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Invoice not found"})
+		return
+	}
+
+	// Get company settings
+	company, err := h.invoiceRepo.GetCompanySettings()
+	if err != nil {
+		log.Printf("GenerateInvoicePDF: Error fetching company settings: %v", err)
+		company = &models.CompanySettings{CompanyName: "RentalCore Company"}
+	}
+
+	// Get invoice settings
+	settings, err := h.invoiceRepo.GetAllInvoiceSettings()
+	if err != nil {
+		log.Printf("GenerateInvoicePDF: Error fetching settings: %v", err)
+		settings = &models.InvoiceSettings{CurrencySymbol: "€"}
+	}
+
+	// Generate PDF
+	pdfBytes, err := h.pdfService.GenerateInvoicePDF(invoice, company, settings)
+	if err != nil {
+		log.Printf("GenerateInvoicePDF: Error generating PDF, falling back to HTML view: %v", err)
+		// Instead of failing, redirect to HTML preview as fallback
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/invoices/%d/preview", invoiceID))
+		return
+	}
+
+	// Check if the returned content is actually HTML (fallback case)
+	if len(pdfBytes) > 15 && string(pdfBytes[:15]) == "<!DOCTYPE html>" {
+		log.Printf("GenerateInvoicePDF: PDF service returned HTML, redirecting to preview")
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/invoices/%d/preview", invoiceID))
+		return
+	}
+
+	// Check if this is the fallback PDF with error message
+	if len(pdfBytes) > 0 {
+		// Convert to string to check content
+		content := string(pdfBytes)
+		if len(content) > 500 && (len(content) < 2000) { // Fallback PDFs are typically small
+			// This is likely a fallback PDF, redirect to HTML preview instead
+			log.Printf("GenerateInvoicePDF: Detected fallback PDF, redirecting to HTML preview")
+			c.Redirect(http.StatusSeeOther, fmt.Sprintf("/invoices/%d/preview", invoiceID))
+			return
+		}
+	}
+
+	// Set headers for PDF download
+	filename := fmt.Sprintf("Invoice_%s.pdf", invoice.InvoiceNumber)
+	c.Header("Content-Type", "application/pdf")
+	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename))
+	c.Header("Content-Length", strconv.Itoa(len(pdfBytes)))
+
+	// Send PDF
+	c.Data(http.StatusOK, "application/pdf", pdfBytes)
+}
+
+// EmailInvoice sends an invoice via email
+func (h *InvoiceHandler) EmailInvoice(c *gin.Context) {
+	invoiceIDStr := c.Param("id")
+	invoiceID, err := strconv.ParseUint(invoiceIDStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid invoice ID"})
+		return
+	}
+
+	var request struct {
+		ToEmail     string `json:"toEmail"`
+		Subject     string `json:"subject"`
+		Message     string `json:"message"`
+		IncludePDF  bool   `json:"includePdf"`
+		MarkAsSent  bool   `json:"markAsSent"`
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid request data",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// Get invoice
+	invoice, err := h.invoiceRepo.GetInvoiceByID(invoiceID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Invoice not found"})
+		return
+	}
+
+	// Get company settings
+	company, err := h.invoiceRepo.GetCompanySettings()
+	if err != nil {
+		log.Printf("EmailInvoice: Error fetching company settings: %v", err)
+		company = &models.CompanySettings{CompanyName: "RentalCore Company"}
+	}
+
+	// Get invoice settings
+	settings, err := h.invoiceRepo.GetAllInvoiceSettings()
+	if err != nil {
+		log.Printf("EmailInvoice: Error fetching settings: %v", err)
+		settings = &models.InvoiceSettings{CurrencySymbol: "€"}
+	}
+
+	// Use customer email if not specified
+	toEmail := request.ToEmail
+	if toEmail == "" && invoice.Customer != nil && invoice.Customer.Email != nil {
+		toEmail = *invoice.Customer.Email
+	}
+
+	if toEmail == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No email address specified"})
+		return
+	}
+
+	// Prepare email data
+	emailData := &services.EmailData{
+		Invoice:      invoice,
+		Company:      company,
+		Customer:     invoice.Customer,
+		Settings:     settings,
+		InvoiceURL:   fmt.Sprintf("%s/invoices/%d", c.Request.Host, invoice.InvoiceID),
+		SupportEmail: func() string { if company.Email != nil { return *company.Email } else { return "" } }(),
+	}
+
+	// Generate PDF if requested
+	var pdfAttachment []byte
+	if request.IncludePDF {
+		pdfBytes, err := h.pdfService.GenerateInvoicePDF(invoice, company, settings)
+		if err != nil {
+			log.Printf("EmailInvoice: Error generating PDF: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate PDF attachment"})
+			return
+		}
+		pdfAttachment = pdfBytes
+	}
+
+	// Send email
+	if err := h.emailService.SendInvoiceEmail(emailData, pdfAttachment); err != nil {
+		log.Printf("EmailInvoice: Error sending email: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to send email",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// Mark invoice as sent if requested
+	if request.MarkAsSent && invoice.Status == "draft" {
+		if err := h.invoiceRepo.UpdateInvoiceStatus(invoiceID, "sent"); err != nil {
+			log.Printf("EmailInvoice: Error updating invoice status: %v", err)
+			// Don't fail the request, email was sent successfully
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "Invoice sent successfully",
+		"sentTo":  toEmail,
+	})
+}
+
+// TestEmailSettings sends a test email to verify configuration
+func (h *InvoiceHandler) TestEmailSettings(c *gin.Context) {
+	var request struct {
+		ToEmail string `json:"toEmail" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid request data",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// Send test email
+	if err := h.emailService.SendTestEmail(request.ToEmail, nil); err != nil {
+		log.Printf("TestEmailSettings: Error sending test email: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Failed to send test email",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "Test email sent successfully",
+		"sentTo":  request.ToEmail,
+	})
+}
+
+// PreviewInvoicePDF generates and displays a PDF preview in browser
+func (h *InvoiceHandler) PreviewInvoicePDF(c *gin.Context) {
+	invoiceIDStr := c.Param("id")
+	log.Printf("PreviewInvoicePDF: Called with ID: %s", invoiceIDStr)
+	
+	// Simple HTML preview instead of PDF for debugging
+	c.Header("Content-Type", "text/html")
+	
+	// Check if this is the test route
+	if invoiceIDStr == "test" {
+		c.String(http.StatusOK, `
+			<html>
+			<head><title>Invoice Preview Test</title></head>
+			<body>
+				<h1>Invoice Preview Route is Working!</h1>
+				<p>Invoice ID: %s</p>
+				<p>Time: %s</p>
+				<p>If you see this, the route is working correctly.</p>
+			</body>
+			</html>
+		`, invoiceIDStr, time.Now().Format("2006-01-02 15:04:05"))
+		return
+	}
+	
+	invoiceID, err := strconv.ParseUint(invoiceIDStr, 10, 64)
+	if err != nil {
+		c.String(http.StatusBadRequest, `
+			<html>
+			<head><title>Error</title></head>
+			<body>
+				<h1>Invalid Invoice ID</h1>
+				<p>ID provided: %s</p>
+				<p>Error: %v</p>
+			</body>
+			</html>
+		`, invoiceIDStr, err)
+		return
+	}
+
+	// Get invoice
+	invoice, err := h.invoiceRepo.GetInvoiceByID(invoiceID)
+	if err != nil {
+		c.String(http.StatusNotFound, `
+			<html>
+			<head><title>Invoice Not Found</title></head>
+			<body>
+				<h1>Invoice Not Found</h1>
+				<p>Invoice ID: %d</p>
+				<p>Error: %v</p>
+				<p>This usually means the invoice doesn't exist in the database.</p>
+			</body>
+			</html>
+		`, invoiceID, err)
+		return
+	}
+	
+	// Get company settings for the preview
+	company, err := h.invoiceRepo.GetCompanySettings()
+	if err != nil {
+		company = &models.CompanySettings{CompanyName: "RentalCore Company"}
+	}
+
+	// Get invoice settings
+	settings, err := h.invoiceRepo.GetAllInvoiceSettings()
+	if err != nil {
+		settings = &models.InvoiceSettings{CurrencySymbol: "€"}
+	}
+
+	// Create a nice HTML invoice preview
+	c.String(http.StatusOK, `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice Preview - %s</title>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .header { border-bottom: 2px solid #007bff; margin-bottom: 30px; padding-bottom: 20px; }
+        .company-info { float: left; width: 50%%; }
+        .invoice-info { float: right; width: 45%%; text-align: right; }
+        .customer-info { clear: both; margin: 30px 0; padding: 15px; background: #f8f9fa; border-radius: 5px; }
+        .line-items { margin: 30px 0; }
+        .line-items table { width: 100%%; border-collapse: collapse; }
+        .line-items th, .line-items td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+        .line-items th { background: #f8f9fa; font-weight: bold; }
+        .totals { float: right; width: 300px; margin: 20px 0; }
+        .totals table { width: 100%%; }
+        .totals td { padding: 8px; border-bottom: 1px solid #ddd; }
+        .total-row { background: #f8f9fa; font-weight: bold; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; color: white; font-size: 12px; }
+        .status-draft { background: #6c757d; }
+        .status-sent { background: #17a2b8; }
+        .status-paid { background: #28a745; }
+        .clear { clear: both; }
+        .preview-note { background: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; border-radius: 5px; margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="company-info">
+            <h1>%s</h1>
+            <p>Invoice Preview</p>
+        </div>
+        <div class="invoice-info">
+            <h2>Invoice #%s</h2>
+            <p><strong>Issue Date:</strong> %s</p>
+            <p><strong>Due Date:</strong> %s</p>
+            <p><strong>Status:</strong> <span class="status-badge status-%s">%s</span></p>
+        </div>
+        <div class="clear"></div>
+    </div>
+
+    <div class="customer-info">
+        <h3>Bill To:</h3>
+        %s
+    </div>
+
+    <div class="line-items">
+        <h3>Invoice Items</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th style="text-align: right;">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                %s
+            </tbody>
+        </table>
+    </div>
+
+    <div class="totals">
+        <table>
+            <tr><td>Subtotal:</td><td style="text-align: right;">%s%.2f</td></tr>
+            <tr><td>Tax (%.1f%%):</td><td style="text-align: right;">%s%.2f</td></tr>
+            <tr class="total-row"><td><strong>Total:</strong></td><td style="text-align: right;"><strong>%s%.2f</strong></td></tr>
+        </table>
+    </div>
+    <div class="clear"></div>
+
+    <div class="preview-note">
+        <strong>Preview Mode</strong> - This is an HTML preview of the invoice. 
+        Use the download button to get the PDF version.
+    </div>
+</body>
+</html>
+	`, 
+		// Title
+		invoice.InvoiceNumber,
+		// Company name
+		company.CompanyName,
+		// Invoice details
+		invoice.InvoiceNumber,
+		invoice.IssueDate.Format("January 2, 2006"),
+		invoice.DueDate.Format("January 2, 2006"),
+		invoice.Status, invoice.Status,
+		// Customer info
+		func() string {
+			if invoice.Customer != nil {
+				if invoice.Customer.CompanyName != nil && *invoice.Customer.CompanyName != "" {
+					return fmt.Sprintf("<strong>%s</strong><br>%s %s", *invoice.Customer.CompanyName, invoice.Customer.FirstName, invoice.Customer.LastName)
+				}
+				return fmt.Sprintf("<strong>%s %s</strong>", invoice.Customer.FirstName, invoice.Customer.LastName)
+			}
+			return "No customer information"
+		}(),
+		// Line items
+		func() string {
+			if len(invoice.LineItems) == 0 {
+				return `<tr><td colspan="4" style="text-align: center; color: #666;">No line items</td></tr>`
+			}
+			var items string
+			for _, item := range invoice.LineItems {
+				items += fmt.Sprintf(`<tr><td>%s</td><td>%.1f</td><td>%s%.2f</td><td style="text-align: right;">%s%.2f</td></tr>`,
+					item.Description, item.Quantity, settings.CurrencySymbol, item.UnitPrice, settings.CurrencySymbol, item.TotalPrice)
+			}
+			return items
+		}(),
+		// Totals
+		settings.CurrencySymbol, invoice.Subtotal,
+		invoice.TaxRate, settings.CurrencySymbol, invoice.TaxAmount,
+		settings.CurrencySymbol, invoice.TotalAmount,
+	)
+}
+
+// ================================================================
+// INVOICE TEMPLATE MANAGEMENT
+// ================================================================
+
+// ListInvoiceTemplates displays all invoice templates
+func (h *InvoiceHandler) ListInvoiceTemplates(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+
+	templates, err := h.invoiceRepo.GetInvoiceTemplates()
+	if err != nil {
+		log.Printf("ListInvoiceTemplates: Error fetching templates: %v", err)
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"error": "Failed to load templates",
+			"user":  user,
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "invoice_templates_list.html", gin.H{
+		"title":     "Invoice Templates",
+		"templates": templates,
+		"user":      user,
+	})
+}
+
+// NewInvoiceTemplateForm displays the form for creating a new invoice template
+func (h *InvoiceHandler) NewInvoiceTemplateForm(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+
+	c.HTML(http.StatusOK, "invoice_template_designer_advanced.html", gin.H{
+		"title":    "Advanced Invoice Template Designer - RentalCore",
+		"template": &models.InvoiceTemplate{},
+		"isEdit":   false,
+		"user":     user,
+	})
+}
+
+// CreateInvoiceTemplate creates a new invoice template
+func (h *InvoiceHandler) CreateInvoiceTemplate(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	var request struct {
+		Name         string `json:"name" binding:"required"`
+		Description  string `json:"description"`
+		HTMLTemplate string `json:"htmlTemplate" binding:"required"`
+		CSSStyles    string `json:"cssStyles"`
+		IsDefault    bool   `json:"isDefault"`
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input data"})
+		return
+	}
+
+	// Create template
+	template := models.InvoiceTemplate{
+		Name:         request.Name,
+		Description:  &request.Description,
+		HTMLTemplate: request.HTMLTemplate,
+		CSSStyles:    &request.CSSStyles,
+		IsDefault:    request.IsDefault,
+		IsActive:     true,
+		CreatedBy:    &user.UserID,
+	}
+
+	if err := h.invoiceRepo.CreateInvoiceTemplate(&template); err != nil {
+		log.Printf("CreateInvoiceTemplate: Error creating template: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create template"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{
+		"message":    "Template created successfully",
+		"templateId": template.TemplateID,
+	})
+}
+
+// GetInvoiceTemplate returns a specific invoice template
+func (h *InvoiceHandler) GetInvoiceTemplate(c *gin.Context) {
+	templateIDStr := c.Param("id")
+	templateID, err := strconv.ParseUint(templateIDStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid template ID"})
+		return
+	}
+
+	template, err := h.invoiceRepo.GetInvoiceTemplateByID(uint(templateID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Template not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, template)
+}
+
+// EditInvoiceTemplateForm displays the form for editing an invoice template
+func (h *InvoiceHandler) EditInvoiceTemplateForm(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+
+	templateIDStr := c.Param("id")
+	templateID, err := strconv.ParseUint(templateIDStr, 10, 64)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"error": "Invalid template ID",
+			"user":  user,
+		})
+		return
+	}
+
+	template, err := h.invoiceRepo.GetInvoiceTemplateByID(uint(templateID))
+	if err != nil {
+		c.HTML(http.StatusNotFound, "error.html", gin.H{
+			"error": "Template not found",
+			"user":  user,
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "invoice_template_designer_advanced.html", gin.H{
+		"title":    "Edit Invoice Template - Advanced Designer",
+		"template": template,
+		"isEdit":   true,
+		"user":     user,
+	})
+}
+
+// UpdateInvoiceTemplate updates an existing invoice template
+func (h *InvoiceHandler) UpdateInvoiceTemplate(c *gin.Context) {
+	templateIDStr := c.Param("id")
+	templateID, err := strconv.ParseUint(templateIDStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid template ID"})
+		return
+	}
+
+	var request struct {
+		Name         string `json:"name" binding:"required"`
+		Description  string `json:"description"`
+		HTMLTemplate string `json:"htmlTemplate" binding:"required"`
+		CSSStyles    string `json:"cssStyles"`
+		IsDefault    bool   `json:"isDefault"`
+		IsActive     bool   `json:"isActive"`
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input data"})
+		return
+	}
+
+	// Get existing template
+	template, err := h.invoiceRepo.GetInvoiceTemplateByID(uint(templateID))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Template not found"})
+		return
+	}
+
+	// Update template
+	template.Name = request.Name
+	template.Description = &request.Description
+	template.HTMLTemplate = request.HTMLTemplate
+	template.CSSStyles = &request.CSSStyles
+	template.IsDefault = request.IsDefault
+	template.IsActive = request.IsActive
+
+	if err := h.invoiceRepo.UpdateInvoiceTemplate(template); err != nil {
+		log.Printf("UpdateInvoiceTemplate: Error updating template: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update template"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Template updated successfully"})
+}
+
+// PreviewInvoiceTemplate shows a preview of an invoice template
+func (h *InvoiceHandler) PreviewInvoiceTemplate(c *gin.Context) {
+	templateIDStr := c.Param("id")
+	templateID, err := strconv.ParseUint(templateIDStr, 10, 64)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"error": "Invalid template ID",
+		})
+		return
+	}
+
+	template, err := h.invoiceRepo.GetInvoiceTemplateByID(uint(templateID))
+	if err != nil {
+		c.HTML(http.StatusNotFound, "error.html", gin.H{
+			"error": "Template not found",
+		})
+		return
+	}
+
+	// Note: For now, we're just rendering the raw template HTML
+	// Future enhancement: could include sample data processing
+
+	// Render the template HTML directly
+	c.Header("Content-Type", "text/html")
+	c.String(http.StatusOK, template.HTMLTemplate)
+}
+
+// DeleteInvoiceTemplate deletes an invoice template
+func (h *InvoiceHandler) DeleteInvoiceTemplate(c *gin.Context) {
+	templateIDStr := c.Param("id")
+	templateID, err := strconv.ParseUint(templateIDStr, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid template ID"})
+		return
+	}
+
+	if err := h.invoiceRepo.DeleteInvoiceTemplate(uint(templateID)); err != nil {
+		log.Printf("DeleteInvoiceTemplate: Error deleting template: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete template"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Template deleted successfully"})
+}
+
+// ================================================================
+// HELPER METHODS
+// ================================================================
+
+// generateREInvoiceNumber generates the next invoice number in RE#### format
+func (h *InvoiceHandler) generateREInvoiceNumber() (string, error) {
+	// Get all invoices with RE prefix and find the highest number
+	filter := &models.InvoiceFilter{
+		SearchTerm: "RE",
+		PageSize:   1000,
+		Page:       1,
+	}
+	
+	invoices, _, err := h.invoiceRepo.GetInvoices(filter)
+	if err != nil {
+		return "", fmt.Errorf("failed to get invoices: %v", err)
+	}
+	
+	// Find the highest RE number
+	highestNumber := 1000 // Start from RE1001
+	for _, invoice := range invoices {
+		if len(invoice.InvoiceNumber) >= 3 && invoice.InvoiceNumber[:2] == "RE" {
+			numberPart := invoice.InvoiceNumber[2:]
+			if currentNumber, err := strconv.Atoi(numberPart); err == nil {
+				if currentNumber > highestNumber {
+					highestNumber = currentNumber
+				}
+			}
+		}
+	}
+	
+	// Generate next number
+	nextNumber := highestNumber + 1
+	return fmt.Sprintf("RE%d", nextNumber), nil
+}
+
+// PreviewInvoice shows a preview of an invoice based on form data
+func (h *InvoiceHandler) PreviewInvoice(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+
+	// Get form parameters
+	customerId := c.Query("customerId")
+	jobId := c.Query("jobId")
+	invoiceNumber := c.Query("invoiceNumber")
+	issueDate := c.Query("issueDate")
+	dueDate := c.Query("dueDate")
+	status := c.Query("status")
+	notes := c.Query("notes")
+
+	// Validate required fields
+	if customerId == "" || invoiceNumber == "" {
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"title": "Preview Error",
+			"error": "Missing required fields for preview",
+			"user":  user,
+		})
+		return
+	}
+
+	// Convert customerId to uint
+	customerIdUint, err := strconv.ParseUint(customerId, 10, 32)
+	if err != nil {
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{
+			"title": "Preview Error",
+			"error": "Invalid customer ID",
+			"user":  user,
+		})
+		return
+	}
+
+	// Get customer
+	customer, err := h.customerRepo.GetByID(uint(customerIdUint))
+	if err != nil {
+		log.Printf("PreviewInvoice: Error fetching customer: %v", err)
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+			"title": "Preview Error",
+			"error": "Failed to load customer data",
+			"user":  user,
+		})
+		return
+	}
+
+	// Get job if specified
+	var job *models.Job
+	if jobId != "" {
+		jobIdUint, err := strconv.ParseUint(jobId, 10, 32)
+		if err == nil {
+			job, _ = h.jobRepo.GetByID(uint(jobIdUint))
+		}
+	}
+
+	// Get company settings
+	company, err := h.invoiceRepo.GetCompanySettings()
+	if err != nil {
+		log.Printf("PreviewInvoice: Error fetching company settings: %v", err)
+		address1 := "123 Business St"
+		postalCode := "12345"
+		city := "Business City"
+		phone := "+1 234 567 8900"
+		email := "info@rentalcore.com"
+		company = &models.CompanySettings{
+			CompanyName:  "RentalCore Company",
+			AddressLine1: &address1,
+			PostalCode:   &postalCode,
+			City:         &city,
+			Phone:        &phone,
+			Email:        &email,
+		}
+	}
+
+	// Get default template
+	template, err := h.invoiceRepo.GetDefaultInvoiceTemplate()
+	if err != nil {
+		log.Printf("PreviewInvoice: Error fetching default template: %v", err)
+		// Use a basic template if none found
+		description := "Basic invoice template"
+		template = &models.InvoiceTemplate{
+			Name:        "Default",
+			Description: &description,
+			IsDefault:   true,
+		}
+	}
+
+	// Create preview invoice object
+	var notesPtr *string
+	if notes != "" {
+		notesPtr = &notes
+	}
+	
+	previewInvoice := &models.Invoice{
+		InvoiceNumber: invoiceNumber,
+		CustomerID:    uint(customerIdUint),
+		Customer:      customer,
+		Job:           job,
+		Status:        status,
+		IssueDate:     parseDate(issueDate),
+		DueDate:       parseDate(dueDate),
+		Notes:         notesPtr,
+		Template:      template,
+		// Add some sample line items for preview
+		LineItems: []models.InvoiceLineItem{
+			{
+				Description: "Sample Item 1",
+				Quantity:    1,
+				UnitPrice:   100.00,
+				TotalPrice:  100.00,
+			},
+			{
+				Description: "Sample Item 2",
+				Quantity:    2,
+				UnitPrice:   50.00,
+				TotalPrice:  100.00,
+			},
+		},
+		Subtotal:    200.00,
+		TaxAmount:   38.00,
+		TotalAmount: 238.00,
+	}
+
+	c.HTML(http.StatusOK, "invoice_preview.html", gin.H{
+		"title":   "Invoice Preview",
+		"invoice": previewInvoice,
+		"company": company,
+		"user":    user,
+	})
+}
+
+// parseDate safely parses a date string in YYYY-MM-DD format
+func parseDate(dateStr string) time.Time {
+	if dateStr == "" {
+		return time.Now()
+	}
+	
+	date, err := time.Parse("2006-01-02", dateStr)
+	if err != nil {
+		return time.Now()
+	}
+	
+	return date
+}

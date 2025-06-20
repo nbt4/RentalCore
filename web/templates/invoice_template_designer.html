@@ -246,9 +246,9 @@
                             <button class="btn btn-primary" onclick="saveTemplate()">
                                 <i class="bi bi-save"></i> Save Template
                             </button>
-                            <a href="/invoice-templates" class="btn btn-secondary">
+                            <button onclick="navigateToTemplates()" class="btn btn-secondary">
                                 <i class="bi bi-arrow-left"></i> Back to Templates
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -705,11 +705,18 @@
                 },
                 body: JSON.stringify(templateData)
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
-                if (data.message) {
+                if (data.success || data.message || data.templateId) {
                     alert('Template saved successfully!');
-                    window.location.href = '/invoice-templates';
+                    setTimeout(() => {
+                        window.location.href = '/invoice-templates';
+                    }, 500);
                 } else {
                     alert(data.error || 'Failed to save template');
                 }
@@ -718,6 +725,17 @@
                 console.error('Error:', error);
                 alert('Failed to save template');
             });
+        }
+
+        // Navigation helper function
+        function navigateToTemplates() {
+            try {
+                window.location.href = '/invoice-templates';
+            } catch (error) {
+                console.error('Navigation error:', error);
+                // Fallback navigation
+                window.location = '/invoice-templates';
+            }
         }
     </script>
 </body>

@@ -281,8 +281,12 @@ func (h *AnalyticsHandler) getTopCustomers(startDate, endDate time.Time, limit i
 			COALESCE(SUM(j.final_revenue), 0) as total_revenue,
 			COALESCE(AVG(j.final_revenue), 0) as avg_revenue
 		FROM customers c
-		LEFT JOIN jobs j ON c.customerID = j.customerID AND j.endDate BETWEEN ? AND ?
-		GROUP BY c.customerID, customer_name
+		LEFT JOIN jobs j ON c.customerID = j.customerID 
+			AND j.endDate BETWEEN ? AND ?
+			AND j.final_revenue IS NOT NULL
+		WHERE c.customerID IS NOT NULL
+		GROUP BY c.customerID, c.companyname, c.firstname, c.lastname
+		HAVING total_revenue > 0
 		ORDER BY total_revenue DESC
 		LIMIT ?
 	`, startDate, endDate, limit).Rows()

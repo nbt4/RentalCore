@@ -133,19 +133,38 @@
         }
         
         [data-theme="dark"] .form-control {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-            color: #e2e8f0;
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+            color: #e2e8f0 !important;
         }
         
         [data-theme="dark"] .form-control:focus {
-            background: rgba(255, 255, 255, 0.15);
-            border-color: #6c757d;
-            color: #e2e8f0;
+            background: rgba(255, 255, 255, 0.15) !important;
+            border-color: #6c757d !important;
+            color: #e2e8f0 !important;
+            box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.25) !important;
+        }
+        
+        [data-theme="dark"] .form-control:active,
+        [data-theme="dark"] .form-control:hover {
+            background: rgba(255, 255, 255, 0.12) !important;
+            color: #e2e8f0 !important;
         }
         
         [data-theme="dark"] .form-floating label {
-            color: #a0aec0;
+            color: #a0aec0 !important;
+        }
+        
+        [data-theme="dark"] .form-floating > .form-control:focus ~ label,
+        [data-theme="dark"] .form-floating > .form-control:not(:placeholder-shown) ~ label {
+            color: #6c757d !important;
+        }
+        
+        /* Override Bootstrap floating label styles for dark theme */
+        [data-theme="dark"] .form-floating > .form-control:focus ~ label::after,
+        [data-theme="dark"] .form-floating > .form-control:not(:placeholder-shown) ~ label::after,
+        [data-theme="dark"] .form-floating > .form-select ~ label::after {
+            background-color: transparent !important;
         }
     </style>
 </head>

@@ -1,6 +1,8 @@
 package models
 
 import (
+	"fmt"
+	"strings"
 	"time"
 )
 
@@ -20,6 +22,22 @@ type CompanySettings struct {
 	TaxNumber    *string   `gorm:"column:tax_number" json:"taxNumber"`
 	VATNumber    *string   `gorm:"column:vat_number" json:"vatNumber"`
 	LogoPath     *string   `gorm:"column:logo_path" json:"logoPath"`
+	
+	// German Banking Information for Invoices
+	BankName        *string `gorm:"column:bank_name" json:"bankName"`
+	IBAN            *string `gorm:"column:iban" json:"iban"`
+	BIC             *string `gorm:"column:bic" json:"bic"`
+	AccountHolder   *string `gorm:"column:account_holder" json:"accountHolder"`
+	
+	// German Legal Information
+	CEOName         *string `gorm:"column:ceo_name" json:"ceoName"`
+	RegisterCourt   *string `gorm:"column:register_court" json:"registerCourt"`
+	RegisterNumber  *string `gorm:"column:register_number" json:"registerNumber"`
+	
+	// Invoice Footer Text
+	FooterText      *string `gorm:"type:text;column:footer_text" json:"footerText"`
+	PaymentTermsText *string `gorm:"type:text;column:payment_terms_text" json:"paymentTermsText"`
+	
 	CreatedAt    time.Time `gorm:"column:created_at" json:"createdAt"`
 	UpdatedAt    time.Time `gorm:"column:updated_at" json:"updatedAt"`
 }
@@ -84,7 +102,7 @@ type Invoice struct {
 	UpdatedAt time.Time  `gorm:"column:updated_at" json:"updatedAt"`
 
 	// Relationships
-	Customer     *Customer           `gorm:"foreignKey:CustomerID" json:"customer,omitempty"`
+	Customer     *Customer           `gorm:"foreignKey:CustomerID;references:CustomerID" json:"customer,omitempty"`
 	Job          *Job                `gorm:"foreignKey:JobID" json:"job,omitempty"`
 	Template     *InvoiceTemplate    `gorm:"foreignKey:TemplateID" json:"template,omitempty"`
 	Creator      *User               `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
@@ -100,12 +118,24 @@ func (Invoice) TableName() string {
 func (i *Invoice) CalculateTotals() {
 	i.Subtotal = 0
 	for _, item := range i.LineItems {
+		item.CalculateTotal()
 		i.Subtotal += item.TotalPrice
 	}
 	
-	i.TaxAmount = (i.Subtotal - i.DiscountAmount) * (i.TaxRate / 100)
-	i.TotalAmount = i.Subtotal - i.DiscountAmount + i.TaxAmount
+	// Apply discount to subtotal, then calculate tax
+	discountedSubtotal := i.Subtotal - i.DiscountAmount
+	if discountedSubtotal < 0 {
+		discountedSubtotal = 0
+	}
+	
+	i.TaxAmount = discountedSubtotal * (i.TaxRate / 100)
+	i.TotalAmount = discountedSubtotal + i.TaxAmount
 	i.BalanceDue = i.TotalAmount - i.PaidAmount
+	
+	// Ensure no negative values
+	if i.BalanceDue < 0 {
+		i.BalanceDue = 0
+	}
 }
 
 // IsOverdue checks if the invoice is overdue
@@ -144,6 +174,24 @@ func (InvoiceLineItem) TableName() string {
 // CalculateTotal calculates the total price for this line item
 func (ili *InvoiceLineItem) CalculateTotal() {
 	ili.TotalPrice = ili.Quantity * ili.UnitPrice
+	// Ensure no negative values
+	if ili.TotalPrice < 0 {
+		ili.TotalPrice = 0
+	}
+}
+
+// Validate validates the line item data
+func (ili *InvoiceLineItem) Validate() error {
+	if strings.TrimSpace(ili.Description) == "" {
+		return fmt.Errorf("description is required")
+	}
+	if ili.Quantity <= 0 {
+		return fmt.Errorf("quantity must be greater than 0")
+	}
+	if ili.UnitPrice < 0 {
+		return fmt.Errorf("unit price cannot be negative")
+	}
+	return nil
 }
 
 // InvoiceSettings represents configurable invoice settings
@@ -197,11 +245,36 @@ type InvoiceCreateRequest struct {
 	IssueDate       time.Time                    `json:"issueDate" binding:"required"`
 	DueDate         time.Time                    `json:"dueDate" binding:"required"`
 	PaymentTerms    *string                      `json:"paymentTerms"`
-	TaxRate         float64                      `json:"taxRate"`
-	DiscountAmount  float64                      `json:"discountAmount"`
+	TaxRate         float64                      `json:"taxRate" binding:"gte=0,lte=100"`
+	DiscountAmount  float64                      `json:"discountAmount" binding:"gte=0"`
 	Notes           *string                      `json:"notes"`
 	TermsConditions *string                      `json:"termsConditions"`
-	LineItems       []InvoiceLineItemCreateRequest `json:"lineItems" binding:"required,dive"`
+	LineItems       []InvoiceLineItemCreateRequest `json:"lineItems" binding:"required,min=1,dive"`
+}
+
+// Validate validates the invoice create request
+func (icr *InvoiceCreateRequest) Validate() error {
+	if icr.CustomerID == 0 {
+		return fmt.Errorf("customer ID is required")
+	}
+	if icr.IssueDate.IsZero() {
+		return fmt.Errorf("issue date is required")
+	}
+	if icr.DueDate.IsZero() {
+		return fmt.Errorf("due date is required")
+	}
+	if icr.DueDate.Before(icr.IssueDate) {
+		return fmt.Errorf("due date cannot be before issue date")
+	}
+	if len(icr.LineItems) == 0 {
+		return fmt.Errorf("at least one line item is required")
+	}
+	for i, item := range icr.LineItems {
+		if err := item.Validate(); err != nil {
+			return fmt.Errorf("line item %d: %v", i+1, err)
+		}
+	}
+	return nil
 }
 
 // InvoiceLineItemCreateRequest represents a line item in the create request
@@ -215,6 +288,25 @@ type InvoiceLineItemCreateRequest struct {
 	RentalStartDate *time.Time `json:"rentalStartDate"`
 	RentalEndDate   *time.Time `json:"rentalEndDate"`
 	RentalDays      *int       `json:"rentalDays"`
+}
+
+// Validate validates the line item create request
+func (ilicr *InvoiceLineItemCreateRequest) Validate() error {
+	if strings.TrimSpace(ilicr.Description) == "" {
+		return fmt.Errorf("description is required")
+	}
+	if ilicr.Quantity <= 0 {
+		return fmt.Errorf("quantity must be greater than 0")
+	}
+	if ilicr.UnitPrice < 0 {
+		return fmt.Errorf("unit price cannot be negative")
+	}
+	if ilicr.RentalStartDate != nil && ilicr.RentalEndDate != nil {
+		if ilicr.RentalEndDate.Before(*ilicr.RentalStartDate) {
+			return fmt.Errorf("rental end date cannot be before start date")
+		}
+	}
+	return nil
 }
 
 // InvoiceResponse represents the response when returning invoice data
@@ -275,4 +367,41 @@ type InvoiceFilter struct {
 	SearchTerm    string     `form:"search" json:"searchTerm"`
 	Page          int        `form:"page" json:"page"`
 	PageSize      int        `form:"page_size" json:"pageSize"`
+}
+
+// ================================================================
+// EMAIL TEMPLATE MODELS
+// ================================================================
+
+// EmailTemplate represents customizable email templates
+type EmailTemplate struct {
+	TemplateID   uint      `gorm:"primaryKey;autoIncrement;column:template_id" json:"templateId"`
+	Name         string    `gorm:"not null;column:name" json:"name" binding:"required"`
+	Description  *string   `gorm:"column:description" json:"description"`
+	TemplateType string    `gorm:"type:enum('invoice','reminder','payment_confirmation','general');not null;default:'general';column:template_type" json:"templateType"`
+	Subject      string    `gorm:"not null;column:subject" json:"subject" binding:"required"`
+	HTMLContent  string    `gorm:"type:longtext;not null;column:html_content" json:"htmlContent" binding:"required"`
+	TextContent  *string   `gorm:"type:longtext;column:text_content" json:"textContent"`
+	IsDefault    bool      `gorm:"not null;default:false;column:is_default" json:"isDefault"`
+	IsActive     bool      `gorm:"not null;default:true;column:is_active" json:"isActive"`
+	CreatedBy    *uint     `gorm:"column:created_by" json:"createdBy"`
+	CreatedAt    time.Time `gorm:"column:created_at" json:"createdAt"`
+	UpdatedAt    time.Time `gorm:"column:updated_at" json:"updatedAt"`
+
+	// Relationships
+	Creator *User `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
+}
+
+func (EmailTemplate) TableName() string {
+	return "email_templates"
+}
+
+// EmailTemplateCreateRequest represents the request to create an email template
+type EmailTemplateCreateRequest struct {
+	Name         string  `json:"name" binding:"required"`
+	Description  *string `json:"description"`
+	TemplateType string  `json:"templateType" binding:"required,oneof=invoice reminder payment_confirmation general"`
+	Subject      string  `json:"subject" binding:"required"`
+	HTMLContent  string  `json:"htmlContent" binding:"required"`
+	TextContent  *string `json:"textContent"`
 }

@@ -1,0 +1,1488 @@
+2025/06/19 08:40:39 Database connection established successfully
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:77
+[0m[33m[11.590ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:77
+[0m[33m[24.142ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:77
+[0m[33m[23.120ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:77
+[0m[33m[11.757ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:77
+[0m[33m[23.359ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:77
+[0m[33m[11.839ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:77
+[0m[33m[24.963ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:77
+[0m[33m[40.845ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:81
+[0m[33m[11.455ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:81
+[0m[33m[22.201ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:81
+[0m[33m[23.059ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:81
+[0m[33m[11.275ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:81
+[0m[33m[23.263ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:81
+[0m[33m[11.561ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:81
+[0m[33m[24.794ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[11.810ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[22.154ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[22.997ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[10.989ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[23.071ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[10.839ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[23.022ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[10.847ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[22.021ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[22.314ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[10.878ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[22.685ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[12.002ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[23.412ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[38.809ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[11.354ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[22.074ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:85
+[0m[33m[22.860ms] [34;1m[rows:-][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'TS-Lager' AND table_name = 'users' AND constraint_name = 'fk_sessions_user'
+
+2025/06/19 08:40:39 [31;1m/opt/dev/go-barcode-webapp/cmd/server/main.go:85 [35;1mError 1142 (42000): REFERENCES command denied to user 'tsweb'@'91.9.39.124' for table 'TS-Lager.sessions'
+[0m[33m[11.447ms] [34;1m[rows:0][0m ALTER TABLE `users` ADD CONSTRAINT `fk_sessions_user` FOREIGN KEY (`userID`) REFERENCES `sessions`(`user_id`)
+2025/06/19 08:40:39 Failed to auto-migrate equipment_packages table: Error 1142 (42000): REFERENCES command denied to user 'tsweb'@'91.9.39.124' for table 'TS-Lager.sessions'
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[11.353ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[22.971ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[23.475ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[11.478ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[23.024ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[11.403ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[23.427ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[11.276ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[22.664ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[22.900ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[11.360ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[22.519ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[11.486ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
+
+2025/06/19 08:40:39 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[23.109ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
+
+2025/06/19 08:40:40 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[95.305ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
+
+2025/06/19 08:40:40 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[11.340ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 08:40:40 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[22.468ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 08:40:40 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:89
+[0m[33m[22.475ms] [34;1m[rows:-][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'TS-Lager' AND table_name = 'users' AND constraint_name = 'fk_sessions_user'
+
+2025/06/19 08:40:40 [31;1m/opt/dev/go-barcode-webapp/cmd/server/main.go:89 [35;1mError 1142 (42000): REFERENCES command denied to user 'tsweb'@'91.9.39.124' for table 'TS-Lager.sessions'
+[0m[33m[11.251ms] [34;1m[rows:0][0m ALTER TABLE `users` ADD CONSTRAINT `fk_sessions_user` FOREIGN KEY (`userID`) REFERENCES `sessions`(`user_id`)
+2025/06/19 08:40:40 Failed to auto-migrate invoice_templates table: Error 1142 (42000): REFERENCES command denied to user 'tsweb'@'91.9.39.124' for table 'TS-Lager.sessions'
+
+2025/06/19 08:40:40 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:510
+[0m[33m[98.414ms] [34;1m[rows:1][0m SELECT * FROM `invoice_templates` ORDER BY is_default DESC, name ASC
+2025/06/19 08:40:40 Templates already exist (1), skipping default template creation
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] Loaded HTML Templates (62): 
+	- invoice_template_designer_simple_new.html
+	- job_detail.html
+	- transactions_list.html
+	- analytics_dashboard.html
+	- customer_detail.html
+	- devices_standalone.html
+	- job_templates_list.html
+	- transaction_form.html
+	- user_detail.html
+	- customer_form.html
+	- device_detail.html
+	- invoice_preview_new.html
+	- home.html
+	- invoices_list.html
+	- mobile_scanner.html
+	- scan_job.html
+	- case_form.html
+	- cases_list.html
+	- equipment_package_form.html
+	- financial_reports.html
+	- transaction_detail.html
+	- invoice_template_designer_new.html
+	- jobs.html
+	- login.html
+	- search_results.html
+	- base.html
+	- documents_list.html
+	- home_new.html.backup
+	- job_form.html
+	- users_list.html
+	- case_device_mapping.html
+	- equipment_package_form_enhanced.html
+	- invoice_settings_form.html
+	- equipment_packages_list.html
+	- invoice_template_designer.html
+	- security_roles.html
+	- invoice_form_new.html
+	- job_template_form.html
+	- mobile_scanner_enhanced.html
+	- equipment_package_detail.html
+	- financial_dashboard.html
+	- invoice_template_designer_simple.html
+	- scan_select_job.html
+	- invoice_form.html
+	- invoice_preview.html
+	- signature_form.html
+	- case_detail.html
+	- error.html
+	- invoice_detail.html
+	- invoice_template_designer_advanced.html
+	- security_audit.html
+	- 
+	- company_settings_form.html
+	- device_form.html
+	- bulk_operations.html
+	- devices.html
+	- customers.html
+	- job_template_detail.html
+	- user_form.html
+	- content
+	- document_upload_form.html
+	- invoice_templates_list.html
+
+[GIN-debug] GET    /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] HEAD   /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] GET    /sw.js                    --> main.main.func17 (4 handlers)
+[GIN-debug] GET    /manifest.json            --> main.main.func18 (4 handlers)
+
+2025/06/19 08:40:40 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
+[0m[33m[22.797ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'admin' ORDER BY `roles`.`roleID` LIMIT 1
+
+2025/06/19 08:40:40 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
+[0m[33m[22.617ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'manager' ORDER BY `roles`.`roleID` LIMIT 1
+
+2025/06/19 08:40:40 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
+[0m[33m[22.483ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'employee' ORDER BY `roles`.`roleID` LIMIT 1
+
+2025/06/19 08:40:40 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
+[0m[33m[22.080ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'viewer' ORDER BY `roles`.`roleID` LIMIT 1
+[GIN-debug] GET    /login                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).LoginForm-fm (4 handlers)
+[GIN-debug] POST   /login                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).Login-fm (4 handlers)
+[GIN-debug] GET    /logout                   --> go-barcode-webapp/internal/handlers.(*AuthHandler).Logout-fm (4 handlers)
+[GIN-debug] GET    /debug/invoice-test       --> main.setupRoutes.func1 (4 handlers)
+[GIN-debug] GET    /debug/customer-selection --> main.setupRoutes.func2 (4 handlers)
+[GIN-debug] GET    /                         --> go-barcode-webapp/internal/handlers.(*HomeHandler).Dashboard-fm (5 handlers)
+[GIN-debug] GET    /jobs                     --> go-barcode-webapp/internal/handlers.(*JobHandler).ListJobs-fm (5 handlers)
+[GIN-debug] GET    /jobs/new                 --> go-barcode-webapp/internal/handlers.(*JobHandler).NewJobForm-fm (5 handlers)
+[GIN-debug] POST   /jobs                     --> go-barcode-webapp/internal/handlers.(*JobHandler).CreateJob-fm (5 handlers)
+[GIN-debug] GET    /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).GetJob-fm (5 handlers)
+[GIN-debug] GET    /jobs/:id/edit            --> go-barcode-webapp/internal/handlers.(*JobHandler).EditJobForm-fm (5 handlers)
+[GIN-debug] PUT    /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).UpdateJob-fm (5 handlers)
+[GIN-debug] DELETE /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).DeleteJob-fm (5 handlers)
+[GIN-debug] GET    /jobs/:id/devices         --> go-barcode-webapp/internal/handlers.(*JobHandler).GetJobDevices-fm (5 handlers)
+[GIN-debug] POST   /jobs/:id/devices         --> go-barcode-webapp/internal/handlers.(*JobHandler).AssignDevice-fm (5 handlers)
+[GIN-debug] DELETE /jobs/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*JobHandler).RemoveDevice-fm (5 handlers)
+[GIN-debug] POST   /jobs/:id/bulk-scan       --> go-barcode-webapp/internal/handlers.(*JobHandler).BulkScanDevices-fm (5 handlers)
+[GIN-debug] GET    /devices                  --> go-barcode-webapp/internal/handlers.(*DeviceHandler).ListDevices-fm (5 handlers)
+[GIN-debug] GET    /devices/new              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).NewDeviceForm-fm (5 handlers)
+[GIN-debug] POST   /devices                  --> go-barcode-webapp/internal/handlers.(*DeviceHandler).CreateDevice-fm (5 handlers)
+[GIN-debug] GET    /devices/:id              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDevice-fm (5 handlers)
+[GIN-debug] GET    /devices/:id/edit         --> go-barcode-webapp/internal/handlers.(*DeviceHandler).EditDeviceForm-fm (5 handlers)
+[GIN-debug] PUT    /devices/:id              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).UpdateDevice-fm (5 handlers)
+[GIN-debug] DELETE /devices/:id              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).DeleteDevice-fm (5 handlers)
+[GIN-debug] GET    /devices/:id/qr           --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceQR-fm (5 handlers)
+[GIN-debug] GET    /devices/:id/barcode      --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceBarcode-fm (5 handlers)
+[GIN-debug] GET    /devices/available        --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetAvailableDevices-fm (5 handlers)
+[GIN-debug] GET    /customers                --> go-barcode-webapp/internal/handlers.(*CustomerHandler).ListCustomers-fm (5 handlers)
+[GIN-debug] GET    /customers/new            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).NewCustomerForm-fm (5 handlers)
+[GIN-debug] POST   /customers                --> go-barcode-webapp/internal/handlers.(*CustomerHandler).CreateCustomer-fm (5 handlers)
+[GIN-debug] GET    /customers/:id            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).GetCustomer-fm (5 handlers)
+[GIN-debug] GET    /customers/:id/edit       --> go-barcode-webapp/internal/handlers.(*CustomerHandler).EditCustomerForm-fm (5 handlers)
+[GIN-debug] PUT    /customers/:id            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).UpdateCustomer-fm (5 handlers)
+[GIN-debug] DELETE /customers/:id            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).DeleteCustomer-fm (5 handlers)
+[GIN-debug] GET    /statuses                 --> go-barcode-webapp/internal/handlers.(*StatusHandler).ListStatuses-fm (5 handlers)
+[GIN-debug] GET    /products                 --> go-barcode-webapp/internal/handlers.(*ProductHandler).ListProducts-fm (5 handlers)
+[GIN-debug] GET    /cases                    --> go-barcode-webapp/internal/handlers.(*CaseHandler).ListCases-fm (5 handlers)
+[GIN-debug] GET    /cases/new                --> go-barcode-webapp/internal/handlers.(*CaseHandler).NewCaseForm-fm (5 handlers)
+[GIN-debug] POST   /cases                    --> go-barcode-webapp/internal/handlers.(*CaseHandler).CreateCase-fm (5 handlers)
+[GIN-debug] GET    /cases/:id                --> go-barcode-webapp/internal/handlers.(*CaseHandler).GetCase-fm (5 handlers)
+[GIN-debug] GET    /cases/:id/edit           --> go-barcode-webapp/internal/handlers.(*CaseHandler).EditCaseForm-fm (5 handlers)
+[GIN-debug] PUT    /cases/:id                --> go-barcode-webapp/internal/handlers.(*CaseHandler).UpdateCase-fm (5 handlers)
+[GIN-debug] DELETE /cases/:id                --> go-barcode-webapp/internal/handlers.(*CaseHandler).DeleteCase-fm (5 handlers)
+[GIN-debug] GET    /cases/:id/devices        --> go-barcode-webapp/internal/handlers.(*CaseHandler).CaseDeviceMapping-fm (5 handlers)
+[GIN-debug] POST   /cases/:id/devices        --> go-barcode-webapp/internal/handlers.(*CaseHandler).ScanDeviceToCase-fm (5 handlers)
+[GIN-debug] DELETE /cases/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*CaseHandler).RemoveDeviceFromCase-fm (5 handlers)
+[GIN-debug] GET    /barcodes/device/:serialNo/qr --> go-barcode-webapp/internal/handlers.(*BarcodeHandler).GenerateDeviceQR-fm (5 handlers)
+[GIN-debug] GET    /barcodes/device/:serialNo/barcode --> go-barcode-webapp/internal/handlers.(*BarcodeHandler).GenerateDeviceBarcode-fm (5 handlers)
+[GIN-debug] GET    /scan/select              --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanJobSelection-fm (5 handlers)
+[GIN-debug] GET    /scan/:jobId              --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanJob-fm (5 handlers)
+[GIN-debug] POST   /scan/:jobId/assign       --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanDevice-fm (5 handlers)
+[GIN-debug] DELETE /scan/:jobId/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*ScannerHandler).RemoveDevice-fm (5 handlers)
+[GIN-debug] GET    /analytics                --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).Dashboard-fm (5 handlers)
+[GIN-debug] GET    /analytics/revenue        --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).GetRevenueAPI-fm (5 handlers)
+[GIN-debug] GET    /analytics/equipment      --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).GetEquipmentAPI-fm (5 handlers)
+[GIN-debug] GET    /analytics/export         --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).ExportAnalytics-fm (5 handlers)
+[GIN-debug] GET    /search/global            --> go-barcode-webapp/internal/handlers.(*SearchHandler).GlobalSearch-fm (5 handlers)
+[GIN-debug] POST   /search/advanced          --> go-barcode-webapp/internal/handlers.(*SearchHandler).AdvancedSearch-fm (5 handlers)
+[GIN-debug] GET    /search/suggestions       --> go-barcode-webapp/internal/handlers.(*SearchHandler).SearchSuggestions-fm (5 handlers)
+[GIN-debug] GET    /search/saved             --> go-barcode-webapp/internal/handlers.(*SearchHandler).SavedSearches-fm (5 handlers)
+[GIN-debug] DELETE /search/saved/:id         --> go-barcode-webapp/internal/handlers.(*SearchHandler).DeleteSavedSearch-fm (5 handlers)
+[GIN-debug] POST   /pwa/subscribe            --> go-barcode-webapp/internal/handlers.(*PWAHandler).SubscribePush-fm (5 handlers)
+[GIN-debug] POST   /pwa/unsubscribe          --> go-barcode-webapp/internal/handlers.(*PWAHandler).UnsubscribePush-fm (5 handlers)
+[GIN-debug] POST   /pwa/sync                 --> go-barcode-webapp/internal/handlers.(*PWAHandler).SyncOfflineData-fm (5 handlers)
+[GIN-debug] GET    /pwa/manifest             --> go-barcode-webapp/internal/handlers.(*PWAHandler).GetOfflineManifest-fm (5 handlers)
+[GIN-debug] GET    /pwa/install              --> go-barcode-webapp/internal/handlers.(*PWAHandler).InstallPrompt-fm (5 handlers)
+[GIN-debug] GET    /pwa/status               --> go-barcode-webapp/internal/handlers.(*PWAHandler).GetConnectionStatus-fm (5 handlers)
+[GIN-debug] GET    /workflow/templates       --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).ListJobTemplates-fm (5 handlers)
+[GIN-debug] GET    /workflow/templates/new   --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).NewJobTemplateForm-fm (5 handlers)
+[GIN-debug] POST   /workflow/templates       --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).CreateJobTemplate-fm (5 handlers)
+[GIN-debug] GET    /workflow/templates/:id   --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetJobTemplate-fm (5 handlers)
+[GIN-debug] GET    /workflow/templates/:id/edit --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).EditJobTemplateForm-fm (5 handlers)
+[GIN-debug] PUT    /workflow/templates/:id   --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).UpdateJobTemplate-fm (5 handlers)
+[GIN-debug] DELETE /workflow/templates/:id   --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).DeleteJobTemplate-fm (5 handlers)
+[GIN-debug] POST   /workflow/templates/:id/create-job --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).CreateJobFromTemplate-fm (5 handlers)
+[GIN-debug] GET    /workflow/packages        --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).ListEquipmentPackages-fm (5 handlers)
+[GIN-debug] GET    /workflow/packages/new    --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).NewEquipmentPackageForm-fm (5 handlers)
+[GIN-debug] GET    /workflow/packages/debug  --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).DebugPackageForm-fm (5 handlers)
+[GIN-debug] POST   /workflow/packages        --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).CreateEquipmentPackage-fm (5 handlers)
+[GIN-debug] GET    /workflow/packages/:id    --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetEquipmentPackage-fm (5 handlers)
+[GIN-debug] GET    /workflow/bulk            --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkOperationsForm-fm (5 handlers)
+[GIN-debug] POST   /workflow/bulk/update-status --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkUpdateDeviceStatus-fm (5 handlers)
+[GIN-debug] POST   /workflow/bulk/assign-job --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkAssignToJob-fm (5 handlers)
+[GIN-debug] POST   /workflow/bulk/generate-qr --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkGenerateQRCodes-fm (5 handlers)
+[GIN-debug] GET    /workflow/stats           --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetWorkflowStats-fm (5 handlers)
+[GIN-debug] GET    /documents                --> go-barcode-webapp/internal/handlers.(*DocumentHandler).ListDocuments-fm (5 handlers)
+[GIN-debug] GET    /documents/upload         --> go-barcode-webapp/internal/handlers.(*DocumentHandler).UploadDocumentForm-fm (5 handlers)
+[GIN-debug] POST   /documents/upload         --> go-barcode-webapp/internal/handlers.(*DocumentHandler).UploadDocument-fm (5 handlers)
+[GIN-debug] GET    /documents/:id            --> go-barcode-webapp/internal/handlers.(*DocumentHandler).GetDocument-fm (5 handlers)
+[GIN-debug] GET    /documents/:id/view       --> go-barcode-webapp/internal/handlers.(*DocumentHandler).ViewDocument-fm (5 handlers)
+[GIN-debug] GET    /documents/:id/download   --> go-barcode-webapp/internal/handlers.(*DocumentHandler).DownloadDocument-fm (5 handlers)
+[GIN-debug] DELETE /documents/:id            --> go-barcode-webapp/internal/handlers.(*DocumentHandler).DeleteDocument-fm (5 handlers)
+[GIN-debug] GET    /documents/:id/sign       --> go-barcode-webapp/internal/handlers.(*DocumentHandler).SignatureForm-fm (5 handlers)
+[GIN-debug] POST   /documents/:id/sign       --> go-barcode-webapp/internal/handlers.(*DocumentHandler).AddSignature-fm (5 handlers)
+[GIN-debug] GET    /documents/signatures/:id/verify --> go-barcode-webapp/internal/handlers.(*DocumentHandler).VerifySignature-fm (5 handlers)
+[GIN-debug] GET    /financial                --> go-barcode-webapp/internal/handlers.(*FinancialHandler).FinancialDashboard-fm (5 handlers)
+[GIN-debug] GET    /financial/transactions   --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ListTransactions-fm (5 handlers)
+[GIN-debug] GET    /financial/transactions/new --> go-barcode-webapp/internal/handlers.(*FinancialHandler).NewTransactionForm-fm (5 handlers)
+[GIN-debug] POST   /financial/transactions   --> go-barcode-webapp/internal/handlers.(*FinancialHandler).CreateTransaction-fm (5 handlers)
+[GIN-debug] GET    /financial/transactions/:id --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetTransaction-fm (5 handlers)
+[GIN-debug] PUT    /financial/transactions/:id/status --> go-barcode-webapp/internal/handlers.(*FinancialHandler).UpdateTransactionStatus-fm (5 handlers)
+[GIN-debug] POST   /financial/jobs/:jobId/invoice --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GenerateInvoice-fm (5 handlers)
+[GIN-debug] GET    /financial/reports        --> go-barcode-webapp/internal/handlers.(*FinancialHandler).FinancialReports-fm (5 handlers)
+[GIN-debug] GET    /financial/api/revenue-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetRevenueReport-fm (5 handlers)
+[GIN-debug] GET    /financial/api/payment-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetPaymentReport-fm (5 handlers)
+[GIN-debug] GET    /financial/api/export/transactions --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ExportTransactions-fm (5 handlers)
+[GIN-debug] GET    /financial/api/export/revenue --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ExportRevenue-fm (5 handlers)
+[GIN-debug] GET    /financial/api/export/tax-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ExportTaxReportCSV-fm (5 handlers)
+[GIN-debug] GET    /invoices                 --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).ListInvoices-fm (5 handlers)
+[GIN-debug] GET    /invoices/new             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).NewInvoiceForm-fm (5 handlers)
+[GIN-debug] POST   /invoices                 --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).CreateInvoice-fm (5 handlers)
+[GIN-debug] GET    /invoices/:id             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoice-fm (5 handlers)
+[GIN-debug] GET    /invoices/:id/edit        --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).EditInvoiceForm-fm (5 handlers)
+[GIN-debug] GET    /invoices/:id/preview     --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).PreviewInvoice-fm (5 handlers)
+[GIN-debug] PUT    /invoices/:id             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoice-fm (5 handlers)
+[GIN-debug] PUT    /invoices/:id/status      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoiceStatus-fm (5 handlers)
+[GIN-debug] DELETE /invoices/:id             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).DeleteInvoice-fm (5 handlers)
+[GIN-debug] GET    /invoices/:id/pdf         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GenerateInvoicePDF-fm (5 handlers)
+[GIN-debug] GET    /invoice-templates        --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).ListTemplates-fm (5 handlers)
+[GIN-debug] GET    /invoice-templates/new    --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).NewTemplateForm-fm (5 handlers)
+[GIN-debug] POST   /invoice-templates        --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).CreateTemplate-fm (5 handlers)
+[GIN-debug] GET    /invoice-templates/:id/edit --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).EditTemplateForm-fm (5 handlers)
+[GIN-debug] PUT    /invoice-templates/:id    --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).UpdateTemplate-fm (5 handlers)
+[GIN-debug] DELETE /invoice-templates/:id    --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).DeleteTemplate-fm (5 handlers)
+[GIN-debug] GET    /invoice-templates/:id/preview --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).PreviewTemplate-fm (5 handlers)
+[GIN-debug] POST   /invoice-templates/:id/set-default --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).SetDefaultTemplate-fm (5 handlers)
+[GIN-debug] GET    /security/roles           --> main.setupRoutes.func3 (5 handlers)
+[GIN-debug] GET    /security/audit           --> main.setupRoutes.func4 (5 handlers)
+[GIN-debug] GET    /security/api/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRoles-fm (5 handlers)
+[GIN-debug] GET    /security/api/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRole-fm (5 handlers)
+[GIN-debug] POST   /security/api/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CreateRole-fm (5 handlers)
+[GIN-debug] PUT    /security/api/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).UpdateRole-fm (5 handlers)
+[GIN-debug] DELETE /security/api/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).DeleteRole-fm (5 handlers)
+[GIN-debug] GET    /security/api/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetUserRoles-fm (5 handlers)
+[GIN-debug] POST   /security/api/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).AssignUserRole-fm (5 handlers)
+[GIN-debug] DELETE /security/api/users/:userId/roles/:roleId --> go-barcode-webapp/internal/handlers.(*SecurityHandler).RevokeUserRole-fm (5 handlers)
+[GIN-debug] GET    /security/api/audit       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLogs-fm (5 handlers)
+[GIN-debug] GET    /security/api/audit/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLog-fm (5 handlers)
+[GIN-debug] GET    /security/api/audit/export --> go-barcode-webapp/internal/handlers.(*SecurityHandler).ExportAuditLogs-fm (5 handlers)
+[GIN-debug] GET    /security/api/permissions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissions-fm (5 handlers)
+[GIN-debug] GET    /security/api/permissions/definitions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissionDefinitionsAPI-fm (5 handlers)
+[GIN-debug] GET    /security/api/permissions/check --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CheckPermission-fm (5 handlers)
+[GIN-debug] GET    /mobile/scanner/:jobId    --> main.setupRoutes.func5 (5 handlers)
+[GIN-debug] GET    /mobile/scanner/:jobId/enhanced --> main.setupRoutes.func6 (5 handlers)
+[GIN-debug] GET    /users                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).ListUsers-fm (5 handlers)
+[GIN-debug] POST   /users                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).CreateUserWeb-fm (5 handlers)
+[GIN-debug] GET    /user-management/new      --> go-barcode-webapp/internal/handlers.(*AuthHandler).NewUserForm-fm (5 handlers)
+[GIN-debug] GET    /user-management/:id/edit --> go-barcode-webapp/internal/handlers.(*AuthHandler).EditUserForm-fm (5 handlers)
+[GIN-debug] GET    /user-management/:id/view --> go-barcode-webapp/internal/handlers.(*AuthHandler).GetUser-fm (5 handlers)
+[GIN-debug] PUT    /user-management/:id      --> go-barcode-webapp/internal/handlers.(*AuthHandler).UpdateUser-fm (5 handlers)
+[GIN-debug] DELETE /user-management/:id      --> go-barcode-webapp/internal/handlers.(*AuthHandler).DeleteUser-fm (5 handlers)
+[GIN-debug] GET    /users/new                --> main.setupRoutes.func7 (5 handlers)
+[GIN-debug] GET    /api/v1/jobs              --> go-barcode-webapp/internal/handlers.(*JobHandler).ListJobsAPI-fm (5 handlers)
+[GIN-debug] POST   /api/v1/jobs              --> go-barcode-webapp/internal/handlers.(*JobHandler).CreateJobAPI-fm (5 handlers)
+[GIN-debug] GET    /api/v1/jobs/:id          --> go-barcode-webapp/internal/handlers.(*JobHandler).GetJobAPI-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/jobs/:id          --> go-barcode-webapp/internal/handlers.(*JobHandler).UpdateJobAPI-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/jobs/:id          --> go-barcode-webapp/internal/handlers.(*JobHandler).DeleteJobAPI-fm (5 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*JobHandler).AssignDeviceAPI-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/jobs/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*JobHandler).RemoveDeviceAPI-fm (5 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/bulk-scan --> go-barcode-webapp/internal/handlers.(*JobHandler).BulkScanDevicesAPI-fm (5 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/assign-device --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanDevice-fm (5 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/assign-case --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanCase-fm (5 handlers)
+[GIN-debug] GET    /api/v1/devices           --> go-barcode-webapp/internal/handlers.(*DeviceHandler).ListDevicesAPI-fm (5 handlers)
+[GIN-debug] POST   /api/v1/devices           --> go-barcode-webapp/internal/handlers.(*DeviceHandler).CreateDeviceAPI-fm (5 handlers)
+[GIN-debug] GET    /api/v1/devices/:id       --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceAPI-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/devices/:id       --> go-barcode-webapp/internal/handlers.(*DeviceHandler).UpdateDeviceAPI-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/devices/:id       --> go-barcode-webapp/internal/handlers.(*DeviceHandler).DeleteDeviceAPI-fm (5 handlers)
+[GIN-debug] GET    /api/v1/devices/available --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetAvailableDevicesAPI-fm (5 handlers)
+[GIN-debug] GET    /api/v1/customers         --> go-barcode-webapp/internal/handlers.(*CustomerHandler).ListCustomersAPI-fm (5 handlers)
+[GIN-debug] POST   /api/v1/customers         --> go-barcode-webapp/internal/handlers.(*CustomerHandler).CreateCustomerAPI-fm (5 handlers)
+[GIN-debug] GET    /api/v1/customers/:id     --> go-barcode-webapp/internal/handlers.(*CustomerHandler).GetCustomerAPI-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/customers/:id     --> go-barcode-webapp/internal/handlers.(*CustomerHandler).UpdateCustomerAPI-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/customers/:id     --> go-barcode-webapp/internal/handlers.(*CustomerHandler).DeleteCustomerAPI-fm (5 handlers)
+[GIN-debug] GET    /api/v1/cases             --> go-barcode-webapp/internal/handlers.(*CaseHandler).ListCasesAPI-fm (5 handlers)
+[GIN-debug] POST   /api/v1/cases             --> go-barcode-webapp/internal/handlers.(*CaseHandler).CreateCaseAPI-fm (5 handlers)
+[GIN-debug] GET    /api/v1/cases/:id         --> go-barcode-webapp/internal/handlers.(*CaseHandler).GetCaseAPI-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/cases/:id         --> go-barcode-webapp/internal/handlers.(*CaseHandler).UpdateCaseAPI-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/cases/:id         --> go-barcode-webapp/internal/handlers.(*CaseHandler).DeleteCaseAPI-fm (5 handlers)
+[GIN-debug] GET    /api/v1/cases/:id/devices --> go-barcode-webapp/internal/handlers.(*CaseHandler).GetCaseDevicesAPI-fm (5 handlers)
+[GIN-debug] GET    /api/v1/workflow/templates --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).ListJobTemplatesAPI-fm (5 handlers)
+[GIN-debug] POST   /api/v1/workflow/templates --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).CreateJobTemplate-fm (5 handlers)
+[GIN-debug] GET    /api/v1/workflow/templates/most-used --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetMostUsedTemplatesAPI-fm (5 handlers)
+[GIN-debug] GET    /api/v1/workflow/templates/category/:categoryId --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetTemplatesByCategoryAPI-fm (5 handlers)
+[GIN-debug] GET    /api/v1/workflow/templates/:id --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetJobTemplate-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/workflow/templates/:id --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).UpdateJobTemplate-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/workflow/templates/:id --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).DeleteJobTemplate-fm (5 handlers)
+[GIN-debug] POST   /api/v1/workflow/templates/:id/create-job --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).CreateJobFromTemplate-fm (5 handlers)
+[GIN-debug] GET    /api/v1/documents         --> go-barcode-webapp/internal/handlers.(*DocumentHandler).ListDocumentsAPI-fm (5 handlers)
+[GIN-debug] GET    /api/v1/documents/stats   --> go-barcode-webapp/internal/handlers.(*DocumentHandler).GetDocumentStats-fm (5 handlers)
+[GIN-debug] GET    /api/v1/documents/:id     --> go-barcode-webapp/internal/handlers.(*DocumentHandler).GetDocument-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/documents/:id     --> go-barcode-webapp/internal/handlers.(*DocumentHandler).DeleteDocument-fm (5 handlers)
+[GIN-debug] GET    /api/v1/financial/transactions --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ListTransactionsAPI-fm (5 handlers)
+[GIN-debug] GET    /api/v1/financial/stats   --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetFinancialStatsAPI-fm (5 handlers)
+[GIN-debug] GET    /api/v1/financial/revenue-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetRevenueReport-fm (5 handlers)
+[GIN-debug] GET    /api/v1/financial/payment-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetPaymentReport-fm (5 handlers)
+[GIN-debug] GET    /api/v1/invoices          --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoicesAPI-fm (5 handlers)
+[GIN-debug] POST   /api/v1/invoices          --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).CreateInvoice-fm (5 handlers)
+[GIN-debug] GET    /api/v1/invoices/:id      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoice-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/invoices/:id      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoice-fm (5 handlers)
+[GIN-debug] PUT    /api/v1/invoices/:id/status --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoiceStatus-fm (5 handlers)
+[GIN-debug] DELETE /api/v1/invoices/:id      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).DeleteInvoice-fm (5 handlers)
+[GIN-debug] GET    /api/v1/invoices/stats    --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoiceStatsAPI-fm (5 handlers)
+[GIN-debug] GET    /api/v1/invoices/products/:productId --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetProductDetails-fm (5 handlers)
+[GIN-debug] GET    /api/v1/invoices/products/:productId/devices --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetDevicesByProduct-fm (5 handlers)
+[GIN-debug] GET    /api/v1/security/audit    --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLogs-fm (5 handlers)
+[GIN-debug] GET    /api/v1/security/audit/:id --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLog-fm (5 handlers)
+[GIN-debug] GET    /api/v1/security/audit/export --> go-barcode-webapp/internal/handlers.(*SecurityHandler).ExportAuditLogs-fm (5 handlers)
+[GIN-debug] GET    /api/v1/security/auth/users --> go-barcode-webapp/internal/handlers.(*AuthHandler).ListUsersAPI-fm (5 handlers)
+[GIN-debug] GET    /api/invoices             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoicesAPI-fm (5 handlers)
+[GIN-debug] POST   /api/invoices             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).CreateInvoice-fm (5 handlers)
+[GIN-debug] GET    /api/invoices/:id         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoice-fm (5 handlers)
+[GIN-debug] PUT    /api/invoices/:id         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoice-fm (5 handlers)
+[GIN-debug] PUT    /api/invoices/:id/status  --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoiceStatus-fm (5 handlers)
+[GIN-debug] DELETE /api/invoices/:id         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).DeleteInvoice-fm (5 handlers)
+[GIN-debug] GET    /api/invoices/stats       --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoiceStatsAPI-fm (5 handlers)
+[GIN-debug] GET    /api/security/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRoles-fm (5 handlers)
+[GIN-debug] GET    /api/security/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRole-fm (5 handlers)
+[GIN-debug] POST   /api/security/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CreateRole-fm (5 handlers)
+[GIN-debug] PUT    /api/security/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).UpdateRole-fm (5 handlers)
+[GIN-debug] DELETE /api/security/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).DeleteRole-fm (5 handlers)
+[GIN-debug] GET    /api/security/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetUserRoles-fm (5 handlers)
+[GIN-debug] POST   /api/security/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).AssignUserRole-fm (5 handlers)
+[GIN-debug] DELETE /api/security/users/:userId/roles/:roleId --> go-barcode-webapp/internal/handlers.(*SecurityHandler).RevokeUserRole-fm (5 handlers)
+[GIN-debug] GET    /api/security/audit       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLogs-fm (5 handlers)
+[GIN-debug] GET    /api/security/audit/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLog-fm (5 handlers)
+[GIN-debug] GET    /api/security/audit/export --> go-barcode-webapp/internal/handlers.(*SecurityHandler).ExportAuditLogs-fm (5 handlers)
+[GIN-debug] GET    /api/security/permissions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissions-fm (5 handlers)
+[GIN-debug] GET    /api/security/check-permission --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CheckPermission-fm (5 handlers)
+2025/06/19 08:40:40 Server starting on 0.0.0.0:8080
+DEBUG: AuthMiddleware called for URL: /invoice-templates/new
+DEBUG: No session cookie found, redirecting to login
+[GIN] 2025/06/19 - 08:40:50 | 303 |      69.454µs |       127.0.0.1 | GET      "/invoice-templates/new"
+DEBUG: AuthMiddleware called for URL: /
+DEBUG: No session cookie found, redirecting to login
+[GIN] 2025/06/19 - 08:41:39 | 303 |   89.737035ms |       10.0.0.20 | GET      "/"
+[GIN] 2025/06/19 - 08:41:39 | 200 |    9.603602ms |       10.0.0.20 | GET      "/login"
+[GIN] 2025/06/19 - 08:41:39 | 200 |    3.105464ms |       10.0.0.20 | GET      "/static/css/app.css"
+2025/06/19 08:41:39 NotFoundHandler: 404 for path: /static/images/icon-180.png
+2025/06/19 08:41:39 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 08:41:39 NotFoundHandler: 404 for path: /favicon.ico
+2025/06/19 08:41:39 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 08:41:39 | 404 |   11.243408ms |       10.0.0.20 | GET      "/static/images/icon-180.png"
+[GIN] 2025/06/19 - 08:41:39 | 404 |   10.923676ms |       10.0.0.20 | GET      "/favicon.ico"
+2025/06/19 08:41:45 POST request to /login with Content-Type: 'application/x-www-form-urlencoded'
+2025/06/19 08:41:45 Form _method parameter: ''
+
+2025/06/19 08:41:45 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:60
+[0m[33m[23.331ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE username = 'admin' AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Creating session for user admin (ID: 5)
+
+2025/06/19 08:41:45 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:88
+[0m[33m[100.954ms] [34;1m[rows:1][0m INSERT INTO `sessions` (`session_id`,`user_id`,`expires_at`,`created_at`) VALUES ('62e0d10b8183ae9ebd1d117997cd6f73bf379074ac6af4684774675e467a6c4e',5,'2025-06-19 09:41:45.744','2025-06-19 08:41:45.744')
+
+2025/06/19 08:41:46 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:100
+[0m[33m[126.748ms] [34;1m[rows:1][0m UPDATE `users` SET `username`='admin',`email`='admin@yourdomain.com',`password_hash`='$2a$10$VUoz2YuTF2WiPlNB3xmWx.nPdM.pIXKqSiDGirHVwhJrB5QCOUfym',`first_name`='',`last_name`='',`is_active`=true,`created_at`='2025-06-13 01:13:45.593',`updated_at`='2025-06-19 08:41:45.894',`last_login`='2025-06-19 08:41:45.882' WHERE `userID` = 5
+DEBUG: Login successful, session created: 62e0d10b8183ae9ebd1d117997cd6f73bf379074ac6af4684774675e467a6c4e
+[GIN] 2025/06/19 - 08:41:46 | 303 |  347.104266ms |       10.0.0.20 | POST     "/login"
+DEBUG: AuthMiddleware called for URL: /
+DEBUG: Found session cookie: 62e0d10b8183ae9ebd1d117997cd6f73bf379074ac6af4684774675e467a6c4e
+
+2025/06/19 08:41:46 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:141
+[0m[33m[22.673ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '62e0d10b8183ae9ebd1d117997cd6f73bf379074ac6af4684774675e467a6c4e' AND expires_at > '2025-06-19 08:41:46.021' ORDER BY `sessions`.`session_id` LIMIT 1
+
+2025/06/19 08:41:46 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:152
+[0m[33m[23.038ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Session valid for user: admin (ID: 5)
+
+2025/06/19 08:41:46 [32m/opt/dev/go-barcode-webapp/internal/handlers/home_handler.go:41
+[0m[33m[11.343ms] [34;1m[rows:1][0m SELECT count(*) FROM `jobs`
+
+2025/06/19 08:41:46 [32m/opt/dev/go-barcode-webapp/internal/handlers/home_handler.go:42
+[0m[33m[11.605ms] [34;1m[rows:1][0m SELECT count(*) FROM `devices`
+
+2025/06/19 08:41:46 [32m/opt/dev/go-barcode-webapp/internal/handlers/home_handler.go:43
+[0m[33m[11.861ms] [34;1m[rows:1][0m SELECT count(*) FROM `customers`
+
+2025/06/19 08:41:46 [32m/opt/dev/go-barcode-webapp/internal/handlers/home_handler.go:44
+[0m[33m[11.974ms] [34;1m[rows:1][0m SELECT count(*) FROM `cases`
+
+2025/06/19 08:41:46 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:109
+[0m[33m[12.201ms] [34;1m[rows:3][0m SELECT j.jobID, j.customerID, j.statusID, 
+			j.description, j.startDate, j.endDate, 
+			j.revenue, j.final_revenue,
+			CONCAT(COALESCE(c.companyname, ''), ' ', COALESCE(c.firstname, ''), ' ', COALESCE(c.lastname, '')) as customer_name, 
+			s.status as status_name,
+			COUNT(DISTINCT jd.deviceID) as device_count,
+			COALESCE(j.final_revenue, j.revenue) as total_revenue
+		FROM jobs j 
+		LEFT JOIN customers c ON j.customerID = c.customerID
+		LEFT JOIN status s ON j.statusID = s.statusID
+		LEFT JOIN jobdevices jd ON j.jobID = jd.jobID GROUP BY j.jobID, j.customerID, j.statusID, j.description, j.startDate, j.endDate, j.revenue, j.final_revenue, customer_name, s.status ORDER BY j.jobID DESC LIMIT 5
+[GIN] 2025/06/19 - 08:41:46 | 200 |  114.681482ms |       10.0.0.20 | GET      "/"
+[GIN] 2025/06/19 - 08:41:46 | 200 |     138.787µs |       10.0.0.20 | GET      "/static/css/app-new.css"
+[GIN] 2025/06/19 - 08:41:46 | 200 |     152.983µs |       10.0.0.20 | GET      "/static/js/app.js"
+DEBUG: AuthMiddleware called for URL: /invoices
+DEBUG: Found session cookie: 62e0d10b8183ae9ebd1d117997cd6f73bf379074ac6af4684774675e467a6c4e
+
+2025/06/19 08:41:48 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:141
+[0m[33m[22.420ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '62e0d10b8183ae9ebd1d117997cd6f73bf379074ac6af4684774675e467a6c4e' AND expires_at > '2025-06-19 08:41:48.679' ORDER BY `sessions`.`session_id` LIMIT 1
+
+2025/06/19 08:41:48 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:152
+[0m[33m[22.143ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Session valid for user: admin (ID: 5)
+
+2025/06/19 08:41:48 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:478
+[0m[33m[11.332ms] [34;1m[rows:1][0m SELECT count(*) FROM `invoices`
+
+2025/06/19 08:41:48 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:495
+[0m[33m[22.066ms] [34;1m[rows:1][0m SELECT * FROM `customers` WHERE `customers`.`customerID` = 52
+
+2025/06/19 08:41:48 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:495
+[0m[33m[22.932ms] [34;1m[rows:0][0m SELECT * FROM `jobs` WHERE `jobs`.`jobID` = 30
+
+2025/06/19 08:41:48 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:495
+[0m[33m[22.325ms] [34;1m[rows:0][0m SELECT * FROM `invoice_templates` WHERE `invoice_templates`.`template_id` = 30
+
+2025/06/19 08:41:48 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:495
+[0m[33m[79.310ms] [34;1m[rows:1][0m SELECT * FROM `invoices` ORDER BY issue_date DESC, created_at DESC LIMIT 20
+[GIN] 2025/06/19 - 08:41:48 | 200 |   143.58664ms |       10.0.0.20 | GET      "/invoices"
+DEBUG: AuthMiddleware called for URL: /invoice-templates
+DEBUG: Found session cookie: 62e0d10b8183ae9ebd1d117997cd6f73bf379074ac6af4684774675e467a6c4e
+
+2025/06/19 08:41:50 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:141
+[0m[33m[23.566ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '62e0d10b8183ae9ebd1d117997cd6f73bf379074ac6af4684774675e467a6c4e' AND expires_at > '2025-06-19 08:41:50.817' ORDER BY `sessions`.`session_id` LIMIT 1
+
+2025/06/19 08:41:50 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:152
+[0m[33m[22.313ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Session valid for user: admin (ID: 5)
+2025/06/19 08:41:50 === INVOICE TEMPLATE HANDLER CALLED ===
+2025/06/19 08:41:50 ListTemplates: Handler called for path: /invoice-templates
+2025/06/19 08:41:50 ListTemplates: Request method: GET
+2025/06/19 08:41:50 ListTemplates: User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0
+2025/06/19 08:41:50 ListTemplates: Current user: &{UserID:5 Username:admin Email:admin@yourdomain.com PasswordHash:$2a$10$VUoz2YuTF2WiPlNB3xmWx.nPdM.pIXKqSiDGirHVwhJrB5QCOUfym FirstName: LastName: IsActive:true CreatedAt:2025-06-13 01:13:45.593 +0200 CEST UpdatedAt:2025-06-19 08:41:45.894 +0200 CEST LastLogin:2025-06-19 08:41:45.883 +0200 CEST}
+
+2025/06/19 08:41:50 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:510
+[0m[33m[97.079ms] [34;1m[rows:1][0m SELECT * FROM `invoice_templates` ORDER BY is_default DESC, name ASC
+2025/06/19 08:41:50 ListTemplates: Found 1 templates
+2025/06/19 08:41:50 ListTemplates: Template 1: ID=2, Name=rechnungen, IsActive=true
+2025/06/19 08:41:50 ListTemplates: Rendering template 'invoice_templates_list.html' with 1 templates
+2025/06/19 08:41:50 === ABOUT TO RENDER INVOICE_TEMPLATES_LIST.HTML ===
+2025/06/19 08:41:50 === FINISHED RENDERING INVOICE_TEMPLATES_LIST.HTML ===
+[GIN] 2025/06/19 - 08:41:50 | 200 |  152.467646ms |       10.0.0.20 | GET      "/invoice-templates"
+DEBUG: AuthMiddleware called for URL: /invoice-templates/2/edit
+DEBUG: Found session cookie: 62e0d10b8183ae9ebd1d117997cd6f73bf379074ac6af4684774675e467a6c4e
+
+2025/06/19 08:41:54 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:141
+[0m[33m[22.991ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '62e0d10b8183ae9ebd1d117997cd6f73bf379074ac6af4684774675e467a6c4e' AND expires_at > '2025-06-19 08:41:54.282' ORDER BY `sessions`.`session_id` LIMIT 1
+
+2025/06/19 08:41:54 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:152
+[0m[33m[23.105ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Session valid for user: admin (ID: 5)
+
+2025/06/19 08:41:54 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:521
+[0m[33m[111.541ms] [34;1m[rows:1][0m SELECT * FROM `invoice_templates` WHERE `invoice_templates`.`template_id` = 2 ORDER BY `invoice_templates`.`template_id` LIMIT 1
+[GIN] 2025/06/19 - 08:41:54 | 200 |  167.099017ms |       10.0.0.20 | GET      "/invoice-templates/2/edit"
+
+2025/06/19 09:10:40 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:198
+[0m[33m[115.631ms] [34;1m[rows:0][0m DELETE FROM `sessions` WHERE expires_at < '2025-06-19 09:10:40.135'
+2025/06/19 09:14:39 NotFoundHandler: 404 for path: /settings/company
+2025/06/19 09:14:39 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 09:14:39 | 404 |    8.970184ms |       127.0.0.1 | GET      "/settings/company"
+
+2025/06/19 09:40:40 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:198
+[0m[33m[162.335ms] [34;1m[rows:0][0m DELETE FROM `sessions` WHERE expires_at < '2025-06-19 09:40:40.138'
+
+2025/06/19 10:10:40 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:198
+[0m[33m[153.690ms] [34;1m[rows:1][0m DELETE FROM `sessions` WHERE expires_at < '2025-06-19 10:10:40.195'
+DEBUG: Cleaned up 1 expired sessions
+DEBUG: AuthMiddleware called for URL: /invoices
+DEBUG: No session cookie found, redirecting to login
+[GIN] 2025/06/19 - 10:14:09 | 303 |      66.997µs |       127.0.0.1 | GET      "/invoices"
+
+2025/06/19 10:40:40 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:198
+[0m[33m[142.560ms] [34;1m[rows:0][0m DELETE FROM `sessions` WHERE expires_at < '2025-06-19 10:40:40.191'
+
+2025/06/19 11:10:40 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:198
+[0m[33m[147.514ms] [34;1m[rows:0][0m DELETE FROM `sessions` WHERE expires_at < '2025-06-19 11:10:40.154'
+DEBUG: AuthMiddleware called for URL: /
+DEBUG: No session cookie found, redirecting to login
+[GIN] 2025/06/19 - 11:21:20 | 303 |       65.82µs |       10.0.0.20 | GET      "/"
+[GIN] 2025/06/19 - 11:21:20 | 200 |   11.446251ms |       10.0.0.20 | GET      "/login"
+[GIN] 2025/06/19 - 11:21:20 | 200 |      131.95µs |       10.0.0.20 | GET      "/static/css/app.css"
+2025/06/19 11:21:20 NotFoundHandler: 404 for path: /static/images/icon-180.png
+2025/06/19 11:21:20 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:21:20 NotFoundHandler: 404 for path: /favicon.ico
+2025/06/19 11:21:20 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:21:20 | 404 |   12.295397ms |       10.0.0.20 | GET      "/favicon.ico"
+[GIN] 2025/06/19 - 11:21:20 | 404 |   12.866027ms |       10.0.0.20 | GET      "/static/images/icon-180.png"
+2025/06/19 11:21:23 POST request to /login with Content-Type: 'application/x-www-form-urlencoded'
+2025/06/19 11:21:23 Form _method parameter: ''
+
+2025/06/19 11:21:23 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:60
+[0m[33m[94.574ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE username = 'admin' AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Creating session for user admin (ID: 5)
+
+2025/06/19 11:21:23 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:88
+[0m[33m[46.894ms] [34;1m[rows:1][0m INSERT INTO `sessions` (`session_id`,`user_id`,`expires_at`,`created_at`) VALUES ('855492dad41494988df3e12c5b6bca85f4f56e1b1a246ea2933b6caa8b9ddceb',5,'2025-06-19 12:21:23.556','2025-06-19 11:21:23.556')
+
+2025/06/19 11:21:23 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:100
+[0m[33m[49.062ms] [34;1m[rows:1][0m UPDATE `users` SET `username`='admin',`email`='admin@yourdomain.com',`password_hash`='$2a$10$VUoz2YuTF2WiPlNB3xmWx.nPdM.pIXKqSiDGirHVwhJrB5QCOUfym',`first_name`='',`last_name`='',`is_active`=true,`created_at`='2025-06-13 01:13:45.593',`updated_at`='2025-06-19 11:21:23.614',`last_login`='2025-06-19 11:21:23.603' WHERE `userID` = 5
+DEBUG: Login successful, session created: 855492dad41494988df3e12c5b6bca85f4f56e1b1a246ea2933b6caa8b9ddceb
+[GIN] 2025/06/19 - 11:21:23 | 303 |  250.628338ms |       10.0.0.20 | POST     "/login"
+DEBUG: AuthMiddleware called for URL: /
+DEBUG: Found session cookie: 855492dad41494988df3e12c5b6bca85f4f56e1b1a246ea2933b6caa8b9ddceb
+
+2025/06/19 11:21:23 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:141
+[0m[33m[22.815ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '855492dad41494988df3e12c5b6bca85f4f56e1b1a246ea2933b6caa8b9ddceb' AND expires_at > '2025-06-19 11:21:23.658' ORDER BY `sessions`.`session_id` LIMIT 1
+
+2025/06/19 11:21:23 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:152
+[0m[33m[22.591ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Session valid for user: admin (ID: 5)
+
+2025/06/19 11:21:23 [32m/opt/dev/go-barcode-webapp/internal/handlers/home_handler.go:41
+[0m[33m[11.248ms] [34;1m[rows:1][0m SELECT count(*) FROM `jobs`
+
+2025/06/19 11:21:23 [32m/opt/dev/go-barcode-webapp/internal/handlers/home_handler.go:42
+[0m[33m[11.558ms] [34;1m[rows:1][0m SELECT count(*) FROM `devices`
+
+2025/06/19 11:21:23 [32m/opt/dev/go-barcode-webapp/internal/handlers/home_handler.go:43
+[0m[33m[11.944ms] [34;1m[rows:1][0m SELECT count(*) FROM `customers`
+
+2025/06/19 11:21:23 [32m/opt/dev/go-barcode-webapp/internal/handlers/home_handler.go:44
+[0m[33m[12.445ms] [34;1m[rows:1][0m SELECT count(*) FROM `cases`
+
+2025/06/19 11:21:23 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:109
+[0m[33m[12.592ms] [34;1m[rows:3][0m SELECT j.jobID, j.customerID, j.statusID, 
+			j.description, j.startDate, j.endDate, 
+			j.revenue, j.final_revenue,
+			CONCAT(COALESCE(c.companyname, ''), ' ', COALESCE(c.firstname, ''), ' ', COALESCE(c.lastname, '')) as customer_name, 
+			s.status as status_name,
+			COUNT(DISTINCT jd.deviceID) as device_count,
+			COALESCE(j.final_revenue, j.revenue) as total_revenue
+		FROM jobs j 
+		LEFT JOIN customers c ON j.customerID = c.customerID
+		LEFT JOIN status s ON j.statusID = s.statusID
+		LEFT JOIN jobdevices jd ON j.jobID = jd.jobID GROUP BY j.jobID, j.customerID, j.statusID, j.description, j.startDate, j.endDate, j.revenue, j.final_revenue, customer_name, s.status ORDER BY j.jobID DESC LIMIT 5
+[GIN] 2025/06/19 - 11:21:23 | 200 |  117.268929ms |       10.0.0.20 | GET      "/"
+[GIN] 2025/06/19 - 11:21:23 | 200 |     254.674µs |       10.0.0.20 | GET      "/static/css/app-new.css"
+[GIN] 2025/06/19 - 11:21:23 | 200 |      280.25µs |       10.0.0.20 | GET      "/static/js/app.js"
+DEBUG: AuthMiddleware called for URL: /invoices
+DEBUG: Found session cookie: 855492dad41494988df3e12c5b6bca85f4f56e1b1a246ea2933b6caa8b9ddceb
+
+2025/06/19 11:21:27 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:141
+[0m[33m[22.956ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '855492dad41494988df3e12c5b6bca85f4f56e1b1a246ea2933b6caa8b9ddceb' AND expires_at > '2025-06-19 11:21:27.068' ORDER BY `sessions`.`session_id` LIMIT 1
+
+2025/06/19 11:21:27 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:152
+[0m[33m[23.453ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Session valid for user: admin (ID: 5)
+
+2025/06/19 11:21:27 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:478
+[0m[33m[11.769ms] [34;1m[rows:1][0m SELECT count(*) FROM `invoices`
+
+2025/06/19 11:21:27 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:495
+[0m[33m[22.121ms] [34;1m[rows:1][0m SELECT * FROM `customers` WHERE `customers`.`customerID` = 52
+
+2025/06/19 11:21:27 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:495
+[0m[33m[22.374ms] [34;1m[rows:0][0m SELECT * FROM `jobs` WHERE `jobs`.`jobID` = 30
+
+2025/06/19 11:21:27 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:495
+[0m[33m[22.513ms] [34;1m[rows:0][0m SELECT * FROM `invoice_templates` WHERE `invoice_templates`.`template_id` = 30
+
+2025/06/19 11:21:27 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:495
+[0m[33m[78.977ms] [34;1m[rows:1][0m SELECT * FROM `invoices` ORDER BY issue_date DESC, created_at DESC LIMIT 20
+[GIN] 2025/06/19 - 11:21:27 | 200 |   147.64892ms |       10.0.0.20 | GET      "/invoices"
+DEBUG: AuthMiddleware called for URL: /invoice-templates
+DEBUG: Found session cookie: 855492dad41494988df3e12c5b6bca85f4f56e1b1a246ea2933b6caa8b9ddceb
+
+2025/06/19 11:21:31 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:141
+[0m[33m[23.311ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '855492dad41494988df3e12c5b6bca85f4f56e1b1a246ea2933b6caa8b9ddceb' AND expires_at > '2025-06-19 11:21:31.688' ORDER BY `sessions`.`session_id` LIMIT 1
+
+2025/06/19 11:21:31 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:152
+[0m[33m[22.568ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Session valid for user: admin (ID: 5)
+2025/06/19 11:21:31 === INVOICE TEMPLATE HANDLER CALLED ===
+2025/06/19 11:21:31 ListTemplates: Handler called for path: /invoice-templates
+2025/06/19 11:21:31 ListTemplates: Request method: GET
+2025/06/19 11:21:31 ListTemplates: User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0
+2025/06/19 11:21:31 ListTemplates: Current user: &{UserID:5 Username:admin Email:admin@yourdomain.com PasswordHash:$2a$10$VUoz2YuTF2WiPlNB3xmWx.nPdM.pIXKqSiDGirHVwhJrB5QCOUfym FirstName: LastName: IsActive:true CreatedAt:2025-06-13 01:13:45.593 +0200 CEST UpdatedAt:2025-06-19 11:21:23.614 +0200 CEST LastLogin:2025-06-19 11:21:23.603 +0200 CEST}
+
+2025/06/19 11:21:31 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:510
+[0m[33m[98.174ms] [34;1m[rows:1][0m SELECT * FROM `invoice_templates` ORDER BY is_default DESC, name ASC
+2025/06/19 11:21:31 ListTemplates: Found 1 templates
+2025/06/19 11:21:31 ListTemplates: Template 1: ID=2, Name=rechnungen, IsActive=true
+2025/06/19 11:21:31 ListTemplates: Rendering template 'invoice_templates_list.html' with 1 templates
+2025/06/19 11:21:31 === ABOUT TO RENDER INVOICE_TEMPLATES_LIST.HTML ===
+2025/06/19 11:21:31 === FINISHED RENDERING INVOICE_TEMPLATES_LIST.HTML ===
+[GIN] 2025/06/19 - 11:21:31 | 200 |  155.700195ms |       10.0.0.20 | GET      "/invoice-templates"
+DEBUG: AuthMiddleware called for URL: /invoice-templates/2/edit
+DEBUG: Found session cookie: 855492dad41494988df3e12c5b6bca85f4f56e1b1a246ea2933b6caa8b9ddceb
+
+2025/06/19 11:21:35 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:141
+[0m[33m[22.219ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '855492dad41494988df3e12c5b6bca85f4f56e1b1a246ea2933b6caa8b9ddceb' AND expires_at > '2025-06-19 11:21:35.122' ORDER BY `sessions`.`session_id` LIMIT 1
+
+2025/06/19 11:21:35 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:152
+[0m[33m[23.036ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Session valid for user: admin (ID: 5)
+
+2025/06/19 11:21:35 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:521
+[0m[33m[108.700ms] [34;1m[rows:1][0m SELECT * FROM `invoice_templates` WHERE `invoice_templates`.`template_id` = 2 ORDER BY `invoice_templates`.`template_id` LIMIT 1
+[GIN] 2025/06/19 - 11:21:35 | 200 |  163.988674ms |       10.0.0.20 | GET      "/invoice-templates/2/edit"
+DEBUG: AuthMiddleware called for URL: /invoice-templates
+DEBUG: Found session cookie: 855492dad41494988df3e12c5b6bca85f4f56e1b1a246ea2933b6caa8b9ddceb
+
+2025/06/19 11:21:41 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:141
+[0m[33m[23.259ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '855492dad41494988df3e12c5b6bca85f4f56e1b1a246ea2933b6caa8b9ddceb' AND expires_at > '2025-06-19 11:21:41.766' ORDER BY `sessions`.`session_id` LIMIT 1
+
+2025/06/19 11:21:41 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:152
+[0m[33m[23.093ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Session valid for user: admin (ID: 5)
+2025/06/19 11:21:41 === INVOICE TEMPLATE HANDLER CALLED ===
+2025/06/19 11:21:41 ListTemplates: Handler called for path: /invoice-templates
+2025/06/19 11:21:41 ListTemplates: Request method: GET
+2025/06/19 11:21:41 ListTemplates: User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0
+2025/06/19 11:21:41 ListTemplates: Current user: &{UserID:5 Username:admin Email:admin@yourdomain.com PasswordHash:$2a$10$VUoz2YuTF2WiPlNB3xmWx.nPdM.pIXKqSiDGirHVwhJrB5QCOUfym FirstName: LastName: IsActive:true CreatedAt:2025-06-13 01:13:45.593 +0200 CEST UpdatedAt:2025-06-19 11:21:23.614 +0200 CEST LastLogin:2025-06-19 11:21:23.603 +0200 CEST}
+
+2025/06/19 11:21:41 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:510
+[0m[33m[98.758ms] [34;1m[rows:1][0m SELECT * FROM `invoice_templates` ORDER BY is_default DESC, name ASC
+2025/06/19 11:21:41 ListTemplates: Found 1 templates
+2025/06/19 11:21:41 ListTemplates: Template 1: ID=2, Name=rechnungen, IsActive=true
+2025/06/19 11:21:41 ListTemplates: Rendering template 'invoice_templates_list.html' with 1 templates
+2025/06/19 11:21:41 === ABOUT TO RENDER INVOICE_TEMPLATES_LIST.HTML ===
+2025/06/19 11:21:41 === FINISHED RENDERING INVOICE_TEMPLATES_LIST.HTML ===
+[GIN] 2025/06/19 - 11:21:41 | 200 |  155.841614ms |       10.0.0.20 | GET      "/invoice-templates"
+DEBUG: AuthMiddleware called for URL: /
+DEBUG: Found session cookie: 855492dad41494988df3e12c5b6bca85f4f56e1b1a246ea2933b6caa8b9ddceb
+
+2025/06/19 11:21:44 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:141
+[0m[33m[22.514ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '855492dad41494988df3e12c5b6bca85f4f56e1b1a246ea2933b6caa8b9ddceb' AND expires_at > '2025-06-19 11:21:44.442' ORDER BY `sessions`.`session_id` LIMIT 1
+
+2025/06/19 11:21:44 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:152
+[0m[33m[23.086ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Session valid for user: admin (ID: 5)
+
+2025/06/19 11:21:44 [32m/opt/dev/go-barcode-webapp/internal/handlers/home_handler.go:41
+[0m[33m[11.362ms] [34;1m[rows:1][0m SELECT count(*) FROM `jobs`
+
+2025/06/19 11:21:44 [32m/opt/dev/go-barcode-webapp/internal/handlers/home_handler.go:42
+[0m[33m[11.429ms] [34;1m[rows:1][0m SELECT count(*) FROM `devices`
+
+2025/06/19 11:21:44 [32m/opt/dev/go-barcode-webapp/internal/handlers/home_handler.go:43
+[0m[33m[12.502ms] [34;1m[rows:1][0m SELECT count(*) FROM `customers`
+
+2025/06/19 11:21:44 [32m/opt/dev/go-barcode-webapp/internal/handlers/home_handler.go:44
+[0m[33m[12.010ms] [34;1m[rows:1][0m SELECT count(*) FROM `cases`
+
+2025/06/19 11:21:44 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:109
+[0m[33m[11.632ms] [34;1m[rows:3][0m SELECT j.jobID, j.customerID, j.statusID, 
+			j.description, j.startDate, j.endDate, 
+			j.revenue, j.final_revenue,
+			CONCAT(COALESCE(c.companyname, ''), ' ', COALESCE(c.firstname, ''), ' ', COALESCE(c.lastname, '')) as customer_name, 
+			s.status as status_name,
+			COUNT(DISTINCT jd.deviceID) as device_count,
+			COALESCE(j.final_revenue, j.revenue) as total_revenue
+		FROM jobs j 
+		LEFT JOIN customers c ON j.customerID = c.customerID
+		LEFT JOIN status s ON j.statusID = s.statusID
+		LEFT JOIN jobdevices jd ON j.jobID = jd.jobID GROUP BY j.jobID, j.customerID, j.statusID, j.description, j.startDate, j.endDate, j.revenue, j.final_revenue, customer_name, s.status ORDER BY j.jobID DESC LIMIT 5
+[GIN] 2025/06/19 - 11:21:44 | 200 |  114.761621ms |       10.0.0.20 | GET      "/"
+DEBUG: AuthMiddleware called for URL: /invoices
+DEBUG: Found session cookie: 855492dad41494988df3e12c5b6bca85f4f56e1b1a246ea2933b6caa8b9ddceb
+
+2025/06/19 11:22:03 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:141
+[0m[33m[23.091ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '855492dad41494988df3e12c5b6bca85f4f56e1b1a246ea2933b6caa8b9ddceb' AND expires_at > '2025-06-19 11:22:03.147' ORDER BY `sessions`.`session_id` LIMIT 1
+
+2025/06/19 11:22:03 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:152
+[0m[33m[23.094ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Session valid for user: admin (ID: 5)
+
+2025/06/19 11:22:03 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:478
+[0m[33m[11.296ms] [34;1m[rows:1][0m SELECT count(*) FROM `invoices`
+
+2025/06/19 11:22:03 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:495
+[0m[33m[23.026ms] [34;1m[rows:1][0m SELECT * FROM `customers` WHERE `customers`.`customerID` = 52
+
+2025/06/19 11:22:03 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:495
+[0m[33m[22.349ms] [34;1m[rows:0][0m SELECT * FROM `jobs` WHERE `jobs`.`jobID` = 30
+
+2025/06/19 11:22:03 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:495
+[0m[33m[22.911ms] [34;1m[rows:0][0m SELECT * FROM `invoice_templates` WHERE `invoice_templates`.`template_id` = 30
+
+2025/06/19 11:22:03 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:495
+[0m[33m[79.741ms] [34;1m[rows:1][0m SELECT * FROM `invoices` ORDER BY issue_date DESC, created_at DESC LIMIT 20
+[GIN] 2025/06/19 - 11:22:03 | 200 |  148.328517ms |       10.0.0.20 | GET      "/invoices"
+2025/06/19 11:22:08 NotFoundHandler: 404 for path: /settings/company
+2025/06/19 11:22:08 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:22:08 | 404 |   10.646023ms |       10.0.0.20 | GET      "/settings/company"
+[GIN] 2025/06/19 - 11:22:08 | 200 |     155.714µs |       10.0.0.20 | GET      "/static/js/ui-enhancements.js"
+2025/06/19 11:22:08 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:22:08 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:22:08 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:22:08 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:22:08 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:22:08 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:22:08 | 404 |   14.437991ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:22:08 | 404 |   15.827222ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:22:08 | 404 |   14.383592ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:22:11 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:22:11 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:22:11 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:22:11 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:22:11 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:22:11 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:22:12 | 404 |   20.664222ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:22:12 | 404 |   20.342095ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+[GIN] 2025/06/19 - 11:22:12 | 404 |   24.200043ms |       10.0.0.20 | GET      "/monitoring/metrics"
+2025/06/19 11:22:13 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:22:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:22:13 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:22:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:22:13 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:22:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:22:13 | 404 |    13.58628ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:22:13 | 404 |   15.203917ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:22:13 | 404 |   13.659002ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:22:38 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:22:38 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:22:38 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:22:38 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:22:38 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:22:38 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:22:38 | 404 |   12.763974ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:22:38 | 404 |   14.009885ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:22:38 | 404 |   13.756867ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:23:08 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:23:08 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:23:08 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:23:08 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:23:08 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:23:08 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:23:08 | 404 |   16.341287ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+[GIN] 2025/06/19 - 11:23:08 | 404 |   16.465273ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:23:08 | 404 |   16.715307ms |       10.0.0.20 | GET      "/monitoring/health"
+2025/06/19 11:23:38 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:23:38 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:23:38 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:23:38 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:23:38 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:23:38 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:23:38 | 404 |   11.874976ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:23:38 | 404 |   14.649919ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:23:38 | 404 |   14.340658ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:24:08 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:24:08 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:24:08 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:24:08 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:24:08 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:24:08 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:24:08 | 404 |   13.015161ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:24:08 | 404 |   13.609687ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:24:08 | 404 |   13.661438ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:24:38 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:24:38 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:24:38 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:24:38 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:24:38 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:24:38 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:24:38 | 404 |    14.95713ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+[GIN] 2025/06/19 - 11:24:38 | 404 |   16.137806ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:24:38 | 404 |   16.287258ms |       10.0.0.20 | GET      "/monitoring/metrics"
+2025/06/19 11:25:09 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:25:09 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:25:09 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:25:09 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:25:09 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:25:09 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:25:09 | 404 |   14.491775ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:25:09 | 404 |   15.380189ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:25:09 | 404 |   16.191354ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:25:38 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:25:38 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:25:38 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:25:38 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:25:38 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:25:38 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:25:38 | 404 |   11.661511ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:25:38 | 404 |   12.064736ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+[GIN] 2025/06/19 - 11:25:38 | 404 |   17.524946ms |       10.0.0.20 | GET      "/monitoring/health"
+2025/06/19 11:26:08 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:26:08 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:26:08 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:26:08 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:26:09 | 404 |   10.049579ms |       10.0.0.20 | GET      "/monitoring/health"
+2025/06/19 11:26:09 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:26:09 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:26:09 | 404 |    15.78928ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:26:09 | 404 |   11.040525ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:26:38 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:26:38 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:26:38 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:26:38 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:26:38 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:26:38 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:26:39 | 404 |    14.35922ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:26:39 | 404 |   15.026058ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:26:39 | 404 |   16.715546ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:27:08 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:27:08 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:27:08 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:27:08 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:27:08 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:27:08 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:27:09 | 404 |   13.858838ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:27:09 | 404 |   14.070042ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:27:09 | 404 |   13.088523ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:27:39 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:27:39 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:27:39 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:27:39 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:27:39 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:27:39 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:27:39 | 404 |   11.237402ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:27:39 | 404 |   14.804555ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:27:39 | 404 |   15.876634ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:28:09 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:28:09 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:28:09 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:28:09 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:28:09 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:28:09 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:28:09 | 404 |   13.678522ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:28:09 | 404 |   13.415858ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:28:09 | 404 |     12.5423ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:28:39 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:28:39 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:28:39 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:28:39 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:28:39 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:28:39 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:28:39 | 404 |   13.317816ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:28:39 | 404 |   13.336048ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+[GIN] 2025/06/19 - 11:28:39 | 404 |    13.93365ms |       10.0.0.20 | GET      "/monitoring/health"
+2025/06/19 11:29:11 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:29:11 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:29:11 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:29:11 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:29:11 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:29:11 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:29:11 | 404 |   18.590766ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:29:11 | 404 |   20.550238ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:29:11 | 404 |   20.872926ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:29:43 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:29:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:29:43 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:29:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:29:43 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:29:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:29:43 | 404 |   15.104769ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:29:43 | 404 |   15.264941ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+[GIN] 2025/06/19 - 11:29:43 | 404 |   15.448413ms |       10.0.0.20 | GET      "/monitoring/health"
+2025/06/19 11:30:13 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:30:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:30:13 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:30:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:30:13 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:30:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:30:13 | 404 |   14.736823ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:30:13 | 404 |   15.840145ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+[GIN] 2025/06/19 - 11:30:13 | 404 |   16.316226ms |       10.0.0.20 | GET      "/monitoring/metrics"
+2025/06/19 11:30:43 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:30:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:30:43 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:30:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:30:43 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:30:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:30:43 | 404 |   10.810648ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:30:43 | 404 |   12.738184ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:30:43 | 404 |   13.323297ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:31:13 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:31:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:31:13 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:31:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:31:13 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:31:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:31:13 | 404 |   14.491139ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:31:13 | 404 |   15.443927ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:31:13 | 404 |   15.629499ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:31:43 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:31:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:31:43 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:31:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:31:43 | 404 |    9.891766ms |       10.0.0.20 | GET      "/monitoring/health"
+2025/06/19 11:31:43 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:31:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:31:43 | 404 |   11.862229ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:31:43 | 404 |   10.956883ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:32:13 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:32:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:32:13 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:32:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:32:13 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:32:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:32:13 | 404 |   13.634309ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:32:13 | 404 |   15.112584ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:32:13 | 404 |   12.824264ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:32:43 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:32:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:32:43 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:32:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:32:43 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:32:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:32:43 | 404 |   15.983618ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:32:43 | 404 |   14.050296ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:32:43 | 404 |   11.020612ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:33:13 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:33:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:33:13 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:33:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:33:13 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:33:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:33:13 | 404 |   16.920105ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:33:13 | 404 |   16.302721ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:33:13 | 404 |   13.046996ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:33:43 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:33:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:33:43 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:33:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:33:43 | 404 |   13.862039ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:33:43 | 404 |   13.307855ms |       10.0.0.20 | GET      "/monitoring/metrics"
+2025/06/19 11:33:43 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:33:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:33:43 | 404 |    9.544129ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:34:13 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:34:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:34:13 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:34:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:34:13 | 404 |   15.282861ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:34:13 | 404 |   11.616917ms |       10.0.0.20 | GET      "/monitoring/metrics"
+2025/06/19 11:34:13 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:34:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:34:13 | 404 |   10.409185ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:34:43 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:34:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:34:43 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:34:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:34:43 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:34:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:34:43 | 404 |   17.363113ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:34:43 | 404 |   16.875809ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:34:43 | 404 |   14.128208ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:35:13 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:35:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:35:13 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:35:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:35:13 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:35:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:35:13 | 404 |   12.182819ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:35:13 | 404 |   13.415498ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:35:13 | 404 |   13.290688ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:35:43 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:35:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:35:43 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:35:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:35:43 | 404 |   12.489896ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:35:43 | 404 |    11.99359ms |       10.0.0.20 | GET      "/monitoring/metrics"
+2025/06/19 11:35:43 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:35:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:35:43 | 404 |   11.614719ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:36:13 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:36:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:36:13 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:36:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:36:13 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:36:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:36:13 | 404 |    17.02524ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:36:13 | 404 |   16.878002ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:36:13 | 404 |   20.862998ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:36:43 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:36:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:36:43 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:36:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:36:43 | 404 |   11.443462ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:36:43 | 404 |   11.541948ms |       10.0.0.20 | GET      "/monitoring/metrics"
+2025/06/19 11:36:43 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:36:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:36:43 | 404 |   11.645954ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:37:13 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:37:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:37:13 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:37:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:37:13 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:37:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:37:13 | 404 |   13.483741ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:37:13 | 404 |    13.36751ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:37:13 | 404 |   13.112267ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:37:43 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:37:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:37:43 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:37:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:37:43 | 404 |   10.250506ms |       10.0.0.20 | GET      "/monitoring/health"
+2025/06/19 11:37:43 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:37:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:37:43 | 404 |    12.34374ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:37:43 | 404 |   11.286878ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:38:13 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:38:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:38:13 | 404 |   10.717248ms |       10.0.0.20 | GET      "/monitoring/health"
+2025/06/19 11:38:13 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:38:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:38:13 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:38:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:38:13 | 404 |   14.474644ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+[GIN] 2025/06/19 - 11:38:13 | 404 |   14.772247ms |       10.0.0.20 | GET      "/monitoring/metrics"
+2025/06/19 11:38:43 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:38:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:38:43 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:38:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:38:43 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:38:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:38:43 | 404 |   14.160578ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:38:43 | 404 |   14.514555ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:38:43 | 404 |    14.99298ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:39:13 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:39:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:39:13 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:39:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:39:13 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:39:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:39:13 | 404 |    14.62121ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:39:13 | 404 |   16.471376ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:39:13 | 404 |   14.706412ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:39:43 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:39:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:39:43 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:39:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:39:43 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:39:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:39:43 | 404 |   12.894862ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:39:43 | 404 |   12.598801ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:39:43 | 404 |   11.946159ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:40:13 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:40:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:40:13 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:40:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:40:13 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:40:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:40:13 | 404 |   14.705394ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:40:13 | 404 |   14.452228ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:40:13 | 404 |   12.585906ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+
+2025/06/19 11:40:40 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:198 [33mSLOW SQL >= 200ms
+[0m[31;1m[276.528ms] [33m[rows:0][35m DELETE FROM `sessions` WHERE expires_at < '2025-06-19 11:40:40.16'[0m
+2025/06/19 11:40:43 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:40:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:40:43 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:40:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:40:43 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:40:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:40:43 | 404 |   17.553955ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:40:43 | 404 |    17.32066ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:40:43 | 404 |   16.249174ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:41:13 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:41:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:41:13 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:41:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:41:13 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:41:13 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:41:13 | 404 |   12.109925ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:41:13 | 404 |   13.072115ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+[GIN] 2025/06/19 - 11:41:13 | 404 |    15.05018ms |       10.0.0.20 | GET      "/monitoring/metrics"
+2025/06/19 11:41:43 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:41:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:41:43 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:41:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:41:43 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:41:43 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:41:43 | 404 |   14.611894ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:41:43 | 404 |   14.202595ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:41:43 | 404 |   13.978608ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:42:14 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:42:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:42:14 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:42:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:42:14 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:42:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:42:14 | 404 |   10.984944ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:42:14 | 404 |   14.391143ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:42:14 | 404 |   13.237722ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:42:44 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:42:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:42:44 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:42:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:42:44 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:42:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:42:44 | 404 |   13.668897ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:42:44 | 404 |   16.758788ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:42:44 | 404 |   13.688042ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:43:14 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:43:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:43:14 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:43:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:43:14 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:43:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:43:14 | 404 |   13.152338ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:43:14 | 404 |   14.531386ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:43:14 | 404 |   14.293189ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:43:44 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:43:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:43:44 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:43:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:43:44 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:43:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:43:44 | 404 |    15.49197ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:43:44 | 404 |   15.014794ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:43:44 | 404 |   13.878632ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:44:14 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:44:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:44:14 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:44:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:44:14 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:44:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:44:14 | 404 |   16.208832ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:44:14 | 404 |   14.256981ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:44:14 | 404 |   15.039957ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:44:44 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:44:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:44:44 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:44:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:44:44 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:44:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:44:44 | 404 |   16.301704ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:44:44 | 404 |   16.079819ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:44:44 | 404 |   15.593571ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:45:14 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:45:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:45:14 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:45:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:45:14 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:45:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:45:14 | 404 |   12.900301ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:45:14 | 404 |   13.185835ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:45:14 | 404 |   14.469763ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:45:44 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:45:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:45:44 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:45:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:45:44 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:45:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:45:44 | 404 |   13.842363ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:45:44 | 404 |   17.362324ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:45:44 | 404 |   13.377064ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:46:14 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:46:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:46:14 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:46:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:46:14 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:46:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:46:14 | 404 |   14.268944ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:46:14 | 404 |   13.889701ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+[GIN] 2025/06/19 - 11:46:14 | 404 |   16.555367ms |       10.0.0.20 | GET      "/monitoring/health"
+2025/06/19 11:46:44 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:46:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:46:44 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:46:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:46:44 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:46:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:46:44 | 404 |   14.841903ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:46:44 | 404 |   16.684841ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:46:44 | 404 |     14.7584ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:47:14 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:47:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:47:14 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:47:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:47:14 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:47:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:47:14 | 404 |   18.643091ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:47:14 | 404 |   17.974106ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:47:14 | 404 |   16.307062ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:47:44 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:47:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:47:44 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:47:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:47:44 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:47:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:47:44 | 404 |   13.434211ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:47:44 | 404 |   15.295201ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:47:44 | 404 |   14.048184ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:48:14 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:48:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:48:14 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:48:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:48:14 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:48:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:48:14 | 404 |   14.241184ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:48:14 | 404 |   13.945743ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:48:14 | 404 |   13.543191ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:48:44 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:48:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:48:44 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:48:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:48:44 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:48:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:48:44 | 404 |   14.551499ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:48:44 | 404 |   15.553336ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:48:44 | 404 |   12.955808ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:49:14 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:49:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:49:14 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:49:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:49:14 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:49:14 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:49:14 | 404 |   14.898629ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:49:14 | 404 |    13.12807ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+[GIN] 2025/06/19 - 11:49:14 | 404 |   17.368393ms |       10.0.0.20 | GET      "/monitoring/health"
+2025/06/19 11:49:44 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:49:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:49:44 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:49:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:49:44 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:49:44 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:49:44 | 404 |   13.409461ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:49:44 | 404 |   13.289912ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:49:44 | 404 |   14.426456ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:50:15 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:50:15 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:50:15 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:50:15 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:50:15 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:50:15 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:50:15 | 404 |    11.22965ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:50:15 | 404 |    12.58838ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:50:15 | 404 |   13.746934ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:50:45 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:50:45 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:50:45 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:50:45 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:50:45 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:50:45 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:50:45 | 404 |    17.12887ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:50:45 | 404 |   16.509498ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:50:45 | 404 |   15.430961ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:51:15 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:51:15 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:51:15 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:51:15 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:51:15 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:51:15 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:51:15 | 404 |   16.428409ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:51:15 | 404 |   15.199322ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:51:15 | 404 |   14.572308ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:51:45 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:51:45 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:51:45 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:51:45 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:51:45 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:51:45 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:51:45 | 404 |   18.039345ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:51:45 | 404 |   20.115825ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:51:45 | 404 |   17.067503ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:52:15 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:52:15 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:52:15 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:52:15 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:52:15 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:52:15 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:52:15 | 404 |   19.808382ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:52:15 | 404 |    17.67788ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:52:15 | 404 |   16.586026ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:52:45 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:52:45 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:52:45 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:52:45 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:52:45 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:52:45 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:52:45 | 404 |   15.422691ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:52:45 | 404 |   16.475426ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:52:45 | 404 |   17.876906ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:53:15 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:53:15 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:53:15 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:53:15 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:53:15 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:53:15 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:53:15 | 404 |    17.41548ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:53:15 | 404 |   17.076162ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:53:15 | 404 |   17.060812ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:53:46 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:53:46 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:53:46 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:53:46 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:53:46 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:53:46 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:53:46 | 404 |    17.40792ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:53:46 | 404 |    15.48486ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:53:46 | 404 |   17.713451ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:54:16 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:54:16 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:54:16 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:54:16 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:54:16 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:54:16 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:54:16 | 404 |   13.841628ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:54:16 | 404 |   13.751422ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+[GIN] 2025/06/19 - 11:54:16 | 404 |   15.565201ms |       10.0.0.20 | GET      "/monitoring/health"
+2025/06/19 11:54:46 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:54:46 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:54:46 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:54:46 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:54:46 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:54:46 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:54:46 | 404 |   10.978711ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:54:46 | 404 |   13.293135ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:54:46 | 404 |   13.012943ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:55:16 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:55:16 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:55:16 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:55:16 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:55:16 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:55:16 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:55:16 | 404 |   16.144606ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:55:16 | 404 |    15.69694ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:55:16 | 404 |   14.217704ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:55:46 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:55:46 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:55:46 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:55:46 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:55:46 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:55:46 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:55:46 | 404 |   14.522903ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:55:46 | 404 |   15.744962ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:55:46 | 404 |   13.497008ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:56:16 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:56:16 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:56:16 NotFoundHandler: 404 for path: /monitoring/metrics
+2025/06/19 11:56:16 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:56:16 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:56:16 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:56:16 | 404 |   13.450582ms |       10.0.0.20 | GET      "/monitoring/health"
+[GIN] 2025/06/19 - 11:56:16 | 404 |   14.743693ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:56:16 | 404 |    14.60679ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"
+2025/06/19 11:56:46 NotFoundHandler: 404 for path: /monitoring/health
+2025/06/19 11:56:46 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:56:46 NotFoundHandler: 404 for path: /monitoring/metrics
+[GIN] 2025/06/19 - 11:56:46 | 404 |    9.835324ms |       10.0.0.20 | GET      "/monitoring/health"
+2025/06/19 11:56:46 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/06/19 11:56:46 NotFoundHandler: 404 for path: /monitoring/errors
+2025/06/19 11:56:46 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+[GIN] 2025/06/19 - 11:56:46 | 404 |   33.276082ms |       10.0.0.20 | GET      "/monitoring/metrics"
+[GIN] 2025/06/19 - 11:56:46 | 404 |   29.104567ms |       10.0.0.20 | GET      "/monitoring/errors?limit=5"

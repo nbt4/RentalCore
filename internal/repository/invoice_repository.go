@@ -64,7 +64,7 @@ func (r *InvoiceRepository) GetInvoices(filter *models.InvoiceFilter) ([]models.
 		}
 		if filter.SearchTerm != "" {
 			searchTerm := "%" + filter.SearchTerm + "%"
-			query = query.Where("invoice_number ILIKE ? OR notes ILIKE ?", searchTerm, searchTerm)
+			query = query.Where("invoice_number LIKE ? OR notes LIKE ?", searchTerm, searchTerm)
 		}
 	}
 
@@ -107,7 +107,8 @@ func (r *InvoiceRepository) GetInvoiceByID(id uint64) (*models.Invoice, error) {
 			return db.Order("sort_order ASC, line_item_id ASC")
 		}).
 		Preload("LineItems.Device").
-		Preload("LineItems.Package").
+		// Temporarily disabled Package preload due to column naming mismatch
+		// Preload("LineItems.Package").
 		Preload("Payments", func(db *gorm.DB) *gorm.DB {
 			return db.Order("payment_date DESC")
 		}).
@@ -134,7 +135,8 @@ func (r *InvoiceRepository) GetInvoiceByNumber(invoiceNumber string) (*models.In
 			return db.Order("sort_order ASC, line_item_id ASC")
 		}).
 		Preload("LineItems.Device").
-		Preload("LineItems.Package").
+		// Temporarily disabled Package preload due to column naming mismatch
+		// Preload("LineItems.Package").
 		Preload("Payments", func(db *gorm.DB) *gorm.DB {
 			return db.Order("payment_date DESC")
 		}).

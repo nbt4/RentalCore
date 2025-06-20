@@ -1,0 +1,667 @@
+2025/06/19 17:27:05 Database connection established successfully
+
+2025/06/19 17:27:05 [31;1m/opt/dev/go-barcode-webapp/internal/compliance/audit_logger.go:39 [35;1mError 1146 (42S02): Table 'TS-Lager.audit_events' doesn't exist
+[0m[33m[11.498ms] [34;1m[rows:0][0m SELECT * FROM `audit_events` ORDER BY timestamp DESC,`audit_events`.`id` LIMIT 1
+2025/06/19 17:27:05 Warning: Failed to create compliance middleware: failed to create GoBD compliance: failed to initialize audit logger: failed to get last audit event: Error 1146 (42S02): Table 'TS-Lager.audit_events' doesn't exist
+
+2025/06/19 17:27:05 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:134
+[0m[33m[11.255ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:05 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:134
+[0m[33m[22.649ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:05 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:134
+[0m[33m[22.527ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
+
+2025/06/19 17:27:05 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:134
+[0m[33m[11.356ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:05 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:134
+[0m[33m[22.612ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:05 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:134
+[0m[33m[11.517ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
+
+2025/06/19 17:27:05 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:134
+[0m[33m[24.178ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:134
+[0m[33m[36.443ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:138
+[0m[33m[11.331ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:138
+[0m[33m[22.734ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:138
+[0m[33m[22.930ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:138
+[0m[33m[10.932ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:138
+[0m[33m[22.787ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:138
+[0m[33m[10.865ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:138
+[0m[33m[24.245ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[10.977ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[22.135ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[23.514ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[10.957ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[22.633ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[11.016ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[24.106ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[11.336ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[23.220ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[23.119ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[11.031ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[23.139ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[10.998ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[22.775ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[33.265ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[11.529ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[22.911ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
+[0m[33m[24.099ms] [34;1m[rows:-][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'TS-Lager' AND table_name = 'users' AND constraint_name = 'fk_sessions_user'
+
+2025/06/19 17:27:06 [31;1m/opt/dev/go-barcode-webapp/cmd/server/main.go:142 [35;1mError 1142 (42000): REFERENCES command denied to user 'tsweb'@'91.9.39.124' for table 'TS-Lager.sessions'
+[0m[33m[12.411ms] [34;1m[rows:0][0m ALTER TABLE `users` ADD CONSTRAINT `fk_sessions_user` FOREIGN KEY (`userID`) REFERENCES `sessions`(`user_id`)
+2025/06/19 17:27:06 Failed to auto-migrate equipment_packages table: Error 1142 (42000): REFERENCES command denied to user 'tsweb'@'91.9.39.124' for table 'TS-Lager.sessions'
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
+[0m[33m[10.786ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
+[0m[33m[22.624ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
+[0m[33m[23.522ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'invoice_line_items' AND table_type = 'BASE TABLE'
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
+[0m[33m[11.504ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
+[0m[33m[23.081ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
+[0m[33m[11.443ms] [34;1m[rows:-][0m SELECT * FROM `invoice_line_items` LIMIT 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
+[0m[33m[23.763ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'invoice_line_items' ORDER BY ORDINAL_POSITION
+
+2025/06/19 17:27:06 [31;1m/opt/dev/go-barcode-webapp/cmd/server/main.go:146 [35;1mError 1170 (42000): BLOB/TEXT column 'device_id' used in key specification without a key length
+[0m[33m[11.136ms] [34;1m[rows:0][0m ALTER TABLE `invoice_line_items` MODIFY COLUMN `device_id` longtext
+2025/06/19 17:27:06 Failed to auto-migrate invoice_templates table: Error 1170 (42000): BLOB/TEXT column 'device_id' used in key specification without a key length
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:150
+[0m[33m[11.353ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:150
+[0m[33m[22.747ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:150
+[0m[33m[23.133ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'company_settings' AND table_type = 'BASE TABLE'
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:150
+[0m[33m[11.239ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:150
+[0m[33m[22.827ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:150
+[0m[33m[11.513ms] [34;1m[rows:-][0m SELECT * FROM `company_settings` LIMIT 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:150
+[0m[33m[23.124ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'company_settings' ORDER BY ORDINAL_POSITION
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[11.023ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[22.663ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[22.757ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[11.466ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[23.117ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[11.133ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[23.708ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[11.292ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[22.608ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[23.341ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[11.403ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[22.544ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:06 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[12.082ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
+
+2025/06/19 17:27:07 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[23.623ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
+
+2025/06/19 17:27:07 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[36.901ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
+
+2025/06/19 17:27:07 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[10.980ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/06/19 17:27:07 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[23.230ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/06/19 17:27:07 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
+[0m[33m[22.956ms] [34;1m[rows:-][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'TS-Lager' AND table_name = 'users' AND constraint_name = 'fk_sessions_user'
+
+2025/06/19 17:27:07 [31;1m/opt/dev/go-barcode-webapp/cmd/server/main.go:154 [35;1mError 1142 (42000): REFERENCES command denied to user 'tsweb'@'91.9.39.124' for table 'TS-Lager.sessions'
+[0m[33m[11.460ms] [34;1m[rows:0][0m ALTER TABLE `users` ADD CONSTRAINT `fk_sessions_user` FOREIGN KEY (`userID`) REFERENCES `sessions`(`user_id`)
+2025/06/19 17:27:07 Failed to auto-migrate email_templates table: Error 1142 (42000): REFERENCES command denied to user 'tsweb'@'91.9.39.124' for table 'TS-Lager.sessions'
+
+2025/06/19 17:27:07 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository_new.go:510
+[0m[33m[99.135ms] [34;1m[rows:1][0m SELECT * FROM `invoice_templates` ORDER BY is_default DESC, name ASC
+2025/06/19 17:27:07 Templates already exist (1), skipping default template creation
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] Loaded HTML Templates (67): 
+	- 
+	- company_settings_FIXED.html
+	- jobs.html
+	- invoice_form.html
+	- case_form.html
+	- email_template_preview.html
+	- invoice_detail.html
+	- case_detail.html
+	- devices_standalone.html
+	- transaction_detail.html
+	- invoice_template_designer_simple.html
+	- invoices_list.html
+	- user_detail.html
+	- equipment_package_form_enhanced.html
+	- job_template_detail.html
+	- signature_form.html
+	- email_templates_list.html
+	- financial_dashboard.html
+	- invoice_template_designer_advanced.html
+	- invoice_preview_new.html
+	- mobile_scanner.html
+	- analytics_dashboard.html
+	- base.html
+	- device_form.html
+	- scan_select_job.html
+	- financial_reports.html
+	- invoice_preview.html
+	- scan_job.html
+	- job_detail.html
+	- transactions_list.html
+	- case_device_mapping.html
+	- equipment_packages_list.html
+	- home_new.html.backup
+	- job_form.html
+	- login.html
+	- cases_list.html
+	- customers.html
+	- devices.html
+	- invoice_template_designer_simple_new.html
+	- security_roles.html
+	- documents_list.html
+	- invoice_form_new.html
+	- invoice_template_designer_new.html
+	- job_templates_list.html
+	- search_results.html
+	- security_audit.html
+	- customer_detail.html
+	- error.html
+	- invoice_templates_list.html
+	- monitoring_dashboard.html
+	- user_form.html
+	- equipment_package_detail.html
+	- invoice_template_designer.html
+	- mobile_scanner_enhanced.html
+	- email_template_form.html
+	- home.html
+	- device_detail.html
+	- equipment_package_form.html
+	- invoice_template_german.html
+	- transaction_form.html
+	- bulk_operations.html
+	- content
+	- customer_form.html
+	- users_list.html
+	- document_upload_form.html
+	- invoice_settings_form.html
+	- job_template_form.html
+
+[GIN-debug] GET    /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (5 handlers)
+[GIN-debug] HEAD   /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (5 handlers)
+[GIN-debug] GET    /uploads/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (5 handlers)
+[GIN-debug] HEAD   /uploads/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (5 handlers)
+[GIN-debug] GET    /sw.js                    --> main.main.func17 (6 handlers)
+[GIN-debug] GET    /manifest.json            --> main.main.func18 (6 handlers)
+
+2025/06/19 17:27:07 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
+[0m[33m[22.989ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'admin' ORDER BY `roles`.`roleID` LIMIT 1
+
+2025/06/19 17:27:07 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
+[0m[33m[22.151ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'manager' ORDER BY `roles`.`roleID` LIMIT 1
+
+2025/06/19 17:27:07 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
+[0m[33m[22.135ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'employee' ORDER BY `roles`.`roleID` LIMIT 1
+
+2025/06/19 17:27:07 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
+[0m[33m[22.713ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'viewer' ORDER BY `roles`.`roleID` LIMIT 1
+[GIN-debug] GET    /                         --> main.setupRoutes.func1 (6 handlers)
+[GIN-debug] GET    /login                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).LoginForm-fm (6 handlers)
+[GIN-debug] POST   /login                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).Login-fm (6 handlers)
+[GIN-debug] GET    /logout                   --> go-barcode-webapp/internal/handlers.(*AuthHandler).Logout-fm (6 handlers)
+[GIN-debug] GET    /debug/invoice-test       --> main.setupRoutes.func2 (6 handlers)
+[GIN-debug] GET    /debug/customer-selection --> main.setupRoutes.func3 (6 handlers)
+[GIN-debug] GET    /dashboard                --> go-barcode-webapp/internal/handlers.(*HomeHandler).Dashboard-fm (7 handlers)
+[GIN-debug] GET    /jobs                     --> go-barcode-webapp/internal/handlers.(*JobHandler).ListJobs-fm (7 handlers)
+[GIN-debug] GET    /jobs/new                 --> go-barcode-webapp/internal/handlers.(*JobHandler).NewJobForm-fm (7 handlers)
+[GIN-debug] POST   /jobs                     --> go-barcode-webapp/internal/handlers.(*JobHandler).CreateJob-fm (7 handlers)
+[GIN-debug] GET    /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).GetJob-fm (7 handlers)
+[GIN-debug] GET    /jobs/:id/edit            --> go-barcode-webapp/internal/handlers.(*JobHandler).EditJobForm-fm (7 handlers)
+[GIN-debug] PUT    /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).UpdateJob-fm (7 handlers)
+[GIN-debug] DELETE /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).DeleteJob-fm (7 handlers)
+[GIN-debug] GET    /jobs/:id/devices         --> go-barcode-webapp/internal/handlers.(*JobHandler).GetJobDevices-fm (7 handlers)
+[GIN-debug] POST   /jobs/:id/devices         --> go-barcode-webapp/internal/handlers.(*JobHandler).AssignDevice-fm (7 handlers)
+[GIN-debug] DELETE /jobs/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*JobHandler).RemoveDevice-fm (7 handlers)
+[GIN-debug] POST   /jobs/:id/bulk-scan       --> go-barcode-webapp/internal/handlers.(*JobHandler).BulkScanDevices-fm (7 handlers)
+[GIN-debug] GET    /devices                  --> go-barcode-webapp/internal/handlers.(*DeviceHandler).ListDevices-fm (7 handlers)
+[GIN-debug] GET    /devices/new              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).NewDeviceForm-fm (7 handlers)
+[GIN-debug] POST   /devices                  --> go-barcode-webapp/internal/handlers.(*DeviceHandler).CreateDevice-fm (7 handlers)
+[GIN-debug] GET    /devices/:id              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDevice-fm (7 handlers)
+[GIN-debug] GET    /devices/:id/edit         --> go-barcode-webapp/internal/handlers.(*DeviceHandler).EditDeviceForm-fm (7 handlers)
+[GIN-debug] PUT    /devices/:id              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).UpdateDevice-fm (7 handlers)
+[GIN-debug] DELETE /devices/:id              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).DeleteDevice-fm (7 handlers)
+[GIN-debug] GET    /devices/:id/qr           --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceQR-fm (7 handlers)
+[GIN-debug] GET    /devices/:id/barcode      --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceBarcode-fm (7 handlers)
+[GIN-debug] GET    /devices/available        --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetAvailableDevices-fm (7 handlers)
+[GIN-debug] GET    /customers                --> go-barcode-webapp/internal/handlers.(*CustomerHandler).ListCustomers-fm (7 handlers)
+[GIN-debug] GET    /customers/new            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).NewCustomerForm-fm (7 handlers)
+[GIN-debug] POST   /customers                --> go-barcode-webapp/internal/handlers.(*CustomerHandler).CreateCustomer-fm (7 handlers)
+[GIN-debug] GET    /customers/:id            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).GetCustomer-fm (7 handlers)
+[GIN-debug] GET    /customers/:id/edit       --> go-barcode-webapp/internal/handlers.(*CustomerHandler).EditCustomerForm-fm (7 handlers)
+[GIN-debug] PUT    /customers/:id            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).UpdateCustomer-fm (7 handlers)
+[GIN-debug] DELETE /customers/:id            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).DeleteCustomer-fm (7 handlers)
+[GIN-debug] GET    /statuses                 --> go-barcode-webapp/internal/handlers.(*StatusHandler).ListStatuses-fm (7 handlers)
+[GIN-debug] GET    /products                 --> go-barcode-webapp/internal/handlers.(*ProductHandler).ListProducts-fm (7 handlers)
+[GIN-debug] GET    /cases                    --> go-barcode-webapp/internal/handlers.(*CaseHandler).ListCases-fm (7 handlers)
+[GIN-debug] GET    /cases/new                --> go-barcode-webapp/internal/handlers.(*CaseHandler).NewCaseForm-fm (7 handlers)
+[GIN-debug] POST   /cases                    --> go-barcode-webapp/internal/handlers.(*CaseHandler).CreateCase-fm (7 handlers)
+[GIN-debug] GET    /cases/:id                --> go-barcode-webapp/internal/handlers.(*CaseHandler).GetCase-fm (7 handlers)
+[GIN-debug] GET    /cases/:id/edit           --> go-barcode-webapp/internal/handlers.(*CaseHandler).EditCaseForm-fm (7 handlers)
+[GIN-debug] PUT    /cases/:id                --> go-barcode-webapp/internal/handlers.(*CaseHandler).UpdateCase-fm (7 handlers)
+[GIN-debug] DELETE /cases/:id                --> go-barcode-webapp/internal/handlers.(*CaseHandler).DeleteCase-fm (7 handlers)
+[GIN-debug] GET    /cases/:id/devices        --> go-barcode-webapp/internal/handlers.(*CaseHandler).CaseDeviceMapping-fm (7 handlers)
+[GIN-debug] POST   /cases/:id/devices        --> go-barcode-webapp/internal/handlers.(*CaseHandler).ScanDeviceToCase-fm (7 handlers)
+[GIN-debug] DELETE /cases/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*CaseHandler).RemoveDeviceFromCase-fm (7 handlers)
+[GIN-debug] GET    /barcodes/device/:serialNo/qr --> go-barcode-webapp/internal/handlers.(*BarcodeHandler).GenerateDeviceQR-fm (7 handlers)
+[GIN-debug] GET    /barcodes/device/:serialNo/barcode --> go-barcode-webapp/internal/handlers.(*BarcodeHandler).GenerateDeviceBarcode-fm (7 handlers)
+[GIN-debug] GET    /scan/select              --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanJobSelection-fm (7 handlers)
+[GIN-debug] GET    /scan/:jobId              --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanJob-fm (7 handlers)
+[GIN-debug] POST   /scan/:jobId/assign       --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanDevice-fm (7 handlers)
+[GIN-debug] DELETE /scan/:jobId/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*ScannerHandler).RemoveDevice-fm (7 handlers)
+[GIN-debug] GET    /analytics                --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).Dashboard-fm (7 handlers)
+[GIN-debug] GET    /analytics/revenue        --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).GetRevenueAPI-fm (7 handlers)
+[GIN-debug] GET    /analytics/equipment      --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).GetEquipmentAPI-fm (7 handlers)
+[GIN-debug] GET    /analytics/export         --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).ExportAnalytics-fm (7 handlers)
+[GIN-debug] GET    /search/global            --> go-barcode-webapp/internal/handlers.(*SearchHandler).GlobalSearch-fm (7 handlers)
+[GIN-debug] POST   /search/advanced          --> go-barcode-webapp/internal/handlers.(*SearchHandler).AdvancedSearch-fm (7 handlers)
+[GIN-debug] GET    /search/suggestions       --> go-barcode-webapp/internal/handlers.(*SearchHandler).SearchSuggestions-fm (7 handlers)
+[GIN-debug] GET    /search/saved             --> go-barcode-webapp/internal/handlers.(*SearchHandler).SavedSearches-fm (7 handlers)
+[GIN-debug] DELETE /search/saved/:id         --> go-barcode-webapp/internal/handlers.(*SearchHandler).DeleteSavedSearch-fm (7 handlers)
+[GIN-debug] POST   /pwa/subscribe            --> go-barcode-webapp/internal/handlers.(*PWAHandler).SubscribePush-fm (7 handlers)
+[GIN-debug] POST   /pwa/unsubscribe          --> go-barcode-webapp/internal/handlers.(*PWAHandler).UnsubscribePush-fm (7 handlers)
+[GIN-debug] POST   /pwa/sync                 --> go-barcode-webapp/internal/handlers.(*PWAHandler).SyncOfflineData-fm (7 handlers)
+[GIN-debug] GET    /pwa/manifest             --> go-barcode-webapp/internal/handlers.(*PWAHandler).GetOfflineManifest-fm (7 handlers)
+[GIN-debug] GET    /pwa/install              --> go-barcode-webapp/internal/handlers.(*PWAHandler).InstallPrompt-fm (7 handlers)
+[GIN-debug] GET    /pwa/status               --> go-barcode-webapp/internal/handlers.(*PWAHandler).GetConnectionStatus-fm (7 handlers)
+[GIN-debug] GET    /workflow/templates       --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).ListJobTemplates-fm (7 handlers)
+[GIN-debug] GET    /workflow/templates/new   --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).NewJobTemplateForm-fm (7 handlers)
+[GIN-debug] POST   /workflow/templates       --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).CreateJobTemplate-fm (7 handlers)
+[GIN-debug] GET    /workflow/templates/:id   --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetJobTemplate-fm (7 handlers)
+[GIN-debug] GET    /workflow/templates/:id/edit --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).EditJobTemplateForm-fm (7 handlers)
+[GIN-debug] PUT    /workflow/templates/:id   --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).UpdateJobTemplate-fm (7 handlers)
+[GIN-debug] DELETE /workflow/templates/:id   --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).DeleteJobTemplate-fm (7 handlers)
+[GIN-debug] POST   /workflow/templates/:id/create-job --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).CreateJobFromTemplate-fm (7 handlers)
+[GIN-debug] GET    /workflow/packages        --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).ListEquipmentPackages-fm (7 handlers)
+[GIN-debug] GET    /workflow/packages/new    --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).NewEquipmentPackageForm-fm (7 handlers)
+[GIN-debug] GET    /workflow/packages/debug  --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).DebugPackageForm-fm (7 handlers)
+[GIN-debug] POST   /workflow/packages        --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).CreateEquipmentPackage-fm (7 handlers)
+[GIN-debug] GET    /workflow/packages/:id    --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetEquipmentPackage-fm (7 handlers)
+[GIN-debug] GET    /workflow/bulk            --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkOperationsForm-fm (7 handlers)
+[GIN-debug] POST   /workflow/bulk/update-status --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkUpdateDeviceStatus-fm (7 handlers)
+[GIN-debug] POST   /workflow/bulk/assign-job --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkAssignToJob-fm (7 handlers)
+[GIN-debug] POST   /workflow/bulk/generate-qr --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkGenerateQRCodes-fm (7 handlers)
+[GIN-debug] GET    /workflow/stats           --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetWorkflowStats-fm (7 handlers)
+[GIN-debug] GET    /documents                --> go-barcode-webapp/internal/handlers.(*DocumentHandler).ListDocuments-fm (7 handlers)
+[GIN-debug] GET    /documents/upload         --> go-barcode-webapp/internal/handlers.(*DocumentHandler).UploadDocumentForm-fm (7 handlers)
+[GIN-debug] POST   /documents/upload         --> go-barcode-webapp/internal/handlers.(*DocumentHandler).UploadDocument-fm (7 handlers)
+[GIN-debug] GET    /documents/:id            --> go-barcode-webapp/internal/handlers.(*DocumentHandler).GetDocument-fm (7 handlers)
+[GIN-debug] GET    /documents/:id/view       --> go-barcode-webapp/internal/handlers.(*DocumentHandler).ViewDocument-fm (7 handlers)
+[GIN-debug] GET    /documents/:id/download   --> go-barcode-webapp/internal/handlers.(*DocumentHandler).DownloadDocument-fm (7 handlers)
+[GIN-debug] DELETE /documents/:id            --> go-barcode-webapp/internal/handlers.(*DocumentHandler).DeleteDocument-fm (7 handlers)
+[GIN-debug] GET    /documents/:id/sign       --> go-barcode-webapp/internal/handlers.(*DocumentHandler).SignatureForm-fm (7 handlers)
+[GIN-debug] POST   /documents/:id/sign       --> go-barcode-webapp/internal/handlers.(*DocumentHandler).AddSignature-fm (7 handlers)
+[GIN-debug] GET    /documents/signatures/:id/verify --> go-barcode-webapp/internal/handlers.(*DocumentHandler).VerifySignature-fm (7 handlers)
+[GIN-debug] GET    /financial                --> go-barcode-webapp/internal/handlers.(*FinancialHandler).FinancialDashboard-fm (7 handlers)
+[GIN-debug] GET    /financial/transactions   --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ListTransactions-fm (7 handlers)
+[GIN-debug] GET    /financial/transactions/new --> go-barcode-webapp/internal/handlers.(*FinancialHandler).NewTransactionForm-fm (7 handlers)
+[GIN-debug] POST   /financial/transactions   --> go-barcode-webapp/internal/handlers.(*FinancialHandler).CreateTransaction-fm (7 handlers)
+[GIN-debug] GET    /financial/transactions/:id --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetTransaction-fm (7 handlers)
+[GIN-debug] PUT    /financial/transactions/:id/status --> go-barcode-webapp/internal/handlers.(*FinancialHandler).UpdateTransactionStatus-fm (7 handlers)
+[GIN-debug] POST   /financial/jobs/:jobId/invoice --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GenerateInvoice-fm (7 handlers)
+[GIN-debug] GET    /financial/reports        --> go-barcode-webapp/internal/handlers.(*FinancialHandler).FinancialReports-fm (7 handlers)
+[GIN-debug] GET    /financial/api/revenue-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetRevenueReport-fm (7 handlers)
+[GIN-debug] GET    /financial/api/payment-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetPaymentReport-fm (7 handlers)
+[GIN-debug] GET    /financial/api/export/transactions --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ExportTransactions-fm (7 handlers)
+[GIN-debug] GET    /financial/api/export/revenue --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ExportRevenue-fm (7 handlers)
+[GIN-debug] GET    /financial/api/export/tax-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ExportTaxReportCSV-fm (7 handlers)
+[GIN-debug] GET    /invoices                 --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).ListInvoices-fm (7 handlers)
+[GIN-debug] GET    /invoices/new             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).NewInvoiceForm-fm (7 handlers)
+[GIN-debug] POST   /invoices                 --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).CreateInvoice-fm (7 handlers)
+[GIN-debug] GET    /invoices/:id             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoice-fm (7 handlers)
+[GIN-debug] GET    /invoices/:id/edit        --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).EditInvoiceForm-fm (7 handlers)
+[GIN-debug] GET    /invoices/:id/preview     --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).PreviewInvoice-fm (7 handlers)
+[GIN-debug] PUT    /invoices/:id             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoice-fm (7 handlers)
+[GIN-debug] PUT    /invoices/:id/status      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoiceStatus-fm (7 handlers)
+[GIN-debug] DELETE /invoices/:id             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).DeleteInvoice-fm (7 handlers)
+[GIN-debug] GET    /invoices/:id/pdf         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GenerateInvoicePDF-fm (7 handlers)
+[GIN-debug] GET    /invoice-templates        --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).ListTemplates-fm (7 handlers)
+[GIN-debug] GET    /invoice-templates/new    --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).NewTemplateForm-fm (7 handlers)
+[GIN-debug] POST   /invoice-templates        --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).CreateTemplate-fm (7 handlers)
+[GIN-debug] GET    /invoice-templates/:id/edit --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).EditTemplateForm-fm (7 handlers)
+[GIN-debug] PUT    /invoice-templates/:id    --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).UpdateTemplate-fm (7 handlers)
+[GIN-debug] DELETE /invoice-templates/:id    --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).DeleteTemplate-fm (7 handlers)
+[GIN-debug] GET    /invoice-templates/:id/preview --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).PreviewTemplate-fm (7 handlers)
+[GIN-debug] POST   /invoice-templates/:id/set-default --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).SetDefaultTemplate-fm (7 handlers)
+[GIN-debug] GET    /settings/company         --> main.setupRoutes.func4 (7 handlers)
+[GIN-debug] GET    /settings/company/api     --> go-barcode-webapp/internal/handlers.(*CompanyHandler).GetCompanySettings-fm (7 handlers)
+[GIN-debug] PUT    /settings/company/api     --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UpdateCompanySettings-fm (7 handlers)
+[GIN-debug] POST   /settings/company/logo    --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UploadCompanyLogo-fm (7 handlers)
+[GIN-debug] DELETE /settings/company/logo    --> go-barcode-webapp/internal/handlers.(*CompanyHandler).DeleteCompanyLogo-fm (7 handlers)
+[GIN-debug] GET    /settings/email-templates --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).ListEmailTemplates-fm (7 handlers)
+[GIN-debug] GET    /settings/email-templates/new --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).NewEmailTemplateForm-fm (7 handlers)
+[GIN-debug] POST   /settings/email-templates --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).CreateEmailTemplate-fm (7 handlers)
+[GIN-debug] GET    /settings/email-templates/:id --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).GetEmailTemplate-fm (7 handlers)
+[GIN-debug] GET    /settings/email-templates/:id/edit --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).EditEmailTemplateForm-fm (7 handlers)
+[GIN-debug] PUT    /settings/email-templates/:id --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).UpdateEmailTemplate-fm (7 handlers)
+[GIN-debug] DELETE /settings/email-templates/:id --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).DeleteEmailTemplate-fm (7 handlers)
+[GIN-debug] GET    /settings/email-templates/:id/preview --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).PreviewEmailTemplate-fm (7 handlers)
+[GIN-debug] POST   /settings/email-templates/:id/set-default --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).SetDefaultEmailTemplate-fm (7 handlers)
+[GIN-debug] POST   /settings/email-templates/:id/test --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).TestEmailTemplate-fm (7 handlers)
+[GIN-debug] GET    /security/roles           --> main.setupRoutes.func5 (7 handlers)
+[GIN-debug] GET    /security/audit           --> main.setupRoutes.func6 (7 handlers)
+[GIN-debug] GET    /security/api/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRoles-fm (7 handlers)
+[GIN-debug] GET    /security/api/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRole-fm (7 handlers)
+[GIN-debug] POST   /security/api/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CreateRole-fm (7 handlers)
+[GIN-debug] PUT    /security/api/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).UpdateRole-fm (7 handlers)
+[GIN-debug] DELETE /security/api/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).DeleteRole-fm (7 handlers)
+[GIN-debug] GET    /security/api/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetUserRoles-fm (7 handlers)
+[GIN-debug] POST   /security/api/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).AssignUserRole-fm (7 handlers)
+[GIN-debug] DELETE /security/api/users/:userId/roles/:roleId --> go-barcode-webapp/internal/handlers.(*SecurityHandler).RevokeUserRole-fm (7 handlers)
+[GIN-debug] GET    /security/api/audit       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLogs-fm (7 handlers)
+[GIN-debug] GET    /security/api/audit/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLog-fm (7 handlers)
+[GIN-debug] GET    /security/api/audit/export --> go-barcode-webapp/internal/handlers.(*SecurityHandler).ExportAuditLogs-fm (7 handlers)
+[GIN-debug] GET    /security/api/permissions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissions-fm (7 handlers)
+[GIN-debug] GET    /security/api/permissions/definitions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissionDefinitionsAPI-fm (7 handlers)
+[GIN-debug] GET    /security/api/permissions/check --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CheckPermission-fm (7 handlers)
+[GIN-debug] GET    /monitoring               --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).Dashboard-fm (7 handlers)
+[GIN-debug] GET    /monitoring/health        --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetApplicationHealth-fm (7 handlers)
+[GIN-debug] GET    /monitoring/metrics       --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetSystemMetrics-fm (7 handlers)
+[GIN-debug] GET    /monitoring/metrics/prometheus --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).ExportMetrics-fm (7 handlers)
+[GIN-debug] GET    /monitoring/performance   --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetPerformanceMetrics-fm (7 handlers)
+[GIN-debug] GET    /monitoring/errors        --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetErrorDetails-fm (7 handlers)
+[GIN-debug] POST   /monitoring/errors/:fingerprint/resolve --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).ResolveError-fm (7 handlers)
+[GIN-debug] POST   /monitoring/test-error    --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).TriggerTestError-fm (7 handlers)
+[GIN-debug] GET    /monitoring/logs          --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetLogStream-fm (7 handlers)
+[GIN-debug] GET    /mobile/scanner/:jobId    --> main.setupRoutes.func7 (7 handlers)
+[GIN-debug] GET    /mobile/scanner/:jobId/enhanced --> main.setupRoutes.func8 (7 handlers)
+[GIN-debug] GET    /users                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).ListUsers-fm (7 handlers)
+[GIN-debug] POST   /users                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).CreateUserWeb-fm (7 handlers)
+[GIN-debug] GET    /user-management/new      --> go-barcode-webapp/internal/handlers.(*AuthHandler).NewUserForm-fm (7 handlers)
+[GIN-debug] GET    /user-management/:id/edit --> go-barcode-webapp/internal/handlers.(*AuthHandler).EditUserForm-fm (7 handlers)
+[GIN-debug] GET    /user-management/:id/view --> go-barcode-webapp/internal/handlers.(*AuthHandler).GetUser-fm (7 handlers)
+[GIN-debug] PUT    /user-management/:id      --> go-barcode-webapp/internal/handlers.(*AuthHandler).UpdateUser-fm (7 handlers)
+[GIN-debug] DELETE /user-management/:id      --> go-barcode-webapp/internal/handlers.(*AuthHandler).DeleteUser-fm (7 handlers)
+[GIN-debug] GET    /users/new                --> main.setupRoutes.func9 (7 handlers)
+[GIN-debug] GET    /api/v1/jobs              --> go-barcode-webapp/internal/handlers.(*JobHandler).ListJobsAPI-fm (7 handlers)
+[GIN-debug] POST   /api/v1/jobs              --> go-barcode-webapp/internal/handlers.(*JobHandler).CreateJobAPI-fm (7 handlers)
+[GIN-debug] GET    /api/v1/jobs/:id          --> go-barcode-webapp/internal/handlers.(*JobHandler).GetJobAPI-fm (7 handlers)
+[GIN-debug] PUT    /api/v1/jobs/:id          --> go-barcode-webapp/internal/handlers.(*JobHandler).UpdateJobAPI-fm (7 handlers)
+[GIN-debug] DELETE /api/v1/jobs/:id          --> go-barcode-webapp/internal/handlers.(*JobHandler).DeleteJobAPI-fm (7 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*JobHandler).AssignDeviceAPI-fm (7 handlers)
+[GIN-debug] DELETE /api/v1/jobs/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*JobHandler).RemoveDeviceAPI-fm (7 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/bulk-scan --> go-barcode-webapp/internal/handlers.(*JobHandler).BulkScanDevicesAPI-fm (7 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/assign-device --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanDevice-fm (7 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/assign-case --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanCase-fm (7 handlers)
+[GIN-debug] GET    /api/v1/devices           --> go-barcode-webapp/internal/handlers.(*DeviceHandler).ListDevicesAPI-fm (7 handlers)
+[GIN-debug] POST   /api/v1/devices           --> go-barcode-webapp/internal/handlers.(*DeviceHandler).CreateDeviceAPI-fm (7 handlers)
+[GIN-debug] GET    /api/v1/devices/:id       --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceAPI-fm (7 handlers)
+[GIN-debug] PUT    /api/v1/devices/:id       --> go-barcode-webapp/internal/handlers.(*DeviceHandler).UpdateDeviceAPI-fm (7 handlers)
+[GIN-debug] DELETE /api/v1/devices/:id       --> go-barcode-webapp/internal/handlers.(*DeviceHandler).DeleteDeviceAPI-fm (7 handlers)
+[GIN-debug] GET    /api/v1/devices/available --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetAvailableDevicesAPI-fm (7 handlers)
+[GIN-debug] GET    /api/v1/customers         --> go-barcode-webapp/internal/handlers.(*CustomerHandler).ListCustomersAPI-fm (7 handlers)
+[GIN-debug] POST   /api/v1/customers         --> go-barcode-webapp/internal/handlers.(*CustomerHandler).CreateCustomerAPI-fm (7 handlers)
+[GIN-debug] GET    /api/v1/customers/:id     --> go-barcode-webapp/internal/handlers.(*CustomerHandler).GetCustomerAPI-fm (7 handlers)
+[GIN-debug] PUT    /api/v1/customers/:id     --> go-barcode-webapp/internal/handlers.(*CustomerHandler).UpdateCustomerAPI-fm (7 handlers)
+[GIN-debug] DELETE /api/v1/customers/:id     --> go-barcode-webapp/internal/handlers.(*CustomerHandler).DeleteCustomerAPI-fm (7 handlers)
+[GIN-debug] GET    /api/v1/cases             --> go-barcode-webapp/internal/handlers.(*CaseHandler).ListCasesAPI-fm (7 handlers)
+[GIN-debug] POST   /api/v1/cases             --> go-barcode-webapp/internal/handlers.(*CaseHandler).CreateCaseAPI-fm (7 handlers)
+[GIN-debug] GET    /api/v1/cases/:id         --> go-barcode-webapp/internal/handlers.(*CaseHandler).GetCaseAPI-fm (7 handlers)
+[GIN-debug] PUT    /api/v1/cases/:id         --> go-barcode-webapp/internal/handlers.(*CaseHandler).UpdateCaseAPI-fm (7 handlers)
+[GIN-debug] DELETE /api/v1/cases/:id         --> go-barcode-webapp/internal/handlers.(*CaseHandler).DeleteCaseAPI-fm (7 handlers)
+[GIN-debug] GET    /api/v1/cases/:id/devices --> go-barcode-webapp/internal/handlers.(*CaseHandler).GetCaseDevicesAPI-fm (7 handlers)
+[GIN-debug] GET    /api/v1/workflow/templates --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).ListJobTemplatesAPI-fm (7 handlers)
+[GIN-debug] POST   /api/v1/workflow/templates --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).CreateJobTemplate-fm (7 handlers)
+[GIN-debug] GET    /api/v1/workflow/templates/most-used --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetMostUsedTemplatesAPI-fm (7 handlers)
+[GIN-debug] GET    /api/v1/workflow/templates/category/:categoryId --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetTemplatesByCategoryAPI-fm (7 handlers)
+[GIN-debug] GET    /api/v1/workflow/templates/:id --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetJobTemplate-fm (7 handlers)
+[GIN-debug] PUT    /api/v1/workflow/templates/:id --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).UpdateJobTemplate-fm (7 handlers)
+[GIN-debug] DELETE /api/v1/workflow/templates/:id --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).DeleteJobTemplate-fm (7 handlers)
+[GIN-debug] POST   /api/v1/workflow/templates/:id/create-job --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).CreateJobFromTemplate-fm (7 handlers)
+[GIN-debug] GET    /api/v1/documents         --> go-barcode-webapp/internal/handlers.(*DocumentHandler).ListDocumentsAPI-fm (7 handlers)
+[GIN-debug] GET    /api/v1/documents/stats   --> go-barcode-webapp/internal/handlers.(*DocumentHandler).GetDocumentStats-fm (7 handlers)
+[GIN-debug] GET    /api/v1/documents/:id     --> go-barcode-webapp/internal/handlers.(*DocumentHandler).GetDocument-fm (7 handlers)
+[GIN-debug] DELETE /api/v1/documents/:id     --> go-barcode-webapp/internal/handlers.(*DocumentHandler).DeleteDocument-fm (7 handlers)
+[GIN-debug] GET    /api/v1/financial/transactions --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ListTransactionsAPI-fm (7 handlers)
+[GIN-debug] GET    /api/v1/financial/stats   --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetFinancialStatsAPI-fm (7 handlers)
+[GIN-debug] GET    /api/v1/financial/revenue-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetRevenueReport-fm (7 handlers)
+[GIN-debug] GET    /api/v1/financial/payment-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetPaymentReport-fm (7 handlers)
+[GIN-debug] GET    /api/v1/invoices          --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoicesAPI-fm (7 handlers)
+[GIN-debug] POST   /api/v1/invoices          --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).CreateInvoice-fm (7 handlers)
+[GIN-debug] GET    /api/v1/invoices/:id      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoice-fm (7 handlers)
+[GIN-debug] PUT    /api/v1/invoices/:id      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoice-fm (7 handlers)
+[GIN-debug] PUT    /api/v1/invoices/:id/status --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoiceStatus-fm (7 handlers)
+[GIN-debug] DELETE /api/v1/invoices/:id      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).DeleteInvoice-fm (7 handlers)
+[GIN-debug] GET    /api/v1/invoices/stats    --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoiceStatsAPI-fm (7 handlers)
+[GIN-debug] GET    /api/v1/invoices/products/:productId --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetProductDetails-fm (7 handlers)
+[GIN-debug] GET    /api/v1/invoices/products/:productId/devices --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetDevicesByProduct-fm (7 handlers)
+[GIN-debug] GET    /api/v1/security/audit    --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLogs-fm (7 handlers)
+[GIN-debug] GET    /api/v1/security/audit/:id --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLog-fm (7 handlers)
+[GIN-debug] GET    /api/v1/security/audit/export --> go-barcode-webapp/internal/handlers.(*SecurityHandler).ExportAuditLogs-fm (7 handlers)
+[GIN-debug] GET    /api/v1/security/auth/users --> go-barcode-webapp/internal/handlers.(*AuthHandler).ListUsersAPI-fm (7 handlers)
+[GIN-debug] GET    /api/invoices             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoicesAPI-fm (7 handlers)
+[GIN-debug] POST   /api/invoices             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).CreateInvoice-fm (7 handlers)
+[GIN-debug] GET    /api/invoices/:id         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoice-fm (7 handlers)
+[GIN-debug] PUT    /api/invoices/:id         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoice-fm (7 handlers)
+[GIN-debug] PUT    /api/invoices/:id/status  --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoiceStatus-fm (7 handlers)
+[GIN-debug] DELETE /api/invoices/:id         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).DeleteInvoice-fm (7 handlers)
+[GIN-debug] GET    /api/invoices/stats       --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoiceStatsAPI-fm (7 handlers)
+[GIN-debug] GET    /api/company-settings     --> go-barcode-webapp/internal/handlers.(*CompanyHandler).GetCompanySettings-fm (7 handlers)
+[GIN-debug] PUT    /api/company-settings     --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UpdateCompanySettings-fm (7 handlers)
+[GIN-debug] POST   /api/company-settings/logo --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UploadCompanyLogo-fm (7 handlers)
+[GIN-debug] DELETE /api/company-settings/logo --> go-barcode-webapp/internal/handlers.(*CompanyHandler).DeleteCompanyLogo-fm (7 handlers)
+[GIN-debug] GET    /api/security/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRoles-fm (7 handlers)
+[GIN-debug] GET    /api/security/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRole-fm (7 handlers)
+[GIN-debug] POST   /api/security/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CreateRole-fm (7 handlers)
+[GIN-debug] PUT    /api/security/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).UpdateRole-fm (7 handlers)
+[GIN-debug] DELETE /api/security/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).DeleteRole-fm (7 handlers)
+[GIN-debug] GET    /api/security/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetUserRoles-fm (7 handlers)
+[GIN-debug] POST   /api/security/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).AssignUserRole-fm (7 handlers)
+[GIN-debug] DELETE /api/security/users/:userId/roles/:roleId --> go-barcode-webapp/internal/handlers.(*SecurityHandler).RevokeUserRole-fm (7 handlers)
+[GIN-debug] GET    /api/security/audit       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLogs-fm (7 handlers)
+[GIN-debug] GET    /api/security/audit/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLog-fm (7 handlers)
+[GIN-debug] GET    /api/security/audit/export --> go-barcode-webapp/internal/handlers.(*SecurityHandler).ExportAuditLogs-fm (7 handlers)
+[GIN-debug] GET    /api/security/permissions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissions-fm (7 handlers)
+[GIN-debug] GET    /api/security/check-permission --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CheckPermission-fm (7 handlers)
+2025/06/19 17:27:07 Server starting on 0.0.0.0:8080
+DEBUG: AuthMiddleware called for URL: /monitoring/health
+DEBUG: No session cookie found, redirecting to login
+DEBUG: AuthMiddleware called for URL: /monitoring/errors
+DEBUG: No session cookie found, redirecting to login
+DEBUG: AuthMiddleware called for URL: /monitoring/metrics
+DEBUG: No session cookie found, redirecting to login
+{"timestamp":"2025-06-19T15:27:35.819377622Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346855818474826","method":"GET","path":"/monitoring/health","status_code":303,"duration":"900.937µs","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+{"timestamp":"2025-06-19T15:27:35.819642205Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346855818533517","method":"GET","path":"/monitoring/errors","status_code":303,"duration":"1.106181ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+{"timestamp":"2025-06-19T15:27:35.819824613Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346855819565675","method":"GET","path":"/monitoring/metrics","status_code":303,"duration":"257.384µs","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+{"timestamp":"2025-06-19T15:27:35.845352513Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346855831195313","method":"GET","path":"/login","status_code":200,"duration":"14.154551ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}
+{"timestamp":"2025-06-19T15:27:35.862440756Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346855851863300","method":"GET","path":"/login","status_code":200,"duration":"10.575843ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}
+{"timestamp":"2025-06-19T15:27:35.879990542Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346855867256805","method":"GET","path":"/login","status_code":200,"duration":"12.73069ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}
+DEBUG: AuthMiddleware called for URL: /monitoring/health
+DEBUG: No session cookie found, redirecting to login
+DEBUG: AuthMiddleware called for URL: /monitoring/metrics
+DEBUG: No session cookie found, redirecting to login
+{"timestamp":"2025-06-19T15:28:06.216995371Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346886216824845","method":"GET","path":"/monitoring/health","status_code":303,"duration":"168.628µs","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+{"timestamp":"2025-06-19T15:28:06.217083773Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346886216843691","method":"GET","path":"/monitoring/metrics","status_code":303,"duration":"238.64µs","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+DEBUG: AuthMiddleware called for URL: /monitoring/errors
+DEBUG: No session cookie found, redirecting to login
+{"timestamp":"2025-06-19T15:28:06.21801905Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346886217933736","method":"GET","path":"/monitoring/errors","status_code":303,"duration":"83.274µs","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+{"timestamp":"2025-06-19T15:28:06.237210783Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346886226928078","method":"GET","path":"/login","status_code":200,"duration":"10.281101ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}
+{"timestamp":"2025-06-19T15:28:06.254833241Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346886243251337","method":"GET","path":"/login","status_code":200,"duration":"11.579142ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}
+{"timestamp":"2025-06-19T15:28:06.274577607Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346886263777542","method":"GET","path":"/login","status_code":200,"duration":"10.797881ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}
+DEBUG: AuthMiddleware called for URL: /monitoring/health
+DEBUG: No session cookie found, redirecting to login
+{"timestamp":"2025-06-19T15:28:36.395192289Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346916395037331","method":"GET","path":"/monitoring/health","status_code":303,"duration":"152.627µs","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+DEBUG: AuthMiddleware called for URL: /monitoring/metrics
+DEBUG: No session cookie found, redirecting to login
+{"timestamp":"2025-06-19T15:28:36.396153801Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346916395987116","method":"GET","path":"/monitoring/metrics","status_code":303,"duration":"160.138µs","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+DEBUG: AuthMiddleware called for URL: /monitoring/errors
+DEBUG: No session cookie found, redirecting to login
+{"timestamp":"2025-06-19T15:28:36.396663369Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346916396540114","method":"GET","path":"/monitoring/errors","status_code":303,"duration":"121.452µs","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+{"timestamp":"2025-06-19T15:28:36.413465478Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346916403757610","method":"GET","path":"/login","status_code":200,"duration":"9.706263ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}
+{"timestamp":"2025-06-19T15:28:36.428122626Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346916417865096","method":"GET","path":"/login","status_code":200,"duration":"10.255717ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}
+{"timestamp":"2025-06-19T15:28:36.44313054Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346916433629596","method":"GET","path":"/login","status_code":200,"duration":"9.498882ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}
+DEBUG: AuthMiddleware called for URL: /monitoring/health
+DEBUG: No session cookie found, redirecting to login
+{"timestamp":"2025-06-19T15:29:06.73249562Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346946732334860","method":"GET","path":"/monitoring/health","status_code":303,"duration":"158.235µs","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+DEBUG: AuthMiddleware called for URL: /monitoring/metrics
+DEBUG: No session cookie found, redirecting to login
+{"timestamp":"2025-06-19T15:29:06.733221365Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346946733087777","method":"GET","path":"/monitoring/metrics","status_code":303,"duration":"131.793µs","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+DEBUG: AuthMiddleware called for URL: /monitoring/errors
+DEBUG: No session cookie found, redirecting to login
+{"timestamp":"2025-06-19T15:29:06.735679188Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346946735509051","method":"GET","path":"/monitoring/errors","status_code":303,"duration":"167.731µs","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+{"timestamp":"2025-06-19T15:29:06.753964574Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346946743733304","method":"GET","path":"/login","status_code":200,"duration":"10.229888ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}
+{"timestamp":"2025-06-19T15:29:06.769388042Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346946760492388","method":"GET","path":"/login","status_code":200,"duration":"8.89353ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}
+{"timestamp":"2025-06-19T15:29:06.784406472Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346946774065230","method":"GET","path":"/login","status_code":200,"duration":"10.339258ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}
+DEBUG: AuthMiddleware called for URL: /settings/company
+DEBUG: Found session cookie: 89377a9371caa2f4b417efb1753fd477a447de35e18924673ac73aaedd91195b
+
+2025/06/19 17:29:08 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:141
+[0m[33m[23.535ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '89377a9371caa2f4b417efb1753fd477a447de35e18924673ac73aaedd91195b' AND expires_at > '2025-06-19 17:29:08.69' ORDER BY `sessions`.`session_id` LIMIT 1
+
+2025/06/19 17:29:08 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:152
+[0m[33m[23.411ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Session valid for user: admin (ID: 5)
+2025/06/19 17:29:08 DEBUG: /settings/company route called directly
+
+2025/06/19 17:29:08 [32m/opt/dev/go-barcode-webapp/internal/handlers/company_handler.go:325
+[0m[33m[11.634ms] [34;1m[rows:1][0m SELECT * FROM `company_settings` ORDER BY `company_settings`.`id` LIMIT 1
+2025/06/19 17:29:08 DEBUG: Loading company_settings_FIXED.html template with title: Firmeneinstellungen
+{"timestamp":"2025-06-19T15:29:08.761255971Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346948690730620","method":"GET","path":"/settings/company","status_code":200,"duration":"70.523688ms","ip":"127.0.0.1","user_agent":"curl/7.88.1","fields":{"bytes_in":0,"bytes_out":33267}}
+DEBUG: AuthMiddleware called for URL: /settings/company
+DEBUG: Found session cookie: 89377a9371caa2f4b417efb1753fd477a447de35e18924673ac73aaedd91195b
+
+2025/06/19 17:29:14 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:141
+[0m[33m[23.819ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '89377a9371caa2f4b417efb1753fd477a447de35e18924673ac73aaedd91195b' AND expires_at > '2025-06-19 17:29:14.73' ORDER BY `sessions`.`session_id` LIMIT 1
+
+2025/06/19 17:29:14 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:152
+[0m[33m[23.364ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Session valid for user: admin (ID: 5)
+2025/06/19 17:29:14 DEBUG: /settings/company route called directly
+
+2025/06/19 17:29:14 [32m/opt/dev/go-barcode-webapp/internal/handlers/company_handler.go:325
+[0m[33m[12.035ms] [34;1m[rows:1][0m SELECT * FROM `company_settings` ORDER BY `company_settings`.`id` LIMIT 1
+2025/06/19 17:29:14 DEBUG: Loading company_settings_FIXED.html template with title: Firmeneinstellungen
+{"timestamp":"2025-06-19T15:29:14.8047583Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346954730674150","method":"GET","path":"/settings/company","status_code":200,"duration":"74.081655ms","ip":"127.0.0.1","user_agent":"curl/7.88.1","fields":{"bytes_in":0,"bytes_out":33267}}
+DEBUG: AuthMiddleware called for URL: /monitoring/health
+DEBUG: No session cookie found, redirecting to login
+{"timestamp":"2025-06-19T15:29:36.73790242Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346976737759305","method":"GET","path":"/monitoring/health","status_code":303,"duration":"140.64µs","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+DEBUG: AuthMiddleware called for URL: /monitoring/metrics
+DEBUG: No session cookie found, redirecting to login
+{"timestamp":"2025-06-19T15:29:36.741112318Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346976740982148","method":"GET","path":"/monitoring/metrics","status_code":303,"duration":"128.126µs","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+DEBUG: AuthMiddleware called for URL: /monitoring/errors
+DEBUG: No session cookie found, redirecting to login
+{"timestamp":"2025-06-19T15:29:36.743803319Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346976743673460","method":"GET","path":"/monitoring/errors","status_code":303,"duration":"127.635µs","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+{"timestamp":"2025-06-19T15:29:36.753424056Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346976744852124","method":"GET","path":"/login","status_code":200,"duration":"8.569598ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}
+{"timestamp":"2025-06-19T15:29:36.768059781Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346976757327227","method":"GET","path":"/login","status_code":200,"duration":"10.730761ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}
+{"timestamp":"2025-06-19T15:29:36.78165213Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750346976772955568","method":"GET","path":"/login","status_code":200,"duration":"8.694779ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}
+DEBUG: AuthMiddleware called for URL: /monitoring/health
+DEBUG: No session cookie found, redirecting to login
+{"timestamp":"2025-06-19T15:30:07.027874157Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750347007027707396","method":"GET","path":"/monitoring/health","status_code":303,"duration":"163.715µs","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+DEBUG: AuthMiddleware called for URL: /monitoring/metrics
+DEBUG: No session cookie found, redirecting to login
+{"timestamp":"2025-06-19T15:30:07.028460133Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750347007028327147","method":"GET","path":"/monitoring/metrics","status_code":303,"duration":"131.152µs","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+DEBUG: AuthMiddleware called for URL: /monitoring/errors
+DEBUG: No session cookie found, redirecting to login
+{"timestamp":"2025-06-19T15:30:07.03017077Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750347007030103682","method":"GET","path":"/monitoring/errors","status_code":303,"duration":"65.045µs","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":33}}
+{"timestamp":"2025-06-19T15:30:07.047377605Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750347007036818885","method":"GET","path":"/login","status_code":200,"duration":"10.556945ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}
+{"timestamp":"2025-06-19T15:30:07.06117665Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750347007052416276","method":"GET","path":"/login","status_code":200,"duration":"8.758551ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}
+{"timestamp":"2025-06-19T15:30:07.076005024Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1750347007065695152","method":"GET","path":"/login","status_code":200,"duration":"10.307377ms","ip":"10.0.0.20","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:139.0) Gecko/20100101 Firefox/139.0","fields":{"bytes_in":0,"bytes_out":7561}}

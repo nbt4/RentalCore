@@ -169,17 +169,22 @@ func (JobTemplate) TableName() string {
 
 type EquipmentPackage struct {
 	PackageID        uint            `gorm:"primaryKey;autoIncrement" json:"packageID"`
-	Name             string          `gorm:"not null" json:"name"`
-	Description      string          `json:"description"`
+	Name             string          `gorm:"not null;size:100" json:"name" binding:"required,min=3,max=100"`
+	Description      string          `gorm:"size:1000" json:"description" binding:"max=1000"`
 	PackageItems     json.RawMessage `gorm:"type:json;not null" json:"packageItems"`
-	PackagePrice     *float64        `gorm:"type:decimal(12,2)" json:"packagePrice"`
-	DiscountPercent  float64         `gorm:"type:decimal(5,2);default:0.00" json:"discountPercent"`
-	MinRentalDays    int             `gorm:"default:1" json:"minRentalDays"`
+	PackagePrice     *float64        `gorm:"type:decimal(12,2)" json:"packagePrice" binding:"omitempty,min=0"`
+	DiscountPercent  float64         `gorm:"type:decimal(5,2);default:0.00" json:"discountPercent" binding:"min=0,max=100"`
+	MinRentalDays    int             `gorm:"default:1" json:"minRentalDays" binding:"min=1,max=365"`
+	MaxRentalDays    *int            `gorm:"" json:"maxRentalDays" binding:"omitempty,min=1,max=3650"`
 	IsActive         bool            `gorm:"default:true" json:"isActive"`
+	Category         string          `gorm:"size:50" json:"category" binding:"max=50"`
+	Tags             string          `gorm:"size:500" json:"tags" binding:"max=500"`
 	CreatedBy        *uint           `json:"createdBy"`
 	CreatedAt        time.Time       `json:"createdAt"`
 	UpdatedAt        time.Time       `json:"updatedAt"`
 	UsageCount       int             `gorm:"default:0" json:"usageCount"`
+	LastUsedAt       *time.Time      `json:"lastUsedAt"`
+	TotalRevenue     float64         `gorm:"type:decimal(12,2);default:0.00" json:"totalRevenue"`
 
 	// Relationships
 	Creator        *User           `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
@@ -192,11 +197,11 @@ func (EquipmentPackage) TableName() string {
 
 type PackageDevice struct {
 	PackageID   uint     `gorm:"primaryKey;column:packageID" json:"packageID"`
-	DeviceID    string   `gorm:"primaryKey;column:deviceID" json:"deviceID"`
-	Quantity    uint     `gorm:"not null;default:1;column:quantity" json:"quantity"`
-	CustomPrice *float64 `gorm:"type:decimal(12,2);column:custom_price" json:"customPrice"`
+	DeviceID    string   `gorm:"primaryKey;column:deviceID;size:50" json:"deviceID" binding:"required,max=50"`
+	Quantity    uint     `gorm:"not null;default:1;column:quantity" json:"quantity" binding:"required,min=1,max=1000"`
+	CustomPrice *float64 `gorm:"type:decimal(12,2);column:custom_price" json:"customPrice" binding:"omitempty,min=0"`
 	IsRequired  bool     `gorm:"not null;default:false;column:is_required" json:"isRequired"`
-	Notes       string   `gorm:"column:notes" json:"notes"`
+	Notes       string   `gorm:"size:500;column:notes" json:"notes" binding:"max=500"`
 	SortOrder   *uint    `gorm:"column:sort_order" json:"sortOrder"`
 	CreatedAt   time.Time `gorm:"column:created_at" json:"createdAt"`
 	UpdatedAt   time.Time `gorm:"column:updated_at" json:"updatedAt"`
@@ -453,4 +458,82 @@ type BulkActionRequest struct {
 	Action   string   `json:"action"`
 	EntityIDs []string `json:"entityIds"`
 	Data     map[string]interface{} `json:"data"`
+}
+
+// Equipment Package DTOs
+type CreateEquipmentPackageRequest struct {
+	Name            string                    `json:"name" binding:"required,min=3,max=100"`
+	Description     string                    `json:"description" binding:"max=1000"`
+	PackagePrice    *float64                  `json:"packagePrice" binding:"omitempty,min=0"`
+	DiscountPercent float64                   `json:"discountPercent" binding:"min=0,max=100"`
+	MinRentalDays   int                       `json:"minRentalDays" binding:"min=1,max=365"`
+	MaxRentalDays   *int                      `json:"maxRentalDays" binding:"omitempty,min=1,max=3650"`
+	IsActive        bool                      `json:"isActive"`
+	Category        string                    `json:"category" binding:"max=50"`
+	Tags            string                    `json:"tags" binding:"max=500"`
+	Devices         []CreatePackageDeviceRequest `json:"devices"`
+}
+
+type CreatePackageDeviceRequest struct {
+	DeviceID    string   `json:"deviceID" binding:"required,max=50"`
+	Quantity    uint     `json:"quantity" binding:"required,min=1,max=1000"`
+	CustomPrice *float64 `json:"customPrice" binding:"omitempty,min=0"`
+	IsRequired  bool     `json:"isRequired"`
+	Notes       string   `json:"notes" binding:"max=500"`
+	SortOrder   *uint    `json:"sortOrder"`
+}
+
+type UpdateEquipmentPackageRequest struct {
+	Name            string                       `json:"name" binding:"required,min=3,max=100"`
+	Description     string                       `json:"description" binding:"max=1000"`
+	PackagePrice    *float64                     `json:"packagePrice" binding:"omitempty,min=0"`
+	DiscountPercent float64                      `json:"discountPercent" binding:"min=0,max=100"`
+	MinRentalDays   int                          `json:"minRentalDays" binding:"min=1,max=365"`
+	MaxRentalDays   *int                         `json:"maxRentalDays" binding:"omitempty,min=1,max=3650"`
+	IsActive        bool                         `json:"isActive"`
+	Category        string                       `json:"category" binding:"max=50"`
+	Tags            string                       `json:"tags" binding:"max=500"`
+	Devices         []UpdatePackageDeviceRequest `json:"devices"`
+}
+
+type UpdatePackageDeviceRequest struct {
+	DeviceID    string   `json:"deviceID" binding:"required,max=50"`
+	Quantity    uint     `json:"quantity" binding:"required,min=1,max=1000"`
+	CustomPrice *float64 `json:"customPrice" binding:"omitempty,min=0"`
+	IsRequired  bool     `json:"isRequired"`
+	Notes       string   `json:"notes" binding:"max=500"`
+	SortOrder   *uint    `json:"sortOrder"`
+}
+
+type EquipmentPackageResponse struct {
+	PackageID       uint                     `json:"packageID"`
+	Name            string                   `json:"name"`
+	Description     string                   `json:"description"`
+	PackagePrice    *float64                 `json:"packagePrice"`
+	DiscountPercent float64                  `json:"discountPercent"`
+	MinRentalDays   int                      `json:"minRentalDays"`
+	MaxRentalDays   *int                     `json:"maxRentalDays"`
+	IsActive        bool                     `json:"isActive"`
+	Category        string                   `json:"category"`
+	Tags            string                   `json:"tags"`
+	UsageCount      int                      `json:"usageCount"`
+	LastUsedAt      *time.Time               `json:"lastUsedAt"`
+	TotalRevenue    float64                  `json:"totalRevenue"`
+	CreatedAt       time.Time                `json:"createdAt"`
+	UpdatedAt       time.Time                `json:"updatedAt"`
+	Creator         *User                    `json:"creator,omitempty"`
+	Devices         []PackageDeviceResponse  `json:"devices,omitempty"`
+	CalculatedPrice float64                  `json:"calculatedPrice"`
+	DeviceCount     int                      `json:"deviceCount"`
+}
+
+type PackageDeviceResponse struct {
+	DeviceID    string   `json:"deviceID"`
+	Quantity    uint     `json:"quantity"`
+	CustomPrice *float64 `json:"customPrice"`
+	IsRequired  bool     `json:"isRequired"`
+	Notes       string   `json:"notes"`
+	SortOrder   *uint    `json:"sortOrder"`
+	Device      *Device  `json:"device,omitempty"`
+	TotalPrice  float64  `json:"totalPrice"`
 }

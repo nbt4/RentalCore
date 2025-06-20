@@ -238,6 +238,34 @@ type FilterParams struct {
 	Available    *bool      `form:"available"`
 	Limit        int        `form:"limit"`
 	Offset       int        `form:"offset"`
+	// Additional fields for optimized repository
+	Page               int    `form:"page"`
+	SortBy             string `form:"sort_by"`
+	SortOrder          string `form:"sort_order"`
+	Status             string `form:"status"`
+	ProductID          *uint  `form:"product_id"`
+	Search             string `form:"search"`
+	AssignmentStatus   string `form:"assignment_status"`
+	JobID              *uint  `form:"job_id"`
+}
+
+// DeviceAssignmentHistory represents the history of device assignments
+type DeviceAssignmentHistory struct {
+	ID           uint      `json:"id" gorm:"primaryKey"`
+	DeviceID     string    `json:"deviceID" gorm:"not null"`
+	JobID        *uint     `json:"jobID" gorm:"index"`
+	CustomerID   *uint     `json:"customerID" gorm:"index"`
+	AssignedAt   time.Time `json:"assignedAt" gorm:"not null"`
+	UnassignedAt *time.Time `json:"unassignedAt"`
+	Duration     *time.Duration `json:"duration"`
+	Notes        string    `json:"notes"`
+	AssignedBy   string    `json:"assignedBy"`
+	CreatedAt    time.Time `json:"createdAt" gorm:"autoCreateTime"`
+	UpdatedAt    time.Time `json:"updatedAt" gorm:"autoUpdateTime"`
+}
+
+func (DeviceAssignmentHistory) TableName() string {
+	return "device_assignment_history"
 }
 
 // User represents a user account for authentication
@@ -296,4 +324,24 @@ type DeviceCase struct {
 
 func (DeviceCase) TableName() string {
 	return "devicescases"
+}
+
+// DeviceCategoryGroup represents devices grouped by category and subcategory
+type DeviceCategoryGroup struct {
+	Category     *Category                      `json:"category"`
+	Subcategories []DeviceSubcategoryGroup      `json:"subcategories"`
+	DeviceCount  int                           `json:"deviceCount"`
+}
+
+type DeviceSubcategoryGroup struct {
+	Subcategory *Subcategory            `json:"subcategory"`
+	Devices     []DeviceWithJobInfo     `json:"devices"`
+	DeviceCount int                     `json:"deviceCount"`
+}
+
+// CategorizedDevicesResponse represents the response structure for categorized devices
+type CategorizedDevicesResponse struct {
+	Categories  []DeviceCategoryGroup   `json:"categories"`
+	Uncategorized []DeviceWithJobInfo   `json:"uncategorized"`
+	TotalDevices int                    `json:"totalDevices"`
 }

@@ -1,0 +1,855 @@
+{{template "base.html" .}}
+{{define "content"}}
+<div class="page-header">
+    <h1><i class="bi bi-boxes"></i> {{if .package}}Edit{{else}}Create{{end}} Equipment Package</h1>
+    <div class="d-flex gap-2">
+        <a href="/workflow/packages" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Packages
+        </a>
+        {{if .package}}
+        <a href="/workflow/packages/{{.package.PackageID}}" class="btn btn-outline-primary">
+            <i class="bi bi-eye"></i> View Package
+        </a>
+        {{end}}
+    </div>
+</div>
+
+<!-- Progress Indicator -->
+<div class="card mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+            <div class="step-indicator">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div class="step-label">Basic Info</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div class="step-label">Devices</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div class="step-label">Pricing</div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div class="step-label">Review</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error Display -->
+{{if .errors}}
+<div class="alert alert-danger" role="alert">
+    <h5><i class="bi bi-exclamation-triangle"></i> Please fix the following errors:</h5>
+    <ul class="mb-0">
+        {{range .errors}}
+        <li>{{.}}</li>
+        {{end}}
+    </ul>
+</div>
+{{end}}
+
+<!-- Form -->
+<form method="POST" action="{{if .package}}/workflow/packages/{{.package.PackageID}}{{else}}/workflow/packages{{end}}" id="packageForm" novalidate>
+    {{if .package}}<input type="hidden" name="_method" value="PUT">{{end}}
+    
+    <!-- Step 1: Basic Information -->
+    <div class="card mb-4 form-step" data-step="1">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-info-circle"></i> Basic Information</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Package Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="name" name="name" 
+                               value="{{if .package}}{{.package.Name}}{{else}}{{.form.Name}}{{end}}" 
+                               required maxlength="100">
+                        <div class="form-text">Enter a descriptive name for this equipment package</div>
+                        <div class="invalid-feedback">Please provide a valid package name (3-100 characters).</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control" id="description" name="description" rows="3" maxlength="1000">{{if .package}}{{.package.Description}}{{else}}{{.form.Description}}{{end}}</textarea>
+                        <div class="form-text">Describe what this package includes and when to use it</div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="mb-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select class="form-select" id="category" name="category">
+                            <option value="">No Category</option>
+                            <option value="audio" {{if eq .package.Category "audio"}}selected{{end}}>Audio Equipment</option>
+                            <option value="lighting" {{if eq .package.Category "lighting"}}selected{{end}}>Lighting</option>
+                            <option value="video" {{if eq .package.Category "video"}}selected{{end}}>Video Equipment</option>
+                            <option value="staging" {{if eq .package.Category "staging"}}selected{{end}}>Staging</option>
+                            <option value="power" {{if eq .package.Category "power"}}selected{{end}}>Power & Cables</option>
+                            <option value="transport" {{if eq .package.Category "transport"}}selected{{end}}>Transport Cases</option>
+                            <option value="custom" {{if eq .package.Category "custom"}}selected{{end}}>Custom Package</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="tags" class="form-label">Tags</label>
+                        <input type="text" class="form-control" id="tags" name="tags" 
+                               value="{{if .package}}{{.package.Tags}}{{else}}{{.form.Tags}}{{end}}" 
+                               placeholder="wedding, corporate, outdoor">
+                        <div class="form-text">Comma-separated tags for easier searching</div>
+                    </div>
+                    
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="isActive" name="isActive" 
+                               {{if .package}}{{if .package.IsActive}}checked{{end}}{{else}}checked{{end}}>
+                        <label class="form-check-label" for="isActive">
+                            <strong>Active Package</strong><br>
+                            <small class="text-muted">Available for selection in new jobs</small>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 2: Device Selection -->
+    <div class="card mb-4 form-step d-none" data-step="2">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><i class="bi bi-cpu"></i> Equipment Selection</h5>
+            <span class="badge bg-primary" id="device-count">0 devices</span>
+        </div>
+        <div class="card-body">
+            <!-- Device Search and Filter -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">Search Devices</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="deviceSearch" placeholder="Search by device ID, product name...">
+                        <button class="btn btn-outline-secondary" type="button" id="searchBtn">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Filter by Category</label>
+                    <select class="form-select" id="deviceCategoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="audio">Audio</option>
+                        <option value="lighting">Lighting</option>
+                        <option value="video">Video</option>
+                        <option value="staging">Staging</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">Filter by Status</label>
+                    <select class="form-select" id="deviceStatusFilter">
+                        <option value="">All Available</option>
+                        <option value="free">Free</option>
+                        <option value="available">Available</option>
+                        <option value="ready">Ready</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Available Devices -->
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Available Devices <span class="text-muted" id="available-count">({{if .availableDevices}}{{len .availableDevices}}{{else}}0{{end}} available)</span></h6>
+                    <div class="device-list available-devices" id="availableDevices" style="max-height: 400px; overflow-y: auto;">
+                        {{if .availableDevices}}
+                            {{range .availableDevices}}
+                            <div class="device-item" data-device-id="{{.DeviceID}}" data-product="{{if .Product}}{{.Product.Name}}{{else}}Unknown{{end}}" data-price="{{if .Product}}{{.Product.ItemCostPerDay}}{{else}}0{{end}}">
+                                <div class="d-flex justify-content-between align-items-center p-3 border rounded mb-2 bg-light">
+                                    <div class="flex-grow-1">
+                                        <div class="fw-bold">{{.DeviceID}}</div>
+                                        <div class="text-muted small">{{if .Product}}{{.Product.Name}}{{else}}No Product{{end}}</div>
+                                        <div class="text-success small">{{.Status}}</div>
+                                        {{if .Product}}
+                                        <div class="text-primary small">€{{printf "%.2f" .Product.ItemCostPerDay}}/day</div>
+                                        {{end}}
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-success add-device-btn">
+                                        <i class="bi bi-plus"></i> Add
+                                    </button>
+                                </div>
+                            </div>
+                            {{end}}
+                        {{else}}
+                        <div class="text-center py-4">
+                            <i class="bi bi-cpu fa-2x text-muted"></i>
+                            <p class="text-muted mt-2">No devices available</p>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <h6>Selected Devices <span class="text-muted" id="selected-count">(0 selected)</span></h6>
+                    <div class="device-list selected-devices" id="selectedDevices" style="max-height: 400px; overflow-y: auto;">
+                        <div class="text-center py-4" id="no-devices-message">
+                            <i class="bi bi-box fa-2x text-muted"></i>
+                            <p class="text-muted mt-2">No devices selected yet</p>
+                            <p class="small text-muted">Add devices from the left panel</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 3: Pricing Configuration -->
+    <div class="card mb-4 form-step d-none" data-step="3">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-currency-euro"></i> Pricing Configuration</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="packagePrice" class="form-label">Package Price (€)</label>
+                        <input type="number" class="form-control" id="packagePrice" name="packagePrice" 
+                               value="{{if .package}}{{if .package.PackagePrice}}{{printf "%.2f" (deref .package.PackagePrice)}}{{end}}{{end}}" 
+                               step="0.01" min="0">
+                        <div class="form-text">
+                            Leave empty to use calculated price from individual devices.<br>
+                            <strong>Calculated Price: €<span id="calculatedPrice">0.00</span>/day</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="discountPercent" class="form-label">Discount Percentage (%)</label>
+                        <input type="number" class="form-control" id="discountPercent" name="discountPercent" 
+                               value="{{if .package}}{{printf "%.2f" .package.DiscountPercent}}{{else}}0{{end}}" 
+                               step="0.01" min="0" max="100">
+                        <div class="form-text">
+                            Discount applied to the package price.<br>
+                            <strong>Final Price: €<span id="finalPrice">0.00</span>/day</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="minRentalDays" class="form-label">Minimum Rental Days</label>
+                        <input type="number" class="form-control" id="minRentalDays" name="minRentalDays" 
+                               value="{{if .package}}{{.package.MinRentalDays}}{{else}}1{{end}}" 
+                               min="1" max="365" required>
+                        <div class="form-text">Minimum number of days for renting this package</div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="maxRentalDays" class="form-label">Maximum Rental Days (Optional)</label>
+                        <input type="number" class="form-control" id="maxRentalDays" name="maxRentalDays" 
+                               value="{{if .package}}{{if .package.MaxRentalDays}}{{deref .package.MaxRentalDays}}{{end}}{{end}}" 
+                               min="1" max="3650">
+                        <div class="form-text">Leave empty for no maximum limit</div>
+                    </div>
+                    
+                    <!-- Pricing Summary -->
+                    <div class="card bg-light">
+                        <div class="card-body">
+                            <h6>Pricing Summary</h6>
+                            <div class="row text-sm">
+                                <div class="col-6">Individual total:</div>
+                                <div class="col-6 text-end">€<span id="individualTotal">0.00</span></div>
+                            </div>
+                            <div class="row text-sm">
+                                <div class="col-6">Package price:</div>
+                                <div class="col-6 text-end">€<span id="packagePriceDisplay">0.00</span></div>
+                            </div>
+                            <div class="row text-sm">
+                                <div class="col-6">Discount:</div>
+                                <div class="col-6 text-end text-danger">-€<span id="discountAmount">0.00</span></div>
+                            </div>
+                            <hr>
+                            <div class="row fw-bold">
+                                <div class="col-6">Final price/day:</div>
+                                <div class="col-6 text-end text-primary">€<span id="finalPriceDisplay">0.00</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 4: Review and Confirm -->
+    <div class="card mb-4 form-step d-none" data-step="4">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="bi bi-check-circle"></i> Review and Confirm</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Package Details</h6>
+                    <table class="table table-sm">
+                        <tr><td>Name:</td><td id="review-name">-</td></tr>
+                        <tr><td>Category:</td><td id="review-category">-</td></tr>
+                        <tr><td>Description:</td><td id="review-description">-</td></tr>
+                        <tr><td>Tags:</td><td id="review-tags">-</td></tr>
+                        <tr><td>Status:</td><td id="review-status">-</td></tr>
+                    </table>
+                    
+                    <h6 class="mt-4">Pricing</h6>
+                    <table class="table table-sm">
+                        <tr><td>Package Price:</td><td id="review-package-price">-</td></tr>
+                        <tr><td>Discount:</td><td id="review-discount">-</td></tr>
+                        <tr><td>Min Rental Days:</td><td id="review-min-days">-</td></tr>
+                        <tr><td>Max Rental Days:</td><td id="review-max-days">-</td></tr>
+                        <tr class="fw-bold"><td>Final Price/Day:</td><td id="review-final-price">-</td></tr>
+                    </table>
+                </div>
+                
+                <div class="col-md-6">
+                    <h6>Devices (<span id="review-device-count">0</span>)</h6>
+                    <div id="review-devices" style="max-height: 300px; overflow-y: auto;">
+                        <!-- Device list will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                <div>
+                    <button type="button" class="btn btn-secondary" id="prevBtn" style="display: none;">
+                        <i class="bi bi-arrow-left"></i> Previous
+                    </button>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-primary" id="nextBtn">
+                        Next <i class="bi bi-arrow-right"></i>
+                    </button>
+                    <button type="submit" class="btn btn-success" id="submitBtn" style="display: none;">
+                        <i class="bi bi-check-circle"></i> {{if .package}}Update{{else}}Create{{end}} Package
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+// Equipment Package Form Controller
+class EquipmentPackageForm {
+    constructor() {
+        this.currentStep = 1;
+        this.selectedDevices = new Map();
+        this.availableDevices = new Map();
+        
+        this.initializeDevices();
+        this.bindEvents();
+        this.updateUI();
+    }
+    
+    initializeDevices() {
+        // Load available devices from the template
+        document.querySelectorAll('#availableDevices .device-item').forEach(item => {
+            const deviceId = item.dataset.deviceId;
+            this.availableDevices.set(deviceId, {
+                id: deviceId,
+                product: item.dataset.product,
+                price: parseFloat(item.dataset.price) || 0,
+                element: item
+            });
+        });
+    }
+    
+    bindEvents() {
+        // Navigation
+        document.getElementById('nextBtn').addEventListener('click', () => this.nextStep());
+        document.getElementById('prevBtn').addEventListener('click', () => this.prevStep());
+        
+        // Device management
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.add-device-btn')) {
+                const deviceItem = e.target.closest('.device-item');
+                this.addDevice(deviceItem.dataset.deviceId);
+            }
+            
+            if (e.target.closest('.remove-device-btn')) {
+                const deviceItem = e.target.closest('.selected-device-item');
+                this.removeDevice(deviceItem.dataset.deviceId);
+            }
+        });
+        
+        // Price calculation
+        ['packagePrice', 'discountPercent'].forEach(id => {
+            document.getElementById(id).addEventListener('input', () => this.calculatePricing());
+        });
+        
+        // Form validation
+        document.getElementById('packageForm').addEventListener('submit', (e) => this.handleSubmit(e));
+        
+        // Real-time validation
+        document.getElementById('name').addEventListener('input', (e) => this.validateField(e.target));
+        
+        // Search functionality
+        document.getElementById('deviceSearch').addEventListener('input', (e) => this.filterDevices());
+        document.getElementById('deviceCategoryFilter').addEventListener('change', () => this.filterDevices());
+        document.getElementById('deviceStatusFilter').addEventListener('change', () => this.filterDevices());
+    }
+    
+    nextStep() {
+        if (this.validateCurrentStep()) {
+            if (this.currentStep < 4) {
+                this.currentStep++;
+                this.updateUI();
+            }
+        }
+    }
+    
+    prevStep() {
+        if (this.currentStep > 1) {
+            this.currentStep--;
+            this.updateUI();
+        }
+    }
+    
+    updateUI() {
+        // Update step indicators
+        document.querySelectorAll('.step').forEach((step, index) => {
+            step.classList.toggle('active', index + 1 <= this.currentStep);
+            step.classList.toggle('completed', index + 1 < this.currentStep);
+        });
+        
+        // Show/hide form steps
+        document.querySelectorAll('.form-step').forEach((step, index) => {
+            step.classList.toggle('d-none', index + 1 !== this.currentStep);
+        });
+        
+        // Update navigation buttons
+        document.getElementById('prevBtn').style.display = this.currentStep > 1 ? 'block' : 'none';
+        document.getElementById('nextBtn').style.display = this.currentStep < 4 ? 'block' : 'none';
+        document.getElementById('submitBtn').style.display = this.currentStep === 4 ? 'block' : 'none';
+        
+        // Update review step
+        if (this.currentStep === 4) {
+            this.updateReview();
+        }
+        
+        // Update device counts
+        this.updateDeviceCounts();
+        this.calculatePricing();
+    }
+    
+    validateCurrentStep() {
+        switch (this.currentStep) {
+            case 1:
+                return this.validateBasicInfo();
+            case 2:
+                return this.validateDevices();
+            case 3:
+                return this.validatePricing();
+            default:
+                return true;
+        }
+    }
+    
+    validateBasicInfo() {
+        const name = document.getElementById('name');
+        if (!name.value.trim() || name.value.length < 3) {
+            name.classList.add('is-invalid');
+            name.focus();
+            return false;
+        }
+        name.classList.remove('is-invalid');
+        name.classList.add('is-valid');
+        return true;
+    }
+    
+    validateDevices() {
+        if (this.selectedDevices.size === 0) {
+            alert('Please select at least one device for this package.');
+            return false;
+        }
+        return true;
+    }
+    
+    validatePricing() {
+        const minDays = document.getElementById('minRentalDays');
+        const maxDays = document.getElementById('maxRentalDays');
+        
+        if (parseInt(minDays.value) < 1) {
+            minDays.classList.add('is-invalid');
+            minDays.focus();
+            return false;
+        }
+        
+        if (maxDays.value && parseInt(maxDays.value) < parseInt(minDays.value)) {
+            maxDays.classList.add('is-invalid');
+            alert('Maximum rental days cannot be less than minimum rental days.');
+            maxDays.focus();
+            return false;
+        }
+        
+        minDays.classList.remove('is-invalid');
+        maxDays.classList.remove('is-invalid');
+        return true;
+    }
+    
+    addDevice(deviceId) {
+        const device = this.availableDevices.get(deviceId);
+        if (!device) return;
+        
+        this.selectedDevices.set(deviceId, {
+            ...device,
+            quantity: 1,
+            customPrice: null,
+            isRequired: false,
+            notes: ''
+        });
+        
+        this.renderSelectedDevices();
+        this.hideAvailableDevice(deviceId);
+        this.updateDeviceCounts();
+        this.calculatePricing();
+    }
+    
+    removeDevice(deviceId) {
+        this.selectedDevices.delete(deviceId);
+        this.renderSelectedDevices();
+        this.showAvailableDevice(deviceId);
+        this.updateDeviceCounts();
+        this.calculatePricing();
+    }
+    
+    renderSelectedDevices() {
+        const container = document.getElementById('selectedDevices');
+        const noMessage = document.getElementById('no-devices-message');
+        
+        if (this.selectedDevices.size === 0) {
+            noMessage.style.display = 'block';
+            return;
+        }
+        
+        noMessage.style.display = 'none';
+        
+        let html = '';
+        this.selectedDevices.forEach((device, deviceId) => {
+            html += this.renderSelectedDeviceItem(device);
+        });
+        
+        container.innerHTML = html + document.getElementById('no-devices-message').outerHTML;
+    }
+    
+    renderSelectedDeviceItem(device) {
+        return `
+            <div class="selected-device-item border rounded mb-2 p-3" data-device-id="${device.id}">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <div class="fw-bold">${device.id}</div>
+                        <div class="text-muted small">${device.product}</div>
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-danger remove-device-btn">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+                
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <label class="form-label form-label-sm">Quantity</label>
+                        <input type="number" class="form-control form-control-sm device-quantity" 
+                               value="${device.quantity}" min="1" max="1000" 
+                               data-device-id="${device.id}">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label form-label-sm">Custom Price (€)</label>
+                        <input type="number" class="form-control form-control-sm device-custom-price" 
+                               value="${device.customPrice || ''}" step="0.01" min="0" 
+                               data-device-id="${device.id}" placeholder="Default: €${device.price.toFixed(2)}">
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-check mt-4">
+                            <input class="form-check-input device-required" type="checkbox" 
+                                   ${device.isRequired ? 'checked' : ''} data-device-id="${device.id}">
+                            <label class="form-check-label form-label-sm">Required</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-2">
+                    <label class="form-label form-label-sm">Notes</label>
+                    <input type="text" class="form-control form-control-sm device-notes" 
+                           value="${device.notes}" data-device-id="${device.id}" 
+                           placeholder="Optional notes">
+                </div>
+                
+                <!-- Hidden inputs for form submission -->
+                <input type="hidden" name="devices[${device.id}][deviceID]" value="${device.id}">
+                <input type="hidden" name="devices[${device.id}][quantity]" value="${device.quantity}" class="hidden-quantity">
+                <input type="hidden" name="devices[${device.id}][customPrice]" value="${device.customPrice || ''}" class="hidden-custom-price">
+                <input type="hidden" name="devices[${device.id}][isRequired]" value="${device.isRequired}" class="hidden-required">
+                <input type="hidden" name="devices[${device.id}][notes]" value="${device.notes}" class="hidden-notes">
+            </div>
+        `;
+    }
+    
+    hideAvailableDevice(deviceId) {
+        const device = this.availableDevices.get(deviceId);
+        if (device && device.element) {
+            device.element.style.display = 'none';
+        }
+    }
+    
+    showAvailableDevice(deviceId) {
+        const device = this.availableDevices.get(deviceId);
+        if (device && device.element) {
+            device.element.style.display = 'block';
+        }
+    }
+    
+    updateDeviceCounts() {
+        document.getElementById('device-count').textContent = `${this.selectedDevices.size} devices`;
+        document.getElementById('selected-count').textContent = `(${this.selectedDevices.size} selected)`;
+    }
+    
+    calculatePricing() {
+        let individualTotal = 0;
+        this.selectedDevices.forEach(device => {
+            const price = device.customPrice || device.price;
+            individualTotal += price * device.quantity;
+        });
+        
+        const packagePrice = parseFloat(document.getElementById('packagePrice').value) || individualTotal;
+        const discountPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
+        const discountAmount = packagePrice * (discountPercent / 100);
+        const finalPrice = packagePrice - discountAmount;
+        
+        // Update displays
+        document.getElementById('calculatedPrice').textContent = individualTotal.toFixed(2);
+        document.getElementById('finalPrice').textContent = finalPrice.toFixed(2);
+        document.getElementById('individualTotal').textContent = individualTotal.toFixed(2);
+        document.getElementById('packagePriceDisplay').textContent = packagePrice.toFixed(2);
+        document.getElementById('discountAmount').textContent = discountAmount.toFixed(2);
+        document.getElementById('finalPriceDisplay').textContent = finalPrice.toFixed(2);
+    }
+    
+    updateReview() {
+        // Basic info
+        document.getElementById('review-name').textContent = document.getElementById('name').value || '-';
+        document.getElementById('review-category').textContent = 
+            document.getElementById('category').selectedOptions[0].text || 'No Category';
+        document.getElementById('review-description').textContent = 
+            document.getElementById('description').value || 'No description';
+        document.getElementById('review-tags').textContent = 
+            document.getElementById('tags').value || 'No tags';
+        document.getElementById('review-status').textContent = 
+            document.getElementById('isActive').checked ? 'Active' : 'Inactive';
+        
+        // Pricing
+        const packagePrice = document.getElementById('packagePrice').value;
+        document.getElementById('review-package-price').textContent = 
+            packagePrice ? `€${parseFloat(packagePrice).toFixed(2)}` : 'Calculated from devices';
+        document.getElementById('review-discount').textContent = 
+            `${document.getElementById('discountPercent').value || 0}%`;
+        document.getElementById('review-min-days').textContent = 
+            `${document.getElementById('minRentalDays').value} day(s)`;
+        document.getElementById('review-max-days').textContent = 
+            document.getElementById('maxRentalDays').value ? 
+            `${document.getElementById('maxRentalDays').value} day(s)` : 'No limit';
+        document.getElementById('review-final-price').textContent = 
+            `€${document.getElementById('finalPriceDisplay').textContent}`;
+        
+        // Devices
+        document.getElementById('review-device-count').textContent = this.selectedDevices.size;
+        const devicesHtml = Array.from(this.selectedDevices.values()).map(device => 
+            `<div class="border rounded p-2 mb-2">
+                <div class="fw-bold">${device.id}</div>
+                <div class="small text-muted">${device.product}</div>
+                <div class="small">Qty: ${device.quantity} | Price: €${(device.customPrice || device.price).toFixed(2)} | ${device.isRequired ? 'Required' : 'Optional'}</div>
+                ${device.notes ? `<div class="small text-info">Notes: ${device.notes}</div>` : ''}
+            </div>`
+        ).join('');
+        document.getElementById('review-devices').innerHTML = devicesHtml || '<p class="text-muted">No devices selected</p>';
+    }
+    
+    filterDevices() {
+        const search = document.getElementById('deviceSearch').value.toLowerCase();
+        const categoryFilter = document.getElementById('deviceCategoryFilter').value;
+        const statusFilter = document.getElementById('deviceStatusFilter').value;
+        
+        document.querySelectorAll('#availableDevices .device-item').forEach(item => {
+            const deviceId = item.dataset.deviceId.toLowerCase();
+            const product = item.dataset.product.toLowerCase();
+            const matchesSearch = !search || deviceId.includes(search) || product.includes(search);
+            
+            // Note: Add category and status filtering logic here if needed
+            const visible = matchesSearch && !this.selectedDevices.has(item.dataset.deviceId);
+            item.style.display = visible ? 'block' : 'none';
+        });
+    }
+    
+    handleSubmit(e) {
+        if (!this.validateCurrentStep()) {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Update hidden form fields with current device data
+        document.querySelectorAll('.selected-device-item').forEach(item => {
+            const deviceId = item.dataset.deviceId;
+            const device = this.selectedDevices.get(deviceId);
+            
+            if (device) {
+                item.querySelector('.hidden-quantity').value = device.quantity;
+                item.querySelector('.hidden-custom-price').value = device.customPrice || '';
+                item.querySelector('.hidden-required').value = device.isRequired;
+                item.querySelector('.hidden-notes').value = device.notes;
+            }
+        });
+        
+        return true;
+    }
+    
+    validateField(field) {
+        const value = field.value.trim();
+        const isValid = value.length >= 3 && value.length <= 100;
+        
+        field.classList.toggle('is-invalid', !isValid);
+        field.classList.toggle('is-valid', isValid);
+        
+        return isValid;
+    }
+}
+
+// Initialize form when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    new EquipmentPackageForm();
+});
+
+// Handle device input changes
+document.addEventListener('input', (e) => {
+    if (e.target.classList.contains('device-quantity')) {
+        const deviceId = e.target.dataset.deviceId;
+        const form = window.equipmentForm || document.querySelector('form');
+        if (form.selectedDevices) {
+            const device = form.selectedDevices.get(deviceId);
+            if (device) {
+                device.quantity = parseInt(e.target.value) || 1;
+                form.calculatePricing();
+            }
+        }
+    }
+    
+    if (e.target.classList.contains('device-custom-price')) {
+        const deviceId = e.target.dataset.deviceId;
+        const form = window.equipmentForm || document.querySelector('form');
+        if (form.selectedDevices) {
+            const device = form.selectedDevices.get(deviceId);
+            if (device) {
+                device.customPrice = parseFloat(e.target.value) || null;
+                form.calculatePricing();
+            }
+        }
+    }
+});
+
+document.addEventListener('change', (e) => {
+    if (e.target.classList.contains('device-required')) {
+        const deviceId = e.target.dataset.deviceId;
+        const form = window.equipmentForm || document.querySelector('form');
+        if (form.selectedDevices) {
+            const device = form.selectedDevices.get(deviceId);
+            if (device) {
+                device.isRequired = e.target.checked;
+            }
+        }
+    }
+});
+</script>
+
+<style>
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    flex: 1;
+}
+
+.step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 15px;
+    left: 60%;
+    width: 80%;
+    height: 2px;
+    background: #dee2e6;
+    z-index: 1;
+}
+
+.step.active:not(:last-child)::after,
+.step.completed:not(:last-child)::after {
+    background: var(--accent-color);
+}
+
+.step-number {
+    width: 30px;
+    height: 30px;
+    border: 2px solid #dee2e6;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    font-weight: bold;
+    position: relative;
+    z-index: 2;
+}
+
+.step.active .step-number {
+    border-color: var(--accent-color);
+    background: var(--accent-color);
+    color: white;
+}
+
+.step.completed .step-number {
+    border-color: var(--success-color);
+    background: var(--success-color);
+    color: white;
+}
+
+.step-label {
+    margin-top: 8px;
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.device-list {
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 0.5rem;
+    background: #f8f9fa;
+}
+
+.device-item,
+.selected-device-item {
+    background: white;
+}
+
+.form-label-sm {
+    font-size: 0.8rem;
+    margin-bottom: 0.25rem;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+}
+</style>
+{{end}}

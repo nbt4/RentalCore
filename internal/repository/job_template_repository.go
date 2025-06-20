@@ -29,7 +29,7 @@ func (r *JobTemplateRepository) List(params *models.FilterParams) ([]models.JobT
 	// Apply filters
 	if params != nil {
 		if params.SearchTerm != "" {
-			query = query.Where("name ILIKE ? OR description ILIKE ?", 
+			query = query.Where("name LIKE ? OR description LIKE ?", 
 				"%"+params.SearchTerm+"%", "%"+params.SearchTerm+"%")
 		}
 		
@@ -172,7 +172,7 @@ func (r *JobTemplateRepository) Count(params *models.FilterParams) (int64, error
 	
 	if params != nil {
 		if params.SearchTerm != "" {
-			query = query.Where("name ILIKE ? OR description ILIKE ?", 
+			query = query.Where("name LIKE ? OR description LIKE ?", 
 				"%"+params.SearchTerm+"%", "%"+params.SearchTerm+"%")
 		}
 		

@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Erstellungszeit: 16. Jun 2025 um 07:19
--- Server-Version: 9.2.0
--- PHP-Version: 8.2.27
+-- Generation Time: Jun 17, 2025 at 07:11 AM
+-- Server version: 9.2.0
+-- PHP Version: 8.2.27
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -18,13 +18,13 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8mb4 */;
 
 --
--- Datenbank: `TS-Lager`
+-- Database: `TS-Lager`
 --
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `analytics_cache`
+-- Table structure for table `analytics_cache`
 --
 
 CREATE TABLE `analytics_cache` (
@@ -40,7 +40,7 @@ CREATE TABLE `analytics_cache` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `audit_log`
+-- Table structure for table `audit_log`
 --
 
 CREATE TABLE `audit_log` (
@@ -60,7 +60,7 @@ CREATE TABLE `audit_log` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `brands`
+-- Table structure for table `brands`
 --
 
 CREATE TABLE `brands` (
@@ -72,7 +72,7 @@ CREATE TABLE `brands` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `cases`
+-- Table structure for table `cases`
 --
 
 CREATE TABLE `cases` (
@@ -89,7 +89,7 @@ CREATE TABLE `cases` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `categories`
+-- Table structure for table `categories`
 --
 
 CREATE TABLE `categories` (
@@ -101,7 +101,7 @@ CREATE TABLE `categories` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `company_settings`
+-- Table structure for table `company_settings`
 --
 
 CREATE TABLE `company_settings` (
@@ -126,7 +126,7 @@ CREATE TABLE `company_settings` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `customers`
+-- Table structure for table `customers`
 --
 
 CREATE TABLE `customers` (
@@ -159,7 +159,7 @@ CREATE TABLE `customers` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `devices`
+-- Table structure for table `devices`
 --
 
 CREATE TABLE `devices` (
@@ -185,7 +185,7 @@ CREATE TABLE `devices` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Trigger `devices`
+-- Triggers `devices`
 --
 DELIMITER $$
 CREATE TRIGGER `devices` BEFORE INSERT ON `devices` FOR EACH ROW BEGIN
@@ -226,7 +226,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `devicescases`
+-- Table structure for table `devicescases`
 --
 
 CREATE TABLE `devicescases` (
@@ -237,7 +237,7 @@ CREATE TABLE `devicescases` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `devicestatushistory`
+-- Table structure for table `devicestatushistory`
 --
 
 CREATE TABLE `devicestatushistory` (
@@ -251,8 +251,8 @@ CREATE TABLE `devicestatushistory` (
 -- --------------------------------------------------------
 
 --
--- Stellvertreter-Struktur des Views `device_earnings_summary`
--- (Siehe unten für die tatsächliche Ansicht)
+-- Stand-in structure for view `device_earnings_summary`
+-- (See below for the actual view)
 --
 CREATE TABLE `device_earnings_summary` (
 `deviceID` varchar(50)
@@ -264,7 +264,7 @@ CREATE TABLE `device_earnings_summary` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `digital_signatures`
+-- Table structure for table `digital_signatures`
 --
 
 CREATE TABLE `digital_signatures` (
@@ -283,7 +283,7 @@ CREATE TABLE `digital_signatures` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `documents`
+-- Table structure for table `documents`
 --
 
 CREATE TABLE `documents` (
@@ -308,7 +308,7 @@ CREATE TABLE `documents` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `employee`
+-- Table structure for table `employee`
 --
 
 CREATE TABLE `employee` (
@@ -328,7 +328,7 @@ CREATE TABLE `employee` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `employeejob`
+-- Table structure for table `employeejob`
 --
 
 CREATE TABLE `employeejob` (
@@ -339,7 +339,7 @@ CREATE TABLE `employeejob` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `equipment_packages`
+-- Table structure for table `equipment_packages`
 --
 
 CREATE TABLE `equipment_packages` (
@@ -355,13 +355,18 @@ CREATE TABLE `equipment_packages` (
   `created_by` bigint UNSIGNED DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `usage_count` int DEFAULT '0'
+  `usage_count` int DEFAULT '0',
+  `max_rental_days` int DEFAULT NULL,
+  `category` varchar(50) DEFAULT NULL,
+  `tags` text,
+  `last_used_at` timestamp NULL DEFAULT NULL,
+  `total_revenue` decimal(12,2) DEFAULT '0.00'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `equipment_usage_logs`
+-- Table structure for table `equipment_usage_logs`
 --
 
 CREATE TABLE `equipment_usage_logs` (
@@ -379,7 +384,7 @@ CREATE TABLE `equipment_usage_logs` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `financial_transactions`
+-- Table structure for table `financial_transactions`
 --
 
 CREATE TABLE `financial_transactions` (
@@ -403,7 +408,7 @@ CREATE TABLE `financial_transactions` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `insuranceprovider`
+-- Table structure for table `insuranceprovider`
 --
 
 CREATE TABLE `insuranceprovider` (
@@ -416,7 +421,7 @@ CREATE TABLE `insuranceprovider` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `insurances`
+-- Table structure for table `insurances`
 --
 
 CREATE TABLE `insurances` (
@@ -432,7 +437,7 @@ CREATE TABLE `insurances` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `invoices`
+-- Table structure for table `invoices`
 --
 
 CREATE TABLE `invoices` (
@@ -465,7 +470,7 @@ CREATE TABLE `invoices` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `invoice_line_items`
+-- Table structure for table `invoice_line_items`
 --
 
 CREATE TABLE `invoice_line_items` (
@@ -489,7 +494,7 @@ CREATE TABLE `invoice_line_items` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `invoice_payments`
+-- Table structure for table `invoice_payments`
 --
 
 CREATE TABLE `invoice_payments` (
@@ -507,7 +512,7 @@ CREATE TABLE `invoice_payments` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `invoice_settings`
+-- Table structure for table `invoice_settings`
 --
 
 CREATE TABLE `invoice_settings` (
@@ -523,7 +528,7 @@ CREATE TABLE `invoice_settings` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `invoice_templates`
+-- Table structure for table `invoice_templates`
 --
 
 CREATE TABLE `invoice_templates` (
@@ -542,7 +547,7 @@ CREATE TABLE `invoice_templates` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `jobCategory`
+-- Table structure for table `jobCategory`
 --
 
 CREATE TABLE `jobCategory` (
@@ -554,7 +559,7 @@ CREATE TABLE `jobCategory` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `jobdevices`
+-- Table structure for table `jobdevices`
 --
 
 CREATE TABLE `jobdevices` (
@@ -566,7 +571,7 @@ CREATE TABLE `jobdevices` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `jobs`
+-- Table structure for table `jobs`
 --
 
 CREATE TABLE `jobs` (
@@ -594,7 +599,7 @@ CREATE TABLE `jobs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Trigger `jobs`
+-- Triggers `jobs`
 --
 DELIMITER $$
 CREATE TRIGGER `jobs_before_insert` BEFORE INSERT ON `jobs` FOR EACH ROW BEGIN
@@ -634,7 +639,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `job_templates`
+-- Table structure for table `job_templates`
 --
 
 CREATE TABLE `job_templates` (
@@ -657,7 +662,7 @@ CREATE TABLE `job_templates` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `maintenanceLogs`
+-- Table structure for table `maintenanceLogs`
 --
 
 CREATE TABLE `maintenanceLogs` (
@@ -672,7 +677,7 @@ CREATE TABLE `maintenanceLogs` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `manufacturer`
+-- Table structure for table `manufacturer`
 --
 
 CREATE TABLE `manufacturer` (
@@ -684,7 +689,7 @@ CREATE TABLE `manufacturer` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `offline_sync_queue`
+-- Table structure for table `offline_sync_queue`
 --
 
 CREATE TABLE `offline_sync_queue` (
@@ -703,7 +708,7 @@ CREATE TABLE `offline_sync_queue` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `package_categories`
+-- Table structure for table `package_categories`
 --
 
 CREATE TABLE `package_categories` (
@@ -720,7 +725,7 @@ CREATE TABLE `package_categories` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `package_devices`
+-- Table structure for table `package_devices`
 --
 
 CREATE TABLE `package_devices` (
@@ -738,7 +743,7 @@ CREATE TABLE `package_devices` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `products`
+-- Table structure for table `products`
 --
 
 CREATE TABLE `products` (
@@ -761,7 +766,7 @@ CREATE TABLE `products` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Trigger `products`
+-- Triggers `products`
 --
 DELIMITER $$
 CREATE TRIGGER `pos_in_subcategory` BEFORE INSERT ON `products` FOR EACH ROW BEGIN
@@ -782,8 +787,8 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Stellvertreter-Struktur des Views `product_revenue`
--- (Siehe unten für die tatsächliche Ansicht)
+-- Stand-in structure for view `product_revenue`
+-- (See below for the actual view)
 --
 CREATE TABLE `product_revenue` (
 `product_name` varchar(50)
@@ -793,7 +798,7 @@ CREATE TABLE `product_revenue` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `push_subscriptions`
+-- Table structure for table `push_subscriptions`
 --
 
 CREATE TABLE `push_subscriptions` (
@@ -812,7 +817,7 @@ CREATE TABLE `push_subscriptions` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `roles`
+-- Table structure for table `roles`
 --
 
 CREATE TABLE `roles` (
@@ -830,7 +835,7 @@ CREATE TABLE `roles` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `saved_searches`
+-- Table structure for table `saved_searches`
 --
 
 CREATE TABLE `saved_searches` (
@@ -850,7 +855,7 @@ CREATE TABLE `saved_searches` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `search_history`
+-- Table structure for table `search_history`
 --
 
 CREATE TABLE `search_history` (
@@ -867,7 +872,7 @@ CREATE TABLE `search_history` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `sessions`
+-- Table structure for table `sessions`
 --
 
 CREATE TABLE `sessions` (
@@ -880,7 +885,7 @@ CREATE TABLE `sessions` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `status`
+-- Table structure for table `status`
 --
 
 CREATE TABLE `status` (
@@ -891,7 +896,7 @@ CREATE TABLE `status` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `subbiercategories`
+-- Table structure for table `subbiercategories`
 --
 
 CREATE TABLE `subbiercategories` (
@@ -902,7 +907,7 @@ CREATE TABLE `subbiercategories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Trigger `subbiercategories`
+-- Triggers `subbiercategories`
 --
 DELIMITER $$
 CREATE TRIGGER `before_insert_subbiercategory` BEFORE INSERT ON `subbiercategories` FOR EACH ROW BEGIN
@@ -931,7 +936,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `subcategories`
+-- Table structure for table `subcategories`
 --
 
 CREATE TABLE `subcategories` (
@@ -942,7 +947,7 @@ CREATE TABLE `subcategories` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
--- Trigger `subcategories`
+-- Triggers `subcategories`
 --
 DELIMITER $$
 CREATE TRIGGER `before_insert_subcategory` BEFORE INSERT ON `subcategories` FOR EACH ROW BEGIN
@@ -971,7 +976,7 @@ DELIMITER ;
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `users`
+-- Table structure for table `users`
 --
 
 CREATE TABLE `users` (
@@ -999,7 +1004,7 @@ CREATE TABLE `users` (
 -- --------------------------------------------------------
 
 --
--- Tabellenstruktur für Tabelle `user_roles`
+-- Table structure for table `user_roles`
 --
 
 CREATE TABLE `user_roles` (
@@ -1014,8 +1019,8 @@ CREATE TABLE `user_roles` (
 -- --------------------------------------------------------
 
 --
--- Stellvertreter-Struktur des Views `view_device_product`
--- (Siehe unten für die tatsächliche Ansicht)
+-- Stand-in structure for view `view_device_product`
+-- (See below for the actual view)
 --
 CREATE TABLE `view_device_product` (
 `deviceID` varchar(50)
@@ -1026,8 +1031,8 @@ CREATE TABLE `view_device_product` (
 -- --------------------------------------------------------
 
 --
--- Stellvertreter-Struktur des Views `vw_invoice_summary`
--- (Siehe unten für die tatsächliche Ansicht)
+-- Stand-in structure for view `vw_invoice_summary`
+-- (See below for the actual view)
 --
 CREATE TABLE `vw_invoice_summary` (
 `balance_due` decimal(12,2)
@@ -1049,8 +1054,8 @@ CREATE TABLE `vw_invoice_summary` (
 -- --------------------------------------------------------
 
 --
--- Stellvertreter-Struktur des Views `vw_package_devices_detail`
--- (Siehe unten für die tatsächliche Ansicht)
+-- Stand-in structure for view `vw_package_devices_detail`
+-- (See below for the actual view)
 --
 CREATE TABLE `vw_package_devices_detail` (
 `custom_price` decimal(12,2)
@@ -1073,8 +1078,8 @@ CREATE TABLE `vw_package_devices_detail` (
 -- --------------------------------------------------------
 
 --
--- Stellvertreter-Struktur des Views `vw_package_summary`
--- (Siehe unten für die tatsächliche Ansicht)
+-- Stand-in structure for view `vw_package_summary`
+-- (See below for the actual view)
 --
 CREATE TABLE `vw_package_summary` (
 `categoryColor` varchar(7)
@@ -1096,11 +1101,11 @@ CREATE TABLE `vw_package_summary` (
 );
 
 --
--- Indizes der exportierten Tabellen
+-- Indexes for dumped tables
 --
 
 --
--- Indizes für die Tabelle `analytics_cache`
+-- Indexes for table `analytics_cache`
 --
 ALTER TABLE `analytics_cache`
   ADD PRIMARY KEY (`cacheID`),
@@ -1108,7 +1113,7 @@ ALTER TABLE `analytics_cache`
   ADD KEY `idx_metric_period` (`metric_name`,`period_type`);
 
 --
--- Indizes für die Tabelle `audit_log`
+-- Indexes for table `audit_log`
 --
 ALTER TABLE `audit_log`
   ADD PRIMARY KEY (`auditID`),
@@ -1118,39 +1123,39 @@ ALTER TABLE `audit_log`
   ADD KEY `idx_timestamp` (`timestamp`);
 
 --
--- Indizes für die Tabelle `brands`
+-- Indexes for table `brands`
 --
 ALTER TABLE `brands`
   ADD PRIMARY KEY (`brandID`),
   ADD KEY `idx_brands_manufacturerID` (`manufacturerID`);
 
 --
--- Indizes für die Tabelle `cases`
+-- Indexes for table `cases`
 --
 ALTER TABLE `cases`
   ADD PRIMARY KEY (`caseID`);
 
 --
--- Indizes für die Tabelle `categories`
+-- Indexes for table `categories`
 --
 ALTER TABLE `categories`
   ADD PRIMARY KEY (`categoryID`);
 
 --
--- Indizes für die Tabelle `company_settings`
+-- Indexes for table `company_settings`
 --
 ALTER TABLE `company_settings`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indizes für die Tabelle `customers`
+-- Indexes for table `customers`
 --
 ALTER TABLE `customers`
   ADD PRIMARY KEY (`customerID`);
 ALTER TABLE `customers` ADD FULLTEXT KEY `idx_customers_search` (`companyname`,`firstname`,`lastname`,`email`);
 
 --
--- Indizes für die Tabelle `devices`
+-- Indexes for table `devices`
 --
 ALTER TABLE `devices`
   ADD PRIMARY KEY (`deviceID`),
@@ -1161,21 +1166,21 @@ ALTER TABLE `devices`
   ADD KEY `idx_devices_qr` (`qr_code`);
 
 --
--- Indizes für die Tabelle `devicescases`
+-- Indexes for table `devicescases`
 --
 ALTER TABLE `devicescases`
   ADD PRIMARY KEY (`caseID`,`deviceID`),
   ADD KEY `deviceID` (`deviceID`);
 
 --
--- Indizes für die Tabelle `devicestatushistory`
+-- Indexes for table `devicestatushistory`
 --
 ALTER TABLE `devicestatushistory`
   ADD PRIMARY KEY (`statushistoryID`),
   ADD KEY `idx_devicestatushistory_deviceID` (`deviceID`);
 
 --
--- Indizes für die Tabelle `digital_signatures`
+-- Indexes for table `digital_signatures`
 --
 ALTER TABLE `digital_signatures`
   ADD PRIMARY KEY (`signatureID`),
@@ -1183,7 +1188,7 @@ ALTER TABLE `digital_signatures`
   ADD KEY `idx_signed_date` (`signed_at`);
 
 --
--- Indizes für die Tabelle `documents`
+-- Indexes for table `documents`
 --
 ALTER TABLE `documents`
   ADD PRIMARY KEY (`documentID`),
@@ -1196,20 +1201,20 @@ ALTER TABLE `documents`
   ADD KEY `idx_documents_date` (`uploaded_at`,`document_type`);
 
 --
--- Indizes für die Tabelle `employee`
+-- Indexes for table `employee`
 --
 ALTER TABLE `employee`
   ADD PRIMARY KEY (`employeeID`);
 
 --
--- Indizes für die Tabelle `employeejob`
+-- Indexes for table `employeejob`
 --
 ALTER TABLE `employeejob`
   ADD PRIMARY KEY (`employeeID`,`jobID`),
   ADD KEY `idx_employeejob_jobID` (`jobID`);
 
 --
--- Indizes für die Tabelle `equipment_packages`
+-- Indexes for table `equipment_packages`
 --
 ALTER TABLE `equipment_packages`
   ADD PRIMARY KEY (`packageID`),
@@ -1218,7 +1223,7 @@ ALTER TABLE `equipment_packages`
   ADD KEY `idx_equipment_packages_category` (`categoryID`);
 
 --
--- Indizes für die Tabelle `equipment_usage_logs`
+-- Indexes for table `equipment_usage_logs`
 --
 ALTER TABLE `equipment_usage_logs`
   ADD PRIMARY KEY (`logID`),
@@ -1228,7 +1233,7 @@ ALTER TABLE `equipment_usage_logs`
   ADD KEY `idx_usage_logs_device_date` (`deviceID`,`timestamp`);
 
 --
--- Indizes für die Tabelle `financial_transactions`
+-- Indexes for table `financial_transactions`
 --
 ALTER TABLE `financial_transactions`
   ADD PRIMARY KEY (`transactionID`),
@@ -1241,20 +1246,20 @@ ALTER TABLE `financial_transactions`
   ADD KEY `idx_transactions_status` (`status`,`due_date`);
 
 --
--- Indizes für die Tabelle `insuranceprovider`
+-- Indexes for table `insuranceprovider`
 --
 ALTER TABLE `insuranceprovider`
   ADD PRIMARY KEY (`insuranceproviderID`);
 
 --
--- Indizes für die Tabelle `insurances`
+-- Indexes for table `insurances`
 --
 ALTER TABLE `insurances`
   ADD PRIMARY KEY (`insuranceID`),
   ADD KEY `insuranceproviderID` (`insuranceproviderID`);
 
 --
--- Indizes für die Tabelle `invoices`
+-- Indexes for table `invoices`
 --
 ALTER TABLE `invoices`
   ADD PRIMARY KEY (`invoice_id`),
@@ -1267,7 +1272,7 @@ ALTER TABLE `invoices`
   ADD KEY `idx_invoices_number` (`invoice_number`);
 
 --
--- Indizes für die Tabelle `invoice_line_items`
+-- Indexes for table `invoice_line_items`
 --
 ALTER TABLE `invoice_line_items`
   ADD PRIMARY KEY (`line_item_id`),
@@ -1277,7 +1282,7 @@ ALTER TABLE `invoice_line_items`
   ADD KEY `idx_invoice_line_items_type` (`item_type`);
 
 --
--- Indizes für die Tabelle `invoice_payments`
+-- Indexes for table `invoice_payments`
 --
 ALTER TABLE `invoice_payments`
   ADD PRIMARY KEY (`payment_id`),
@@ -1285,7 +1290,7 @@ ALTER TABLE `invoice_payments`
   ADD KEY `idx_invoice_payments_date` (`payment_date`);
 
 --
--- Indizes für die Tabelle `invoice_settings`
+-- Indexes for table `invoice_settings`
 --
 ALTER TABLE `invoice_settings`
   ADD PRIMARY KEY (`setting_id`),
@@ -1293,7 +1298,7 @@ ALTER TABLE `invoice_settings`
   ADD KEY `idx_invoice_settings_key` (`setting_key`);
 
 --
--- Indizes für die Tabelle `invoice_templates`
+-- Indexes for table `invoice_templates`
 --
 ALTER TABLE `invoice_templates`
   ADD PRIMARY KEY (`template_id`),
@@ -1301,20 +1306,20 @@ ALTER TABLE `invoice_templates`
   ADD KEY `idx_invoice_templates_active` (`is_active`);
 
 --
--- Indizes für die Tabelle `jobCategory`
+-- Indexes for table `jobCategory`
 --
 ALTER TABLE `jobCategory`
   ADD PRIMARY KEY (`jobcategoryID`);
 
 --
--- Indizes für die Tabelle `jobdevices`
+-- Indexes for table `jobdevices`
 --
 ALTER TABLE `jobdevices`
   ADD PRIMARY KEY (`jobID`,`deviceID`),
   ADD KEY `deviceID` (`deviceID`);
 
 --
--- Indizes für die Tabelle `jobs`
+-- Indexes for table `jobs`
 --
 ALTER TABLE `jobs`
   ADD PRIMARY KEY (`jobID`),
@@ -1326,7 +1331,7 @@ ALTER TABLE `jobs`
 ALTER TABLE `jobs` ADD FULLTEXT KEY `idx_jobs_search` (`description`,`internal_notes`,`customer_notes`);
 
 --
--- Indizes für die Tabelle `job_templates`
+-- Indexes for table `job_templates`
 --
 ALTER TABLE `job_templates`
   ADD PRIMARY KEY (`templateID`),
@@ -1335,7 +1340,7 @@ ALTER TABLE `job_templates`
   ADD KEY `idx_usage_count` (`usage_count` DESC);
 
 --
--- Indizes für die Tabelle `maintenanceLogs`
+-- Indexes for table `maintenanceLogs`
 --
 ALTER TABLE `maintenanceLogs`
   ADD PRIMARY KEY (`maintenanceLogID`),
@@ -1343,13 +1348,13 @@ ALTER TABLE `maintenanceLogs`
   ADD KEY `idx_maintenanceLogs_employeeID` (`employeeID`);
 
 --
--- Indizes für die Tabelle `manufacturer`
+-- Indexes for table `manufacturer`
 --
 ALTER TABLE `manufacturer`
   ADD PRIMARY KEY (`manufacturerID`);
 
 --
--- Indizes für die Tabelle `offline_sync_queue`
+-- Indexes for table `offline_sync_queue`
 --
 ALTER TABLE `offline_sync_queue`
   ADD PRIMARY KEY (`queueID`),
@@ -1357,7 +1362,7 @@ ALTER TABLE `offline_sync_queue`
   ADD KEY `idx_timestamp_synced` (`timestamp`,`synced`);
 
 --
--- Indizes für die Tabelle `package_categories`
+-- Indexes for table `package_categories`
 --
 ALTER TABLE `package_categories`
   ADD PRIMARY KEY (`categoryID`),
@@ -1366,7 +1371,7 @@ ALTER TABLE `package_categories`
   ADD KEY `idx_package_categories_sort` (`sort_order`);
 
 --
--- Indizes für die Tabelle `package_devices`
+-- Indexes for table `package_devices`
 --
 ALTER TABLE `package_devices`
   ADD PRIMARY KEY (`packageID`,`deviceID`),
@@ -1376,7 +1381,7 @@ ALTER TABLE `package_devices`
   ADD KEY `idx_package_devices_sort` (`sort_order`);
 
 --
--- Indizes für die Tabelle `products`
+-- Indexes for table `products`
 --
 ALTER TABLE `products`
   ADD PRIMARY KEY (`productID`),
@@ -1387,7 +1392,7 @@ ALTER TABLE `products`
   ADD KEY `idx_products_subbiercategoryID` (`subbiercategoryID`);
 
 --
--- Indizes für die Tabelle `push_subscriptions`
+-- Indexes for table `push_subscriptions`
 --
 ALTER TABLE `push_subscriptions`
   ADD PRIMARY KEY (`subscriptionID`),
@@ -1395,7 +1400,7 @@ ALTER TABLE `push_subscriptions`
   ADD KEY `idx_last_used` (`last_used`);
 
 --
--- Indizes für die Tabelle `roles`
+-- Indexes for table `roles`
 --
 ALTER TABLE `roles`
   ADD PRIMARY KEY (`roleID`),
@@ -1403,7 +1408,7 @@ ALTER TABLE `roles`
   ADD KEY `idx_active_system` (`is_active`,`is_system_role`);
 
 --
--- Indizes für die Tabelle `saved_searches`
+-- Indexes for table `saved_searches`
 --
 ALTER TABLE `saved_searches`
   ADD PRIMARY KEY (`searchID`),
@@ -1411,7 +1416,7 @@ ALTER TABLE `saved_searches`
   ADD KEY `idx_usage_count` (`usage_count` DESC);
 
 --
--- Indizes für die Tabelle `search_history`
+-- Indexes for table `search_history`
 --
 ALTER TABLE `search_history`
   ADD PRIMARY KEY (`historyID`),
@@ -1419,33 +1424,33 @@ ALTER TABLE `search_history`
   ADD KEY `idx_search_type` (`search_type`,`searched_at`);
 
 --
--- Indizes für die Tabelle `sessions`
+-- Indexes for table `sessions`
 --
 ALTER TABLE `sessions`
   ADD PRIMARY KEY (`session_id`);
 
 --
--- Indizes für die Tabelle `status`
+-- Indexes for table `status`
 --
 ALTER TABLE `status`
   ADD PRIMARY KEY (`statusID`);
 
 --
--- Indizes für die Tabelle `subbiercategories`
+-- Indexes for table `subbiercategories`
 --
 ALTER TABLE `subbiercategories`
   ADD PRIMARY KEY (`subbiercategoryID`),
   ADD KEY `idx_subbiercategories_subcategoyID_unique` (`subcategoryID`) USING BTREE;
 
 --
--- Indizes für die Tabelle `subcategories`
+-- Indexes for table `subcategories`
 --
 ALTER TABLE `subcategories`
   ADD PRIMARY KEY (`subcategoryID`),
   ADD KEY `categoryID` (`categoryID`);
 
 --
--- Indizes für die Tabelle `users`
+-- Indexes for table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`userID`),
@@ -1453,7 +1458,7 @@ ALTER TABLE `users`
   ADD UNIQUE KEY `email` (`email`);
 
 --
--- Indizes für die Tabelle `user_roles`
+-- Indexes for table `user_roles`
 --
 ALTER TABLE `user_roles`
   ADD PRIMARY KEY (`userID`,`roleID`),
@@ -1462,215 +1467,215 @@ ALTER TABLE `user_roles`
   ADD KEY `idx_role_active` (`roleID`,`is_active`);
 
 --
--- AUTO_INCREMENT für exportierte Tabellen
+-- AUTO_INCREMENT for dumped tables
 --
 
 --
--- AUTO_INCREMENT für Tabelle `analytics_cache`
+-- AUTO_INCREMENT for table `analytics_cache`
 --
 ALTER TABLE `analytics_cache`
   MODIFY `cacheID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `audit_log`
+-- AUTO_INCREMENT for table `audit_log`
 --
 ALTER TABLE `audit_log`
   MODIFY `auditID` bigint NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `brands`
+-- AUTO_INCREMENT for table `brands`
 --
 ALTER TABLE `brands`
   MODIFY `brandID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `cases`
+-- AUTO_INCREMENT for table `cases`
 --
 ALTER TABLE `cases`
   MODIFY `caseID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `categories`
+-- AUTO_INCREMENT for table `categories`
 --
 ALTER TABLE `categories`
   MODIFY `categoryID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `company_settings`
+-- AUTO_INCREMENT for table `company_settings`
 --
 ALTER TABLE `company_settings`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `customers`
+-- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
   MODIFY `customerID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `devicestatushistory`
+-- AUTO_INCREMENT for table `devicestatushistory`
 --
 ALTER TABLE `devicestatushistory`
   MODIFY `statushistoryID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `digital_signatures`
+-- AUTO_INCREMENT for table `digital_signatures`
 --
 ALTER TABLE `digital_signatures`
   MODIFY `signatureID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `documents`
+-- AUTO_INCREMENT for table `documents`
 --
 ALTER TABLE `documents`
   MODIFY `documentID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `employee`
+-- AUTO_INCREMENT for table `employee`
 --
 ALTER TABLE `employee`
   MODIFY `employeeID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `equipment_packages`
+-- AUTO_INCREMENT for table `equipment_packages`
 --
 ALTER TABLE `equipment_packages`
   MODIFY `packageID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `equipment_usage_logs`
+-- AUTO_INCREMENT for table `equipment_usage_logs`
 --
 ALTER TABLE `equipment_usage_logs`
   MODIFY `logID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `financial_transactions`
+-- AUTO_INCREMENT for table `financial_transactions`
 --
 ALTER TABLE `financial_transactions`
   MODIFY `transactionID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `insuranceprovider`
+-- AUTO_INCREMENT for table `insuranceprovider`
 --
 ALTER TABLE `insuranceprovider`
   MODIFY `insuranceproviderID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `insurances`
+-- AUTO_INCREMENT for table `insurances`
 --
 ALTER TABLE `insurances`
   MODIFY `insuranceID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `invoices`
+-- AUTO_INCREMENT for table `invoices`
 --
 ALTER TABLE `invoices`
   MODIFY `invoice_id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `invoice_line_items`
+-- AUTO_INCREMENT for table `invoice_line_items`
 --
 ALTER TABLE `invoice_line_items`
   MODIFY `line_item_id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `invoice_payments`
+-- AUTO_INCREMENT for table `invoice_payments`
 --
 ALTER TABLE `invoice_payments`
   MODIFY `payment_id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `invoice_settings`
+-- AUTO_INCREMENT for table `invoice_settings`
 --
 ALTER TABLE `invoice_settings`
   MODIFY `setting_id` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `invoice_templates`
+-- AUTO_INCREMENT for table `invoice_templates`
 --
 ALTER TABLE `invoice_templates`
   MODIFY `template_id` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `jobCategory`
+-- AUTO_INCREMENT for table `jobCategory`
 --
 ALTER TABLE `jobCategory`
   MODIFY `jobcategoryID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `jobs`
+-- AUTO_INCREMENT for table `jobs`
 --
 ALTER TABLE `jobs`
   MODIFY `jobID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `job_templates`
+-- AUTO_INCREMENT for table `job_templates`
 --
 ALTER TABLE `job_templates`
   MODIFY `templateID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `maintenanceLogs`
+-- AUTO_INCREMENT for table `maintenanceLogs`
 --
 ALTER TABLE `maintenanceLogs`
   MODIFY `maintenanceLogID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `manufacturer`
+-- AUTO_INCREMENT for table `manufacturer`
 --
 ALTER TABLE `manufacturer`
   MODIFY `manufacturerID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `offline_sync_queue`
+-- AUTO_INCREMENT for table `offline_sync_queue`
 --
 ALTER TABLE `offline_sync_queue`
   MODIFY `queueID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `package_categories`
+-- AUTO_INCREMENT for table `package_categories`
 --
 ALTER TABLE `package_categories`
   MODIFY `categoryID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `products`
+-- AUTO_INCREMENT for table `products`
 --
 ALTER TABLE `products`
   MODIFY `productID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `push_subscriptions`
+-- AUTO_INCREMENT for table `push_subscriptions`
 --
 ALTER TABLE `push_subscriptions`
   MODIFY `subscriptionID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `roles`
+-- AUTO_INCREMENT for table `roles`
 --
 ALTER TABLE `roles`
   MODIFY `roleID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `saved_searches`
+-- AUTO_INCREMENT for table `saved_searches`
 --
 ALTER TABLE `saved_searches`
   MODIFY `searchID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `search_history`
+-- AUTO_INCREMENT for table `search_history`
 --
 ALTER TABLE `search_history`
   MODIFY `historyID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `status`
+-- AUTO_INCREMENT for table `status`
 --
 ALTER TABLE `status`
   MODIFY `statusID` int NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT für Tabelle `users`
+-- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
   MODIFY `userID` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
@@ -1678,7 +1683,7 @@ ALTER TABLE `users`
 -- --------------------------------------------------------
 
 --
--- Struktur des Views `device_earnings_summary`
+-- Structure for view `device_earnings_summary`
 --
 DROP TABLE IF EXISTS `device_earnings_summary`;
 
@@ -1687,7 +1692,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `device_
 -- --------------------------------------------------------
 
 --
--- Struktur des Views `product_revenue`
+-- Structure for view `product_revenue`
 --
 DROP TABLE IF EXISTS `product_revenue`;
 
@@ -1696,7 +1701,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `product
 -- --------------------------------------------------------
 
 --
--- Struktur des Views `view_device_product`
+-- Structure for view `view_device_product`
 --
 DROP TABLE IF EXISTS `view_device_product`;
 
@@ -1705,7 +1710,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `view_de
 -- --------------------------------------------------------
 
 --
--- Struktur des Views `vw_invoice_summary`
+-- Structure for view `vw_invoice_summary`
 --
 DROP TABLE IF EXISTS `vw_invoice_summary`;
 
@@ -1714,7 +1719,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `vw_invo
 -- --------------------------------------------------------
 
 --
--- Struktur des Views `vw_package_devices_detail`
+-- Structure for view `vw_package_devices_detail`
 --
 DROP TABLE IF EXISTS `vw_package_devices_detail`;
 
@@ -1723,78 +1728,78 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `vw_pack
 -- --------------------------------------------------------
 
 --
--- Struktur des Views `vw_package_summary`
+-- Structure for view `vw_package_summary`
 --
 DROP TABLE IF EXISTS `vw_package_summary`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`%` SQL SECURITY DEFINER VIEW `vw_package_summary`  AS SELECT `ep`.`packageID` AS `packageID`, `ep`.`name` AS `packageName`, `ep`.`description` AS `description`, `ep`.`package_price` AS `packagePrice`, `ep`.`discount_percent` AS `discountPercent`, `ep`.`min_rental_days` AS `minRentalDays`, `ep`.`is_active` AS `isActive`, `ep`.`usage_count` AS `usageCount`, `pc`.`name` AS `categoryName`, `pc`.`color` AS `categoryColor`, count(`pd`.`deviceID`) AS `deviceCount`, sum(`pd`.`quantity`) AS `totalDevices`, sum((case when (`pd`.`is_required` = 1) then `pd`.`quantity` else 0 end)) AS `requiredDevices`, sum((case when (`pd`.`is_required` = 0) then `pd`.`quantity` else 0 end)) AS `optionalDevices`, `ep`.`created_at` AS `createdAt`, `ep`.`updated_at` AS `updatedAt` FROM ((`equipment_packages` `ep` left join `package_categories` `pc` on((`ep`.`categoryID` = `pc`.`categoryID`))) left join `package_devices` `pd` on((`ep`.`packageID` = `pd`.`packageID`))) GROUP BY `ep`.`packageID`, `ep`.`name`, `ep`.`description`, `ep`.`package_price`, `ep`.`discount_percent`, `ep`.`min_rental_days`, `ep`.`is_active`, `ep`.`usage_count`, `pc`.`name`, `pc`.`color`, `ep`.`created_at`, `ep`.`updated_at` ;
 
 --
--- Constraints der exportierten Tabellen
+-- Constraints for dumped tables
 --
 
 --
--- Constraints der Tabelle `audit_log`
+-- Constraints for table `audit_log`
 --
 ALTER TABLE `audit_log`
   ADD CONSTRAINT `audit_log_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE SET NULL;
 
 --
--- Constraints der Tabelle `brands`
+-- Constraints for table `brands`
 --
 ALTER TABLE `brands`
   ADD CONSTRAINT `brands_ibfk_1` FOREIGN KEY (`manufacturerID`) REFERENCES `manufacturer` (`manufacturerID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
--- Constraints der Tabelle `devices`
+-- Constraints for table `devices`
 --
 ALTER TABLE `devices`
   ADD CONSTRAINT `devices_ibfk_1` FOREIGN KEY (`productID`) REFERENCES `products` (`productID`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   ADD CONSTRAINT `devices_ibfk_2` FOREIGN KEY (`insuranceID`) REFERENCES `insurances` (`insuranceID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
--- Constraints der Tabelle `devicescases`
+-- Constraints for table `devicescases`
 --
 ALTER TABLE `devicescases`
   ADD CONSTRAINT `devicescases_ibfk_1` FOREIGN KEY (`caseID`) REFERENCES `cases` (`caseID`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   ADD CONSTRAINT `devicescases_ibfk_2` FOREIGN KEY (`deviceID`) REFERENCES `devices` (`deviceID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
--- Constraints der Tabelle `digital_signatures`
+-- Constraints for table `digital_signatures`
 --
 ALTER TABLE `digital_signatures`
   ADD CONSTRAINT `digital_signatures_ibfk_1` FOREIGN KEY (`documentID`) REFERENCES `documents` (`documentID`) ON DELETE CASCADE;
 
 --
--- Constraints der Tabelle `documents`
+-- Constraints for table `documents`
 --
 ALTER TABLE `documents`
   ADD CONSTRAINT `documents_ibfk_1` FOREIGN KEY (`uploaded_by`) REFERENCES `users` (`userID`) ON DELETE SET NULL,
   ADD CONSTRAINT `documents_ibfk_2` FOREIGN KEY (`parent_documentID`) REFERENCES `documents` (`documentID`) ON DELETE SET NULL;
 
 --
--- Constraints der Tabelle `employeejob`
+-- Constraints for table `employeejob`
 --
 ALTER TABLE `employeejob`
   ADD CONSTRAINT `employeejob_ibfk_1` FOREIGN KEY (`employeeID`) REFERENCES `employee` (`employeeID`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   ADD CONSTRAINT `employeejob_ibfk_2` FOREIGN KEY (`jobID`) REFERENCES `jobs` (`jobID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
--- Constraints der Tabelle `equipment_packages`
+-- Constraints for table `equipment_packages`
 --
 ALTER TABLE `equipment_packages`
   ADD CONSTRAINT `equipment_packages_ibfk_1` FOREIGN KEY (`created_by`) REFERENCES `users` (`userID`) ON DELETE SET NULL,
   ADD CONSTRAINT `fk_equipment_packages_category` FOREIGN KEY (`categoryID`) REFERENCES `package_categories` (`categoryID`) ON DELETE SET NULL ON UPDATE CASCADE;
 
 --
--- Constraints der Tabelle `equipment_usage_logs`
+-- Constraints for table `equipment_usage_logs`
 --
 ALTER TABLE `equipment_usage_logs`
   ADD CONSTRAINT `equipment_usage_logs_ibfk_1` FOREIGN KEY (`deviceID`) REFERENCES `devices` (`deviceID`) ON DELETE CASCADE,
   ADD CONSTRAINT `equipment_usage_logs_ibfk_2` FOREIGN KEY (`jobID`) REFERENCES `jobs` (`jobID`) ON DELETE SET NULL;
 
 --
--- Constraints der Tabelle `financial_transactions`
+-- Constraints for table `financial_transactions`
 --
 ALTER TABLE `financial_transactions`
   ADD CONSTRAINT `financial_transactions_ibfk_1` FOREIGN KEY (`jobID`) REFERENCES `jobs` (`jobID`) ON DELETE CASCADE,
@@ -1802,32 +1807,32 @@ ALTER TABLE `financial_transactions`
   ADD CONSTRAINT `financial_transactions_ibfk_3` FOREIGN KEY (`created_by`) REFERENCES `users` (`userID`) ON DELETE SET NULL;
 
 --
--- Constraints der Tabelle `insurances`
+-- Constraints for table `insurances`
 --
 ALTER TABLE `insurances`
   ADD CONSTRAINT `insurances_ibfk_1` FOREIGN KEY (`insuranceproviderID`) REFERENCES `insuranceprovider` (`insuranceproviderID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
--- Constraints der Tabelle `invoice_line_items`
+-- Constraints for table `invoice_line_items`
 --
 ALTER TABLE `invoice_line_items`
   ADD CONSTRAINT `invoice_line_items_ibfk_1` FOREIGN KEY (`invoice_id`) REFERENCES `invoices` (`invoice_id`) ON DELETE CASCADE;
 
 --
--- Constraints der Tabelle `invoice_payments`
+-- Constraints for table `invoice_payments`
 --
 ALTER TABLE `invoice_payments`
   ADD CONSTRAINT `invoice_payments_ibfk_1` FOREIGN KEY (`invoice_id`) REFERENCES `invoices` (`invoice_id`) ON DELETE CASCADE;
 
 --
--- Constraints der Tabelle `jobdevices`
+-- Constraints for table `jobdevices`
 --
 ALTER TABLE `jobdevices`
   ADD CONSTRAINT `jobdevices_ibfk_2` FOREIGN KEY (`jobID`) REFERENCES `jobs` (`jobID`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   ADD CONSTRAINT `jobdevices_ibfk_3` FOREIGN KEY (`deviceID`) REFERENCES `devices` (`deviceID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
--- Constraints der Tabelle `jobs`
+-- Constraints for table `jobs`
 --
 ALTER TABLE `jobs`
   ADD CONSTRAINT `jobs_ibfk_1` FOREIGN KEY (`customerID`) REFERENCES `customers` (`customerID`) ON DELETE RESTRICT ON UPDATE RESTRICT,
@@ -1837,33 +1842,33 @@ ALTER TABLE `jobs`
   ADD CONSTRAINT `jobs_ibfk_5` FOREIGN KEY (`contract_documentID`) REFERENCES `documents` (`documentID`) ON DELETE SET NULL;
 
 --
--- Constraints der Tabelle `job_templates`
+-- Constraints for table `job_templates`
 --
 ALTER TABLE `job_templates`
   ADD CONSTRAINT `job_templates_ibfk_1` FOREIGN KEY (`jobcategoryID`) REFERENCES `jobCategory` (`jobcategoryID`) ON DELETE SET NULL,
   ADD CONSTRAINT `job_templates_ibfk_2` FOREIGN KEY (`created_by`) REFERENCES `users` (`userID`) ON DELETE SET NULL;
 
 --
--- Constraints der Tabelle `maintenanceLogs`
+-- Constraints for table `maintenanceLogs`
 --
 ALTER TABLE `maintenanceLogs`
   ADD CONSTRAINT `maintenanceLogs_ibfk_2` FOREIGN KEY (`employeeID`) REFERENCES `employee` (`employeeID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
--- Constraints der Tabelle `offline_sync_queue`
+-- Constraints for table `offline_sync_queue`
 --
 ALTER TABLE `offline_sync_queue`
   ADD CONSTRAINT `offline_sync_queue_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE;
 
 --
--- Constraints der Tabelle `package_devices`
+-- Constraints for table `package_devices`
 --
 ALTER TABLE `package_devices`
   ADD CONSTRAINT `fk_package_devices_device` FOREIGN KEY (`deviceID`) REFERENCES `devices` (`deviceID`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_package_devices_package` FOREIGN KEY (`packageID`) REFERENCES `equipment_packages` (`packageID`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
--- Constraints der Tabelle `products`
+-- Constraints for table `products`
 --
 ALTER TABLE `products`
   ADD CONSTRAINT `products_ibfk_1` FOREIGN KEY (`brandID`) REFERENCES `brands` (`brandID`) ON DELETE RESTRICT ON UPDATE RESTRICT,
@@ -1873,37 +1878,37 @@ ALTER TABLE `products`
   ADD CONSTRAINT `products_ibfk_5` FOREIGN KEY (`subcategoryID`) REFERENCES `subcategories` (`subcategoryID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
--- Constraints der Tabelle `push_subscriptions`
+-- Constraints for table `push_subscriptions`
 --
 ALTER TABLE `push_subscriptions`
   ADD CONSTRAINT `push_subscriptions_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE;
 
 --
--- Constraints der Tabelle `saved_searches`
+-- Constraints for table `saved_searches`
 --
 ALTER TABLE `saved_searches`
   ADD CONSTRAINT `saved_searches_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE;
 
 --
--- Constraints der Tabelle `search_history`
+-- Constraints for table `search_history`
 --
 ALTER TABLE `search_history`
   ADD CONSTRAINT `search_history_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE SET NULL;
 
 --
--- Constraints der Tabelle `subbiercategories`
+-- Constraints for table `subbiercategories`
 --
 ALTER TABLE `subbiercategories`
   ADD CONSTRAINT `subbiercategories_ibfk_1` FOREIGN KEY (`subcategoryID`) REFERENCES `subcategories` (`subcategoryID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
--- Constraints der Tabelle `subcategories`
+-- Constraints for table `subcategories`
 --
 ALTER TABLE `subcategories`
   ADD CONSTRAINT `subcategories_ibfk_1` FOREIGN KEY (`categoryID`) REFERENCES `categories` (`categoryID`) ON DELETE RESTRICT ON UPDATE RESTRICT;
 
 --
--- Constraints der Tabelle `user_roles`
+-- Constraints for table `user_roles`
 --
 ALTER TABLE `user_roles`
   ADD CONSTRAINT `user_roles_ibfk_1` FOREIGN KEY (`userID`) REFERENCES `users` (`userID`) ON DELETE CASCADE,
@@ -1914,3 +1919,4 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+

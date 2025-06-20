@@ -32,18 +32,25 @@ func NewPDFService(pdfConfig *config.PDFConfig) *PDFService {
 
 // GenerateInvoicePDF generates a PDF from an invoice
 func (s *PDFService) GenerateInvoicePDF(invoice *models.Invoice, company *models.CompanySettings, settings *models.InvoiceSettings) ([]byte, error) {
+	log.Printf("PDFService: Generating PDF for invoice %s with %d line items", invoice.InvoiceNumber, len(invoice.LineItems))
+	
 	// Create HTML content for the invoice
 	htmlContent, err := s.generateInvoiceHTML(invoice, company, settings)
 	if err != nil {
+		log.Printf("PDFService: Failed to generate HTML: %v", err)
 		return nil, fmt.Errorf("failed to generate HTML: %v", err)
 	}
+
+	log.Printf("PDFService: Generated HTML content (%d bytes)", len(htmlContent))
 
 	// Convert HTML to PDF
 	pdfBytes, err := s.convertHTMLToPDF(htmlContent)
 	if err != nil {
+		log.Printf("PDFService: Failed to convert HTML to PDF: %v", err)
 		return nil, fmt.Errorf("failed to convert HTML to PDF: %v", err)
 	}
 
+	log.Printf("PDFService: Generated PDF (%d bytes)", len(pdfBytes))
 	return pdfBytes, nil
 }
 
@@ -341,6 +348,7 @@ func (s *PDFService) generateInvoiceHTML(invoice *models.Invoice, company *model
                 </tr>
             </thead>
             <tbody>
+                {{if .Invoice.LineItems}}
                 {{range .Invoice.LineItems}}
                 <tr>
                     <td>
@@ -364,6 +372,13 @@ func (s *PDFService) generateInvoiceHTML(invoice *models.Invoice, company *model
                         {{end}}
                     </td>
                     <td class="text-right">{{$.Settings.CurrencySymbol}}{{printf "%.2f" .TotalPrice}}</td>
+                </tr>
+                {{end}}
+                {{else}}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 20px; color: #666;">
+                        No line items have been added to this invoice yet.
+                    </td>
                 </tr>
                 {{end}}
             </tbody>

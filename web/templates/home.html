@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home - RentalCore</title>
+    <title>{{.title}} - RentalCore</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -11,9 +11,10 @@
     <link rel="manifest" href="/static/manifest.json">
     <meta name="theme-color" content="#1e293b">
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
+<body class="animate-fade-in">
+    <!-- Professional Navigation Bar -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
             <a class="navbar-brand" href="/">
                 <i class="bi bi-gear-wide-connected"></i> RentalCore
             </a>
@@ -39,26 +40,32 @@
                             <i class="bi bi-tools"></i> Tools
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="toolsDropdown">
+                            <li><h6 class="dropdown-header">Management</h6></li>
                             <li><a class="dropdown-item" href="/workflow/templates"><i class="bi bi-file-earmark-text"></i> Job Templates</a></li>
                             <li><a class="dropdown-item" href="/workflow/packages"><i class="bi bi-box-seam"></i> Equipment Packages</a></li>
                             <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Business</h6></li>
                             <li><a class="dropdown-item" href="/invoices"><i class="bi bi-file-text"></i> Invoices</a></li>
                             <li><a class="dropdown-item" href="/analytics"><i class="bi bi-graph-up"></i> Analytics</a></li>
                             <li><a class="dropdown-item" href="/financial"><i class="bi bi-calculator"></i> Financial</a></li>
                             <li><a class="dropdown-item" href="/documents"><i class="bi bi-file-earmark"></i> Documents</a></li>
                             <li><hr class="dropdown-divider"></li>
+                            <li><h6 class="dropdown-header">Utilities</h6></li>
                             <li><a class="dropdown-item" href="/search/global"><i class="bi bi-search"></i> Advanced Search</a></li>
                             <li><a class="dropdown-item" href="/workflow/bulk"><i class="bi bi-gear"></i> Bulk Operations</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="navbar-nav">
-                    <button class="btn btn-outline-light btn-sm me-2" onclick="toggleTheme()">
+                    <a href="/scan/select" class="btn btn-outline-primary-enhanced btn-sm me-2" title="Launch Scanner">
+                        <i class="bi bi-qr-code-scan me-1"></i> Scan
+                    </a>
+                    <button class="btn btn-outline-light btn-sm me-2" onclick="toggleTheme()" title="Toggle theme">
                         <i class="bi bi-moon-fill" id="theme-icon"></i>
                     </button>
                     {{if .user}}
                     <div class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-light" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-person-circle"></i> {{.user.Username}}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
@@ -69,23 +76,24 @@
                             <li><a class="dropdown-item" href="/users">
                                 <i class="bi bi-people-fill"></i> User Management
                             </a></li>
-                            <li><a class="dropdown-item" href="/security/roles">
-                                <i class="bi bi-shield-check"></i> Security & Roles
-                            </a></li>
                             <li><hr class="dropdown-divider"></li>
                             <li><a class="dropdown-item" href="/logout">
                                 <i class="bi bi-box-arrow-right"></i> Logout
                             </a></li>
                         </ul>
                     </div>
+                    {{else}}
+                    <a class="btn btn-primary btn-sm" href="/login">
+                        <i class="bi bi-box-arrow-in-right"></i> Login
+                    </a>
                     {{end}}
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="container mt-4">
-{{define "content"}}
+    <!-- Main Content Area -->
+    <main class="container-fluid mt-4 animate-slide-up">
 <!-- Hero Section -->
 <div class="row mb-5">
     <div class="col-12">
@@ -419,17 +427,39 @@
         <div class="card border-0 shadow-sm">
             <div class="card-body p-4">
                 <div class="d-flex align-items-center mb-3">
-                    <div class="bg-secondary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                        <i class="bi bi-tools text-secondary"></i>
+                    <div class="bg-purple bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; background-color: rgba(168, 85, 247, 0.15) !important;">
+                        <i class="bi bi-building" style="color: #a855f7; font-size: 1.5rem;"></i>
+                    </div>
+                    <h6 class="fw-semibold mb-0">Firmeneinstellungen</h6>
+                </div>
+                <p class="text-muted small mb-3">Unternehmensdaten und Konfiguration</p>
+                <div class="d-flex gap-2">
+                    <a href="/settings/company" class="btn btn-sm flex-fill" style="background-color: #a855f7; border-color: #a855f7; color: white;">
+                        <i class="bi bi-building me-1"></i> Einstellungen
+                    </a>
+                    <a href="/invoice-templates" class="btn btn-outline-secondary btn-sm flex-fill" style="border-color: #a855f7; color: #a855f7;">
+                        <i class="bi bi-file-text me-1"></i> Vorlagen
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4 col-md-6">
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; background-color: rgba(99, 102, 241, 0.15) !important;">
+                        <i class="bi bi-tools" style="color: #6366f1; font-size: 1.3rem;"></i>
                     </div>
                     <h6 class="fw-semibold mb-0">System Tools</h6>
                 </div>
                 <p class="text-muted small mb-3">Bulk operations and system utilities</p>
                 <div class="d-flex gap-2">
-                    <a href="/workflow/bulk" class="btn btn-secondary btn-sm flex-fill">
+                    <a href="/workflow/bulk" class="btn btn-sm flex-fill" style="background-color: #6366f1; border-color: #6366f1; color: white;">
                         <i class="bi bi-gear me-1"></i> Bulk Ops
                     </a>
-                    <a href="/users" class="btn btn-outline-secondary btn-sm flex-fill">
+                    <a href="/users" class="btn btn-outline-secondary btn-sm flex-fill" style="border-color: #6366f1; color: #6366f1;">
                         <i class="bi bi-people me-1"></i> Users
                     </a>
                 </div>
@@ -460,57 +490,8 @@
     </div>
 </div>
 
-<!-- Recent Activity -->
-{{if .recentJobs}}
-<div class="section-header mb-4">
-    <h2 class="fw-bold">
-        <i class="bi bi-clock-history me-2 text-primary"></i>
-        Recent Activity
-    </h2>
-    <p class="text-muted">Latest updates and activities</p>
-</div>
-
-<div class="card border-0 shadow-sm mb-5">
-    <div class="card-header bg-light border-0">
-        <h6 class="fw-semibold mb-0">Recent Jobs</h6>
-    </div>
-    <div class="card-body p-0">
-        <div class="list-group list-group-flush">
-            {{range .recentJobs}}
-            <div class="list-group-item border-0">
-                <div class="d-flex align-items-center">
-                    <div class="status-indicator status-{{.Status}} me-3"></div>
-                    <div class="flex-grow-1">
-                        <div class="d-flex justify-content-between align-items-start">
-                            <div>
-                                <h6 class="mb-1">{{.Title}}</h6>
-                                <p class="text-muted mb-1 small">{{.CustomerName}}</p>
-                                <small class="text-muted">
-                                    <i class="bi bi-calendar me-1"></i>
-                                    {{.CreatedAt.Format "Jan 02, 2006"}}
-                                </small>
-                            </div>
-                            <div class="text-end">
-                                <span class="badge bg-{{.Status}} bg-opacity-10 text-{{.Status}} mb-2">{{.Status}}</span>
-                                <br>
-                                <a href="/jobs/{{.ID}}" class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-eye me-1"></i> View
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {{end}}
-        </div>
-    </div>
-    <div class="card-footer bg-light border-0 text-center">
-        <a href="/jobs" class="btn btn-outline-primary">
-            <i class="bi bi-arrow-right me-1"></i> View All Jobs
-        </a>
-    </div>
-</div>
-{{end}}
+<!-- Recent Activity - Disabled for performance -->
+<!-- Will be re-enabled with optimized queries in the future -->
 
 <style>
 .feature-card {
@@ -574,180 +555,62 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-{{end}}
-                </div>
-            </div>
-        </div>
-
-        <!-- Core Management -->
-        <div class="section-header">
-            <h5 class="mb-0"><i class="bi bi-grid-3x3-gap me-2"></i>Core Management</h5>
-        </div>
-        
-        <div class="row mb-5">
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="card feature-card h-100">
-                    <div class="card-body text-center">
-                        <i class="bi bi-briefcase display-5 text-primary mb-3"></i>
-                        <h6>Jobs</h6>
-                        <p class="text-muted small mb-3">Manage projects and equipment assignments</p>
-                        <div class="d-grid gap-2">
-                            <a href="/jobs" class="btn btn-primary">View All</a>
-                            <a href="/jobs/new" class="btn btn-outline-primary btn-sm">New Job</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="card feature-card h-100">
-                    <div class="card-body text-center">
-                        <i class="bi bi-cpu display-5 text-success mb-3"></i>
-                        <h6>Devices</h6>
-                        <p class="text-muted small mb-3">Equipment inventory and tracking</p>
-                        <div class="d-grid gap-2">
-                            <a href="/devices" class="btn btn-success">View All</a>
-                            <a href="/devices/new" class="btn btn-outline-success btn-sm">New Device</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="card feature-card h-100">
-                    <div class="card-body text-center">
-                        <i class="bi bi-people display-5 text-info mb-3"></i>
-                        <h6>Customers</h6>
-                        <p class="text-muted small mb-3">Customer database management</p>
-                        <div class="d-grid gap-2">
-                            <a href="/customers" class="btn btn-info">View All</a>
-                            <a href="/customers/new" class="btn btn-outline-info btn-sm">New Customer</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6 mb-3">
-                <div class="card feature-card h-100">
-                    <div class="card-body text-center">
-                        <i class="bi bi-box display-5 text-warning mb-3"></i>
-                        <h6>Cases</h6>
-                        <p class="text-muted small mb-3">Case management and device mapping</p>
-                        <div class="d-grid gap-2">
-                            <a href="/cases" class="btn btn-warning">View All</a>
-                            <a href="/cases/new" class="btn btn-outline-warning btn-sm">New Case</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Quick Actions -->
-        <div class="section-header">
-            <h5 class="mb-0"><i class="bi bi-lightning-fill me-2"></i>Quick Actions</h5>
-        </div>
-        
-        <div class="row mb-5">
-            <div class="col-md-4 mb-3">
-                <div class="d-grid">
-                    <a href="/scan/select" class="btn btn-outline-primary btn-lg">
-                        <i class="bi bi-qr-code-scan me-2"></i>
-                        Scan Equipment
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="d-grid">
-                    <a href="/jobs/new" class="btn btn-outline-success btn-lg">
-                        <i class="bi bi-plus-circle me-2"></i>
-                        Create New Job
-                    </a>
-                </div>
-            </div>
-            <div class="col-md-4 mb-3">
-                <div class="d-grid">
-                    <a href="/search/global" class="btn btn-outline-secondary btn-lg">
-                        <i class="bi bi-search me-2"></i>
-                        Search Everything
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Advanced Features (Collapsible) -->
-        <div class="section-header advanced-toggle" data-bs-toggle="collapse" data-bs-target="#advancedFeatures" aria-expanded="false">
-            <h5 class="mb-0">
-                <i class="bi bi-gear-fill me-2"></i>
-                Advanced Features
-                <i class="bi bi-chevron-down float-end"></i>
-            </h5>
-        </div>
-        
-        <div class="collapse" id="advancedFeatures">
-            <div class="row">
-                <div class="col-lg-3 col-md-6 mb-3">
-                    <div class="card feature-card">
-                        <div class="card-body text-center">
-                            <i class="bi bi-file-earmark-text display-6 text-primary mb-2"></i>
-                            <h6>Templates & Packages</h6>
-                            <div class="d-grid gap-1">
-                                <a href="/workflow/templates" class="btn btn-outline-primary btn-sm">Job Templates</a>
-                                <a href="/workflow/packages" class="btn btn-outline-primary btn-sm">Equipment Packages</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-3">
-                    <div class="card feature-card">
-                        <div class="card-body text-center">
-                            <i class="bi bi-graph-up display-6 text-success mb-2"></i>
-                            <h6>Reports & Analytics</h6>
-                            <div class="d-grid gap-1">
-                                <a href="/analytics" class="btn btn-outline-success btn-sm">Analytics Dashboard</a>
-                                <a href="/financial" class="btn btn-outline-success btn-sm">Financial Reports</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-3">
-                    <div class="card feature-card">
-                        <div class="card-body text-center">
-                            <i class="bi bi-file-earmark display-6 text-info mb-2"></i>
-                            <h6>Documents</h6>
-                            <div class="d-grid gap-1">
-                                <a href="/documents" class="btn btn-outline-info btn-sm">View Documents</a>
-                                <a href="/documents/upload" class="btn btn-outline-info btn-sm">Upload Files</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-lg-3 col-md-6 mb-3">
-                    <div class="card feature-card">
-                        <div class="card-body text-center">
-                            <i class="bi bi-tools display-6 text-secondary mb-2"></i>
-                            <h6>System Tools</h6>
-                            <div class="d-grid gap-1">
-                                <a href="/workflow/bulk" class="btn btn-outline-secondary btn-sm">Bulk Operations</a>
-                                <a href="/security/audit" class="btn btn-outline-secondary btn-sm">Audit Logs</a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </main>
 
-    <footer class="bg-light mt-5 py-3">
-        <div class="container text-center">
-            <small class="text-muted">RentalCore - The core of your rental business</small>
+    <!-- Professional Footer -->
+    <footer class="mt-auto">
+        <div class="container-fluid text-center">
+            <div class="row align-items-center py-3">
+                <div class="col-md-6 text-md-start">
+                    <small class="text-muted">
+                        <i class="bi bi-gear-wide-connected me-1"></i>
+                        RentalCore - The core of your rental business
+                    </small>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <small class="text-muted">
+                        <i class="bi bi-code-slash me-1"></i>
+                        Professional Theme 3.0
+                    </small>
+                </div>
+            </div>
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/js/app.js"></script>
+    
     <script>
-        // Smooth icon rotation for collapsible
-        document.querySelector('.advanced-toggle').addEventListener('click', function() {
-            const icon = this.querySelector('.bi-chevron-down');
-            icon.style.transform = icon.style.transform === 'rotate(180deg)' ? 'rotate(0deg)' : 'rotate(180deg)';
+        // Theme toggle functionality
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            const currentTheme = html.getAttribute('data-theme');
+            
+            if (currentTheme === 'dark') {
+                html.setAttribute('data-theme', 'light');
+                themeIcon.className = 'bi bi-sun-fill';
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                themeIcon.className = 'bi bi-moon-fill';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+        
+        // Load saved theme
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+            
+            html.setAttribute('data-theme', savedTheme);
+            if (savedTheme === 'light') {
+                themeIcon.className = 'bi bi-sun-fill';
+            }
         });
     </script>
 </body>
 </html>
+        

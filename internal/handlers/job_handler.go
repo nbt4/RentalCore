@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -41,8 +42,16 @@ func (h *JobHandler) ListJobs(c *gin.Context) {
 
 	jobs, err := h.jobRepo.List(params)
 	if err != nil {
+		// Log the error for debugging
+		fmt.Printf("DEBUG: Error loading jobs: %v\n", err)
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
+	}
+
+	// Debug: Log how many jobs were found
+	fmt.Printf("DEBUG: Found %d jobs\n", len(jobs))
+	if len(jobs) > 0 {
+		fmt.Printf("DEBUG: First job: %+v\n", jobs[0])
 	}
 
 	c.HTML(http.StatusOK, "jobs.html", gin.H{

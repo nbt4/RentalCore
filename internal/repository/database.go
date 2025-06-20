@@ -37,9 +37,10 @@ func NewDatabase(cfg *config.DatabaseConfig) (*Database, error) {
 		return nil, fmt.Errorf("failed to get sql.DB: %w", err)
 	}
 
-	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxIdleConns(cfg.PoolSize / 2)
 	sqlDB.SetMaxOpenConns(cfg.PoolSize)
-	sqlDB.SetConnMaxLifetime(time.Hour)
+	sqlDB.SetConnMaxLifetime(30 * time.Minute)
+	sqlDB.SetConnMaxIdleTime(5 * time.Minute)
 
 	log.Println("Database connection established successfully")
 	return &Database{db}, nil

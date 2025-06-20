@@ -1,0 +1,2 @@
+# go-barcode-webapp/internal/handlers
+internal/handlers/invoice_handler_new.go:17:2: "gorm.io/gorm" imported and not used

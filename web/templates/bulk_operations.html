@@ -382,17 +382,39 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    deviceIDs: deviceIds,
-                    format: format
+                    deviceIds: deviceIds,
+                    format: format,
+                    labelFormat: document.getElementById('includeLabels').checked ? 'detailed' : 'simple',
+                    printReady: document.getElementById('printReady').checked
                 })
             })
-            .then(response => response.json())
-            .then(data => {
-                showResults(data);
+            .then(response => {
+                if (response.ok) {
+                    // Handle PDF download
+                    return response.blob().then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = response.headers.get('Content-Disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'device_labels.pdf';
+                        document.body.appendChild(a);
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                        document.body.removeChild(a);
+                        
+                        showResults({
+                            message: `QR codes generated for ${deviceIds.length} devices`,
+                            devices: deviceIds
+                        });
+                    });
+                } else {
+                    return response.json().then(data => {
+                        throw new Error(data.error || 'Failed to generate QR codes');
+                    });
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Failed to generate QR codes');
+                alert('Failed to generate QR codes: ' + error.message);
             });
         }
         

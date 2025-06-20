@@ -1,0 +1,389 @@
+{{template "base.html" .}}
+
+{{define "content"}}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h3 class="card-title">{{.title}}</h3>
+                    <a href="/settings/email-templates" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Zurück zur Übersicht
+                    </a>
+                </div>
+                
+                <div class="card-body">
+                    <form id="emailTemplateForm">
+                        <div class="row">
+                            <!-- Left Column: Template Settings -->
+                            <div class="col-lg-6">
+                                <h5>Template Einstellungen</h5>
+                                
+                                <div class="mb-3">
+                                    <label for="templateName" class="form-label">Name *</label>
+                                    <input type="text" id="templateName" name="name" class="form-control" 
+                                           value="{{if .template}}{{.template.Name}}{{end}}" 
+                                           placeholder="z.B. Standard Rechnungs-E-Mail" required>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="templateDescription" class="form-label">Beschreibung</label>
+                                    <textarea id="templateDescription" name="description" class="form-control" rows="2" 
+                                              placeholder="Kurze Beschreibung des Templates">{{if .template}}{{if .template.Description}}{{.template.Description}}{{end}}{{end}}</textarea>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="templateType" class="form-label">Template Typ *</label>
+                                    <select id="templateType" name="templateType" class="form-select" required>
+                                        <option value="">Bitte wählen...</option>
+                                        <option value="invoice" {{if .template}}{{if eq .template.TemplateType "invoice"}}selected{{end}}{{end}}>
+                                            Rechnung
+                                        </option>
+                                        <option value="reminder" {{if .template}}{{if eq .template.TemplateType "reminder"}}selected{{end}}{{end}}>
+                                            Mahnung
+                                        </option>
+                                        <option value="payment_confirmation" {{if .template}}{{if eq .template.TemplateType "payment_confirmation"}}selected{{end}}{{end}}>
+                                            Zahlungsbestätigung
+                                        </option>
+                                        <option value="general" {{if .template}}{{if eq .template.TemplateType "general"}}selected{{end}}{{end}}>
+                                            Allgemein
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="templateSubject" class="form-label">Betreff *</label>
+                                    <input type="text" id="templateSubject" name="subject" class="form-control" 
+                                           value="{{if .template}}{{.template.Subject}}{{end}}" 
+                                           placeholder="z.B. Rechnung {{.Invoice.InvoiceNumber}} von {{.Company.CompanyName}}" required>
+                                    <div class="form-text">
+                                        Verfügbare Platzhalter: {{.Invoice.InvoiceNumber}}, {{.Company.CompanyName}}, {{.Customer.GetDisplayName}}
+                                    </div>
+                                </div>
+
+                                <!-- Quick Templates -->
+                                <div class="mb-3">
+                                    <label class="form-label">Vorlagen-Shortcuts</label>
+                                    <div class="btn-group-vertical d-grid gap-2">
+                                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="loadQuickTemplate('invoice')">
+                                            <i class="bi bi-file-text"></i> Standard Rechnungs-Template laden
+                                        </button>
+                                        <button type="button" class="btn btn-outline-warning btn-sm" onclick="loadQuickTemplate('reminder')">
+                                            <i class="bi bi-exclamation-triangle"></i> Standard Mahnungs-Template laden
+                                        </button>
+                                        <button type="button" class="btn btn-outline-success btn-sm" onclick="loadQuickTemplate('payment')">
+                                            <i class="bi bi-check-circle"></i> Zahlungsbestätigungs-Template laden
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right Column: Content Editor -->
+                            <div class="col-lg-6">
+                                <h5>E-Mail Inhalt</h5>
+                                
+                                <!-- Editor Tabs -->
+                                <ul class="nav nav-tabs" id="editorTabs">
+                                    <li class="nav-item">
+                                        <button class="nav-link active" id="html-tab" data-bs-toggle="tab" 
+                                                data-bs-target="#html-content" type="button">
+                                            <i class="bi bi-code-slash"></i> HTML
+                                        </button>
+                                    </li>
+                                    <li class="nav-item">
+                                        <button class="nav-link" id="text-tab" data-bs-toggle="tab" 
+                                                data-bs-target="#text-content" type="button">
+                                            <i class="bi bi-file-text"></i> Text (optional)
+                                        </button>
+                                    </li>
+                                    <li class="nav-item">
+                                        <button class="nav-link" id="preview-tab" data-bs-toggle="tab" 
+                                                data-bs-target="#preview-content" type="button" onclick="updatePreview()">
+                                            <i class="bi bi-eye"></i> Vorschau
+                                        </button>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content border border-top-0 p-3" style="min-height: 400px;">
+                                    <!-- HTML Editor -->
+                                    <div class="tab-pane fade show active" id="html-content">
+                                        <textarea id="htmlContent" name="htmlContent" class="form-control" rows="15" 
+                                                  placeholder="HTML Inhalt der E-Mail..." required>{{if .template}}{{.template.HTMLContent}}{{end}}</textarea>
+                                        <div class="form-text mt-2">
+                                            <strong>Verfügbare Platzhalter:</strong><br>
+                                            <code>{{.Invoice.InvoiceNumber}}</code>, <code>{{.Invoice.TotalAmount}}</code>, 
+                                            <code>{{.Customer.GetDisplayName}}</code>, <code>{{.Company.CompanyName}}</code>, 
+                                            <code>{{.InvoiceURL}}</code>
+                                        </div>
+                                    </div>
+
+                                    <!-- Text Editor -->
+                                    <div class="tab-pane fade" id="text-content">
+                                        <textarea id="textContent" name="textContent" class="form-control" rows="15" 
+                                                  placeholder="Text-Version der E-Mail (optional, für E-Mail-Clients ohne HTML-Unterstützung)">{{if .template}}{{if .template.TextContent}}{{.template.TextContent}}{{end}}{{end}}</textarea>
+                                    </div>
+
+                                    <!-- Preview -->
+                                    <div class="tab-pane fade" id="preview-content">
+                                        <div id="emailPreview" class="border rounded p-3" style="background: #f8f9fa; min-height: 350px;">
+                                            <div class="text-center text-muted">
+                                                <i class="bi bi-eye-slash" style="font-size: 2rem;"></i>
+                                                <p>Klicken Sie auf "Vorschau aktualisieren" um eine Vorschau zu sehen</p>
+                                            </div>
+                                        </div>
+                                        <div class="mt-2">
+                                            <button type="button" class="btn btn-outline-primary btn-sm" onclick="updatePreview()">
+                                                <i class="bi bi-arrow-clockwise"></i> Vorschau aktualisieren
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <hr>
+                                <div class="d-flex justify-content-between">
+                                    <div>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-save"></i> Template speichern
+                                        </button>
+                                        <a href="/settings/email-templates" class="btn btn-secondary">Abbrechen</a>
+                                    </div>
+                                    <div>
+                                        {{if .template}}
+                                        <button type="button" class="btn btn-outline-info" onclick="testCurrentTemplate()">
+                                            <i class="bi bi-send"></i> Test E-Mail senden
+                                        </button>
+                                        {{end}}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Set up form submission
+    document.getElementById('emailTemplateForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitEmailTemplate();
+    });
+});
+
+function submitEmailTemplate() {
+    const formData = new FormData(document.getElementById('emailTemplateForm'));
+    
+    const templateData = {
+        name: formData.get('name'),
+        description: formData.get('description') || null,
+        templateType: formData.get('templateType'),
+        subject: formData.get('subject'),
+        htmlContent: formData.get('htmlContent'),
+        textContent: formData.get('textContent') || null
+    };
+    
+    const templateId = {{if .template}}{{.template.TemplateID}}{{else}}0{{end}};
+    const isEdit = templateId > 0;
+    const url = isEdit ? '/settings/email-templates/' + templateId : '/settings/email-templates';
+    const method = isEdit ? 'PUT' : 'POST';
+    
+    const submitBtn = document.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Speichere...';
+    submitBtn.disabled = true;
+    
+    fetch(url, {
+        method: method,
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(templateData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success || data.templateId) {
+            alert('E-Mail-Template erfolgreich gespeichert!');
+            setTimeout(() => {
+                window.location.href = '/settings/email-templates';
+            }, 500);
+        } else {
+            alert('Fehler: ' + (data.error || 'Unbekannter Fehler'));
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Fehler beim Speichern des Templates: ' + error.message);
+    })
+    .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+}
+
+function loadQuickTemplate(type) {
+    const templates = {
+        invoice: {
+            subject: 'Rechnung {{.Invoice.InvoiceNumber}} von {{.Company.CompanyName}}',
+            html: `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Rechnung {{.Invoice.InvoiceNumber}}</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="color: #007bff;">{{.Company.CompanyName}}</h1>
+            <p>Rechnung {{.Invoice.InvoiceNumber}}</p>
+        </div>
+        
+        <p>Sehr geehrte Damen und Herren,</p>
+        <p>anbei erhalten Sie Ihre Rechnung für die erbrachten Leistungen.</p>
+        
+        <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #007bff; margin: 20px 0;">
+            <h3>Rechnungsdetails</h3>
+            <p><strong>Rechnungsnummer:</strong> {{.Invoice.InvoiceNumber}}</p>
+            <p><strong>Rechnungsdatum:</strong> {{.Invoice.IssueDate.Format "02.01.2006"}}</p>
+            <p><strong>Fälligkeitsdatum:</strong> {{.Invoice.DueDate.Format "02.01.2006"}}</p>
+            <p><strong>Gesamtbetrag:</strong> {{printf "%.2f" .Invoice.TotalAmount}} {{.Settings.CurrencySymbol}}</p>
+        </div>
+        
+        <p>Bei Fragen stehen wir Ihnen gerne zur Verfügung.</p>
+        <p>Vielen Dank für Ihr Vertrauen!</p>
+        
+        <hr>
+        <p style="font-size: 12px; color: #666;">
+            {{.Company.CompanyName}}<br>
+            {{if .Company.Phone}}Tel: {{.Company.Phone}}<br>{{end}}
+            {{if .Company.Email}}E-Mail: {{.Company.Email}}{{end}}
+        </p>
+    </div>
+</body>
+</html>`
+        },
+        reminder: {
+            subject: 'Zahlungserinnerung - Rechnung {{.Invoice.InvoiceNumber}}',
+            html: `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Zahlungserinnerung</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 15px; margin-bottom: 20px;">
+            <h2 style="color: #856404;">Freundliche Zahlungserinnerung</h2>
+        </div>
+        
+        <p>Sehr geehrte/r {{.Customer.GetDisplayName}},</p>
+        <p>wir möchten Sie freundlich daran erinnern, dass die folgende Rechnung noch offen ist:</p>
+        
+        <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #ffc107; margin: 20px 0;">
+            <p><strong>Rechnungsnummer:</strong> {{.Invoice.InvoiceNumber}}</p>
+            <p><strong>Rechnungsdatum:</strong> {{.Invoice.IssueDate.Format "02.01.2006"}}</p>
+            <p><strong>Fälligkeitsdatum:</strong> {{.Invoice.DueDate.Format "02.01.2006"}}</p>
+            <p><strong>Offener Betrag:</strong> {{printf "%.2f" .Invoice.BalanceDue}} {{.Settings.CurrencySymbol}}</p>
+        </div>
+        
+        <p>Bitte überweisen Sie den ausstehenden Betrag in den nächsten Tagen.</p>
+        <p>Falls Sie bereits überwiesen haben, betrachten Sie dieses Schreiben als gegenstandslos.</p>
+        
+        <p>Mit freundlichen Grüßen<br>{{.Company.CompanyName}}</p>
+    </div>
+</body>
+</html>`
+        },
+        payment: {
+            subject: 'Zahlungsbestätigung - Rechnung {{.Invoice.InvoiceNumber}}',
+            html: `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Zahlungsbestätigung</title>
+</head>
+<body style="font-family: Arial, sans-serif; line-line: 1.6; color: #333;">
+    <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background-color: #d4edda; border: 1px solid #c3e6cb; padding: 15px; margin-bottom: 20px;">
+            <h2 style="color: #155724;">Zahlungsbestätigung</h2>
+        </div>
+        
+        <p>Sehr geehrte/r {{.Customer.GetDisplayName}},</p>
+        <p>vielen Dank! Ihre Zahlung ist bei uns eingegangen.</p>
+        
+        <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #28a745; margin: 20px 0;">
+            <p><strong>Rechnungsnummer:</strong> {{.Invoice.InvoiceNumber}}</p>
+            <p><strong>Gezahlter Betrag:</strong> {{printf "%.2f" .Invoice.PaidAmount}} {{.Settings.CurrencySymbol}}</p>
+            <p><strong>Status:</strong> Vollständig bezahlt</p>
+        </div>
+        
+        <p>Wir freuen uns auf die weitere Zusammenarbeit!</p>
+        
+        <p>Mit freundlichen Grüßen<br>{{.Company.CompanyName}}</p>
+    </div>
+</body>
+</html>`
+        }
+    };
+    
+    if (templates[type]) {
+        document.getElementById('templateSubject').value = templates[type].subject;
+        document.getElementById('htmlContent').value = templates[type].html;
+        
+        // Set template type
+        const typeMap = {
+            'invoice': 'invoice',
+            'reminder': 'reminder', 
+            'payment': 'payment_confirmation'
+        };
+        document.getElementById('templateType').value = typeMap[type];
+        
+        alert('Template-Vorlage geladen! Sie können diese jetzt anpassen.');
+    }
+}
+
+function updatePreview() {
+    const htmlContent = document.getElementById('htmlContent').value;
+    const previewDiv = document.getElementById('emailPreview');
+    
+    if (!htmlContent.trim()) {
+        previewDiv.innerHTML = '<div class="text-center text-muted"><i class="bi bi-file-x" style="font-size: 2rem;"></i><p>Kein HTML-Inhalt vorhanden</p></div>';
+        return;
+    }
+    
+    // Simple template variable replacement for preview
+    let preview = htmlContent
+        .replace(/\{\{\.Invoice\.InvoiceNumber\}\}/g, 'RE-2024-001')
+        .replace(/\{\{\.Invoice\.TotalAmount\}\}/g, '119.00')
+        .replace(/\{\{\.Invoice\.BalanceDue\}\}/g, '119.00')
+        .replace(/\{\{\.Invoice\.PaidAmount\}\}/g, '119.00')
+        .replace(/\{\{\.Customer\.GetDisplayName\}\}/g, 'Max Mustermann')
+        .replace(/\{\{\.Company\.CompanyName\}\}/g, 'Musterfirma GmbH')
+        .replace(/\{\{\.Company\.Phone\}\}/g, '+49 123 456789')
+        .replace(/\{\{\.Company\.Email\}\}/g, 'info@musterfirma.de')
+        .replace(/\{\{\.Settings\.CurrencySymbol\}\}/g, '€')
+        .replace(/\{\{\.Invoice\.IssueDate\.Format "02\.01\.2006"\}\}/g, '19.06.2024')
+        .replace(/\{\{\.Invoice\.DueDate\.Format "02\.01\.2006"\}\}/g, '03.07.2024')
+        .replace(/\{\{printf "%.2f" \.Invoice\.TotalAmount\}\}/g, '119.00')
+        .replace(/\{\{printf "%.2f" \.Invoice\.BalanceDue\}\}/g, '119.00')
+        .replace(/\{\{printf "%.2f" \.Invoice\.PaidAmount\}\}/g, '119.00');
+    
+    previewDiv.innerHTML = preview;
+}
+
+function testCurrentTemplate() {
+    const email = prompt('E-Mail-Adresse für Test:');
+    if (email && email.includes('@')) {
+        alert('Test-E-Mail-Funktion wird implementiert...');
+        // TODO: Implement test email functionality
+    }
+}
+</script>
+{{end}}

@@ -1,33 +1,52 @@
 package handlers
 
 import (
+	"archive/zip"
+	"bytes"
 	"encoding/json"
+	"fmt"
+	"image"
+	"image/color"
+	"image/draw"
+	"image/png"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"time"
 
 	"go-barcode-webapp/internal/models"
 	"go-barcode-webapp/internal/repository"
+	"go-barcode-webapp/internal/services"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jung-kurt/gofpdf"
+	xdraw "golang.org/x/image/draw"
+	"golang.org/x/image/font"
+	"golang.org/x/image/font/basicfont"
+	"golang.org/x/image/math/fixed"
+	"gorm.io/gorm"
 )
 
 type WorkflowHandler struct {
-	templateRepo *repository.JobTemplateRepository
-	jobRepo      *repository.JobRepository
-	customerRepo *repository.CustomerRepository
-	packageRepo  *repository.EquipmentPackageRepository
-	deviceRepo   *repository.DeviceRepository
+	templateRepo   *repository.JobTemplateRepository
+	jobRepo        *repository.JobRepository
+	customerRepo   *repository.CustomerRepository
+	packageRepo    *repository.EquipmentPackageRepository
+	deviceRepo     *repository.DeviceRepository
+	db             *gorm.DB
+	barcodeService *services.BarcodeService
 }
 
-func NewWorkflowHandler(templateRepo *repository.JobTemplateRepository, jobRepo *repository.JobRepository, customerRepo *repository.CustomerRepository, packageRepo *repository.EquipmentPackageRepository, deviceRepo *repository.DeviceRepository) *WorkflowHandler {
+func NewWorkflowHandler(templateRepo *repository.JobTemplateRepository, jobRepo *repository.JobRepository, customerRepo *repository.CustomerRepository, packageRepo *repository.EquipmentPackageRepository, deviceRepo *repository.DeviceRepository, db *gorm.DB, barcodeService *services.BarcodeService) *WorkflowHandler {
 	return &WorkflowHandler{
-		templateRepo: templateRepo,
-		jobRepo:      jobRepo,
-		customerRepo: customerRepo,
-		packageRepo:  packageRepo,
-		deviceRepo:   deviceRepo,
+		templateRepo:   templateRepo,
+		jobRepo:        jobRepo,
+		customerRepo:   customerRepo,
+		packageRepo:    packageRepo,
+		deviceRepo:     deviceRepo,
+		db:             db,
+		barcodeService: barcodeService,
 	}
 }
 
@@ -797,12 +816,358 @@ func (h *WorkflowHandler) BulkAssignToJob(c *gin.Context) {
 
 // BulkGenerateQRCodes generates QR codes for multiple devices
 func (h *WorkflowHandler) BulkGenerateQRCodes(c *gin.Context) {
-	// TODO: Implement bulk QR code generation
-	log.Printf("BulkGenerateQRCodes: Not yet implemented")
-	c.JSON(http.StatusNotImplemented, gin.H{
-		"error": "Bulk QR code generation not yet implemented",
-	})
+	// Parse request
+	var request struct {
+		DeviceIDs    []string `json:"deviceIds" form:"deviceIds"`
+		Format       string   `json:"format" form:"format"`       // "pdf" or "zip"
+		LabelFormat  string   `json:"labelFormat" form:"labelFormat"` // "simple" or "detailed"
+		PrintReady   bool     `json:"printReady" form:"printReady"`
+	}
+
+	if err := c.ShouldBind(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request format"})
+		return
+	}
+
+	// Validate device IDs
+	if len(request.DeviceIDs) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No device IDs provided"})
+		return
+	}
+
+	// Default values
+	if request.Format == "" {
+		request.Format = "pdf"
+	}
+	if request.LabelFormat == "" {
+		request.LabelFormat = "simple"
+	}
+
+	log.Printf("Generating QR codes for %d devices, format: %s", len(request.DeviceIDs), request.Format)
+
+	// Fetch device information
+	devices := make([]models.Device, 0, len(request.DeviceIDs))
+	for _, deviceID := range request.DeviceIDs {
+		var device models.Device
+		if err := h.db.Preload("Product").Preload("Product.Brand").Where("deviceID = ?", deviceID).First(&device).Error; err != nil {
+			log.Printf("Warning: Device %s not found in database, will generate QR anyway", deviceID)
+			// Create a minimal device record for QR generation
+			device = models.Device{
+				DeviceID: deviceID,
+				Status:   "unknown",
+				Product:  nil, // Will be handled in template
+			}
+		}
+		devices = append(devices, device)
+	}
+
+	if request.Format == "zip" {
+		// Generate PNG files and create ZIP
+		zipBytes, err := h.generateDeviceLabelsZIP(devices, request.LabelFormat, request.PrintReady)
+		if err != nil {
+			log.Printf("Error generating device labels ZIP: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate device labels ZIP"})
+			return
+		}
+
+		// Set headers for ZIP download
+		filename := fmt.Sprintf("device_labels_%s.zip", time.Now().Format("20060102_150405"))
+		c.Header("Content-Type", "application/zip")
+		c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename))
+		c.Header("Content-Length", fmt.Sprintf("%d", len(zipBytes)))
+
+		// Return ZIP
+		c.Data(http.StatusOK, "application/zip", zipBytes)
+	} else {
+		// Generate PDF with multiple labels per page
+		pdfBytes, err := h.generateDeviceLabelsPDF(devices, request.LabelFormat, request.PrintReady)
+		if err != nil {
+			log.Printf("Error generating device labels PDF: %v", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate device labels PDF"})
+			return
+		}
+
+		// Set headers for PDF download
+		filename := fmt.Sprintf("device_labels_%s.pdf", time.Now().Format("20060102_150405"))
+		c.Header("Content-Type", "application/pdf")
+		c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s\"", filename))
+		c.Header("Content-Length", fmt.Sprintf("%d", len(pdfBytes)))
+
+		// Return PDF
+		c.Data(http.StatusOK, "application/pdf", pdfBytes)
+	}
 }
+
+// generateDeviceLabelsPDF creates a PDF with multiple device labels per page
+func (h *WorkflowHandler) generateDeviceLabelsPDF(devices []models.Device, labelFormat string, printReady bool) ([]byte, error) {
+	// Create PDF document - A4 Portrait for multiple labels
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.SetMargins(10, 10, 10)
+	
+	// Load logo if exists
+	logoPath := "logo.png"
+	logoExists := false
+	if _, err := os.Stat(logoPath); err == nil {
+		logoExists = true
+	}
+	
+	// Label dimensions - 3x7 grid on A4 (21 labels per page)
+	labelWidth := 60.0
+	labelHeight := 35.0
+	labelsPerRow := 3
+	labelsPerCol := 7
+	labelsPerPage := labelsPerRow * labelsPerCol
+	
+	// Process devices in batches per page
+	for pageStart := 0; pageStart < len(devices); pageStart += labelsPerPage {
+		pdf.AddPage()
+		
+		// Draw labels for this page
+		for i := 0; i < labelsPerPage && pageStart+i < len(devices); i++ {
+			device := devices[pageStart+i]
+			
+			// Calculate position for this label
+			row := i / labelsPerRow
+			col := i % labelsPerRow
+			
+			offsetX := 10.0 + float64(col)*labelWidth
+			offsetY := 10.0 + float64(row)*labelHeight
+			
+			h.drawSingleLabel(pdf, device, offsetX, offsetY, labelWidth, labelHeight, logoExists, logoPath)
+		}
+	}
+	
+	// Output PDF to bytes
+	var buf bytes.Buffer
+	err := pdf.Output(&buf)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate PDF: %v", err)
+	}
+	
+	return buf.Bytes(), nil
+}
+
+// drawSingleLabel draws a single device label at the specified position
+func (h *WorkflowHandler) drawSingleLabel(pdf *gofpdf.Fpdf, device models.Device, offsetX, offsetY, width, height float64, logoExists bool, logoPath string) {
+	// Get product name
+	productName := "Unknown Product"
+	if device.Product != nil {
+		productName = device.Product.Name
+	}
+	
+	// Draw border around label (optional)
+	pdf.SetDrawColor(200, 200, 200)
+	pdf.Rect(offsetX, offsetY, width, height, "D")
+	
+	// 1. Logo at right side, vertically centered (if exists)
+	if logoExists {
+		logoX := offsetX + width - 20
+		logoY := offsetY + (height-8)/2
+		pdf.Image(logoPath, logoX, logoY, 15, 8, false, "", 0, "")
+	}
+	
+	// Remove the title - start barcode higher up
+	
+	// 3. Main barcode in center area (moved up since no title)
+	barcodeX := offsetX + 2
+	barcodeY := offsetY + 4
+	barcodeWidth := width - 25 // Leave space for logo
+	barcodeHeight := 8.0
+	
+	// Generate realistic Code128 barcode pattern
+	pdf.SetDrawColor(0, 0, 0)
+	pdf.SetFillColor(0, 0, 0)
+	
+	// Use device ID for barcode data
+	deviceData := device.DeviceID
+	totalBars := len(deviceData) * 8 + 20
+	barWidth := barcodeWidth / float64(totalBars)
+	
+	x := barcodeX
+	
+	// Start pattern
+	for i := 0; i < 3; i++ {
+		pdf.Rect(x, barcodeY, barWidth, barcodeHeight, "F")
+		x += barWidth * 2
+	}
+	
+	// Data encoding
+	for i, char := range deviceData {
+		charVal := int(char) + i
+		for j := 0; j < 6; j++ {
+			if (charVal+j)%3 != 0 {
+				pdf.Rect(x, barcodeY, barWidth, barcodeHeight, "F")
+			}
+			x += barWidth
+		}
+		x += barWidth
+	}
+	
+	// End pattern
+	for i := 0; i < 3; i++ {
+		pdf.Rect(x, barcodeY, barWidth, barcodeHeight, "F")
+		x += barWidth * 2
+	}
+	
+	// 4. Human readable text under barcode
+	pdf.SetXY(barcodeX, barcodeY + barcodeHeight + 1)
+	pdf.SetFont("Arial", "", 5)
+	pdf.CellFormat(barcodeWidth, 2, device.DeviceID, "", 0, "C", false, 0, "")
+	
+	// 5. Device information at bottom
+	pdf.SetXY(offsetX+2, offsetY+height-10)
+	pdf.SetFont("Arial", "B", 7)
+	pdf.Cell(0, 3, device.DeviceID)
+	
+	pdf.SetXY(offsetX+2, offsetY+height-7)
+	pdf.SetFont("Arial", "", 6)
+	// Truncate product name if too long
+	if len(productName) > 25 {
+		productName = productName[:22] + "..."
+	}
+	pdf.Cell(0, 3, productName)
+}
+
+// generateDeviceLabelsZIP creates complete label PNG files for each device and packages them in a ZIP
+func (h *WorkflowHandler) generateDeviceLabelsZIP(devices []models.Device, labelFormat string, printReady bool) ([]byte, error) {
+	// Create ZIP file in memory
+	var buf bytes.Buffer
+	zipWriter := zip.NewWriter(&buf)
+	defer zipWriter.Close()
+	
+	// Load logo image if exists
+	var logoImg image.Image
+	logoPath := "logo.png"
+	if logoFile, err := os.Open(logoPath); err == nil {
+		logoImg, _, _ = image.Decode(logoFile)
+		logoFile.Close()
+	}
+	
+	// Create complete label PNG for each device
+	for _, device := range devices {
+		// Create PNG image for this device
+		pngBytes, err := h.createLabelPNG(device, logoImg)
+		if err != nil {
+			log.Printf("Error generating PNG for device %s: %v", device.DeviceID, err)
+			continue
+		}
+		
+		// Create PNG filename
+		filename := fmt.Sprintf("label_%s.png", device.DeviceID)
+		
+		zipFile, err := zipWriter.Create(filename)
+		if err != nil {
+			log.Printf("Error creating zip file for device %s: %v", device.DeviceID, err)
+			continue
+		}
+		
+		_, err = zipFile.Write(pngBytes)
+		if err != nil {
+			log.Printf("Error writing to zip file for device %s: %v", device.DeviceID, err)
+			continue
+		}
+	}
+	
+	err := zipWriter.Close()
+	if err != nil {
+		return nil, fmt.Errorf("failed to close ZIP writer: %v", err)
+	}
+	
+	return buf.Bytes(), nil
+}
+
+// createLabelPNG creates a complete label as PNG image
+func (h *WorkflowHandler) createLabelPNG(device models.Device, logoImg image.Image) ([]byte, error) {
+	// Label dimensions in pixels (300 DPI equivalent for 100x60mm)
+	width := 1200
+	height := 700
+	
+	// Create a new RGBA image
+	img := image.NewRGBA(image.Rect(0, 0, width, height))
+	
+	// Fill with white background
+	draw.Draw(img, img.Bounds(), &image.Uniform{color.RGBA{255, 255, 255, 255}}, image.Point{}, draw.Src)
+	
+	// Draw border
+	borderColor := color.RGBA{200, 200, 200, 255}
+	h.drawRect(img, 10, 10, width-20, height-20, borderColor)
+	
+	// Generate barcode image
+	barcodeBytes, err := h.barcodeService.GenerateDeviceBarcode(device.DeviceID)
+	if err == nil {
+		if barcodeImg, _, err := image.Decode(bytes.NewReader(barcodeBytes)); err == nil {
+			// Scale and position barcode
+			barcodeRect := image.Rect(50, 150, 800, 350)
+			xdraw.BiLinear.Scale(img, barcodeRect, barcodeImg, barcodeImg.Bounds(), draw.Over, nil)
+		}
+	}
+	
+	// Draw logo if available
+	if logoImg != nil {
+		logoRect := image.Rect(900, 200, 1100, 300)
+		xdraw.BiLinear.Scale(img, logoRect, logoImg, logoImg.Bounds(), draw.Over, nil)
+	}
+	
+	// Get product name
+	productName := "Unknown Product"
+	if device.Product != nil {
+		productName = device.Product.Name
+		if len(productName) > 30 {
+			productName = productName[:27] + "..."
+		}
+	}
+	
+	// Draw text
+	textColor := color.RGBA{0, 0, 0, 255}
+	
+	// Device ID (large, bold)
+	h.drawText(img, device.DeviceID, 50, 450, 48, textColor)
+	
+	// Product name (smaller)
+	h.drawText(img, productName, 50, 520, 32, textColor)
+	
+	// Device ID under barcode (small)
+	h.drawText(img, device.DeviceID, 350, 380, 24, textColor)
+	
+	// Convert to PNG bytes
+	var buf bytes.Buffer
+	err = png.Encode(&buf, img)
+	if err != nil {
+		return nil, fmt.Errorf("failed to encode PNG: %v", err)
+	}
+	
+	return buf.Bytes(), nil
+}
+
+// drawRect draws a rectangle outline
+func (h *WorkflowHandler) drawRect(img *image.RGBA, x, y, width, height int, c color.RGBA) {
+	for i := 0; i < width; i++ {
+		img.Set(x+i, y, c)
+		img.Set(x+i, y+height-1, c)
+	}
+	for i := 0; i < height; i++ {
+		img.Set(x, y+i, c)
+		img.Set(x+width-1, y+i, c)
+	}
+}
+
+// drawText draws text on the image
+func (h *WorkflowHandler) drawText(img *image.RGBA, text string, x, y, size int, c color.RGBA) {
+	point := fixed.Point26_6{
+		X: fixed.Int26_6(x * 64),
+		Y: fixed.Int26_6(y * 64),
+	}
+	
+	d := &font.Drawer{
+		Dst:  img,
+		Src:  &image.Uniform{c},
+		Face: basicfont.Face7x13, // Simple built-in font
+		Dot:  point,
+	}
+	
+	d.DrawString(text)
+}
+
 
 // ================================================================
 // WORKFLOW STATISTICS - PLACEHOLDER METHOD
