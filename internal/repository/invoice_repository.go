@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 	"time"
@@ -11,30 +12,435 @@ import (
 	"gorm.io/gorm"
 )
 
-type InvoiceRepository struct {
+type InvoiceRepositoryNew struct {
 	db *Database
 }
 
-func NewInvoiceRepository(db *Database) *InvoiceRepository {
-	return &InvoiceRepository{db: db}
+func NewInvoiceRepositoryNew(db *Database) *InvoiceRepositoryNew {
+	return &InvoiceRepositoryNew{db: db}
+}
+
+// GetDB returns the database instance for direct queries
+func (r *InvoiceRepositoryNew) GetDB() *gorm.DB {
+	return r.db.DB
 }
 
 // ================================================================
-// INVOICE MANAGEMENT
+// CORE INVOICE OPERATIONS
+// ================================================================
+
+// CreateInvoice creates a new invoice with proper validation
+func (r *InvoiceRepositoryNew) CreateInvoice(request *models.InvoiceCreateRequest) (*models.Invoice, error) {
+	// Validate request
+	if err := request.Validate(); err != nil {
+		return nil, fmt.Errorf("validation failed: %v", err)
+	}
+
+	var invoice *models.Invoice
+	err := r.db.DB.Transaction(func(tx *gorm.DB) error {
+		// Generate invoice number
+		invoiceNumber, err := r.generateInvoiceNumber(tx)
+		if err != nil {
+			return fmt.Errorf("failed to generate invoice number: %v", err)
+		}
+
+		// Create invoice
+		invoice = &models.Invoice{
+			InvoiceNumber:   invoiceNumber,
+			CustomerID:      request.CustomerID,
+			JobID:           request.JobID,
+			TemplateID:      request.TemplateID,
+			Status:          "draft",
+			IssueDate:       request.IssueDate,
+			DueDate:         request.DueDate,
+			PaymentTerms:    request.PaymentTerms,
+			TaxRate:         request.TaxRate,
+			DiscountAmount:  request.DiscountAmount,
+			Notes:           request.Notes,
+			TermsConditions: request.TermsConditions,
+			CreatedAt:       time.Now(),
+			UpdatedAt:       time.Now(),
+		}
+
+		// Create line items
+		for i, itemRequest := range request.LineItems {
+			lineItem := models.InvoiceLineItem{
+				ItemType:        itemRequest.ItemType,
+				DeviceID:        itemRequest.DeviceID,
+				PackageID:       itemRequest.PackageID,
+				Description:     itemRequest.Description,
+				Quantity:        itemRequest.Quantity,
+				UnitPrice:       itemRequest.UnitPrice,
+				RentalStartDate: itemRequest.RentalStartDate,
+				RentalEndDate:   itemRequest.RentalEndDate,
+				RentalDays:      itemRequest.RentalDays,
+				SortOrder:       func() *uint { order := uint(i); return &order }(),
+				CreatedAt:       time.Now(),
+				UpdatedAt:       time.Now(),
+			}
+			lineItem.CalculateTotal()
+			invoice.LineItems = append(invoice.LineItems, lineItem)
+		}
+
+		// Calculate totals
+		invoice.CalculateTotals()
+
+		// Save to database
+		if err := tx.Create(invoice).Error; err != nil {
+			return fmt.Errorf("failed to create invoice: %v", err)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Load relationships for return
+	if err := r.db.DB.Preload("Customer").
+		Preload("Job").
+		Preload("Template").
+		Preload("LineItems").
+		First(invoice, invoice.InvoiceID).Error; err != nil {
+		return nil, fmt.Errorf("failed to load created invoice: %v", err)
+	}
+
+	log.Printf("Successfully created invoice %s with ID %d, CustomerID: %d", invoice.InvoiceNumber, invoice.InvoiceID, invoice.CustomerID)
+	if invoice.Customer != nil {
+		log.Printf("Loaded customer: ID=%d, Name=%s", invoice.Customer.CustomerID, invoice.Customer.GetDisplayName())
+	} else {
+		log.Printf("WARNING: Customer not loaded for CustomerID %d", invoice.CustomerID)
+	}
+	return invoice, nil
+}
+
+// GetInvoiceByID retrieves an invoice by ID with all relationships
+func (r *InvoiceRepositoryNew) GetInvoiceByID(id uint64) (*models.Invoice, error) {
+	var invoice models.Invoice
+
+	if err := r.db.DB.
+		Preload("Customer").
+		Preload("Job").
+		Preload("Template").
+		Preload("LineItems", func(db *gorm.DB) *gorm.DB {
+			return db.Order("sort_order ASC, line_item_id ASC")
+		}).
+		Preload("LineItems.Device").
+		Preload("Payments", func(db *gorm.DB) *gorm.DB {
+			return db.Order("payment_date DESC")
+		}).
+		First(&invoice, id).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("invoice with ID %d not found", id)
+		}
+		return nil, fmt.Errorf("failed to get invoice: %v", err)
+	}
+
+	return &invoice, nil
+}
+
+// GetInvoiceByNumber retrieves an invoice by invoice number
+func (r *InvoiceRepositoryNew) GetInvoiceByNumber(invoiceNumber string) (*models.Invoice, error) {
+	var invoice models.Invoice
+
+	if err := r.db.DB.
+		Preload("Customer").
+		Preload("Job").
+		Preload("Template").
+		Preload("LineItems", func(db *gorm.DB) *gorm.DB {
+			return db.Order("sort_order ASC, line_item_id ASC")
+		}).
+		Preload("LineItems.Device").
+		Preload("Payments", func(db *gorm.DB) *gorm.DB {
+			return db.Order("payment_date DESC")
+		}).
+		Where("invoice_number = ?", invoiceNumber).
+		First(&invoice).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("invoice %s not found", invoiceNumber)
+		}
+		return nil, fmt.Errorf("failed to get invoice: %v", err)
+	}
+
+	return &invoice, nil
+}
+
+// UpdateInvoice updates an existing invoice
+func (r *InvoiceRepositoryNew) UpdateInvoice(id uint64, request *models.InvoiceCreateRequest) (*models.Invoice, error) {
+	// Validate request
+	if err := request.Validate(); err != nil {
+		return nil, fmt.Errorf("validation failed: %v", err)
+	}
+
+	var invoice models.Invoice
+	err := r.db.DB.Transaction(func(tx *gorm.DB) error {
+		// Get existing invoice
+		if err := tx.First(&invoice, id).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return fmt.Errorf("invoice with ID %d not found", id)
+			}
+			return fmt.Errorf("failed to get invoice: %v", err)
+		}
+
+		// Only allow editing draft invoices
+		if invoice.Status != "draft" {
+			return fmt.Errorf("only draft invoices can be edited")
+		}
+
+		// Update invoice fields
+		invoice.CustomerID = request.CustomerID
+		invoice.JobID = request.JobID
+		invoice.TemplateID = request.TemplateID
+		invoice.IssueDate = request.IssueDate
+		invoice.DueDate = request.DueDate
+		invoice.PaymentTerms = request.PaymentTerms
+		invoice.TaxRate = request.TaxRate
+		invoice.DiscountAmount = request.DiscountAmount
+		invoice.Notes = request.Notes
+		invoice.TermsConditions = request.TermsConditions
+		invoice.UpdatedAt = time.Now()
+
+		// Delete existing line items
+		if err := tx.Where("invoice_id = ?", id).Delete(&models.InvoiceLineItem{}).Error; err != nil {
+			return fmt.Errorf("failed to delete existing line items: %v", err)
+		}
+
+		// Create new line items
+		invoice.LineItems = []models.InvoiceLineItem{}
+		for i, itemRequest := range request.LineItems {
+			lineItem := models.InvoiceLineItem{
+				InvoiceID:       invoice.InvoiceID,
+				ItemType:        itemRequest.ItemType,
+				DeviceID:        itemRequest.DeviceID,
+				PackageID:       itemRequest.PackageID,
+				Description:     itemRequest.Description,
+				Quantity:        itemRequest.Quantity,
+				UnitPrice:       itemRequest.UnitPrice,
+				RentalStartDate: itemRequest.RentalStartDate,
+				RentalEndDate:   itemRequest.RentalEndDate,
+				RentalDays:      itemRequest.RentalDays,
+				SortOrder:       func() *uint { order := uint(i); return &order }(),
+				CreatedAt:       time.Now(),
+				UpdatedAt:       time.Now(),
+			}
+			lineItem.CalculateTotal()
+			invoice.LineItems = append(invoice.LineItems, lineItem)
+		}
+
+		// Calculate totals
+		invoice.CalculateTotals()
+
+		// Save invoice
+		if err := tx.Save(&invoice).Error; err != nil {
+			return fmt.Errorf("failed to update invoice: %v", err)
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	// Load relationships for return
+	if err := r.db.DB.Preload("Customer").
+		Preload("Job").
+		Preload("Template").
+		Preload("LineItems").
+		First(&invoice, invoice.InvoiceID).Error; err != nil {
+		return nil, fmt.Errorf("failed to load updated invoice: %v", err)
+	}
+
+	log.Printf("Successfully updated invoice %s", invoice.InvoiceNumber)
+	return &invoice, nil
+}
+
+// UpdateInvoiceStatus updates the status of an invoice
+func (r *InvoiceRepositoryNew) UpdateInvoiceStatus(id uint64, status string) error {
+	// Validate status
+	validStatuses := []string{"draft", "sent", "paid", "overdue", "cancelled"}
+	isValid := false
+	for _, validStatus := range validStatuses {
+		if status == validStatus {
+			isValid = true
+			break
+		}
+	}
+	if !isValid {
+		return fmt.Errorf("invalid status: %s", status)
+	}
+
+	updates := map[string]interface{}{
+		"status":     status,
+		"updated_at": time.Now(),
+	}
+
+	// Set special timestamps based on status
+	now := time.Now()
+	switch status {
+	case "sent":
+		updates["sent_at"] = &now
+	case "paid":
+		updates["paid_at"] = &now
+	}
+
+	result := r.db.DB.Model(&models.Invoice{}).
+		Where("invoice_id = ?", id).
+		Updates(updates)
+
+	if result.Error != nil {
+		return fmt.Errorf("failed to update invoice status: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("invoice with ID %d not found", id)
+	}
+
+	log.Printf("Successfully updated invoice %d status to %s", id, status)
+	return nil
+}
+
+// DeleteInvoice soft deletes an invoice by setting status to cancelled
+func (r *InvoiceRepositoryNew) DeleteInvoice(id uint64) error {
+	result := r.db.DB.Model(&models.Invoice{}).
+		Where("invoice_id = ?", id).
+		Updates(map[string]interface{}{
+			"status":     "cancelled",
+			"updated_at": time.Now(),
+		})
+
+	if result.Error != nil {
+		return fmt.Errorf("failed to delete invoice: %v", result.Error)
+	}
+
+	if result.RowsAffected == 0 {
+		return fmt.Errorf("invoice with ID %d not found", id)
+	}
+
+	log.Printf("Successfully deleted invoice %d", id)
+	return nil
+}
+
+// ================================================================
+// INVOICE NUMBER GENERATION
+// ================================================================
+
+// generateInvoiceNumber generates a unique invoice number
+func (r *InvoiceRepositoryNew) generateInvoiceNumber(tx *gorm.DB) (string, error) {
+	// Get settings
+	prefix := r.getSettingWithDefault("invoice_number_prefix", "RE")
+	format := r.getSettingWithDefault("invoice_number_format", "{prefix}{sequence:4}")
+
+	// Get current year
+	year := time.Now().Year()
+
+	// Find the highest existing number for this prefix
+	var maxNumber int
+	pattern := prefix + "%"
+	
+	err := tx.Raw(`
+		SELECT COALESCE(MAX(
+			CAST(
+				SUBSTRING(invoice_number FROM ? FOR 10) AS UNSIGNED
+			)
+		), 1000) as max_num
+		FROM invoices 
+		WHERE invoice_number LIKE ?
+	`, len(prefix)+1, pattern).Scan(&maxNumber).Error
+	
+	if err != nil {
+		// Fallback: use timestamp-based number
+		maxNumber = int(time.Now().Unix()) % 100000
+		log.Printf("Warning: Could not get max invoice number, using fallback: %d", maxNumber)
+	}
+
+	nextNumber := maxNumber + 1
+
+	// Generate invoice number based on format
+	invoiceNumber := strings.ReplaceAll(format, "{prefix}", prefix)
+	invoiceNumber = strings.ReplaceAll(invoiceNumber, "{year}", fmt.Sprintf("%d", year))
+	invoiceNumber = strings.ReplaceAll(invoiceNumber, "{sequence:4}", fmt.Sprintf("%04d", nextNumber))
+
+	// Ensure uniqueness
+	var count int64
+	for i := 0; i < 10; i++ { // Max 10 attempts
+		err = tx.Model(&models.Invoice{}).Where("invoice_number = ?", invoiceNumber).Count(&count).Error
+		if err != nil {
+			return "", fmt.Errorf("failed to check invoice number uniqueness: %v", err)
+		}
+		if count == 0 {
+			break
+		}
+		// If number exists, increment and try again
+		nextNumber++
+		invoiceNumber = strings.ReplaceAll(format, "{prefix}", prefix)
+		invoiceNumber = strings.ReplaceAll(invoiceNumber, "{year}", fmt.Sprintf("%d", year))
+		invoiceNumber = strings.ReplaceAll(invoiceNumber, "{sequence:4}", fmt.Sprintf("%04d", nextNumber))
+	}
+
+	if count > 0 {
+		return "", fmt.Errorf("failed to generate unique invoice number after 10 attempts")
+	}
+
+	return invoiceNumber, nil
+}
+
+// GeneratePreviewInvoiceNumber generates a preview invoice number for the form
+func (r *InvoiceRepositoryNew) GeneratePreviewInvoiceNumber() (string, error) {
+	// Get settings from config - using the configured format
+	prefix := "INV-"
+	format := "{prefix}{year}{month}{sequence:4}"
+	
+	// Get current year and month
+	now := time.Now()
+	year := now.Format("2006")
+	month := now.Format("01")
+	
+	// Find the highest existing number for this prefix and year/month
+	var maxNumber int
+	pattern := prefix + year + month + "%"
+	
+	err := r.db.DB.Raw(`
+		SELECT COALESCE(MAX(
+			CAST(
+				SUBSTRING(invoice_number FROM ? FOR 4) AS UNSIGNED
+			)
+		), 0) as max_num
+		FROM invoices 
+		WHERE invoice_number LIKE ?
+	`, len(prefix)+len(year)+len(month)+1, pattern).Scan(&maxNumber).Error
+	
+	if err != nil {
+		// Fallback: use 1 as the next number
+		maxNumber = 0
+		log.Printf("Warning: Could not get max invoice number for preview, using fallback")
+	}
+	
+	nextNumber := maxNumber + 1
+	
+	// Generate invoice number based on format
+	invoiceNumber := strings.ReplaceAll(format, "{prefix}", prefix)
+	invoiceNumber = strings.ReplaceAll(invoiceNumber, "{year}", year)
+	invoiceNumber = strings.ReplaceAll(invoiceNumber, "{month}", month)
+	invoiceNumber = strings.ReplaceAll(invoiceNumber, "{sequence:4}", fmt.Sprintf("%04d", nextNumber))
+	
+	return invoiceNumber, nil
+}
+
+// ================================================================
+// LIST AND FILTER OPERATIONS
 // ================================================================
 
 // GetInvoices returns a paginated list of invoices with filters
-func (r *InvoiceRepository) GetInvoices(filter *models.InvoiceFilter) ([]models.Invoice, int64, error) {
+func (r *InvoiceRepositoryNew) GetInvoices(filter *models.InvoiceFilter) ([]models.Invoice, int64, error) {
 	var invoices []models.Invoice
 	var totalCount int64
 
 	query := r.db.DB.Model(&models.Invoice{}).
 		Preload("Customer").
 		Preload("Job").
-		Preload("Template").
-		Preload("Creator").
-		Preload("LineItems").
-		Preload("Payments")
+		Preload("Template")
 
 	// Apply filters
 	if filter != nil {
@@ -73,7 +479,7 @@ func (r *InvoiceRepository) GetInvoices(filter *models.InvoiceFilter) ([]models.
 		return nil, 0, fmt.Errorf("failed to count invoices: %v", err)
 	}
 
-	// Apply pagination
+	// Apply pagination and order
 	if filter != nil {
 		if filter.PageSize > 0 {
 			query = query.Limit(filter.PageSize)
@@ -84,7 +490,6 @@ func (r *InvoiceRepository) GetInvoices(filter *models.InvoiceFilter) ([]models.
 		}
 	}
 
-	// Order by issue date desc
 	query = query.Order("issue_date DESC, created_at DESC")
 
 	if err := query.Find(&invoices).Error; err != nil {
@@ -94,263 +499,150 @@ func (r *InvoiceRepository) GetInvoices(filter *models.InvoiceFilter) ([]models.
 	return invoices, totalCount, nil
 }
 
-// GetInvoiceByID returns a specific invoice by ID
-func (r *InvoiceRepository) GetInvoiceByID(id uint64) (*models.Invoice, error) {
-	var invoice models.Invoice
+// ================================================================
+// TEMPLATE OPERATIONS
+// ================================================================
 
-	if err := r.db.DB.
-		Preload("Customer").
-		Preload("Job").
-		Preload("Template").
-		Preload("Creator").
-		Preload("LineItems", func(db *gorm.DB) *gorm.DB {
-			return db.Order("sort_order ASC, line_item_id ASC")
-		}).
-		Preload("LineItems.Device").
-		// Temporarily disabled Package preload due to column naming mismatch
-		// Preload("LineItems.Package").
-		Preload("Payments", func(db *gorm.DB) *gorm.DB {
-			return db.Order("payment_date DESC")
-		}).
-		First(&invoice, id).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("invoice not found")
-		}
-		return nil, fmt.Errorf("failed to get invoice: %v", err)
+// GetAllTemplates returns all invoice templates
+func (r *InvoiceRepositoryNew) GetAllTemplates() ([]models.InvoiceTemplate, error) {
+	var templates []models.InvoiceTemplate
+
+	if err := r.db.DB.Order("is_default DESC, name ASC").Find(&templates).Error; err != nil {
+		return nil, fmt.Errorf("failed to get templates: %v", err)
 	}
 
-	return &invoice, nil
+	return templates, nil
 }
 
-// GetInvoiceByNumber returns a specific invoice by invoice number
-func (r *InvoiceRepository) GetInvoiceByNumber(invoiceNumber string) (*models.Invoice, error) {
-	var invoice models.Invoice
+// GetTemplateByID retrieves a template by ID
+func (r *InvoiceRepositoryNew) GetTemplateByID(id uint) (*models.InvoiceTemplate, error) {
+	var template models.InvoiceTemplate
 
-	if err := r.db.DB.
-		Preload("Customer").
-		Preload("Job").
-		Preload("Template").
-		Preload("Creator").
-		Preload("LineItems", func(db *gorm.DB) *gorm.DB {
-			return db.Order("sort_order ASC, line_item_id ASC")
-		}).
-		Preload("LineItems.Device").
-		// Temporarily disabled Package preload due to column naming mismatch
-		// Preload("LineItems.Package").
-		Preload("Payments", func(db *gorm.DB) *gorm.DB {
-			return db.Order("payment_date DESC")
-		}).
-		Where("invoice_number = ?", invoiceNumber).
-		First(&invoice).Error; err != nil {
+	if err := r.db.DB.First(&template, id).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("invoice not found")
+			return nil, fmt.Errorf("template with ID %d not found", id)
 		}
-		return nil, fmt.Errorf("failed to get invoice: %v", err)
+		return nil, fmt.Errorf("failed to get template: %v", err)
 	}
 
-	return &invoice, nil
+	return &template, nil
 }
 
-// CreateInvoice creates a new invoice with line items
-func (r *InvoiceRepository) CreateInvoice(invoice *models.Invoice) error {
+// CreateTemplate creates a new invoice template
+func (r *InvoiceRepositoryNew) CreateTemplate(template *models.InvoiceTemplate) error {
 	return r.db.DB.Transaction(func(tx *gorm.DB) error {
-		// Generate invoice number if not provided
-		if invoice.InvoiceNumber == "" {
-			invoiceNumber, err := r.generateInvoiceNumber()
-			if err != nil {
-				return fmt.Errorf("failed to generate invoice number: %v", err)
+		// If this is set as default, unset all other defaults
+		if template.IsDefault {
+			if err := tx.Model(&models.InvoiceTemplate{}).
+				Where("is_default = ?", true).
+				Update("is_default", false).Error; err != nil {
+				return fmt.Errorf("failed to unset existing defaults: %v", err)
 			}
-			invoice.InvoiceNumber = invoiceNumber
 		}
 
-		// Set timestamps
-		now := time.Now()
-		invoice.CreatedAt = now
-		invoice.UpdatedAt = now
-
-		// Calculate totals
-		invoice.CalculateTotals()
-
-		// Create the invoice
-		if err := tx.Create(invoice).Error; err != nil {
-			return fmt.Errorf("failed to create invoice: %v", err)
-		}
-
-		// Create line items
-		for i := range invoice.LineItems {
-			invoice.LineItems[i].InvoiceID = invoice.InvoiceID
-			invoice.LineItems[i].CreatedAt = now
-			invoice.LineItems[i].UpdatedAt = now
-			invoice.LineItems[i].CalculateTotal()
+		// Create the template
+		if err := tx.Create(template).Error; err != nil {
+			return fmt.Errorf("failed to create template: %v", err)
 		}
 
 		return nil
 	})
 }
 
-// UpdateInvoice updates an existing invoice
-func (r *InvoiceRepository) UpdateInvoice(invoice *models.Invoice) error {
+// UpdateTemplate updates an existing invoice template
+func (r *InvoiceRepositoryNew) UpdateTemplate(template *models.InvoiceTemplate) error {
 	return r.db.DB.Transaction(func(tx *gorm.DB) error {
-		// Update timestamp
-		invoice.UpdatedAt = time.Now()
-
-		// Calculate totals
-		invoice.CalculateTotals()
-
-		// Update the invoice
-		if err := tx.Save(invoice).Error; err != nil {
-			return fmt.Errorf("failed to update invoice: %v", err)
+		// If this is set as default, unset all other defaults
+		if template.IsDefault {
+			if err := tx.Model(&models.InvoiceTemplate{}).
+				Where("template_id != ? AND is_default = ?", template.TemplateID, true).
+				Update("is_default", false).Error; err != nil {
+				return fmt.Errorf("failed to unset existing defaults: %v", err)
+			}
 		}
 
-		// Update line items if they exist
-		for i := range invoice.LineItems {
-			invoice.LineItems[i].UpdatedAt = invoice.UpdatedAt
-			invoice.LineItems[i].CalculateTotal()
+		// Update the template
+		result := tx.Model(&models.InvoiceTemplate{}).
+			Where("template_id = ?", template.TemplateID).
+			Updates(template)
+
+		if result.Error != nil {
+			return fmt.Errorf("failed to update template: %v", result.Error)
+		}
+
+		if result.RowsAffected == 0 {
+			return fmt.Errorf("template with ID %d not found", template.TemplateID)
 		}
 
 		return nil
 	})
 }
 
-// DeleteInvoice soft deletes an invoice (sets status to cancelled)
-func (r *InvoiceRepository) DeleteInvoice(id uint64) error {
-	result := r.db.DB.Model(&models.Invoice{}).
-		Where("invoice_id = ?", id).
-		Update("status", "cancelled")
+// DeleteTemplate deletes an invoice template
+func (r *InvoiceRepositoryNew) DeleteTemplate(id uint) error {
+	// Check if template is in use
+	var count int64
+	if err := r.db.DB.Model(&models.Invoice{}).
+		Where("template_id = ?", id).
+		Count(&count).Error; err != nil {
+		return fmt.Errorf("failed to check template usage: %v", err)
+	}
 
+	if count > 0 {
+		return fmt.Errorf("cannot delete template that is in use by %d invoices", count)
+	}
+
+	result := r.db.DB.Delete(&models.InvoiceTemplate{}, id)
 	if result.Error != nil {
-		return fmt.Errorf("failed to delete invoice: %v", result.Error)
+		return fmt.Errorf("failed to delete template: %v", result.Error)
 	}
 
 	if result.RowsAffected == 0 {
-		return fmt.Errorf("invoice not found")
+		return fmt.Errorf("template with ID %d not found", id)
 	}
 
 	return nil
 }
 
-// UpdateInvoiceStatus updates the status of an invoice
-func (r *InvoiceRepository) UpdateInvoiceStatus(id uint64, status string) error {
-	updates := map[string]interface{}{
-		"status":     status,
-		"updated_at": time.Now(),
-	}
-
-	// Set special timestamps based on status
-	if status == "sent" {
-		updates["sent_at"] = time.Now()
-	} else if status == "paid" {
-		updates["paid_at"] = time.Now()
-	}
-
-	result := r.db.DB.Model(&models.Invoice{}).
-		Where("invoice_id = ?", id).
-		Updates(updates)
-
-	if result.Error != nil {
-		return fmt.Errorf("failed to update invoice status: %v", result.Error)
-	}
-
-	if result.RowsAffected == 0 {
-		return fmt.Errorf("invoice not found")
-	}
-
-	return nil
-}
-
-// ================================================================
-// INVOICE NUMBER GENERATION
-// ================================================================
-
-// generateInvoiceNumber generates a unique invoice number
-func (r *InvoiceRepository) generateInvoiceNumber() (string, error) {
-	// Get the current year and month
-	now := time.Now()
-	year := now.Format("2006")
-	month := now.Format("01")
-
-	// Get the invoice number format setting
-	format, err := r.GetInvoiceSetting("invoice_number_format")
-	if err != nil || format == "" {
-		format = "{prefix}{year}{month}{sequence:4}"
-	}
-
-	// Get the prefix
-	prefix, err := r.GetInvoiceSetting("invoice_number_prefix")
-	if err != nil || prefix == "" {
-		prefix = "INV-"
-	}
-
-	// Get the next sequence number for this year/month
-	var maxSequence int
-	err = r.db.DB.Raw(`
-		SELECT COALESCE(MAX(CAST(SUBSTRING(invoice_number FROM LENGTH(?) + LENGTH(?) + LENGTH(?) + 1 FOR 4) AS UNSIGNED)), 0)
-		FROM invoices 
-		WHERE invoice_number LIKE ?
-	`, prefix, year, month, prefix+year+month+"%").Scan(&maxSequence).Error
-
-	if err != nil {
-		return "", fmt.Errorf("failed to get next sequence number: %v", err)
-	}
-
-	sequence := maxSequence + 1
-
-	// Replace placeholders in format
-	invoiceNumber := strings.ReplaceAll(format, "{prefix}", prefix)
-	invoiceNumber = strings.ReplaceAll(invoiceNumber, "{year}", year)
-	invoiceNumber = strings.ReplaceAll(invoiceNumber, "{month}", month)
-	invoiceNumber = strings.ReplaceAll(invoiceNumber, "{sequence:4}", fmt.Sprintf("%04d", sequence))
-
-	return invoiceNumber, nil
-}
-
-// ================================================================
-// INVOICE PAYMENTS
-// ================================================================
-
-// AddPayment adds a payment to an invoice
-func (r *InvoiceRepository) AddPayment(payment *models.InvoicePayment) error {
+// SetDefaultTemplate sets a template as the default
+func (r *InvoiceRepositoryNew) SetDefaultTemplate(id uint) error {
 	return r.db.DB.Transaction(func(tx *gorm.DB) error {
-		// Create the payment
-		payment.CreatedAt = time.Now()
-		if err := tx.Create(payment).Error; err != nil {
-			return fmt.Errorf("failed to create payment: %v", err)
+		// Unset all existing defaults
+		if err := tx.Model(&models.InvoiceTemplate{}).
+			Where("is_default = ?", true).
+			Update("is_default", false).Error; err != nil {
+			return fmt.Errorf("failed to unset existing defaults: %v", err)
 		}
 
-		// Update invoice paid amount and status
-		var invoice models.Invoice
-		if err := tx.First(&invoice, payment.InvoiceID).Error; err != nil {
-			return fmt.Errorf("failed to get invoice for payment update: %v", err)
+		// Set the new default
+		result := tx.Model(&models.InvoiceTemplate{}).
+			Where("template_id = ?", id).
+			Update("is_default", true)
+
+		if result.Error != nil {
+			return fmt.Errorf("failed to set default template: %v", result.Error)
 		}
 
-		// Calculate new paid amount
-		var totalPaid float64
-		if err := tx.Model(&models.InvoicePayment{}).
-			Where("invoice_id = ?", payment.InvoiceID).
-			Select("COALESCE(SUM(amount), 0)").
-			Scan(&totalPaid).Error; err != nil {
-			return fmt.Errorf("failed to calculate total payments: %v", err)
-		}
-
-		// Update invoice
-		updates := map[string]interface{}{
-			"paid_amount": totalPaid,
-			"balance_due": invoice.TotalAmount - totalPaid,
-			"updated_at":  time.Now(),
-		}
-
-		// Update status if fully paid
-		if totalPaid >= invoice.TotalAmount {
-			updates["status"] = "paid"
-			updates["paid_at"] = time.Now()
-		}
-
-		if err := tx.Model(&invoice).Updates(updates).Error; err != nil {
-			return fmt.Errorf("failed to update invoice with payment: %v", err)
+		if result.RowsAffected == 0 {
+			return fmt.Errorf("template with ID %d not found", id)
 		}
 
 		return nil
 	})
+}
+
+// GetDefaultTemplate returns the default template
+func (r *InvoiceRepositoryNew) GetDefaultTemplate() (*models.InvoiceTemplate, error) {
+	var template models.InvoiceTemplate
+
+	if err := r.db.DB.Where("is_default = ?", true).First(&template).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("no default template found")
+		}
+		return nil, fmt.Errorf("failed to get default template: %v", err)
+	}
+
+	return &template, nil
 }
 
 // ================================================================
@@ -358,12 +650,21 @@ func (r *InvoiceRepository) AddPayment(payment *models.InvoicePayment) error {
 // ================================================================
 
 // GetCompanySettings returns the company settings
-func (r *InvoiceRepository) GetCompanySettings() (*models.CompanySettings, error) {
+func (r *InvoiceRepositoryNew) GetCompanySettings() (*models.CompanySettings, error) {
 	var settings models.CompanySettings
 
 	if err := r.db.DB.First(&settings).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("company settings not found")
+			// Create default settings
+			defaultSettings := &models.CompanySettings{
+				CompanyName: "RentalCore Company",
+				CreatedAt:   time.Now(),
+				UpdatedAt:   time.Now(),
+			}
+			if err := r.db.DB.Create(defaultSettings).Error; err != nil {
+				return nil, fmt.Errorf("failed to create default company settings: %v", err)
+			}
+			return defaultSettings, nil
 		}
 		return nil, fmt.Errorf("failed to get company settings: %v", err)
 	}
@@ -372,7 +673,7 @@ func (r *InvoiceRepository) GetCompanySettings() (*models.CompanySettings, error
 }
 
 // UpdateCompanySettings updates the company settings
-func (r *InvoiceRepository) UpdateCompanySettings(settings *models.CompanySettings) error {
+func (r *InvoiceRepositoryNew) UpdateCompanySettings(settings *models.CompanySettings) error {
 	settings.UpdatedAt = time.Now()
 
 	if err := r.db.DB.Save(settings).Error; err != nil {
@@ -387,7 +688,7 @@ func (r *InvoiceRepository) UpdateCompanySettings(settings *models.CompanySettin
 // ================================================================
 
 // GetInvoiceSetting returns a specific invoice setting
-func (r *InvoiceRepository) GetInvoiceSetting(key string) (string, error) {
+func (r *InvoiceRepositoryNew) GetInvoiceSetting(key string) (string, error) {
 	var setting models.InvoiceSetting
 
 	if err := r.db.DB.Where("setting_key = ?", key).First(&setting).Error; err != nil {
@@ -404,18 +705,27 @@ func (r *InvoiceRepository) GetInvoiceSetting(key string) (string, error) {
 	return "", nil
 }
 
-// GetAllInvoiceSettings returns all invoice settings as a map
-func (r *InvoiceRepository) GetAllInvoiceSettings() (*models.InvoiceSettings, error) {
+// getSettingWithDefault returns a setting value or a default if not found
+func (r *InvoiceRepositoryNew) getSettingWithDefault(key, defaultValue string) string {
+	value, err := r.GetInvoiceSetting(key)
+	if err != nil || value == "" {
+		return defaultValue
+	}
+	return value
+}
+
+// GetAllInvoiceSettings returns all invoice settings as a structured object
+func (r *InvoiceRepositoryNew) GetAllInvoiceSettings() (*models.InvoiceSettings, error) {
 	var dbSettings []models.InvoiceSetting
 
 	if err := r.db.DB.Find(&dbSettings).Error; err != nil {
 		return nil, fmt.Errorf("failed to get invoice settings: %v", err)
 	}
 
-	// Convert to structured format
+	// Create settings with defaults
 	settings := &models.InvoiceSettings{
-		InvoiceNumberPrefix:     "INV-",
-		InvoiceNumberFormat:     "{prefix}{year}{month}{sequence:4}",
+		InvoiceNumberPrefix:     "RE",
+		InvoiceNumberFormat:     "{prefix}{sequence:4}",
 		DefaultPaymentTerms:     30,
 		DefaultTaxRate:          19.0,
 		AutoCalculateRentalDays: true,
@@ -461,7 +771,7 @@ func (r *InvoiceRepository) GetAllInvoiceSettings() (*models.InvoiceSettings, er
 }
 
 // UpdateInvoiceSetting updates a specific invoice setting
-func (r *InvoiceRepository) UpdateInvoiceSetting(key, value string, updatedBy *uint) error {
+func (r *InvoiceRepositoryNew) UpdateInvoiceSetting(key, value string, updatedBy *uint) error {
 	setting := models.InvoiceSetting{
 		SettingKey:   key,
 		SettingValue: &value,
@@ -477,141 +787,22 @@ func (r *InvoiceRepository) UpdateInvoiceSetting(key, value string, updatedBy *u
 }
 
 // ================================================================
-// INVOICE TEMPLATES
-// ================================================================
-
-// GetInvoiceTemplates returns all invoice templates
-func (r *InvoiceRepository) GetInvoiceTemplates() ([]models.InvoiceTemplate, error) {
-	var templates []models.InvoiceTemplate
-
-	if err := r.db.DB.Where("is_active = ?", true).
-		Order("is_default DESC, name ASC").
-		Find(&templates).Error; err != nil {
-		return nil, fmt.Errorf("failed to get invoice templates: %v", err)
-	}
-
-	return templates, nil
-}
-
-// GetDefaultInvoiceTemplate returns the default invoice template
-func (r *InvoiceRepository) GetDefaultInvoiceTemplate() (*models.InvoiceTemplate, error) {
-	var template models.InvoiceTemplate
-
-	if err := r.db.DB.Where("is_default = ? AND is_active = ?", true, true).
-		First(&template).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("no default invoice template found")
-		}
-		return nil, fmt.Errorf("failed to get default invoice template: %v", err)
-	}
-
-	return &template, nil
-}
-
-// GetInvoiceTemplateByID returns a specific invoice template by ID
-func (r *InvoiceRepository) GetInvoiceTemplateByID(templateID uint) (*models.InvoiceTemplate, error) {
-	var template models.InvoiceTemplate
-
-	if err := r.db.DB.Where("template_id = ?", templateID).
-		Preload("Creator").
-		First(&template).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return nil, fmt.Errorf("invoice template not found")
-		}
-		return nil, fmt.Errorf("failed to get invoice template: %v", err)
-	}
-
-	return &template, nil
-}
-
-// CreateInvoiceTemplate creates a new invoice template
-func (r *InvoiceRepository) CreateInvoiceTemplate(template *models.InvoiceTemplate) error {
-	// If this template is set as default, unset other defaults
-	if template.IsDefault {
-		if err := r.db.DB.Model(&models.InvoiceTemplate{}).
-			Where("is_default = ?", true).
-			Update("is_default", false).Error; err != nil {
-			return fmt.Errorf("failed to unset other default templates: %v", err)
-		}
-	}
-
-	if err := r.db.DB.Create(template).Error; err != nil {
-		return fmt.Errorf("failed to create invoice template: %v", err)
-	}
-
-	return nil
-}
-
-// UpdateInvoiceTemplate updates an existing invoice template
-func (r *InvoiceRepository) UpdateInvoiceTemplate(template *models.InvoiceTemplate) error {
-	// If this template is set as default, unset other defaults
-	if template.IsDefault {
-		if err := r.db.DB.Model(&models.InvoiceTemplate{}).
-			Where("template_id != ? AND is_default = ?", template.TemplateID, true).
-			Update("is_default", false).Error; err != nil {
-			return fmt.Errorf("failed to unset other default templates: %v", err)
-		}
-	}
-
-	if err := r.db.DB.Save(template).Error; err != nil {
-		return fmt.Errorf("failed to update invoice template: %v", err)
-	}
-
-	return nil
-}
-
-// DeleteInvoiceTemplate deletes an invoice template
-func (r *InvoiceRepository) DeleteInvoiceTemplate(templateID uint) error {
-	// Check if template is being used by any invoices
-	var count int64
-	if err := r.db.DB.Model(&models.Invoice{}).
-		Where("template_id = ?", templateID).
-		Count(&count).Error; err != nil {
-		return fmt.Errorf("failed to check template usage: %v", err)
-	}
-
-	if count > 0 {
-		return fmt.Errorf("cannot delete template: it is being used by %d invoice(s)", count)
-	}
-
-	// Check if this is the default template
-	var template models.InvoiceTemplate
-	if err := r.db.DB.First(&template, templateID).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return fmt.Errorf("template not found")
-		}
-		return fmt.Errorf("failed to get template: %v", err)
-	}
-
-	if template.IsDefault {
-		return fmt.Errorf("cannot delete the default template")
-	}
-
-	// Delete the template
-	if err := r.db.DB.Delete(&models.InvoiceTemplate{}, templateID).Error; err != nil {
-		return fmt.Errorf("failed to delete invoice template: %v", err)
-	}
-
-	return nil
-}
-
-// ================================================================
-// STATISTICS AND REPORTING
+// STATISTICS
 // ================================================================
 
 // GetInvoiceStats returns invoice statistics
-func (r *InvoiceRepository) GetInvoiceStats() (map[string]interface{}, error) {
+func (r *InvoiceRepositoryNew) GetInvoiceStats() (map[string]interface{}, error) {
 	stats := make(map[string]interface{})
 
 	// Total invoices
 	var totalInvoices int64
-	r.db.DB.Model(&models.Invoice{}).Count(&totalInvoices)
+	r.db.DB.Model(&models.Invoice{}).Where("status != 'cancelled'").Count(&totalInvoices)
 	stats["total_invoices"] = totalInvoices
 
-	// Total revenue
+	// Total revenue (paid invoices)
 	var totalRevenue float64
 	r.db.DB.Model(&models.Invoice{}).
-		Where("status = ?", "paid").
+		Where("status = 'paid'").
 		Select("COALESCE(SUM(total_amount), 0)").
 		Scan(&totalRevenue)
 	stats["total_revenue"] = totalRevenue
@@ -630,6 +821,13 @@ func (r *InvoiceRepository) GetInvoiceStats() (map[string]interface{}, error) {
 		Where("due_date < ? AND status NOT IN ('paid', 'cancelled')", time.Now()).
 		Count(&overdueCount)
 	stats["overdue_count"] = overdueCount
+
+	// Draft invoices
+	var draftCount int64
+	r.db.DB.Model(&models.Invoice{}).
+		Where("status = 'draft'").
+		Count(&draftCount)
+	stats["draft_count"] = draftCount
 
 	return stats, nil
 }

@@ -2,33 +2,40 @@
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="RentalCore Scanner">
-    <meta name="format-detection" content="telephone=no">
-    <title>Mobile Scanner - RentalCore</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Enhanced Mobile Scanner - RentalCore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="/static/css/app-new.css" rel="stylesheet">
-    <link rel="manifest" href="/static/manifest.json">
-    <meta name="theme-color" content="#1e293b">
-    <meta name="msapplication-TileColor" content="#1e293b">
-    <meta name="apple-touch-fullscreen" content="yes">
+    <link href="/static/css/rental-core-design.css" rel="stylesheet">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0d6efd">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="TS Manager">
     
     <style>
+        :root {
+            --scanner-primary: #0d6efd;
+            --scanner-success: #198754;
+            --scanner-warning: #ffc107;
+            --scanner-danger: #dc3545;
+            --scanner-overlay: rgba(0, 0, 0, 0.7);
+        }
+
         body {
-            overflow-x: hidden;
+            overflow: hidden;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
             -khtml-user-select: none;
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
+            background: #000;
+            margin: 0;
+            padding: 0;
         }
         
-        .mobile-scanner {
+        .enhanced-scanner {
             position: relative;
             width: 100vw;
             height: 100vh;
@@ -36,20 +43,19 @@
             overflow: hidden;
         }
         
-        .scanner-container {
+        .scanner-viewport {
             position: relative;
             width: 100%;
-            height: 60vh;
+            height: 100%;
             background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         
         #scanner-video {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transform-origin: center;
+            transition: transform 0.3s ease;
         }
         
         .scanner-overlay {
@@ -59,25 +65,51 @@
             width: 100%;
             height: 100%;
             pointer-events: none;
-            background: linear-gradient(
-                to bottom,
-                rgba(0,0,0,0.5) 0%,
-                transparent 25%,
-                transparent 75%,
-                rgba(0,0,0,0.5) 100%
-            );
+            background: 
+                linear-gradient(to bottom, var(--scanner-overlay) 0%, transparent 30%, transparent 70%, var(--scanner-overlay) 100%),
+                linear-gradient(to right, var(--scanner-overlay) 0%, transparent 30%, transparent 70%, var(--scanner-overlay) 100%);
         }
         
-        .scanner-frame {
+        .scanner-reticle {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 280px;
             height: 280px;
-            border: 3px solid #0d6efd;
+            border: 3px solid var(--scanner-primary);
             border-radius: 20px;
             pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        
+        .scanner-reticle.scanning {
+            border-color: var(--scanner-success);
+            box-shadow: 0 0 20px rgba(25, 135, 84, 0.5);
+            animation: scanPulse 2s infinite;
+        }
+        
+        .scanner-reticle.success {
+            border-color: var(--scanner-success);
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 0 30px rgba(25, 135, 84, 0.8);
+        }
+        
+        .scanner-reticle.error {
+            border-color: var(--scanner-danger);
+            transform: translate(-50%, -50%) scale(0.9);
+            box-shadow: 0 0 30px rgba(220, 53, 69, 0.8);
+        }
+        
+        @keyframes scanPulse {
+            0%, 100% { 
+                border-color: var(--scanner-success);
+                box-shadow: 0 0 20px rgba(25, 135, 84, 0.5);
+            }
+            50% { 
+                border-color: var(--scanner-primary);
+                box-shadow: 0 0 40px rgba(13, 110, 253, 0.7);
+            }
         }
         
         .scanner-corners {
@@ -90,9 +122,10 @@
         
         .corner {
             position: absolute;
-            width: 30px;
-            height: 30px;
-            border: 4px solid #fff;
+            width: 40px;
+            height: 40px;
+            border: 5px solid #fff;
+            opacity: 0.9;
         }
         
         .corner.top-left {
@@ -127,23 +160,186 @@
             border-bottom-right-radius: 20px;
         }
         
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--scanner-success), transparent);
+            opacity: 0;
+            animation: scanLine 2s linear infinite;
+        }
+        
+        @keyframes scanLine {
+            0% { top: 0; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        
+        .scanner-reticle.scanning .scan-line {
+            opacity: 1;
+        }
+        
+        .enhanced-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(15px);
+            padding: 15px 20px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .header-title {
+            color: white;
+            font-weight: 600;
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        
+        .header-controls {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .control-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .control-btn:hover {
+            background: rgba(255,255,255,0.25);
+            transform: scale(1.05);
+        }
+        
+        .control-btn.active {
+            background: var(--scanner-warning);
+            color: #000;
+            border-color: var(--scanner-warning);
+        }
+        
+        .scan-tools {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 1000;
+        }
+        
+        .tool-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.7);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .tool-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.1);
+        }
+        
+        .tool-btn.active {
+            background: var(--scanner-warning);
+            color: #000;
+            border-color: var(--scanner-warning);
+        }
+        
+        .zoom-controls {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1000;
+        }
+        
+        .zoom-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.7);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .zoom-slider {
+            writing-mode: bt-lr;
+            -webkit-appearance: slider-vertical;
+            width: 30px;
+            height: 120px;
+            background: rgba(0,0,0,0.7);
+            outline: none;
+            border-radius: 15px;
+            margin: 10px 0;
+        }
+        
+        .scan-status-bar {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 25px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255,255,255,0.2);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
         .scan-controls {
             position: fixed;
             bottom: 0;
             left: 0;
             width: 100%;
-            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
             padding: 20px;
             z-index: 1000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
         }
         
         .scan-button {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            background: #0d6efd;
+            background: var(--scanner-primary);
             border: 4px solid #fff;
-            margin: 0 auto;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -151,6 +347,8 @@
             color: white;
             box-shadow: 0 4px 20px rgba(13, 110, 253, 0.4);
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
         
         .scan-button:hover {
@@ -159,81 +357,81 @@
         }
         
         .scan-button.scanning {
-            background: #dc3545;
-            animation: pulse 1s infinite;
+            background: var(--scanner-success);
+            animation: pulseButton 2s infinite;
         }
         
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
-            70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        .scan-button.success {
+            background: var(--scanner-success);
+            transform: scale(1.1);
         }
         
-        .mobile-header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            padding: 15px 20px;
-            z-index: 1000;
+        .scan-button.error {
+            background: var(--scanner-danger);
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes pulseButton {
+            0% { 
+                box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.7);
+                transform: scale(1);
+            }
+            70% { 
+                box-shadow: 0 0 0 15px rgba(25, 135, 84, 0);
+                transform: scale(1.05);
+            }
+            100% { 
+                box-shadow: 0 0 0 0 rgba(25, 135, 84, 0);
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .secondary-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white;
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
+            font-size: 1.5rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
         
-        .header-title {
-            color: white;
-            font-weight: bold;
-            margin: 0;
-        }
-        
-        .header-actions {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .header-btn {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-        }
-        
-        .scan-info {
-            background: rgba(0,0,0,0.9);
-            color: white;
-            padding: 15px 20px;
-            text-align: center;
-        }
-        
-        .scan-result {
+        .scan-result-modal {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             background: white;
             padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
             z-index: 2000;
             display: none;
             max-width: 90vw;
             text-align: center;
+            backdrop-filter: blur(20px);
         }
         
-        .scan-result.show {
+        .scan-result-modal.show {
             display: block;
-            animation: slideUp 0.3s ease-out;
+            animation: slideUpModal 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
         
-        @keyframes slideUp {
+        @keyframes slideUpModal {
             from {
                 opacity: 0;
-                transform: translate(-50%, -30%);
+                transform: translate(-50%, 50%);
             }
             to {
                 opacity: 1;
@@ -241,447 +439,928 @@
             }
         }
         
+        .result-device-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--scanner-success);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin: 0 auto 20px;
+        }
+        
         .result-actions {
             display: flex;
             gap: 10px;
             margin-top: 20px;
             justify-content: center;
+            flex-wrap: wrap;
         }
         
-        .torch-btn {
+        .modal-backdrop {
             position: fixed;
-            top: 80px;
-            right: 20px;
-            background: rgba(0,0,0,0.6);
-            border: none;
-            color: white;
-            padding: 12px;
-            border-radius: 50%;
-            font-size: 1.2rem;
-            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1900;
+            display: none;
+            backdrop-filter: blur(5px);
         }
         
-        .torch-btn.active {
-            background: #ffc107;
-            color: #000;
+        .modal-backdrop.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
         }
         
-        .scanner-tips {
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .focus-ring {
             position: absolute;
-            bottom: 150px;
+            border: 2px solid var(--scanner-warning);
+            border-radius: 50%;
+            pointer-events: none;
+            transform: scale(0);
+            transition: all 0.3s ease;
+        }
+        
+        .focus-ring.active {
+            transform: scale(1);
+            animation: focusPulse 1s ease-out;
+        }
+        
+        @keyframes focusPulse {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        
+        .scan-tips {
+            position: fixed;
+            bottom: 200px;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
             color: white;
             font-size: 0.9rem;
             opacity: 0.8;
+            background: rgba(0,0,0,0.5);
+            padding: 10px 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            max-width: 300px;
         }
         
-        .vibration-feedback {
-            animation: vibrate 0.1s linear 3;
+        .performance-stats {
+            position: fixed;
+            top: 80px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            display: none;
         }
         
-        @keyframes vibrate {
-            0%, 100% { transform: translate(-50%, -50%); }
-            25% { transform: translate(-52%, -50%); }
-            75% { transform: translate(-48%, -50%); }
+        .vibration-indicator {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.1);
+            border: 3px solid var(--scanner-success);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: var(--scanner-success);
+            animation: vibrateIndicator 0.3s ease;
         }
         
-        /* Enhanced Mobile Scanner Styles */
-        @media (max-width: 767px) {
-            .mobile-scanner {
-                background: #000;
-                height: 100vh;
-                height: 100dvh; /* Dynamic viewport height for better mobile support */
-            }
-            
-            .scanner-container {
-                height: calc(100vh - 200px);
-                height: calc(100dvh - 200px);
-            }
-            
-            .mobile-header {
-                background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(30, 41, 59, 0.9) 100%);
-                backdrop-filter: blur(20px);
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-                padding: calc(15px + env(safe-area-inset-top)) 20px 15px;
-            }
-            
-            .scanner-frame {
-                width: min(80vw, 280px);
-                height: min(80vw, 280px);
-                border: 3px solid #3b82f6;
-                box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
-            }
-            
-            .scan-controls {
-                padding: 20px calc(20px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-bottom));
-                background: linear-gradient(transparent, rgba(0,0,0,0.9));
-            }
-            
-            .scan-button {
-                width: 80px;
-                height: 80px;
-                background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-                box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4);
-                transform: scale(1);
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            }
-            
-            .scan-button:active {
-                transform: scale(0.95);
-            }
-            
-            .torch-btn {
-                background: rgba(0,0,0,0.7);
-                backdrop-filter: blur(10px);
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                width: 48px;
-                height: 48px;
-                top: calc(80px + env(safe-area-inset-top));
-                right: calc(20px + env(safe-area-inset-right));
-            }
-            
-            .scan-result {
-                max-width: calc(100vw - 2rem);
-                margin: 1rem;
-                border-radius: 20px;
-                backdrop-filter: blur(20px);
-                background: rgba(255, 255, 255, 0.95);
-                box-shadow: 0 20px 64px rgba(0, 0, 0, 0.4);
-            }
-            
-            .scanner-tips {
-                background: rgba(0, 0, 0, 0.7);
-                padding: 0.75rem 1.5rem;
-                border-radius: 25px;
-                backdrop-filter: blur(10px);
-                border: 1px solid rgba(255, 255, 255, 0.2);
-            }
-        }
-        
-        /* Landscape orientation adjustments */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .scanner-container {
-                height: calc(100vh - 120px);
-                height: calc(100dvh - 120px);
-            }
-            
-            .mobile-header {
-                padding: calc(8px + env(safe-area-inset-top)) 15px 8px;
-            }
-            
-            .scan-controls {
-                padding: 10px calc(10px + env(safe-area-inset-bottom));
-            }
-            
-            .scan-button {
-                width: 60px;
-                height: 60px;
-            }
-        }
-        
-        /* PWA standalone mode */
-        @media (display-mode: standalone) {
-            .mobile-header {
-                padding-top: calc(15px + env(safe-area-inset-top));
-            }
-            
-            .scan-controls {
-                padding-bottom: calc(20px + env(safe-area-inset-bottom));
-            }
-        }
-        
-        /* High contrast mode support */
-        @media (prefers-contrast: high) {
-            .scanner-frame {
-                border-width: 4px;
-                border-color: #ffffff;
-            }
-            
-            .corner {
-                border-width: 5px;
-                border-color: #ffffff;
-            }
-        }
-        
-        /* Reduced motion support */
-        @media (prefers-reduced-motion: reduce) {
-            .scan-button,
-            .vibration-feedback,
-            .scan-result {
-                animation: none !important;
-                transition: none !important;
-            }
-            
-            .scan-button.scanning {
-                animation: none;
-                background: #dc3545;
-            }
+        @keyframes vibrateIndicator {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            25% { transform: translate(-50%, -50%) scale(1.1); }
+            50% { transform: translate(-50%, -50%) scale(0.9); }
+            75% { transform: translate(-50%, -50%) scale(1.05); }
         }
     </style>
 </head>
 <body>
-    <div class="mobile-scanner">
-        <!-- Header -->
-        <div class="mobile-header">
+    <div class="enhanced-scanner">
+        <!-- Enhanced Header -->
+        <div class="enhanced-header">
             <h5 class="header-title">
-                <i class="bi bi-gear-wide-connected"></i> Mobile Scanner
+                <i class="bi bi-gear-wide-connected"></i> Enhanced Scanner
             </h5>
-            <div class="header-actions">
-                <button class="header-btn" onclick="toggleFullscreen()">
+            <div class="header-controls">
+                <button class="control-btn" id="settings-btn" onclick="toggleSettings()">
+                    <i class="bi bi-gear"></i>
+                </button>
+                <button class="control-btn" onclick="toggleFullscreen()">
                     <i class="bi bi-fullscreen"></i>
                 </button>
-                <button class="header-btn" onclick="closeScanner()">
+                <button class="control-btn" onclick="closeScanner()">
                     <i class="bi bi-x-lg"></i>
                 </button>
             </div>
         </div>
         
-        <!-- Torch Button -->
-        <button class="torch-btn" id="torch-btn" onclick="toggleTorch()">
-            <i class="bi bi-lightbulb"></i>
-        </button>
-        
-        <!-- Scanner Container -->
-        <div class="scanner-container">
+        <!-- Scanner Viewport -->
+        <div class="scanner-viewport">
             <video id="scanner-video" autoplay muted playsinline></video>
             
             <!-- Scanner Overlay -->
             <div class="scanner-overlay">
-                <div class="scanner-frame">
+                <div class="scanner-reticle" id="scanner-reticle">
                     <div class="scanner-corners">
                         <div class="corner top-left"></div>
                         <div class="corner top-right"></div>
                         <div class="corner bottom-left"></div>
                         <div class="corner bottom-right"></div>
                     </div>
-                </div>
-                
-                <div class="scanner-tips">
-                    <i class="bi bi-camera"></i><br>
-                    Point camera at barcode or QR code
+                    <div class="scan-line"></div>
                 </div>
             </div>
+            
+            <!-- Focus Ring -->
+            <div class="focus-ring" id="focus-ring"></div>
         </div>
         
-        <!-- Scan Info -->
-        <div class="scan-info">
-            <div id="scan-status">
-                <i class="bi bi-camera-video"></i> Camera ready - Position barcode in frame
-            </div>
-            <div class="mt-2">
-                <small class="text-muted">Job: {{.jobName}} | Status: <span id="connection-status">Connected</span></small>
-            </div>
+        <!-- Scan Tools -->
+        <div class="scan-tools">
+            <button class="tool-btn" id="torch-btn" onclick="toggleTorch()" title="Flashlight">
+                <i class="bi bi-lightbulb"></i>
+            </button>
+            <button class="tool-btn" id="focus-btn" onclick="toggleAutoFocus()" title="Auto Focus">
+                <i class="bi bi-bullseye"></i>
+            </button>
+            <button class="tool-btn" id="camera-btn" onclick="switchCamera()" title="Switch Camera">
+                <i class="bi bi-camera-reels"></i>
+            </button>
+        </div>
+        
+        <!-- Zoom Controls -->
+        <div class="zoom-controls">
+            <button class="zoom-btn" onclick="zoomIn()">
+                <i class="bi bi-plus"></i>
+            </button>
+            <input type="range" class="zoom-slider" id="zoom-slider" min="1" max="5" step="0.1" value="1" 
+                   oninput="setZoom(this.value)" orient="vertical">
+            <button class="zoom-btn" onclick="zoomOut()">
+                <i class="bi bi-dash"></i>
+            </button>
+        </div>
+        
+        <!-- Status Bar -->
+        <div class="scan-status-bar" id="scan-status">
+            <i class="bi bi-camera-video"></i> Camera ready - Position barcode in frame
+        </div>
+        
+        <!-- Scan Tips -->
+        <div class="scan-tips" id="scan-tips">
+            <i class="bi bi-lightbulb"></i><br>
+            Hold steady and ensure good lighting
         </div>
         
         <!-- Scan Controls -->
         <div class="scan-controls">
-            <button class="scan-button" id="scan-btn" onclick="toggleScanning()">
-                <i class="bi bi-camera"></i>
+            <button class="secondary-btn" onclick="manualInput()">
+                <i class="bi bi-keyboard"></i>
             </button>
+            
+            <button class="scan-button" id="scan-btn" onclick="toggleScanning()">
+                <i class="bi bi-camera" id="scan-icon"></i>
+            </button>
+            
+            <button class="secondary-btn" onclick="showHistory()">
+                <i class="bi bi-clock-history"></i>
+            </button>
+        </div>
+        
+        <!-- Vibration Indicator -->
+        <div class="vibration-indicator" id="vibration-indicator">
+            <i class="bi bi-check-lg"></i>
+        </div>
+        
+        <!-- Performance Stats (Hidden by default) -->
+        <div class="performance-stats" id="performance-stats">
+            FPS: <span id="fps-counter">0</span><br>
+            Scans: <span id="scan-counter">0</span><br>
+            Zoom: <span id="zoom-level">1.0x</span>
         </div>
     </div>
     
-    <!-- Scan Result Modal -->
-    <div class="scan-result" id="scan-result">
-        <div class="result-content">
-            <h4><i class="bi bi-check-circle-fill text-success"></i> Scanned Successfully</h4>
-            <p class="mt-3">
-                <strong>Device ID:</strong> <span id="scanned-device"></span><br>
-                <strong>Product:</strong> <span id="scanned-product"></span><br>
-                <strong>Status:</strong> <span id="scanned-status"></span>
-            </p>
-            
-            <div class="result-actions">
-                <button class="btn btn-primary" onclick="assignDevice()">
-                    <i class="bi bi-plus-circle"></i> Assign to Job
-                </button>
-                <button class="btn btn-secondary" onclick="continueScan()">
-                    <i class="bi bi-camera"></i> Continue Scanning
-                </button>
-                <button class="btn btn-outline-secondary" onclick="viewDetails()">
-                    <i class="bi bi-info-circle"></i> View Details
-                </button>
-            </div>
+    <!-- Modal Backdrop -->
+    <div class="modal-backdrop" id="modal-backdrop" onclick="closeModal()"></div>
+    
+    <!-- Enhanced Scan Result Modal -->
+    <div class="scan-result-modal" id="scan-result">
+        <div class="result-device-icon">
+            <i class="bi bi-qr-code-scan"></i>
+        </div>
+        <h4 id="result-title">Scan Successful!</h4>
+        <div class="mt-3">
+            <p><strong>Device ID:</strong> <span id="scanned-device"></span></p>
+            <p><strong>Product:</strong> <span id="scanned-product"></span></p>
+            <p><strong>Status:</strong> <span id="scanned-status"></span></p>
+            <p><strong>Location:</strong> <span id="scanned-location">Warehouse A</span></p>
+        </div>
+        
+        <div class="result-actions">
+            <button class="btn btn-success" onclick="assignDevice()">
+                <i class="bi bi-plus-circle"></i> Assign
+            </button>
+            <button class="btn btn-primary" onclick="continueScan()">
+                <i class="bi bi-camera"></i> Continue
+            </button>
+            <button class="btn btn-outline-primary" onclick="viewDetails()">
+                <i class="bi bi-info-circle"></i> Details
+            </button>
         </div>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://unpkg.com/@zxing/library@0.20.0/umd/index.min.js"></script>
     <script>
-        let codeReader = null;
-        let currentStream = null;
-        let isScanning = false;
-        let torchEnabled = false;
-        let lastScanTime = 0;
-        const scanCooldown = 2000; // 2 seconds between scans
+        // Enhanced Scanner Class
+        class EnhancedScanner {
+            constructor() {
+                this.codeReader = null;
+                this.currentStream = null;
+                this.isScanning = false;
+                this.torchEnabled = false;
+                this.autoFocusEnabled = true;
+                this.currentZoom = 1;
+                this.lastScanTime = 0;
+                this.scanCooldown = 1500;
+                this.scanCount = 0;
+                this.fps = 0;
+                this.lastFrameTime = 0;
+                this.videoDevices = [];
+                this.currentDeviceIndex = 0;
+                this.scanHistory = [];
+                
+                this.capabilities = {
+                    torch: false,
+                    zoom: false,
+                    focus: false
+                };
+                
+                this.init();
+            }
+            
+            async init() {
+                try {
+                    this.updateStatus('Initializing enhanced camera...', 'warning');
+                    
+                    // Initialize ZXing
+                    this.codeReader = new ZXing.BrowserMultiFormatReader();
+                    
+                    // Get available video devices
+                    this.videoDevices = await this.codeReader.listVideoInputDevices();
+                    
+                    if (this.videoDevices.length === 0) {
+                        throw new Error('No camera found');
+                    }
+                    
+                    // Setup camera
+                    await this.setupCamera();
+                    
+                    // Setup event listeners
+                    this.setupEventListeners();
+                    
+                    // Start scanning
+                    this.startContinuousScanning();
+                    
+                    this.updateStatus('Enhanced camera ready', 'success');
+                    
+                } catch (error) {
+                    console.error('Enhanced scanner initialization failed:', error);
+                    this.updateStatus('Camera initialization failed', 'danger');
+                }
+            }
+            
+            async setupCamera() {
+                // Prefer back camera for mobile
+                const backCamera = this.videoDevices.find(device => 
+                    device.label.toLowerCase().includes('back') || 
+                    device.label.toLowerCase().includes('rear') ||
+                    device.label.toLowerCase().includes('environment')
+                ) || this.videoDevices[0];
+                
+                this.currentDeviceIndex = this.videoDevices.indexOf(backCamera);
+                
+                // Enhanced constraints for better scanning
+                const constraints = {
+                    video: {
+                        deviceId: backCamera.deviceId,
+                        facingMode: 'environment',
+                        width: { ideal: 1920, min: 1280 },
+                        height: { ideal: 1080, min: 720 },
+                        frameRate: { ideal: 30, min: 15 },
+                        focusMode: 'continuous',
+                        exposureMode: 'continuous',
+                        whiteBalanceMode: 'continuous'
+                    }
+                };
+                
+                try {
+                    this.currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    const video = document.getElementById('scanner-video');
+                    video.srcObject = this.currentStream;
+                    
+                    // Get track capabilities
+                    const track = this.currentStream.getVideoTracks()[0];
+                    const capabilities = track.getCapabilities();
+                    
+                    this.capabilities = {
+                        torch: !!capabilities.torch,
+                        zoom: !!capabilities.zoom,
+                        focus: !!capabilities.focusMode || !!capabilities.focusDistance
+                    };
+                    
+                    this.updateToolsVisibility();
+                    
+                    // Setup zoom if supported
+                    if (this.capabilities.zoom) {
+                        const zoomSlider = document.getElementById('zoom-slider');
+                        zoomSlider.min = capabilities.zoom.min || 1;
+                        zoomSlider.max = capabilities.zoom.max || 5;
+                        zoomSlider.value = 1;
+                    }
+                    
+                } catch (error) {
+                    console.error('Camera setup failed:', error);
+                    throw error;
+                }
+            }
+            
+            setupEventListeners() {
+                const video = document.getElementById('scanner-video');
+                
+                // Touch focus
+                video.addEventListener('touchstart', (e) => {
+                    e.preventDefault();
+                    this.handleTouchFocus(e);
+                });
+                
+                // Orientation change
+                window.addEventListener('orientationchange', () => {
+                    setTimeout(() => this.handleOrientationChange(), 500);
+                });
+                
+                // Visibility change
+                document.addEventListener('visibilitychange', () => {
+                    if (document.hidden) {
+                        this.pauseScanning();
+                    } else {
+                        setTimeout(() => this.resumeScanning(), 1000);
+                    }
+                });
+                
+                // Performance monitoring
+                this.startPerformanceMonitoring();
+            }
+            
+            handleTouchFocus(e) {
+                if (!this.capabilities.focus) return;
+                
+                const touch = e.touches[0];
+                const video = document.getElementById('scanner-video');
+                const rect = video.getBoundingClientRect();
+                
+                const x = (touch.clientX - rect.left) / rect.width;
+                const y = (touch.clientY - rect.top) / rect.height;
+                
+                this.focusAt(x, y);
+                this.showFocusRing(touch.clientX, touch.clientY);
+            }
+            
+            async focusAt(x, y) {
+                try {
+                    const track = this.currentStream.getVideoTracks()[0];
+                    await track.applyConstraints({
+                        advanced: [{
+                            focusMode: 'single-shot',
+                            pointsOfInterest: [{ x, y }]
+                        }]
+                    });
+                    
+                    // Provide haptic feedback
+                    this.vibrate([50]);
+                    
+                } catch (error) {
+                    console.log('Focus adjustment not supported');
+                }
+            }
+            
+            showFocusRing(x, y) {
+                const focusRing = document.getElementById('focus-ring');
+                focusRing.style.left = x - 30 + 'px';
+                focusRing.style.top = y - 30 + 'px';
+                focusRing.style.width = '60px';
+                focusRing.style.height = '60px';
+                focusRing.classList.add('active');
+                
+                setTimeout(() => {
+                    focusRing.classList.remove('active');
+                }, 1000);
+            }
+            
+            startContinuousScanning() {
+                if (!this.codeReader || this.isScanning) return;
+                
+                this.isScanning = true;
+                this.updateScanButton('scanning');
+                this.updateReticle('scanning');
+                this.updateStatus('Scanning for codes...', 'primary');
+                
+                this.codeReader.decodeFromVideoDevice(undefined, 'scanner-video', (result, err) => {
+                    if (result) {
+                        const now = Date.now();
+                        if (now - this.lastScanTime > this.scanCooldown) {
+                            this.lastScanTime = now;
+                            this.handleScanSuccess(result.text);
+                        }
+                    }
+                    
+                    if (err && !(err instanceof ZXing.NotFoundException)) {
+                        console.log('Scan error:', err);
+                    }
+                });
+            }
+            
+            async handleScanSuccess(scannedText) {
+                console.log('Enhanced scan result:', scannedText);
+                this.scanCount++;
+                
+                // Enhanced feedback
+                await this.provideFeedback();
+                
+                // Update UI
+                this.updateScanButton('success');
+                this.updateReticle('success');
+                
+                // Stop scanning temporarily
+                this.pauseScanning();
+                
+                try {
+                    // Look up device with enhanced info
+                    const deviceInfo = await this.lookupDeviceEnhanced(scannedText);
+                    this.addToHistory(scannedText, deviceInfo);
+                    this.showEnhancedResult(deviceInfo);
+                    
+                } catch (error) {
+                    console.error('Device lookup failed:', error);
+                    this.updateScanButton('error');
+                    this.updateReticle('error');
+                    
+                    this.showEnhancedResult({
+                        deviceID: scannedText,
+                        product: 'Unknown Device',
+                        status: 'Not Found',
+                        location: 'Unknown',
+                        error: true
+                    });
+                }
+            }
+            
+            async provideFeedback() {
+                // Haptic feedback pattern
+                this.vibrate([100, 50, 100, 50, 200]);
+                
+                // Visual feedback
+                this.showVibrationIndicator();
+                
+                // Audio feedback
+                this.playEnhancedSuccessSound();
+                
+                // Flash effect
+                this.flashScreen();
+            }
+            
+            vibrate(pattern) {
+                if (navigator.vibrate) {
+                    navigator.vibrate(pattern);
+                }
+            }
+            
+            showVibrationIndicator() {
+                const indicator = document.getElementById('vibration-indicator');
+                indicator.style.display = 'flex';
+                setTimeout(() => {
+                    indicator.style.display = 'none';
+                }, 300);
+            }
+            
+            playEnhancedSuccessSound() {
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    
+                    // Create a more pleasant success sound
+                    const frequencies = [800, 1000, 1200];
+                    frequencies.forEach((freq, index) => {
+                        const oscillator = audioContext.createOscillator();
+                        const gainNode = audioContext.createGain();
+                        
+                        oscillator.connect(gainNode);
+                        gainNode.connect(audioContext.destination);
+                        
+                        oscillator.frequency.value = freq;
+                        oscillator.type = 'sine';
+                        
+                        const startTime = audioContext.currentTime + (index * 0.1);
+                        const endTime = startTime + 0.1;
+                        
+                        gainNode.gain.setValueAtTime(0.2, startTime);
+                        gainNode.gain.exponentialRampToValueAtTime(0.01, endTime);
+                        
+                        oscillator.start(startTime);
+                        oscillator.stop(endTime);
+                    });
+                    
+                } catch (error) {
+                    console.log('Audio not supported');
+                }
+            }
+            
+            flashScreen() {
+                const overlay = document.querySelector('.scanner-overlay');
+                overlay.style.background = 'rgba(255,255,255,0.3)';
+                setTimeout(() => {
+                    overlay.style.background = '';
+                }, 100);
+            }
+            
+            async lookupDeviceEnhanced(deviceID) {
+                const response = await fetch(`/api/v1/devices/${deviceID}`, {
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Device not found: ${deviceID}`);
+                }
+                
+                const device = await response.json();
+                
+                // Add enhanced info
+                return {
+                    deviceID: device.deviceID,
+                    product: device.product || device.productName || 'Unknown Product',
+                    status: device.status || 'Unknown',
+                    location: device.location || device.currentLocation || 'Unknown Location',
+                    condition: device.condition || 'Good',
+                    lastMaintenance: device.lastMaintenance,
+                    pricePerDay: device.pricePerDay
+                };
+            }
+            
+            showEnhancedResult(deviceInfo) {
+                // Update modal content
+                document.getElementById('scanned-device').textContent = deviceInfo.deviceID;
+                document.getElementById('scanned-product').textContent = deviceInfo.product;
+                document.getElementById('scanned-status').textContent = deviceInfo.status;
+                document.getElementById('scanned-location').textContent = deviceInfo.location;
+                
+                // Update icon based on status
+                const icon = document.querySelector('.result-device-icon i');
+                if (deviceInfo.error) {
+                    icon.className = 'bi bi-exclamation-triangle';
+                    document.querySelector('.result-device-icon').style.background = 'var(--scanner-danger)';
+                    document.getElementById('result-title').textContent = 'Device Not Found';
+                } else {
+                    icon.className = 'bi bi-check-lg';
+                    document.querySelector('.result-device-icon').style.background = 'var(--scanner-success)';
+                    document.getElementById('result-title').textContent = 'Scan Successful!';
+                }
+                
+                // Show modal
+                this.showModal();
+                
+                // Auto-hide after 8 seconds
+                setTimeout(() => {
+                    if (document.getElementById('scan-result').classList.contains('show')) {
+                        this.continueScan();
+                    }
+                }, 8000);
+            }
+            
+            showModal() {
+                document.getElementById('modal-backdrop').classList.add('show');
+                document.getElementById('scan-result').classList.add('show');
+            }
+            
+            addToHistory(code, deviceInfo) {
+                this.scanHistory.unshift({
+                    code,
+                    deviceInfo,
+                    timestamp: new Date()
+                });
+                
+                // Keep only last 50 scans
+                if (this.scanHistory.length > 50) {
+                    this.scanHistory = this.scanHistory.slice(0, 50);
+                }
+            }
+            
+            async toggleTorch() {
+                if (!this.capabilities.torch || !this.currentStream) return;
+                
+                try {
+                    const track = this.currentStream.getVideoTracks()[0];
+                    this.torchEnabled = !this.torchEnabled;
+                    
+                    await track.applyConstraints({
+                        advanced: [{ torch: this.torchEnabled }]
+                    });
+                    
+                    const torchBtn = document.getElementById('torch-btn');
+                    torchBtn.classList.toggle('active', this.torchEnabled);
+                    
+                    this.vibrate([50]);
+                    
+                } catch (error) {
+                    console.error('Torch control failed:', error);
+                }
+            }
+            
+            async toggleAutoFocus() {
+                if (!this.capabilities.focus || !this.currentStream) return;
+                
+                try {
+                    const track = this.currentStream.getVideoTracks()[0];
+                    this.autoFocusEnabled = !this.autoFocusEnabled;
+                    
+                    await track.applyConstraints({
+                        advanced: [{
+                            focusMode: this.autoFocusEnabled ? 'continuous' : 'manual'
+                        }]
+                    });
+                    
+                    const focusBtn = document.getElementById('focus-btn');
+                    focusBtn.classList.toggle('active', this.autoFocusEnabled);
+                    
+                    this.vibrate([50]);
+                    
+                } catch (error) {
+                    console.error('Focus control failed:', error);
+                }
+            }
+            
+            async switchCamera() {
+                if (this.videoDevices.length <= 1) return;
+                
+                this.currentDeviceIndex = (this.currentDeviceIndex + 1) % this.videoDevices.length;
+                
+                // Stop current stream
+                if (this.currentStream) {
+                    this.currentStream.getTracks().forEach(track => track.stop());
+                }
+                
+                this.pauseScanning();
+                
+                // Setup new camera
+                await this.setupCamera();
+                
+                // Resume scanning
+                setTimeout(() => {
+                    this.startContinuousScanning();
+                }, 500);
+                
+                this.vibrate([100]);
+            }
+            
+            async setZoom(value) {
+                if (!this.capabilities.zoom || !this.currentStream) return;
+                
+                try {
+                    const track = this.currentStream.getVideoTracks()[0];
+                    this.currentZoom = parseFloat(value);
+                    
+                    await track.applyConstraints({
+                        advanced: [{ zoom: this.currentZoom }]
+                    });
+                    
+                    document.getElementById('zoom-level').textContent = this.currentZoom.toFixed(1) + 'x';
+                    
+                } catch (error) {
+                    console.error('Zoom control failed:', error);
+                }
+            }
+            
+            zoomIn() {
+                const newZoom = Math.min(this.currentZoom + 0.5, 5);
+                document.getElementById('zoom-slider').value = newZoom;
+                this.setZoom(newZoom);
+            }
+            
+            zoomOut() {
+                const newZoom = Math.max(this.currentZoom - 0.5, 1);
+                document.getElementById('zoom-slider').value = newZoom;
+                this.setZoom(newZoom);
+            }
+            
+            updateToolsVisibility() {
+                // Hide tools that aren't supported
+                if (!this.capabilities.torch) {
+                    document.getElementById('torch-btn').style.display = 'none';
+                }
+                if (!this.capabilities.focus) {
+                    document.getElementById('focus-btn').style.display = 'none';
+                }
+                if (!this.capabilities.zoom) {
+                    document.querySelector('.zoom-controls').style.display = 'none';
+                }
+                if (this.videoDevices.length <= 1) {
+                    document.getElementById('camera-btn').style.display = 'none';
+                }
+            }
+            
+            updateScanButton(state) {
+                const btn = document.getElementById('scan-btn');
+                const icon = document.getElementById('scan-icon');
+                
+                btn.className = 'scan-button';
+                
+                switch (state) {
+                    case 'scanning':
+                        btn.classList.add('scanning');
+                        icon.className = 'bi bi-pause';
+                        break;
+                    case 'success':
+                        btn.classList.add('success');
+                        icon.className = 'bi bi-check-lg';
+                        setTimeout(() => {
+                            btn.className = 'scan-button';
+                            icon.className = 'bi bi-camera';
+                        }, 1000);
+                        break;
+                    case 'error':
+                        btn.classList.add('error');
+                        icon.className = 'bi bi-x-lg';
+                        setTimeout(() => {
+                            btn.className = 'scan-button';
+                            icon.className = 'bi bi-camera';
+                        }, 1000);
+                        break;
+                    default:
+                        icon.className = 'bi bi-camera';
+                }
+            }
+            
+            updateReticle(state) {
+                const reticle = document.getElementById('scanner-reticle');
+                reticle.className = 'scanner-reticle';
+                
+                if (state) {
+                    reticle.classList.add(state);
+                    
+                    if (state !== 'scanning') {
+                        setTimeout(() => {
+                            reticle.className = 'scanner-reticle';
+                        }, 1000);
+                    }
+                }
+            }
+            
+            updateStatus(message, type = 'info') {
+                const statusEl = document.getElementById('scan-status');
+                const icons = {
+                    success: 'check-circle-fill',
+                    warning: 'exclamation-triangle-fill',
+                    danger: 'x-circle-fill',
+                    primary: 'camera-video-fill',
+                    info: 'info-circle-fill'
+                };
+                
+                statusEl.innerHTML = `<i class="bi bi-${icons[type] || 'info-circle'}"></i> ${message}`;
+            }
+            
+            startPerformanceMonitoring() {
+                let frameCount = 0;
+                let lastTime = performance.now();
+                
+                const updateStats = () => {
+                    const now = performance.now();
+                    frameCount++;
+                    
+                    if (now - lastTime >= 1000) {
+                        this.fps = Math.round(frameCount * 1000 / (now - lastTime));
+                        frameCount = 0;
+                        lastTime = now;
+                        
+                        document.getElementById('fps-counter').textContent = this.fps;
+                        document.getElementById('scan-counter').textContent = this.scanCount;
+                    }
+                    
+                    requestAnimationFrame(updateStats);
+                };
+                
+                updateStats();
+            }
+            
+            pauseScanning() {
+                if (this.codeReader && this.isScanning) {
+                    this.codeReader.reset();
+                    this.isScanning = false;
+                    this.updateScanButton('default');
+                    this.updateReticle('default');
+                }
+            }
+            
+            resumeScanning() {
+                if (this.currentStream && !this.isScanning) {
+                    this.startContinuousScanning();
+                }
+            }
+            
+            handleOrientationChange() {
+                if (this.isScanning) {
+                    this.pauseScanning();
+                    setTimeout(() => this.resumeScanning(), 500);
+                }
+            }
+            
+            destroy() {
+                if (this.currentStream) {
+                    this.currentStream.getTracks().forEach(track => track.stop());
+                }
+                if (this.codeReader) {
+                    this.codeReader.reset();
+                }
+            }
+        }
         
-        // Initialize scanner when page loads
-        document.addEventListener('DOMContentLoaded', async () => {
-            await initializeScanner();
-            checkConnection();
+        // Global scanner instance
+        let enhancedScanner;
+        
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            enhancedScanner = new EnhancedScanner();
             
-            // Check connection every 30 seconds
-            setInterval(checkConnection, 30000);
-            
-            // Register service worker for PWA
+            // Register service worker
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('/sw.js');
             }
             
-            // Request persistent notification permission
+            // Request notification permission
             if ('Notification' in window && Notification.permission === 'default') {
                 Notification.requestPermission();
             }
         });
         
-        async function initializeScanner() {
-            try {
-                updateStatus('Initializing camera...', 'warning');
-                
-                codeReader = new ZXing.BrowserMultiFormatReader();
-                
-                // Get video devices
-                const videoDevices = await codeReader.listVideoInputDevices();
-                
-                if (videoDevices.length === 0) {
-                    throw new Error('No camera found');
-                }
-                
-                // Prefer back camera for mobile
-                const backCamera = videoDevices.find(device => 
-                    device.label.toLowerCase().includes('back') || 
-                    device.label.toLowerCase().includes('rear')
-                ) || videoDevices[0];
-                
-                // Start video stream
-                const constraints = {
-                    video: {
-                        deviceId: backCamera.deviceId,
-                        facingMode: 'environment',
-                        width: { ideal: 1280 },
-                        height: { ideal: 720 }
-                    }
-                };
-                
-                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
-                const video = document.getElementById('scanner-video');
-                video.srcObject = currentStream;
-                
-                updateStatus('Camera ready - Position barcode in frame', 'success');
-                
-                // Auto-start scanning
-                startContinuousScanning();
-                
-            } catch (error) {
-                console.error('Scanner initialization failed:', error);
-                updateStatus('Camera access denied or not available', 'danger');
-            }
-        }
-        
-        function startContinuousScanning() {
-            if (!codeReader || isScanning) return;
-            
-            isScanning = true;
-            document.getElementById('scan-btn').classList.add('scanning');
-            updateStatus('Scanning...', 'primary');
-            
-            codeReader.decodeFromVideoDevice(undefined, 'scanner-video', (result, err) => {
-                if (result) {
-                    const now = Date.now();
-                    if (now - lastScanTime > scanCooldown) {
-                        lastScanTime = now;
-                        handleScanResult(result.text);
-                    }
-                }
-            });
-        }
-        
-        function stopScanning() {
-            if (codeReader && isScanning) {
-                codeReader.reset();
-                isScanning = false;
-                document.getElementById('scan-btn').classList.remove('scanning');
-                updateStatus('Scanner stopped', 'secondary');
-            }
-        }
-        
+        // Global functions for UI interactions
         function toggleScanning() {
-            if (isScanning) {
-                stopScanning();
+            if (enhancedScanner.isScanning) {
+                enhancedScanner.pauseScanning();
             } else {
-                startContinuousScanning();
+                enhancedScanner.resumeScanning();
             }
         }
         
-        async function handleScanResult(scannedText) {
-            console.log('Scanned:', scannedText);
-            
-            // Vibrate if supported
-            if (navigator.vibrate) {
-                navigator.vibrate([100, 50, 100]);
-            }
-            
-            // Visual feedback
-            const frame = document.querySelector('.scanner-frame');
-            frame.classList.add('vibration-feedback');
-            setTimeout(() => frame.classList.remove('vibration-feedback'), 300);
-            
-            // Play success sound (if enabled)
-            playSuccessSound();
-            
-            stopScanning();
-            
-            try {
-                // Look up device information
-                const deviceInfo = await lookupDevice(scannedText);
-                showScanResult(deviceInfo);
-                
-            } catch (error) {
-                console.error('Device lookup failed:', error);
-                showScanResult({
-                    deviceID: scannedText,
-                    product: 'Unknown Device',
-                    status: 'Not Found',
-                    error: true
-                });
-            }
+        function toggleTorch() {
+            enhancedScanner.toggleTorch();
         }
         
-        async function lookupDevice(deviceID) {
-            const response = await fetch(`/api/v1/devices/${deviceID}`, {
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`Device not found: ${deviceID}`);
-            }
-            
-            return await response.json();
+        function toggleAutoFocus() {
+            enhancedScanner.toggleAutoFocus();
         }
         
-        function showScanResult(deviceInfo) {
-            document.getElementById('scanned-device').textContent = deviceInfo.deviceID;
-            document.getElementById('scanned-product').textContent = deviceInfo.product || 'Unknown';
-            document.getElementById('scanned-status').textContent = deviceInfo.status || 'Unknown';
-            
-            const resultModal = document.getElementById('scan-result');
-            resultModal.classList.add('show');
-            
-            // Auto-hide after 10 seconds
-            setTimeout(() => {
-                if (resultModal.classList.contains('show')) {
-                    continueScan();
-                }
-            }, 10000);
+        function switchCamera() {
+            enhancedScanner.switchCamera();
+        }
+        
+        function setZoom(value) {
+            enhancedScanner.setZoom(value);
+        }
+        
+        function zoomIn() {
+            enhancedScanner.zoomIn();
+        }
+        
+        function zoomOut() {
+            enhancedScanner.zoomOut();
         }
         
         function continueScan() {
+            closeModal();
+            setTimeout(() => enhancedScanner.resumeScanning(), 500);
+        }
+        
+        function closeModal() {
+            document.getElementById('modal-backdrop').classList.remove('show');
             document.getElementById('scan-result').classList.remove('show');
-            setTimeout(() => startContinuousScanning(), 500);
         }
         
         async function assignDevice() {
@@ -691,13 +1370,12 @@
             try {
                 const response = await fetch(`/api/v1/jobs/${jobID}/devices/${deviceID}`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+                    headers: { 'Content-Type': 'application/json' }
                 });
                 
                 if (response.ok) {
-                    showNotification('Device assigned successfully', 'success');
+                    showNotification('Device assigned successfully!', 'success');
+                    enhancedScanner.vibrate([200, 100, 200]);
                     continueScan();
                 } else {
                     throw new Error('Assignment failed');
@@ -705,6 +1383,7 @@
                 
             } catch (error) {
                 showNotification('Failed to assign device', 'error');
+                enhancedScanner.vibrate([300, 100, 300, 100, 300]);
             }
         }
         
@@ -713,25 +1392,30 @@
             window.location.href = `/devices/${deviceID}`;
         }
         
-        async function toggleTorch() {
-            if (!currentStream) return;
-            
-            try {
-                const track = currentStream.getVideoTracks()[0];
-                const capabilities = track.getCapabilities();
-                
-                if (capabilities.torch) {
-                    torchEnabled = !torchEnabled;
-                    await track.applyConstraints({
-                        advanced: [{ torch: torchEnabled }]
-                    });
-                    
-                    const torchBtn = document.getElementById('torch-btn');
-                    torchBtn.classList.toggle('active', torchEnabled);
-                }
-            } catch (error) {
-                console.error('Torch control failed:', error);
+        function manualInput() {
+            const deviceID = prompt('Enter device ID manually:');
+            if (deviceID) {
+                enhancedScanner.handleScanSuccess(deviceID);
             }
+        }
+        
+        function showHistory() {
+            if (enhancedScanner.scanHistory.length === 0) {
+                showNotification('No scan history available', 'info');
+                return;
+            }
+            
+            // Simple history display
+            const history = enhancedScanner.scanHistory.slice(0, 5)
+                .map(item => `${item.deviceInfo.deviceID} - ${item.timestamp.toLocaleTimeString()}`)
+                .join('\n');
+                
+            alert('Recent scans:\n\n' + history);
+        }
+        
+        function toggleSettings() {
+            const stats = document.getElementById('performance-stats');
+            stats.style.display = stats.style.display === 'none' ? 'block' : 'none';
         }
         
         function toggleFullscreen() {
@@ -743,96 +1427,20 @@
         }
         
         function closeScanner() {
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
-            }
-            if (codeReader) {
-                codeReader.reset();
-            }
+            enhancedScanner.destroy();
             window.location.href = '/scan/select';
         }
         
-        function updateStatus(message, type = 'info') {
-            const statusEl = document.getElementById('scan-status');
-            statusEl.innerHTML = `<i class="bi bi-${getIconForType(type)}"></i> ${message}`;
-            statusEl.className = `text-${type}`;
-        }
-        
-        function getIconForType(type) {
-            const icons = {
-                success: 'check-circle-fill',
-                warning: 'exclamation-triangle-fill',
-                danger: 'x-circle-fill',
-                primary: 'camera-video-fill',
-                secondary: 'pause-circle'
-            };
-            return icons[type] || 'info-circle';
-        }
-        
-        function playSuccessSound() {
-            // Simple beep using Web Audio API
-            try {
-                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                const oscillator = audioContext.createOscillator();
-                const gainNode = audioContext.createGain();
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioContext.destination);
-                
-                oscillator.frequency.value = 800;
-                oscillator.type = 'sine';
-                gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
-                
-                oscillator.start(audioContext.currentTime);
-                oscillator.stop(audioContext.currentTime + 0.1);
-            } catch (error) {
-                // Ignore audio errors
-            }
-        }
-        
         function showNotification(message, type) {
-            // Create toast notification
             const toast = document.createElement('div');
-            toast.className = `alert alert-${type === 'error' ? 'danger' : 'success'} position-fixed top-0 start-50 translate-middle-x mt-3`;
+            toast.className = `alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} position-fixed top-0 start-50 translate-middle-x mt-3`;
             toast.style.zIndex = '9999';
             toast.innerHTML = message;
             
             document.body.appendChild(toast);
             
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
+            setTimeout(() => toast.remove(), 3000);
         }
-        
-        async function checkConnection() {
-            try {
-                const response = await fetch('/pwa/status', { 
-                    method: 'GET',
-                    timeout: 5000 
-                });
-                
-                if (response.ok) {
-                    document.getElementById('connection-status').textContent = 'Connected';
-                    document.getElementById('connection-status').className = 'text-success';
-                } else {
-                    throw new Error('Server unavailable');
-                }
-            } catch (error) {
-                document.getElementById('connection-status').textContent = 'Offline';
-                document.getElementById('connection-status').className = 'text-warning';
-            }
-        }
-        
-        // Handle orientation changes
-        window.addEventListener('orientationchange', () => {
-            setTimeout(() => {
-                if (codeReader && isScanning) {
-                    stopScanning();
-                    setTimeout(startContinuousScanning, 500);
-                }
-            }, 500);
-        });
         
         // Prevent page refresh on pull-to-refresh
         document.addEventListener('touchstart', (e) => {
@@ -840,15 +1448,6 @@
             const touch = e.touches[0];
             if (touch.clientY <= 40) {
                 e.preventDefault();
-            }
-        });
-        
-        // Handle visibility changes
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                stopScanning();
-            } else if (currentStream) {
-                setTimeout(startContinuousScanning, 1000);
             }
         });
     </script>

@@ -3,124 +3,146 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Job #{{.job.JobID}} - RentalCore</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="/static/css/app.css" rel="stylesheet">
-    <style>
-        .navbar-brand { font-weight: 600; }
-        
-        .product-group {
-            border: 1px solid var(--bs-border-color);
-            border-radius: 8px;
-            margin-bottom: 15px;
-            transition: all 0.2s;
-        }
-        
-        .product-group:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-        
-        .product-header {
-            cursor: pointer;
-            padding: 15px;
-            background: var(--bs-gray-800);
-            border-radius: 8px 8px 0 0;
-        }
-        
-        .product-header:hover {
-            background: var(--bs-gray-700);
-        }
-        
-        .device-list {
-            padding: 0;
-            margin: 0;
-            background: var(--bs-body-bg);
-        }
-        
-        .device-item {
-            padding: 10px 15px;
-            border-bottom: 1px solid var(--bs-border-color);
-            transition: background-color 0.2s;
-        }
-        
-        .device-item:last-child {
-            border-bottom: none;
-            border-radius: 0 0 8px 8px;
-        }
-        
-        .device-item:hover {
-            background-color: var(--bs-gray-800);
-        }
-        
-        .quantity-badge {
-            font-size: 1.1em;
-            font-weight: 600;
-        }
-        
-        .product-summary {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .product-info h6 {
-            margin: 0;
-            color: var(--bs-body-color);
-        }
-        
-        .product-meta {
-            color: var(--bs-secondary-color);
-            font-size: 0.9em;
-        }
-        
-        @media (max-width: 768px) {
-            .product-summary {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-            
-            .product-actions {
-                margin-top: 10px;
-                width: 100%;
-            }
-        }
-    </style>
+    <title>{{.title}} - RentalCore</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- iOS Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RentalCore">
+    <link rel="apple-touch-icon" href="/static/images/icon-180.png">
+    
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#030712">
+    <meta name="msapplication-TileColor" content="#030712">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/css/rental-core-design.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="bi bi-gear-wide-connected"></i> RentalCore
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="navbar-nav me-auto">
-                    <a class="nav-link active" href="/jobs">
+<body class="rc-animate-fade-in">
+    <!-- Navigation -->
+    <nav class="rc-navbar">
+        <div class="rc-container">
+            <div class="rc-navbar-content">
+                <a href="/" class="rc-navbar-brand">
+                    <i class="bi bi-gear-wide-connected"></i>
+                    RentalCore
+                </a>
+                
+                <!-- Mobile toggle -->
+                <button class="rc-navbar-toggle">
+                    <i class="bi bi-list"></i>
+                </button>
+                
+                <!-- Main navigation -->
+                <ul class="rc-navbar-nav">
+                    <li><a href="/jobs" class="rc-nav-link">
                         <i class="bi bi-briefcase"></i> Jobs
-                    </a>
-                    <a class="nav-link" href="/devices">
+                    </a></li>
+                    <li><a href="/devices" class="rc-nav-link">
                         <i class="bi bi-cpu"></i> Devices
-                    </a>
-                    <a class="nav-link" href="/customers">
+                    </a></li>
+                    <li><a href="/customers" class="rc-nav-link">
                         <i class="bi bi-people"></i> Customers
-                    </a>
-                    <a class="nav-link" href="/cases">
+                    </a></li>
+                    <li><a href="/cases" class="rc-nav-link">
                         <i class="bi bi-box"></i> Cases
-                    </a>
-                </div>
-                <div class="navbar-nav">
-                    <button class="btn btn-outline-light btn-sm" onclick="toggleTheme()">
-                        <i class="bi bi-moon-fill" id="theme-icon"></i>
-                    </button>
-                </div>
+                    </a></li>
+                    
+                    <!-- Tools Dropdown -->
+                    <li class="rc-dropdown">
+                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
+                            <i class="bi bi-tools"></i> Tools
+                        </a>
+                        <div class="rc-dropdown-menu">
+                            <div class="rc-dropdown-header">
+                                <i class="bi bi-folder"></i> Management
+                            </div>
+                            <a href="/workflow/templates" class="rc-dropdown-item">
+                                <i class="bi bi-file-earmark-text"></i> Job Templates
+                            </a>
+                            <a href="/workflow/packages" class="rc-dropdown-item">
+                                <i class="bi bi-box-seam"></i> Equipment Packages
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">
+                                <i class="bi bi-building"></i> Business
+                            </div>
+                            <a href="/invoices" class="rc-dropdown-item">
+                                <i class="bi bi-file-text"></i> Invoices
+                            </a>
+                            <a href="/analytics" class="rc-dropdown-item">
+                                <i class="bi bi-graph-up"></i> Analytics
+                            </a>
+                            <a href="/financial" class="rc-dropdown-item">
+                                <i class="bi bi-calculator"></i> Financial
+                            </a>
+                        </div>
+                    </li>
+                    
+                    <!-- User Dropdown -->
+                    {{if .user}}
+                    <li class="rc-dropdown">
+                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
+                            <i class="bi bi-person-circle"></i> {{.user.Username}}
+                        </a>
+                        <div class="rc-dropdown-menu">
+                            <div class="rc-dropdown-header">
+                                <i class="bi bi-person"></i> {{.user.FirstName}} {{.user.LastName}}
+                            </div>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">Personal</div>
+                            <a href="/profile/settings" class="rc-dropdown-item">
+                                <i class="bi bi-person-gear"></i> Profile Settings
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">Company</div>
+                            <a href="/settings/company" class="rc-dropdown-item">
+                                <i class="bi bi-building-gear"></i> Company Settings
+                            </a>
+                            <a href="/settings/email-templates" class="rc-dropdown-item">
+                                <i class="bi bi-envelope-gear"></i> E-Mail Templates
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">System</div>
+                            <a href="/users" class="rc-dropdown-item">
+                                <i class="bi bi-people-fill"></i> User Management
+                            </a>
+                            <a href="/security" class="rc-dropdown-item">
+                                <i class="bi bi-shield-check"></i> Security & Audit
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <a href="/logout" class="rc-dropdown-item">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                    {{else}}
+                    <li>
+                        <a href="/login" class="rc-btn rc-btn-primary rc-btn-sm">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </li>
+                    {{end}}
+                    
+                    <!-- Theme Toggle -->
+                    <li>
+                        <button class="rc-btn rc-btn-ghost rc-btn-sm" data-theme-toggle title="Toggle theme">
+                            <i class="bi bi-moon-fill"></i>
+                        </button>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
 
-    <main class="container mt-4">
+    <!-- Main Content -->
+    <main class="rc-container rc-mt-lg">
+        
         <!-- Job Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
@@ -341,141 +363,30 @@
         </div>
     </main>
 
-    <!-- Add Device Modal -->
-    <div class="modal fade" id="addDeviceModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Device to Job</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <!-- Footer -->
+    <footer style="margin-top: var(--space-3xl); padding: var(--space-xl) 0; border-top: 1px solid var(--surface-3);">
+        <div class="rc-container">
+            <div class="rc-flex rc-flex-between" style="align-items: center;">
+                <div class="rc-text-sm" style="color: var(--text-muted);">
+                    <i class="bi bi-gear-wide-connected"></i>
+                    RentalCore - Advanced Equipment Management System
                 </div>
-                <div class="modal-body">
-                    <form id="addDeviceForm">
-                        <div class="mb-3">
-                            <label class="form-label">Device ID or Serial Number</label>
-                            <input type="text" class="form-control" id="deviceInput" placeholder="Enter device ID or scan barcode" required>
-                            <div class="form-text">You can enter the device ID or serial number</div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Custom Price (optional)</label>
-                            <div class="input-group">
-                                <span class="input-group-text">€</span>
-                                <input type="number" class="form-control" id="customPrice" step="0.01" placeholder="0.00">
-                            </div>
-                            <div class="form-text">Leave empty to use default product price</div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="addDevice()">Add Device</button>
+                <div class="rc-flex" style="gap: var(--space-lg);">
+                    <a href="/help" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-question-circle"></i> Help
+                    </a>
+                    <a href="/about" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-info-circle"></i> About
+                    </a>
+                    <a href="/contact" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-envelope"></i> Contact
+                    </a>
                 </div>
             </div>
         </div>
-    </div>
+    </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/js/app.js"></script>
-    <script>
-        const jobId = {{.job.JobID}};
-
-        function toggleProductGroup(productName) {
-            const safeName = productName.replace(/\s/g, '-').replace(/\./g, '-');
-            const devicesElement = document.getElementById(`devices-${productName}`);
-            const toggleIcon = document.querySelector(`[data-product="${productName}"] .toggle-icon`);
-            
-            if (devicesElement.classList.contains('show')) {
-                devicesElement.classList.remove('show');
-                toggleIcon.classList.remove('bi-chevron-up');
-                toggleIcon.classList.add('bi-chevron-down');
-            } else {
-                devicesElement.classList.add('show');
-                toggleIcon.classList.remove('bi-chevron-down');
-                toggleIcon.classList.add('bi-chevron-up');
-            }
-        }
-
-        function toggleProductGroupMobile(productName) {
-            const safeName = productName.replace(/\s/g, '-').replace(/\./g, '-');
-            const devicesElement = document.getElementById(`devices-mobile-${productName}`);
-            const toggleIcon = document.querySelector(`[data-product="${productName}"] .toggle-icon-mobile`);
-            
-            if (devicesElement.classList.contains('show')) {
-                devicesElement.classList.remove('show');
-                toggleIcon.classList.remove('bi-chevron-up');
-                toggleIcon.classList.add('bi-chevron-down');
-            } else {
-                devicesElement.classList.add('show');
-                toggleIcon.classList.remove('bi-chevron-down');
-                toggleIcon.classList.add('bi-chevron-up');
-            }
-        }
-
-        async function addDevice() {
-            const deviceInput = document.getElementById('deviceInput').value.trim();
-            const customPrice = parseFloat(document.getElementById('customPrice').value) || 0;
-            
-            if (!deviceInput) {
-                alert('Please enter a device ID or serial number');
-                return;
-            }
-
-            try {
-                const response = await fetch(`/api/v1/jobs/${jobId}/assign-device`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        device_id: deviceInput,
-                        price: customPrice
-                    })
-                });
-
-                const result = await response.json();
-
-                if (response.ok) {
-                    // Success
-                    bootstrap.Modal.getInstance(document.getElementById('addDeviceModal')).hide();
-                    location.reload();
-                } else {
-                    alert('Error: ' + (result.error || 'Failed to add device'));
-                }
-            } catch (error) {
-                alert('Network error: ' + error.message);
-            }
-        }
-
-        async function removeDevice(deviceId) {
-            if (!confirm('Remove this device from the job?')) return;
-
-            try {
-                const response = await fetch(`/api/v1/jobs/${jobId}/devices/${deviceId}`, {
-                    method: 'DELETE'
-                });
-
-                if (response.ok) {
-                    location.reload();
-                } else {
-                    const result = await response.json();
-                    alert('Error: ' + (result.error || 'Failed to remove device'));
-                }
-            } catch (error) {
-                alert('Network error: ' + error.message);
-            }
-        }
-
-        // Auto-focus device input when modal opens
-        document.getElementById('addDeviceModal').addEventListener('shown.bs.modal', function () {
-            document.getElementById('deviceInput').focus();
-        });
-
-        // Handle Enter key in device input
-        document.getElementById('deviceInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                addDevice();
-            }
-        });
-    </script>
+    <!-- JavaScript -->
+    <script src="/static/js/rental-core-design.js"></script>
 </body>
 </html>

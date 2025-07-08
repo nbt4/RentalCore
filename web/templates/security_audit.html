@@ -4,64 +4,145 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.title}} - RentalCore</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="/static/css/app.css" rel="stylesheet">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- iOS Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RentalCore">
+    <link rel="apple-touch-icon" href="/static/images/icon-180.png">
+    
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#030712">
+    <meta name="msapplication-TileColor" content="#030712">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/css/rental-core-design.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="bi bi-gear-wide-connected"></i> RentalCore
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="navbar-nav me-auto">
-                    <a class="nav-link" href="/jobs">
+<body class="rc-animate-fade-in">
+    <!-- Navigation -->
+    <nav class="rc-navbar">
+        <div class="rc-container">
+            <div class="rc-navbar-content">
+                <a href="/" class="rc-navbar-brand">
+                    <i class="bi bi-gear-wide-connected"></i>
+                    RentalCore
+                </a>
+                
+                <!-- Mobile toggle -->
+                <button class="rc-navbar-toggle">
+                    <i class="bi bi-list"></i>
+                </button>
+                
+                <!-- Main navigation -->
+                <ul class="rc-navbar-nav">
+                    <li><a href="/jobs" class="rc-nav-link">
                         <i class="bi bi-briefcase"></i> Jobs
-                    </a>
-                    <a class="nav-link" href="/devices">
+                    </a></li>
+                    <li><a href="/devices" class="rc-nav-link">
                         <i class="bi bi-cpu"></i> Devices
-                    </a>
-                    <a class="nav-link" href="/customers">
+                    </a></li>
+                    <li><a href="/customers" class="rc-nav-link">
                         <i class="bi bi-people"></i> Customers
-                    </a>
-                    <a class="nav-link" href="/cases">
+                    </a></li>
+                    <li><a href="/cases" class="rc-nav-link">
                         <i class="bi bi-box"></i> Cases
-                    </a>
-                </div>
-                <div class="navbar-nav">
-                    <button class="btn btn-outline-light btn-sm me-2" onclick="toggleTheme()">
-                        <i class="bi bi-moon-fill" id="theme-icon"></i>
-                    </button>
+                    </a></li>
+                    
+                    <!-- Tools Dropdown -->
+                    <li class="rc-dropdown">
+                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
+                            <i class="bi bi-tools"></i> Tools
+                        </a>
+                        <div class="rc-dropdown-menu">
+                            <div class="rc-dropdown-header">
+                                <i class="bi bi-folder"></i> Management
+                            </div>
+                            <a href="/workflow/templates" class="rc-dropdown-item">
+                                <i class="bi bi-file-earmark-text"></i> Job Templates
+                            </a>
+                            <a href="/workflow/packages" class="rc-dropdown-item">
+                                <i class="bi bi-box-seam"></i> Equipment Packages
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">
+                                <i class="bi bi-building"></i> Business
+                            </div>
+                            <a href="/invoices" class="rc-dropdown-item">
+                                <i class="bi bi-file-text"></i> Invoices
+                            </a>
+                            <a href="/analytics" class="rc-dropdown-item">
+                                <i class="bi bi-graph-up"></i> Analytics
+                            </a>
+                            <a href="/financial" class="rc-dropdown-item">
+                                <i class="bi bi-calculator"></i> Financial
+                            </a>
+                        </div>
+                    </li>
+                    
+                    <!-- User Dropdown -->
                     {{if .user}}
-                    <div class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle text-light" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <li class="rc-dropdown">
+                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
                             <i class="bi bi-person-circle"></i> {{.user.Username}}
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><h6 class="dropdown-header">
+                        <div class="rc-dropdown-menu">
+                            <div class="rc-dropdown-header">
                                 <i class="bi bi-person"></i> {{.user.FirstName}} {{.user.LastName}}
-                            </h6></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/users">
+                            </div>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">Personal</div>
+                            <a href="/profile/settings" class="rc-dropdown-item">
+                                <i class="bi bi-person-gear"></i> Profile Settings
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">Company</div>
+                            <a href="/settings/company" class="rc-dropdown-item">
+                                <i class="bi bi-building-gear"></i> Company Settings
+                            </a>
+                            <a href="/settings/email-templates" class="rc-dropdown-item">
+                                <i class="bi bi-envelope-gear"></i> E-Mail Templates
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">System</div>
+                            <a href="/users" class="rc-dropdown-item">
                                 <i class="bi bi-people-fill"></i> User Management
-                            </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/logout">
+                            </a>
+                            <a href="/security" class="rc-dropdown-item">
+                                <i class="bi bi-shield-check"></i> Security & Audit
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <a href="/logout" class="rc-dropdown-item">
                                 <i class="bi bi-box-arrow-right"></i> Logout
-                            </a></li>
-                        </ul>
-                    </div>
+                            </a>
+                        </div>
+                    </li>
+                    {{else}}
+                    <li>
+                        <a href="/login" class="rc-btn rc-btn-primary rc-btn-sm">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </li>
                     {{end}}
-                </div>
+                    
+                    <!-- Theme Toggle -->
+                    <li>
+                        <button class="rc-btn rc-btn-ghost rc-btn-sm" data-theme-toggle title="Toggle theme">
+                            <i class="bi bi-moon-fill"></i>
+                        </button>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
 
-    <main class="container mt-4">
+    <!-- Main Content -->
+    <main class="rc-container rc-mt-lg">
+        
 <div class="container-fluid">
     <!-- Header -->
     <div class="row mb-4">
@@ -210,357 +291,32 @@
         </div>
     </div>
 </div>
-
-<script>
-let currentPage = 1;
-let currentFilters = {};
-
-document.addEventListener('DOMContentLoaded', function() {
-    loadAuditLogs();
-    loadUsers();
-
-    // Filter form handler
-    document.getElementById('filterForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        applyFilters();
-    });
-});
-
-function loadAuditLogs(page = 1, filters = {}) {
-    currentPage = page;
-    currentFilters = filters;
-    
-    // Build query parameters
-    const params = new URLSearchParams({
-        page: page,
-        pageSize: 25,
-        ...filters
-    });
-
-    fetch(`/api/v1/security/audit?${params}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                showAlert(data.error, 'danger');
-                return;
-            }
-
-            renderAuditTable(data.auditLogs || []);
-            renderPagination(data.pagination);
-            updateRecordCount(data.pagination);
-        })
-        .catch(error => {
-            console.error('Error loading audit logs:', error);
-            showAlert('Error loading audit logs', 'danger');
-        });
-}
-
-function loadUsers() {
-    fetch('/api/v1/auth/users')
-        .then(response => response.json())
-        .then(data => {
-            const select = document.getElementById('userFilter');
-            if (data.users) {
-                data.users.forEach(user => {
-                    const option = document.createElement('option');
-                    option.value = user.userID;
-                    option.textContent = `${user.username} (${user.email})`;
-                    select.appendChild(option);
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Error loading users:', error);
-        });
-}
-
-function renderAuditTable(auditLogs) {
-    const tbody = document.querySelector('#auditTable tbody');
-    tbody.innerHTML = '';
-
-    if (auditLogs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="6" class="text-center">No audit logs found</td></tr>';
-        return;
-    }
-
-    auditLogs.forEach(log => {
-        const row = createAuditRow(log);
-        tbody.appendChild(row);
-    });
-}
-
-function createAuditRow(log) {
-    const row = document.createElement('tr');
-    const timestamp = new Date(log.timestamp).toLocaleString();
-    const userName = log.user ? `${log.user.username}` : 'System';
-    
-    row.innerHTML = `
-        <td>
-            <small>${timestamp}</small>
-        </td>
-        <td>
-            <div>
-                <strong>${userName}</strong>
-                ${log.user ? `<br><small class="text-muted">${log.user.email}</small>` : ''}
-            </div>
-        </td>
-        <td>
-            <span class="badge ${getActionBadgeClass(log.action)}">${log.action}</span>
-        </td>
-        <td>
-            <div>
-                <strong>${log.entityType}</strong>
-                <br><code class="small">${log.entityID}</code>
-            </div>
-        </td>
-        <td>
-            <small>${log.ipAddress || 'N/A'}</small>
-        </td>
-        <td>
-            <button class="btn btn-sm btn-outline-info" onclick="showAuditDetail(${log.auditID})">
-                <i class="fas fa-eye"></i> View
-            </button>
-        </td>
-    `;
-    
-    return row;
-}
-
-function getActionBadgeClass(action) {
-    switch(action) {
-        case 'create': return 'bg-success';
-        case 'update': return 'bg-warning';
-        case 'delete': return 'bg-danger';
-        case 'assign_role': return 'bg-info';
-        case 'revoke_role': return 'bg-secondary';
-        case 'login': return 'bg-primary';
-        case 'logout': return 'bg-dark';
-        default: return 'bg-secondary';
-    }
-}
-
-function renderPagination(pagination) {
-    const paginationEl = document.getElementById('pagination');
-    paginationEl.innerHTML = '';
-
-    if (!pagination || pagination.totalPages <= 1) {
-        return;
-    }
-
-    // Previous button
-    if (pagination.page > 1) {
-        const prevLi = document.createElement('li');
-        prevLi.className = 'page-item';
-        prevLi.innerHTML = `
-            <a class="page-link" href="#" onclick="loadAuditLogs(${pagination.page - 1}, currentFilters)">
-                Previous
-            </a>
-        `;
-        paginationEl.appendChild(prevLi);
-    }
-
-    // Page numbers
-    const startPage = Math.max(1, pagination.page - 2);
-    const endPage = Math.min(pagination.totalPages, pagination.page + 2);
-
-    for (let i = startPage; i <= endPage; i++) {
-        const li = document.createElement('li');
-        li.className = `page-item ${i === pagination.page ? 'active' : ''}`;
-        li.innerHTML = `
-            <a class="page-link" href="#" onclick="loadAuditLogs(${i}, currentFilters)">
-                ${i}
-            </a>
-        `;
-        paginationEl.appendChild(li);
-    }
-
-    // Next button
-    if (pagination.page < pagination.totalPages) {
-        const nextLi = document.createElement('li');
-        nextLi.className = 'page-item';
-        nextLi.innerHTML = `
-            <a class="page-link" href="#" onclick="loadAuditLogs(${pagination.page + 1}, currentFilters)">
-                Next
-            </a>
-        `;
-        paginationEl.appendChild(nextLi);
-    }
-}
-
-function updateRecordCount(pagination) {
-    const recordCount = document.getElementById('recordCount');
-    if (pagination) {
-        const start = (pagination.page - 1) * pagination.pageSize + 1;
-        const end = Math.min(pagination.page * pagination.pageSize, pagination.total);
-        recordCount.textContent = `Showing ${start}-${end} of ${pagination.total} records`;
-    } else {
-        recordCount.textContent = 'No records found';
-    }
-}
-
-function applyFilters() {
-    const form = document.getElementById('filterForm');
-    const formData = new FormData(form);
-    const filters = {};
-
-    formData.forEach((value, key) => {
-        if (value.trim()) {
-            filters[key] = value.trim();
-        }
-    });
-
-    loadAuditLogs(1, filters);
-}
-
-function clearFilters() {
-    document.getElementById('filterForm').reset();
-    loadAuditLogs(1, {});
-}
-
-function showAuditDetail(auditId) {
-    fetch(`/api/v1/security/audit/${auditId}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                showAlert(data.error, 'danger');
-                return;
-            }
-
-            renderAuditDetail(data.auditLog);
-            const modal = new bootstrap.Modal(document.getElementById('auditDetailModal'));
-            modal.show();
-        })
-        .catch(error => {
-            console.error('Error loading audit detail:', error);
-            showAlert('Error loading audit details', 'danger');
-        });
-}
-
-function renderAuditDetail(log) {
-    const content = document.getElementById('auditDetailContent');
-    const timestamp = new Date(log.timestamp).toLocaleString();
-    const userName = log.user ? `${log.user.username} (${log.user.email})` : 'System';
-
-    let oldValuesHtml = 'N/A';
-    let newValuesHtml = 'N/A';
-
-    if (log.oldValues) {
-        try {
-            const oldValues = typeof log.oldValues === 'string' ? JSON.parse(log.oldValues) : log.oldValues;
-            oldValuesHtml = `<pre class="bg-light p-2 rounded">${JSON.stringify(oldValues, null, 2)}</pre>`;
-        } catch (e) {
-            oldValuesHtml = `<pre class="bg-light p-2 rounded">${log.oldValues}</pre>`;
-        }
-    }
-
-    if (log.newValues) {
-        try {
-            const newValues = typeof log.newValues === 'string' ? JSON.parse(log.newValues) : log.newValues;
-            newValuesHtml = `<pre class="bg-light p-2 rounded">${JSON.stringify(newValues, null, 2)}</pre>`;
-        } catch (e) {
-            newValuesHtml = `<pre class="bg-light p-2 rounded">${log.newValues}</pre>`;
-        }
-    }
-
-    content.innerHTML = `
-        <div class="row">
-            <div class="col-md-6">
-                <strong>Audit ID:</strong> ${log.auditID}
-            </div>
-            <div class="col-md-6">
-                <strong>Timestamp:</strong> ${timestamp}
-            </div>
-        </div>
-        <hr>
-        <div class="row">
-            <div class="col-md-6">
-                <strong>User:</strong> ${userName}
-            </div>
-            <div class="col-md-6">
-                <strong>Action:</strong> 
-                <span class="badge ${getActionBadgeClass(log.action)}">${log.action}</span>
-            </div>
-        </div>
-        <hr>
-        <div class="row">
-            <div class="col-md-6">
-                <strong>Entity Type:</strong> ${log.entityType}
-            </div>
-            <div class="col-md-6">
-                <strong>Entity ID:</strong> <code>${log.entityID}</code>
-            </div>
-        </div>
-        <hr>
-        <div class="row">
-            <div class="col-md-6">
-                <strong>IP Address:</strong> ${log.ipAddress || 'N/A'}
-            </div>
-            <div class="col-md-6">
-                <strong>Session ID:</strong> ${log.sessionID || 'N/A'}
-            </div>
-        </div>
-        <hr>
-        <div class="row">
-            <div class="col-12">
-                <strong>User Agent:</strong><br>
-                <small class="text-muted">${log.userAgent || 'N/A'}</small>
-            </div>
-        </div>
-        ${log.oldValues ? `
-        <hr>
-        <div class="row">
-            <div class="col-12">
-                <strong>Old Values:</strong><br>
-                ${oldValuesHtml}
-            </div>
-        </div>
-        ` : ''}
-        ${log.newValues ? `
-        <hr>
-        <div class="row">
-            <div class="col-12">
-                <strong>New Values:</strong><br>
-                ${newValuesHtml}
-            </div>
-        </div>
-        ` : ''}
-    `;
-}
-
-function exportAuditLogs() {
-    const params = new URLSearchParams({
-        format: 'csv',
-        ...currentFilters
-    });
-
-    window.open(`/api/v1/security/audit/export?${params}`, '_blank');
-}
-
-function showAlert(message, type) {
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
-    alertDiv.innerHTML = `
-        ${message}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    `;
-    
-    const container = document.querySelector('.container-fluid');
-    container.insertBefore(alertDiv, container.firstChild);
-    
-    setTimeout(() => {
-        alertDiv.remove();
-    }, 5000);
-}
-</script>
     </main>
 
-    <footer class="bg-light mt-5 py-3">
-        <div class="container text-center">
-            <small class="text-muted">RentalCore - Equipment Management System</small>
+    <!-- Footer -->
+    <footer style="margin-top: var(--space-3xl); padding: var(--space-xl) 0; border-top: 1px solid var(--surface-3);">
+        <div class="rc-container">
+            <div class="rc-flex rc-flex-between" style="align-items: center;">
+                <div class="rc-text-sm" style="color: var(--text-muted);">
+                    <i class="bi bi-gear-wide-connected"></i>
+                    RentalCore - Advanced Equipment Management System
+                </div>
+                <div class="rc-flex" style="gap: var(--space-lg);">
+                    <a href="/help" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-question-circle"></i> Help
+                    </a>
+                    <a href="/about" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-info-circle"></i> About
+                    </a>
+                    <a href="/contact" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-envelope"></i> Contact
+                    </a>
+                </div>
+            </div>
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/js/app.js"></script>
+    <!-- JavaScript -->
+    <script src="/static/js/rental-core-design.js"></script>
 </body>
 </html>
