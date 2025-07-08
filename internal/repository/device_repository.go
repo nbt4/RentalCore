@@ -226,7 +226,7 @@ func (r *DeviceRepository) GetDevicesGroupedByCategory(params *models.FilterPara
 		query = query.Offset(params.Offset)
 	}
 
-	query = query.Order("deviceID ASC")
+	query = query.Order("deviceID DESC")
 
 	err := query.Find(&devices).Error
 	if err != nil {
