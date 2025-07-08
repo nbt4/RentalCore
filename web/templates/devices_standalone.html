@@ -167,6 +167,7 @@
         <div class="rc-card rc-mb-lg">
             <div class="rc-card-body">
                 <form method="GET" action="/devices">
+                    <input type="hidden" name="view" value="{{.viewType}}">
                     <div class="rc-flex rc-flex-gap-md">
                         <div class="rc-flex-1">
                             <input type="text" class="rc-input" name="search" value="{{.params.SearchTerm}}" placeholder="Search devices by ID, product, or serial number...">
