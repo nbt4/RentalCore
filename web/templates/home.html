@@ -4,613 +4,389 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.title}} - RentalCore</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="/static/css/app-new.css" rel="stylesheet">
+    
+    <!-- PWA Manifest -->
     <link rel="manifest" href="/static/manifest.json">
-    <meta name="theme-color" content="#1e293b">
+    
+    <!-- iOS Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RentalCore">
+    <link rel="apple-touch-icon" href="/static/images/icon-180.png">
+    
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#030712">
+    <meta name="msapplication-TileColor" content="#030712">
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/css/rental-core-design.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        .rc-hero {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .rc-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 70%, rgba(0, 245, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+        
+        .rc-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .rc-stat-card {
+            background: linear-gradient(135deg, var(--surface-1) 0%, var(--surface-2) 100%);
+            border: 1px solid var(--surface-3);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            text-align: center;
+            transition: var(--transition-normal);
+        }
+        
+        .rc-stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+    </style>
 </head>
-<body class="animate-fade-in">
-    <!-- Professional Navigation Bar -->
-    <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/">
-                <i class="bi bi-gear-wide-connected"></i> RentalCore
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="navbar-nav me-auto">
-                    <a class="nav-link" href="/jobs">
+<body class="rc-animate-fade-in">
+    <!-- Navigation -->
+    <nav class="rc-navbar">
+        <div class="rc-container">
+            <div class="rc-navbar-content">
+                <a href="/" class="rc-navbar-brand">
+                    <i class="bi bi-gear-wide-connected"></i>
+                    RentalCore
+                </a>
+                
+                <!-- Mobile toggle -->
+                <button class="rc-navbar-toggle">
+                    <i class="bi bi-list"></i>
+                </button>
+                
+                <!-- Main navigation -->
+                <ul class="rc-navbar-nav">
+                    <li><a href="/jobs" class="rc-nav-link">
                         <i class="bi bi-briefcase"></i> Jobs
-                    </a>
-                    <a class="nav-link" href="/devices">
+                    </a></li>
+                    <li><a href="/devices" class="rc-nav-link">
                         <i class="bi bi-cpu"></i> Devices
-                    </a>
-                    <a class="nav-link" href="/customers">
+                    </a></li>
+                    <li><a href="/customers" class="rc-nav-link">
                         <i class="bi bi-people"></i> Customers
-                    </a>
-                    <a class="nav-link" href="/cases">
+                    </a></li>
+                    <li><a href="/cases" class="rc-nav-link">
                         <i class="bi bi-box"></i> Cases
-                    </a>
-                    <div class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="toolsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    </a></li>
+                    
+                    <!-- Tools Dropdown -->
+                    <li class="rc-dropdown">
+                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
                             <i class="bi bi-tools"></i> Tools
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="toolsDropdown">
-                            <li><h6 class="dropdown-header">Management</h6></li>
-                            <li><a class="dropdown-item" href="/workflow/templates"><i class="bi bi-file-earmark-text"></i> Job Templates</a></li>
-                            <li><a class="dropdown-item" href="/workflow/packages"><i class="bi bi-box-seam"></i> Equipment Packages</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><h6 class="dropdown-header">Business</h6></li>
-                            <li><a class="dropdown-item" href="/invoices"><i class="bi bi-file-text"></i> Invoices</a></li>
-                            <li><a class="dropdown-item" href="/analytics"><i class="bi bi-graph-up"></i> Analytics</a></li>
-                            <li><a class="dropdown-item" href="/financial"><i class="bi bi-calculator"></i> Financial</a></li>
-                            <li><a class="dropdown-item" href="/documents"><i class="bi bi-file-earmark"></i> Documents</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><h6 class="dropdown-header">Utilities</h6></li>
-                            <li><a class="dropdown-item" href="/search/global"><i class="bi bi-search"></i> Advanced Search</a></li>
-                            <li><a class="dropdown-item" href="/workflow/bulk"><i class="bi bi-gear"></i> Bulk Operations</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="navbar-nav">
-                    <a href="/scan/select" class="btn btn-outline-primary-enhanced btn-sm me-2" title="Launch Scanner">
-                        <i class="bi bi-qr-code-scan me-1"></i> Scan
-                    </a>
-                    <button class="btn btn-outline-light btn-sm me-2" onclick="toggleTheme()" title="Toggle theme">
-                        <i class="bi bi-moon-fill" id="theme-icon"></i>
-                    </button>
+                        <div class="rc-dropdown-menu">
+                            <div class="rc-dropdown-header">
+                                <i class="bi bi-folder"></i> Management
+                            </div>
+                            <a href="/workflow/templates" class="rc-dropdown-item">
+                                <i class="bi bi-file-earmark-text"></i> Job Templates
+                            </a>
+                            <a href="/workflow/packages" class="rc-dropdown-item">
+                                <i class="bi bi-box-seam"></i> Equipment Packages
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">
+                                <i class="bi bi-building"></i> Business
+                            </div>
+                            <a href="/invoices" class="rc-dropdown-item">
+                                <i class="bi bi-file-text"></i> Invoices
+                            </a>
+                            <a href="/analytics" class="rc-dropdown-item">
+                                <i class="bi bi-graph-up"></i> Analytics
+                            </a>
+                            <a href="/financial" class="rc-dropdown-item">
+                                <i class="bi bi-calculator"></i> Financial
+                            </a>
+                        </div>
+                    </li>
+                    
+                    <!-- User Dropdown -->
                     {{if .user}}
-                    <div class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <li class="rc-dropdown">
+                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
                             <i class="bi bi-person-circle"></i> {{.user.Username}}
                         </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            <li><h6 class="dropdown-header">
+                        <div class="rc-dropdown-menu">
+                            <div class="rc-dropdown-header">
                                 <i class="bi bi-person"></i> {{.user.FirstName}} {{.user.LastName}}
-                            </h6></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/users">
+                            </div>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">Personal</div>
+                            <a href="/profile/settings" class="rc-dropdown-item">
+                                <i class="bi bi-person-gear"></i> Profile Settings
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">Company</div>
+                            <a href="/settings/company" class="rc-dropdown-item">
+                                <i class="bi bi-building-gear"></i> Company Settings
+                            </a>
+                            <a href="/settings/email-templates" class="rc-dropdown-item">
+                                <i class="bi bi-envelope-gear"></i> E-Mail Templates
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">System</div>
+                            <a href="/users" class="rc-dropdown-item">
                                 <i class="bi bi-people-fill"></i> User Management
-                            </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="/logout">
+                            </a>
+                            <a href="/security" class="rc-dropdown-item">
+                                <i class="bi bi-shield-check"></i> Security & Audit
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <a href="/logout" class="rc-dropdown-item">
                                 <i class="bi bi-box-arrow-right"></i> Logout
-                            </a></li>
-                        </ul>
-                    </div>
+                            </a>
+                        </div>
+                    </li>
                     {{else}}
-                    <a class="btn btn-primary btn-sm" href="/login">
-                        <i class="bi bi-box-arrow-in-right"></i> Login
-                    </a>
+                    <li>
+                        <a href="/login" class="rc-btn rc-btn-primary rc-btn-sm">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </li>
                     {{end}}
-                </div>
+                    
+                    <!-- Theme Toggle -->
+                    <li>
+                        <button class="rc-btn rc-btn-ghost rc-btn-sm" data-theme-toggle title="Toggle theme">
+                            <i class="bi bi-moon-fill"></i>
+                        </button>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Main Content Area -->
-    <main class="container-fluid mt-4 animate-slide-up">
-<!-- Hero Section -->
-<div class="row mb-5">
-    <div class="col-12">
-        <div class="card bg-gradient-primary text-white border-0 shadow-lg">
-            <div class="card-body p-5">
-                <div class="row align-items-center">
-                    <div class="col-lg-8">
-                        <h1 class="display-4 fw-bold mb-3">
-                            Welcome back{{if .user}}, {{.user.FirstName}}{{end}}!
-                        </h1>
-                        <p class="lead mb-4">
-                            <i class="bi bi-gear-wide-connected me-2"></i>
-                            The core of your rental business - streamlined, efficient, professional.
-                        </p>
-                        <div class="d-flex gap-3 flex-wrap">
-                            <a href="/scan/select" class="btn btn-light btn-lg px-4">
-                                <i class="bi bi-qr-code-scan me-2"></i>
-                                Launch Scanner
-                            </a>
-                            <a href="/jobs/new" class="btn btn-outline-light btn-lg px-4">
-                                <i class="bi bi-plus-circle me-2"></i>
-                                New Job
-                            </a>
+    <!-- Main Content -->
+    <main class="rc-container rc-mt-lg">
+        <!-- Hero Section -->
+        <div class="rc-hero" style="text-align: center; padding: var(--space-3xl) 0; margin-bottom: var(--space-2xl);">
+            <h1 class="rc-heading-1">
+                <i class="bi bi-gear-wide-connected"></i>
+                Welcome to RentalCore
+            </h1>
+            <p class="rc-text" style="font-size: 1.25rem; max-width: 600px; margin: 0 auto var(--space-lg);">
+                The future of equipment rental management. Streamline your operations with our advanced, 
+                AI-powered platform designed for modern rental businesses.
+            </p>
+            <div class="rc-flex rc-flex-center" style="gap: var(--space-md); justify-content: center;">
+                <a href="/scan" class="rc-btn rc-btn-primary rc-btn-lg">
+                    <i class="bi bi-qr-code-scan"></i> Start Scanning
+                </a>
+                <a href="/customers" class="rc-btn rc-btn-secondary rc-btn-lg">
+                    <i class="bi bi-people"></i> Manage Customers
+                </a>
+                <a href="/devices" class="rc-btn rc-btn-ghost rc-btn-lg">
+                    <i class="bi bi-cpu"></i> View Equipment
+                </a>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="rc-grid rc-grid-4 rc-mb-xl">
+            <div class="rc-card" style="text-align: center;">
+                <div style="font-size: 2.5rem; color: var(--accent-electric); margin-bottom: var(--space-sm);">
+                    <i class="bi bi-people"></i>
+                </div>
+                <h3 class="rc-heading-3">{{.stats.TotalCustomers}}</h3>
+                <p class="rc-text-sm">Active Customers</p>
+            </div>
+            <div class="rc-card" style="text-align: center;">
+                <div style="font-size: 2.5rem; color: var(--accent-purple); margin-bottom: var(--space-sm);">
+                    <i class="bi bi-cpu"></i>
+                </div>
+                <h3 class="rc-heading-3">{{.stats.TotalDevices}}</h3>
+                <p class="rc-text-sm">Equipment Items</p>
+            </div>
+            <div class="rc-card" style="text-align: center;">
+                <div style="font-size: 2.5rem; color: var(--accent-coral); margin-bottom: var(--space-sm);">
+                    <i class="bi bi-briefcase"></i>
+                </div>
+                <h3 class="rc-heading-3">{{.stats.ActiveJobs}}</h3>
+                <p class="rc-text-sm">Active Jobs</p>
+            </div>
+            <div class="rc-card" style="text-align: center;">
+                <div style="font-size: 2.5rem; color: var(--accent-gold); margin-bottom: var(--space-sm);">
+                    <i class="bi bi-box"></i>
+                </div>
+                <h3 class="rc-heading-3">{{.stats.TotalCases}}</h3>
+                <p class="rc-text-sm">Equipment Cases</p>
+            </div>
+        </div>
+
+        <!-- Core Management -->
+        <div class="rc-card rc-mb-xl">
+            <div class="rc-card-header">
+                <h2 class="rc-card-title">
+                    <i class="bi bi-layers"></i> Core Management
+                </h2>
+                <p class="rc-text-sm">Essential tools for daily operations</p>
+            </div>
+            <div class="rc-card-body">
+                <div class="rc-grid rc-grid-2">
+                    <a href="/jobs" class="rc-card" style="text-decoration: none; transition: var(--transition-normal);">
+                        <div class="rc-flex" style="align-items: center; gap: var(--space-lg);">
+                            <div style="font-size: 2rem; color: var(--accent-electric);">
+                                <i class="bi bi-briefcase"></i>
+                            </div>
+                            <div>
+                                <h3 style="color: var(--text-primary); margin-bottom: var(--space-xs);">Job Management</h3>
+                                <p class="rc-text-sm">Create, track, and manage rental jobs</p>
+                                <div class="rc-text-sm" style="color: var(--accent-electric); margin-top: var(--space-xs);">
+                                    <i class="bi bi-arrow-right"></i> View Jobs
+                                </div>
+                            </div>
                         </div>
+                    </a>
+                    
+                    <a href="/devices" class="rc-card" style="text-decoration: none; transition: var(--transition-normal);">
+                        <div class="rc-flex" style="align-items: center; gap: var(--space-lg);">
+                            <div style="font-size: 2rem; color: var(--accent-purple);">
+                                <i class="bi bi-cpu"></i>
+                            </div>
+                            <div>
+                                <h3 style="color: var(--text-primary); margin-bottom: var(--space-xs);">Equipment Catalog</h3>
+                                <p class="rc-text-sm">Manage your device inventory</p>
+                                <div class="rc-text-sm" style="color: var(--accent-purple); margin-top: var(--space-xs);">
+                                    <i class="bi bi-arrow-right"></i> View Equipment
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <a href="/customers" class="rc-card" style="text-decoration: none; transition: var(--transition-normal);">
+                        <div class="rc-flex" style="align-items: center; gap: var(--space-lg);">
+                            <div style="font-size: 2rem; color: var(--accent-coral);">
+                                <i class="bi bi-people"></i>
+                            </div>
+                            <div>
+                                <h3 style="color: var(--text-primary); margin-bottom: var(--space-xs);">Customer Database</h3>
+                                <p class="rc-text-sm">Manage customer relationships</p>
+                                <div class="rc-text-sm" style="color: var(--accent-coral); margin-top: var(--space-xs);">
+                                    <i class="bi bi-arrow-right"></i> View Customers
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                    
+                    <a href="/cases" class="rc-card" style="text-decoration: none; transition: var(--transition-normal);">
+                        <div class="rc-flex" style="align-items: center; gap: var(--space-lg);">
+                            <div style="font-size: 2rem; color: var(--accent-gold);">
+                                <i class="bi bi-box"></i>
+                            </div>
+                            <div>
+                                <h3 style="color: var(--text-primary); margin-bottom: var(--space-xs);">Case Management</h3>
+                                <p class="rc-text-sm">Organize equipment in cases</p>
+                                <div class="rc-text-sm" style="color: var(--accent-gold); margin-top: var(--space-xs);">
+                                    <i class="bi bi-arrow-right"></i> View Cases
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions & Business Tools -->
+        <div class="rc-grid rc-grid-2">
+            <!-- Quick Actions -->
+            <div class="rc-card">
+                <div class="rc-card-header">
+                    <h3 class="rc-card-title">
+                        <i class="bi bi-lightning"></i> Quick Actions
+                    </h3>
+                </div>
+                <div class="rc-card-body">
+                    <div class="rc-flex rc-flex-col" style="gap: var(--space-sm);">
+                        <a href="/scan" class="rc-btn rc-btn-primary" style="justify-content: flex-start;">
+                            <i class="bi bi-qr-code-scan"></i> Scan QR Code
+                        </a>
+                        <a href="/jobs/new" class="rc-btn rc-btn-ghost" style="justify-content: flex-start;">
+                            <i class="bi bi-plus-circle"></i> Create New Job
+                        </a>
+                        <a href="/customers/new" class="rc-btn rc-btn-ghost" style="justify-content: flex-start;">
+                            <i class="bi bi-person-plus"></i> Add Customer
+                        </a>
+                        <a href="/devices/new" class="rc-btn rc-btn-ghost" style="justify-content: flex-start;">
+                            <i class="bi bi-plus-square"></i> Add Equipment
+                        </a>
                     </div>
-                    <div class="col-lg-4 text-center">
-                        <i class="bi bi-gear-wide-connected display-1 opacity-25"></i>
+                </div>
+            </div>
+            
+            <!-- Business Tools -->
+            <div class="rc-card">
+                <div class="rc-card-header">
+                    <h3 class="rc-card-title">
+                        <i class="bi bi-tools"></i> Business Tools
+                    </h3>
+                </div>
+                <div class="rc-card-body">
+                    <div class="rc-flex rc-flex-col" style="gap: var(--space-sm);">
+                        <a href="/invoices" class="rc-btn rc-btn-ghost" style="justify-content: flex-start;">
+                            <i class="bi bi-file-text"></i> Invoice Management
+                        </a>
+                        <a href="/analytics" class="rc-btn rc-btn-ghost" style="justify-content: flex-start;">
+                            <i class="bi bi-graph-up"></i> Analytics Dashboard
+                        </a>
+                        <a href="/financial" class="rc-btn rc-btn-ghost" style="justify-content: flex-start;">
+                            <i class="bi bi-calculator"></i> Financial Reports
+                        </a>
+                        <a href="/settings" class="rc-btn rc-btn-ghost" style="justify-content: flex-start;">
+                            <i class="bi bi-gear"></i> System Settings
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
-<!-- Quick Stats -->
-{{if .stats}}
-<div class="row mb-5">
-    <div class="col-md-3 mb-3">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center">
-                <div class="text-primary mb-2">
-                    <i class="bi bi-briefcase display-6"></i>
-                </div>
-                <h3 class="fw-bold text-primary">{{.stats.TotalJobs}}</h3>
-                <p class="text-muted mb-0">Active Jobs</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center">
-                <div class="text-success mb-2">
-                    <i class="bi bi-cpu display-6"></i>
-                </div>
-                <h3 class="fw-bold text-success">{{.stats.TotalDevices}}</h3>
-                <p class="text-muted mb-0">Devices</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center">
-                <div class="text-info mb-2">
-                    <i class="bi bi-people display-6"></i>
-                </div>
-                <h3 class="fw-bold text-info">{{.stats.TotalCustomers}}</h3>
-                <p class="text-muted mb-0">Customers</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body text-center">
-                <div class="text-warning mb-2">
-                    <i class="bi bi-box display-6"></i>
-                </div>
-                <h3 class="fw-bold text-warning">{{.stats.TotalCases}}</h3>
-                <p class="text-muted mb-0">Cases</p>
-            </div>
-        </div>
-    </div>
-</div>
-{{end}}
-
-<!-- Core Management -->
-<div class="section-header mb-4">
-    <h2 class="fw-bold">
-        <i class="bi bi-grid-3x3-gap me-2 text-primary"></i>
-        Core Management
-    </h2>
-    <p class="text-muted">Manage your rental business essentials</p>
-</div>
-
-<div class="row mb-5 g-4">
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 border-0 shadow-sm feature-card">
-            <div class="card-body text-center p-4">
-                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="bi bi-briefcase display-6 text-primary"></i>
-                </div>
-                <h5 class="fw-semibold mb-2">Jobs</h5>
-                <p class="text-muted mb-3">Manage projects and equipment assignments efficiently</p>
-                <div class="d-grid gap-2">
-                    <a href="/jobs" class="btn btn-primary">
-                        <i class="bi bi-eye me-1"></i> View All Jobs
-                    </a>
-                    <a href="/jobs/new" class="btn btn-outline-primary">
-                        <i class="bi bi-plus-circle me-1"></i> Create New
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 border-0 shadow-sm feature-card">
-            <div class="card-body text-center p-4">
-                <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="bi bi-cpu display-6 text-success"></i>
-                </div>
-                <h5 class="fw-semibold mb-2">Devices</h5>
-                <p class="text-muted mb-3">Equipment inventory and comprehensive tracking</p>
-                <div class="d-grid gap-2">
-                    <a href="/devices" class="btn btn-success">
-                        <i class="bi bi-eye me-1"></i> View All Devices
-                    </a>
-                    <a href="/devices/new" class="btn btn-outline-success">
-                        <i class="bi bi-plus-circle me-1"></i> Add Device
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 border-0 shadow-sm feature-card">
-            <div class="card-body text-center p-4">
-                <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="bi bi-people display-6 text-info"></i>
-                </div>
-                <h5 class="fw-semibold mb-2">Customers</h5>
-                <p class="text-muted mb-3">Complete customer database management</p>
-                <div class="d-grid gap-2">
-                    <a href="/customers" class="btn btn-info">
-                        <i class="bi bi-eye me-1"></i> View All Customers
-                    </a>
-                    <a href="/customers/new" class="btn btn-outline-info">
-                        <i class="bi bi-plus-circle me-1"></i> Add Customer
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-lg-3 col-md-6">
-        <div class="card h-100 border-0 shadow-sm feature-card">
-            <div class="card-body text-center p-4">
-                <div class="bg-warning bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="bi bi-box display-6 text-warning"></i>
-                </div>
-                <h5 class="fw-semibold mb-2">Cases</h5>
-                <p class="text-muted mb-3">Case management and device mapping solutions</p>
-                <div class="d-grid gap-2">
-                    <a href="/cases" class="btn btn-warning">
-                        <i class="bi bi-eye me-1"></i> View All Cases
-                    </a>
-                    <a href="/cases/new" class="btn btn-outline-warning">
-                        <i class="bi bi-plus-circle me-1"></i> Create Case
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Quick Actions -->
-<div class="section-header mb-4">
-    <h2 class="fw-bold">
-        <i class="bi bi-lightning-fill me-2 text-primary"></i>
-        Quick Actions
-    </h2>
-    <p class="text-muted">Frequently used operations at your fingertips</p>
-</div>
-
-<div class="row mb-5 g-3">
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body text-center p-4">
-                <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                    <i class="bi bi-qr-code-scan display-6 text-primary"></i>
-                </div>
-                <h6 class="fw-semibold">Equipment Scanner</h6>
-                <p class="text-muted small mb-3">Quickly scan and manage equipment</p>
-                <a href="/scan/select" class="btn btn-primary w-100">
-                    <i class="bi bi-qr-code-scan me-1"></i> Launch Scanner
-                </a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body text-center p-4">
-                <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                    <i class="bi bi-plus-circle display-6 text-success"></i>
-                </div>
-                <h6 class="fw-semibold">New Job Creation</h6>
-                <p class="text-muted small mb-3">Create and configure new jobs</p>
-                <a href="/jobs/new" class="btn btn-success w-100">
-                    <i class="bi bi-plus-circle me-1"></i> Create Job
-                </a>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-md-4">
-        <div class="card border-0 shadow-sm h-100">
-            <div class="card-body text-center p-4">
-                <div class="bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
-                    <i class="bi bi-search display-6 text-secondary"></i>
-                </div>
-                <h6 class="fw-semibold">Global Search</h6>
-                <p class="text-muted small mb-3">Search across all system data</p>
-                <a href="/search/global" class="btn btn-secondary w-100">
-                    <i class="bi bi-search me-1"></i> Advanced Search
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Business Tools -->
-<div class="section-header mb-4">
-    <h2 class="fw-bold">
-        <i class="bi bi-briefcase-fill me-2 text-primary"></i>
-        Business Tools
-    </h2>
-    <p class="text-muted">Advanced features for business management</p>
-</div>
-
-<div class="row mb-5 g-4">
-    <div class="col-lg-4 col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                        <i class="bi bi-file-text text-primary"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-0">Invoicing</h6>
-                </div>
-                <p class="text-muted small mb-3">Generate and manage professional invoices</p>
-                <div class="d-flex gap-2">
-                    <a href="/invoices" class="btn btn-primary btn-sm flex-fill">
-                        <i class="bi bi-eye me-1"></i> View
-                    </a>
-                    <a href="/invoices/new" class="btn btn-outline-primary btn-sm flex-fill">
-                        <i class="bi bi-plus me-1"></i> Create
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-lg-4 col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-success bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                        <i class="bi bi-graph-up text-success"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-0">Analytics</h6>
-                </div>
-                <p class="text-muted small mb-3">Business insights and performance metrics</p>
-                <div class="d-flex gap-2">
-                    <a href="/analytics" class="btn btn-success btn-sm flex-fill">
-                        <i class="bi bi-graph-up me-1"></i> Dashboard
-                    </a>
-                    <a href="/financial" class="btn btn-outline-success btn-sm flex-fill">
-                        <i class="bi bi-calculator me-1"></i> Financial
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-lg-4 col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-info bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                        <i class="bi bi-file-earmark text-info"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-0">Documents</h6>
-                </div>
-                <p class="text-muted small mb-3">Document management and storage</p>
-                <div class="d-flex gap-2">
-                    <a href="/documents" class="btn btn-info btn-sm flex-fill">
-                        <i class="bi bi-folder me-1"></i> Browse
-                    </a>
-                    <a href="/documents/upload" class="btn btn-outline-info btn-sm flex-fill">
-                        <i class="bi bi-upload me-1"></i> Upload
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-lg-4 col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-warning bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                        <i class="bi bi-file-earmark-text text-warning"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-0">Templates</h6>
-                </div>
-                <p class="text-muted small mb-3">Job templates and equipment packages</p>
-                <div class="d-flex gap-2">
-                    <a href="/workflow/templates" class="btn btn-warning btn-sm flex-fill">
-                        <i class="bi bi-file-earmark-text me-1"></i> Jobs
-                    </a>
-                    <a href="/workflow/packages" class="btn btn-outline-warning btn-sm flex-fill">
-                        <i class="bi bi-box-seam me-1"></i> Packages
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-lg-4 col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-purple bg-opacity-20 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; background-color: rgba(168, 85, 247, 0.15) !important;">
-                        <i class="bi bi-building" style="color: #a855f7; font-size: 1.5rem;"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-0">Firmeneinstellungen</h6>
-                </div>
-                <p class="text-muted small mb-3">Unternehmensdaten und Konfiguration</p>
-                <div class="d-flex gap-2">
-                    <a href="/settings/company" class="btn btn-sm flex-fill" style="background-color: #a855f7; border-color: #a855f7; color: white;">
-                        <i class="bi bi-building me-1"></i> Einstellungen
-                    </a>
-                    <a href="/invoice-templates" class="btn btn-outline-secondary btn-sm flex-fill" style="border-color: #a855f7; color: #a855f7;">
-                        <i class="bi bi-file-text me-1"></i> Vorlagen
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-lg-4 col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px; background-color: rgba(99, 102, 241, 0.15) !important;">
-                        <i class="bi bi-tools" style="color: #6366f1; font-size: 1.3rem;"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-0">System Tools</h6>
-                </div>
-                <p class="text-muted small mb-3">Bulk operations and system utilities</p>
-                <div class="d-flex gap-2">
-                    <a href="/workflow/bulk" class="btn btn-sm flex-fill" style="background-color: #6366f1; border-color: #6366f1; color: white;">
-                        <i class="bi bi-gear me-1"></i> Bulk Ops
-                    </a>
-                    <a href="/users" class="btn btn-outline-secondary btn-sm flex-fill" style="border-color: #6366f1; color: #6366f1;">
-                        <i class="bi bi-people me-1"></i> Users
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="col-lg-4 col-md-6">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <div class="d-flex align-items-center mb-3">
-                    <div class="bg-danger bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
-                        <i class="bi bi-shield-check text-danger"></i>
-                    </div>
-                    <h6 class="fw-semibold mb-0">Security</h6>
-                </div>
-                <p class="text-muted small mb-3">Access control and audit logs</p>
-                <div class="d-flex gap-2">
-                    <a href="/security/audit" class="btn btn-danger btn-sm flex-fill">
-                        <i class="bi bi-shield-check me-1"></i> Audit
-                    </a>
-                    <a href="/security/roles" class="btn btn-outline-danger btn-sm flex-fill">
-                        <i class="bi bi-person-badge me-1"></i> Roles
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Recent Activity - Disabled for performance -->
-<!-- Will be re-enabled with optimized queries in the future -->
-
-<style>
-.feature-card {
-    transition: all var(--transition-normal);
-    border-radius: var(--radius-xl) !important;
-}
-
-.feature-card:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl) !important;
-}
-
-.section-header {
-    border-left: 4px solid var(--accent-color);
-    padding-left: var(--space-lg);
-    margin-bottom: var(--space-xl);
-}
-
-.bg-gradient-primary {
-    background: var(--gradient-primary) !important;
-}
-
-.status-indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-}
-
-.status-active {
-    background-color: var(--success-color);
-}
-
-.status-pending {
-    background-color: var(--warning-color);
-}
-
-.status-completed {
-    background-color: var(--info-color);
-}
-
-.status-cancelled {
-    background-color: var(--danger-color);
-}
-</style>
-
-<script>
-// Add smooth animations on load
-document.addEventListener('DOMContentLoaded', function() {
-    // Animate cards on scroll
-    const cards = document.querySelectorAll('.feature-card');
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('animate-bounce-in');
-            }
-        });
-    });
-    
-    cards.forEach(card => {
-        observer.observe(card);
-    });
-});
-</script>
     </main>
 
-    <!-- Professional Footer -->
-    <footer class="mt-auto">
-        <div class="container-fluid text-center">
-            <div class="row align-items-center py-3">
-                <div class="col-md-6 text-md-start">
-                    <small class="text-muted">
-                        <i class="bi bi-gear-wide-connected me-1"></i>
-                        RentalCore - The core of your rental business
-                    </small>
+    <!-- Footer -->
+    <footer style="margin-top: var(--space-3xl); padding: var(--space-xl) 0; border-top: 1px solid var(--surface-3);">
+        <div class="rc-container">
+            <div class="rc-flex rc-flex-between" style="align-items: center;">
+                <div class="rc-text-sm" style="color: var(--text-muted);">
+                    <i class="bi bi-gear-wide-connected"></i>
+                    RentalCore - Advanced Equipment Management System
                 </div>
-                <div class="col-md-6 text-md-end">
-                    <small class="text-muted">
-                        <i class="bi bi-code-slash me-1"></i>
-                        Professional Theme 3.0
-                    </small>
+                <div class="rc-flex" style="gap: var(--space-lg);">
+                    <a href="/help" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-question-circle"></i> Help
+                    </a>
+                    <a href="/about" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-info-circle"></i> About
+                    </a>
+                    <a href="/contact" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-envelope"></i> Contact
+                    </a>
                 </div>
             </div>
         </div>
     </footer>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/static/js/app.js"></script>
-    
-    <script>
-        // Theme toggle functionality
-        function toggleTheme() {
-            const html = document.documentElement;
-            const themeIcon = document.getElementById('theme-icon');
-            const currentTheme = html.getAttribute('data-theme');
-            
-            if (currentTheme === 'dark') {
-                html.setAttribute('data-theme', 'light');
-                themeIcon.className = 'bi bi-sun-fill';
-                localStorage.setItem('theme', 'light');
-            } else {
-                html.setAttribute('data-theme', 'dark');
-                themeIcon.className = 'bi bi-moon-fill';
-                localStorage.setItem('theme', 'dark');
-            }
-        }
-        
-        // Load saved theme
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedTheme = localStorage.getItem('theme') || 'dark';
-            const html = document.documentElement;
-            const themeIcon = document.getElementById('theme-icon');
-            
-            html.setAttribute('data-theme', savedTheme);
-            if (savedTheme === 'light') {
-                themeIcon.className = 'bi bi-sun-fill';
-            }
-        });
-    </script>
+    <!-- JavaScript -->
+    <script src="/static/js/rental-core-design.js"></script>
 </body>
 </html>
-        

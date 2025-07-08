@@ -1,86 +1,218 @@
-{{template "base.html" .}}
-{{define "content"}}
-<div class="page-header">
-    <h1><i class="bi bi-cpu"></i> {{.title}}</h1>
-    <div class="d-flex gap-2">
-        <!-- View Toggle Buttons -->
-        <div class="btn-group" role="group">
-            <a href="/devices?view=list{{if .params.SearchTerm}}&search={{.params.SearchTerm}}{{end}}" 
-               class="btn {{if eq .viewType "list"}}btn-primary{{else}}btn-outline-primary{{end}}">
-                <i class="bi bi-list"></i> List View
-            </a>
-            <a href="/devices?view=categorized{{if .params.SearchTerm}}&search={{.params.SearchTerm}}{{end}}" 
-               class="btn {{if eq .viewType "categorized"}}btn-primary{{else}}btn-outline-primary{{end}}">
-                <i class="bi bi-diagram-3"></i> Categories
-            </a>
-        </div>
-        <a href="/devices/new" class="btn btn-outline-primary-enhanced">
-            <i class="bi bi-plus-lg"></i> New Device
-        </a>
-    </div>
-</div>
-
-<!-- Search -->
-<div class="card mb-4">
-    <div class="card-body">
-        <form method="GET" action="/devices">
-            {{if .categorized}}<input type="hidden" name="view" value="categorized">{{end}}
-            <div class="row search-enhanced">
-                <div class="col-md-10">
-                    <input type="text" class="form-control" name="search" value="{{.params.SearchTerm}}" placeholder="Search devices...">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.title}} - RentalCore</title>
+    
+    <!-- CSS -->
+    <link rel="stylesheet" href="/static/css/rental-core-design.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="rc-animate-fade-in">
+    <!-- Navigation -->
+    <nav class="rc-navbar">
+        <div class="rc-container">
+            <div class="rc-navbar-content">
+                <a href="/" class="rc-navbar-brand">
+                    <i class="bi bi-gear-wide-connected"></i>
+                    RentalCore
+                </a>
+                <ul class="rc-navbar-nav">
+                    <li><a href="/jobs" class="rc-nav-link">
+                        <i class="bi bi-briefcase"></i> Jobs
+                    </a></li>
+                    <li><a href="/devices" class="rc-nav-link active">
+                        <i class="bi bi-cpu"></i> Devices
+                    </a></li>
+                    <li><a href="/customers" class="rc-nav-link">
+                        <i class="bi bi-people"></i> Customers
+                    </a></li>
+                    <li><a href="/cases" class="rc-nav-link">
+                        <i class="bi bi-box"></i> Cases
+                    </a></li>
+                </ul>
+                {{if .user}}
+                <div class="rc-flex rc-flex-center">
+                    <span class="rc-text-sm">Welcome, {{.user.Username}}</span>
+                    <a href="/logout" class="rc-btn rc-btn-ghost rc-btn-sm">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </a>
                 </div>
-                <div class="col-md-2">
-                    <button type="submit" class="btn btn-outline-primary-enhanced w-100">Search</button>
+                {{else}}
+                <a href="/login" class="rc-btn rc-btn-primary rc-btn-sm">
+                    <i class="bi bi-box-arrow-in-right"></i> Login
+                </a>
+                {{end}}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="rc-main">
+        <div class="rc-container">
+            <!-- Page Header -->
+            <div class="rc-page-header">
+                <h1 class="rc-heading-1">{{.title}}</h1>
+                <p class="rc-text">Manage your devices and equipment</p>
+            </div>
+
+            <!-- View Toggle & Actions Bar -->
+            <div class="rc-flex rc-flex-between">
+                <div class="rc-button-group">
+                    <a href="/devices?view=list{{if .params.SearchTerm}}&search={{.params.SearchTerm}}{{end}}" 
+                       class="rc-btn {{if eq .viewType "list"}}rc-btn-primary{{else}}rc-btn-secondary{{end}}">
+                        <i class="bi bi-list"></i> List
+                    </a>
+                    <a href="/devices?view=categorized{{if .params.SearchTerm}}&search={{.params.SearchTerm}}{{end}}" 
+                       class="rc-btn {{if eq .viewType "categorized"}}rc-btn-primary{{else}}rc-btn-secondary{{end}}">
+                        <i class="bi bi-diagram-3"></i> Categories
+                    </a>
+                </div>
+                <a href="/devices/new" class="rc-btn rc-btn-primary">
+                    <i class="bi bi-plus-lg"></i> New Device
+                </a>
+            </div>
+
+            <!-- Search -->
+            <div class="rc-card">
+                <div class="rc-card-body">
+                    <form method="GET" action="/devices">
+                        {{if .categorized}}<input type="hidden" name="view" value="categorized">{{end}}
+                        <div class="rc-search-bar">
+                            <input type="text" class="rc-input" name="search" value="{{.params.SearchTerm}}" placeholder="Search devices...">
+                            <button type="submit" class="rc-btn rc-btn-info">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </form>
-    </div>
-</div>
 
-<!-- Devices Content -->
-{{if .categorized}}
-    <!-- Categorized View -->
-    {{if .categorizedDevices}}
-        {{if .categorizedDevices.Categories}}
-            <!-- Categories and Subcategories -->
-            {{range .categorizedDevices.Categories}}
-            <div class="card mb-3">
-                <div class="card-header bg-primary text-white">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">
-                            <i class="bi bi-folder"></i> 
-                            {{if .Category}}{{.Category.Name}}{{else}}Unknown Category{{end}}
-                            <span class="badge bg-light text-dark ms-2">{{.DeviceCount}} devices</span>
-                        </h5>
-                        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" 
-                                data-bs-target="#category-{{if .Category}}{{.Category.CategoryID}}{{else}}unknown{{end}}" 
-                                aria-expanded="true">
-                            <i class="bi bi-chevron-down"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="collapse show" id="category-{{if .Category}}{{.Category.CategoryID}}{{else}}unknown{{end}}">
-                    <div class="card-body p-0">
-                        {{range .Subcategories}}
-                        <div class="border-bottom">
-                            <div class="p-3 bg-light">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-0">
-                                        <i class="bi bi-folder2"></i>
-                                        {{if .Subcategory}}{{.Subcategory.Name}}{{else}}Unknown Subcategory{{end}}
-                                        <span class="badge bg-secondary ms-2">{{.DeviceCount}} devices</span>
-                                    </h6>
-                                    <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" 
-                                            data-bs-target="#subcategory-{{if .Subcategory}}{{.Subcategory.SubcategoryID}}{{else}}unknown{{end}}" 
-                                            aria-expanded="false">
+            <!-- Devices Content -->
+            {{if .categorized}}
+                <!-- Categorized View -->
+                {{if .categorizedDevices}}
+                    {{if .categorizedDevices.Categories}}
+                        <!-- Categories and Subcategories -->
+                        {{range .categorizedDevices.Categories}}
+                        <div class="rc-card">
+                            <div class="rc-card-header">
+                                <div class="rc-flex rc-flex-between">
+                                    <h3 class="rc-heading-3">
+                                        <i class="bi bi-folder"></i> 
+                                        {{if .Category}}{{.Category.Name}}{{else}}Unknown Category{{end}}
+                                        <span class="rc-badge rc-badge-primary">{{.DeviceCount}} devices</span>
+                                    </h3>
+                                    <button class="rc-btn rc-btn-ghost rc-btn-sm rc-collapse-toggle" 
+                                            data-target="category-{{if .Category}}{{.Category.CategoryID}}{{else}}unknown{{end}}">
                                         <i class="bi bi-chevron-down"></i>
                                     </button>
                                 </div>
                             </div>
-                            <div class="collapse" id="subcategory-{{if .Subcategory}}{{.Subcategory.SubcategoryID}}{{else}}unknown{{end}}">
-                                <div class="table-responsive">
-                                    <table class="table table-sm mb-0">
-                                        <thead class="table-light">
+                            <div class="rc-collapse rc-collapse-show" id="category-{{if .Category}}{{.Category.CategoryID}}{{else}}unknown{{end}}">
+                                <div class="rc-card-body rc-no-padding">
+                                    {{range .Subcategories}}
+                                    <div class="rc-subcategory">
+                                        <div class="rc-subcategory-header">
+                                            <div class="rc-flex rc-flex-between">
+                                                <h4 class="rc-subcategory-title">
+                                                    <i class="bi bi-folder2"></i>
+                                                    {{if .Subcategory}}{{.Subcategory.Name}}{{else}}Unknown Subcategory{{end}}
+                                                    <span class="rc-badge rc-badge-secondary">{{.DeviceCount}} devices</span>
+                                                </h4>
+                                                <button class="rc-btn rc-btn-ghost rc-btn-sm rc-collapse-toggle" 
+                                                        data-target="subcategory-{{if .Subcategory}}{{.Subcategory.SubcategoryID}}{{else}}unknown{{end}}">
+                                                    <i class="bi bi-chevron-down"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="rc-collapse" id="subcategory-{{if .Subcategory}}{{.Subcategory.SubcategoryID}}{{else}}unknown{{end}}">
+                                            <div class="rc-table-responsive">
+                                                <table class="rc-table rc-table-sm">
+                                                    <thead>
+                                                        <tr>
+                                                            <th>Device ID</th>
+                                                            <th>Product</th>
+                                                            <th>Serial Number</th>
+                                                            <th>Status</th>
+                                                            <th>Job Assignment</th>
+                                                            <th>Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {{range .Devices}}
+                                                        <tr>
+                                                            <td><span class="rc-text-mono">{{.DeviceID}}</span></td>
+                                                            <td>{{if .Product}}{{.Product.Name}}{{else}}-{{end}}</td>
+                                                            <td><span class="rc-text-mono">{{derefString .SerialNumber}}</span></td>
+                                                            <td>
+                                                                {{if eq .Status "free"}}
+                                                                    <span class="rc-badge rc-badge-success">Free</span>
+                                                                {{else if eq .Status "rented"}}
+                                                                    <span class="rc-badge rc-badge-warning">Rented</span>
+                                                                {{else if eq .Status "maintenance"}}
+                                                                    <span class="rc-badge rc-badge-danger">Maintenance</span>
+                                                                {{else}}
+                                                                    <span class="rc-badge rc-badge-secondary">{{.Status}}</span>
+                                                                {{end}}
+                                                            </td>
+                                                            <td>
+                                                                {{if .IsAssigned}}
+                                                                    <span class="rc-badge rc-badge-info">Job {{.JobID}}</span>
+                                                                    {{if .JobTitle}}<br><small class="rc-text-sm">{{.JobTitle}}</small>{{end}}
+                                                                {{else}}
+                                                                    <span class="rc-badge rc-badge-success">Available</span>
+                                                                {{end}}
+                                                            </td>
+                                                            <td>
+                                                                <div class="rc-button-group">
+                                                                    <a href="/devices/{{.DeviceID}}" class="rc-btn rc-btn-info rc-btn-sm">
+                                                                        <i class="bi bi-eye"></i>
+                                                                    </a>
+                                                                    <a href="/devices/{{.DeviceID}}/qr" class="rc-btn rc-btn-secondary rc-btn-sm" target="_blank">
+                                                                        <i class="bi bi-qr-code"></i>
+                                                                    </a>
+                                                                    <a href="/devices/{{.DeviceID}}/barcode" class="rc-btn rc-btn-secondary rc-btn-sm" target="_blank">
+                                                                        <i class="bi bi-upc"></i>
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        {{end}}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {{end}}
+                                </div>
+                            </div>
+                        </div>
+                        {{end}}
+                    {{end}}
+
+                    <!-- Uncategorized Devices -->
+                    {{if .categorizedDevices.Uncategorized}}
+                    <div class="rc-card">
+                        <div class="rc-card-header rc-card-header-secondary">
+                            <div class="rc-flex rc-flex-between">
+                                <h3 class="rc-heading-3">
+                                    <i class="bi bi-question-circle"></i> 
+                                    Uncategorized Devices
+                                    <span class="rc-badge rc-badge-secondary">{{len .categorizedDevices.Uncategorized}} devices</span>
+                                </h3>
+                                <button class="rc-btn rc-btn-ghost rc-btn-sm rc-collapse-toggle" data-target="uncategorized">
+                                    <i class="bi bi-chevron-down"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="rc-collapse" id="uncategorized">
+                            <div class="rc-card-body rc-no-padding">
+                                <div class="rc-table-responsive">
+                                    <table class="rc-table rc-table-sm">
+                                        <thead>
                                             <tr>
                                                 <th>Device ID</th>
                                                 <th>Product</th>
@@ -91,39 +223,39 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {{range .Devices}}
+                                            {{range .categorizedDevices.Uncategorized}}
                                             <tr>
-                                                <td><code>{{.DeviceID}}</code></td>
+                                                <td><span class="rc-text-mono">{{.DeviceID}}</span></td>
                                                 <td>{{if .Product}}{{.Product.Name}}{{else}}-{{end}}</td>
-                                                <td>{{derefString .SerialNumber}}</td>
+                                                <td><span class="rc-text-mono">{{derefString .SerialNumber}}</span></td>
                                                 <td>
                                                     {{if eq .Status "free"}}
-                                                        <span class="badge bg-success">Free</span>
+                                                        <span class="rc-badge rc-badge-success">Free</span>
                                                     {{else if eq .Status "rented"}}
-                                                        <span class="badge bg-warning">Rented</span>
+                                                        <span class="rc-badge rc-badge-warning">Rented</span>
                                                     {{else if eq .Status "maintenance"}}
-                                                        <span class="badge bg-danger">Maintenance</span>
+                                                        <span class="rc-badge rc-badge-danger">Maintenance</span>
                                                     {{else}}
-                                                        <span class="badge bg-secondary">{{.Status}}</span>
+                                                        <span class="rc-badge rc-badge-secondary">{{.Status}}</span>
                                                     {{end}}
                                                 </td>
                                                 <td>
                                                     {{if .IsAssigned}}
-                                                        <span class="badge bg-info">Job {{.JobID}}</span>
-                                                        {{if .JobTitle}}<br><small class="text-muted">{{.JobTitle}}</small>{{end}}
+                                                        <span class="rc-badge rc-badge-info">Job {{.JobID}}</span>
+                                                        {{if .JobTitle}}<br><small class="rc-text-sm">{{.JobTitle}}</small>{{end}}
                                                     {{else}}
-                                                        <span class="badge bg-success">Available</span>
+                                                        <span class="rc-badge rc-badge-success">Available</span>
                                                     {{end}}
                                                 </td>
                                                 <td>
-                                                    <div class="btn-group btn-group-sm">
-                                                        <a href="/devices/{{.DeviceID}}" class="btn btn-outline-primary">
+                                                    <div class="rc-button-group">
+                                                        <a href="/devices/{{.DeviceID}}" class="rc-btn rc-btn-info rc-btn-sm">
                                                             <i class="bi bi-eye"></i>
                                                         </a>
-                                                        <a href="/devices/{{.DeviceID}}/qr" class="btn btn-outline-secondary" target="_blank">
+                                                        <a href="/devices/{{.DeviceID}}/qr" class="rc-btn rc-btn-secondary rc-btn-sm" target="_blank">
                                                             <i class="bi bi-qr-code"></i>
                                                         </a>
-                                                        <a href="/devices/{{.DeviceID}}/barcode" class="btn btn-outline-secondary" target="_blank">
+                                                        <a href="/devices/{{.DeviceID}}/barcode" class="rc-btn rc-btn-secondary rc-btn-sm" target="_blank">
                                                             <i class="bi bi-upc"></i>
                                                         </a>
                                                     </div>
@@ -135,180 +267,143 @@
                                 </div>
                             </div>
                         </div>
-                        {{end}}
                     </div>
-                </div>
-            </div>
-            {{end}}
-        {{end}}
+                    {{end}}
 
-        <!-- Uncategorized Devices -->
-        {{if .categorizedDevices.Uncategorized}}
-        <div class="card">
-            <div class="card-header bg-secondary text-white">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0">
-                        <i class="bi bi-question-circle"></i> 
-                        Uncategorized Devices
-                        <span class="badge bg-light text-dark ms-2">{{len .categorizedDevices.Uncategorized}} devices</span>
-                    </h5>
-                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="collapse" 
-                            data-bs-target="#uncategorized" aria-expanded="false">
-                        <i class="bi bi-chevron-down"></i>
-                    </button>
-                </div>
-            </div>
-            <div class="collapse" id="uncategorized">
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-sm mb-0">
-                            <thead class="table-light">
-                                <tr>
-                                    <th>Device ID</th>
-                                    <th>Product</th>
-                                    <th>Serial Number</th>
-                                    <th>Status</th>
-                                    <th>Job Assignment</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {{range .categorizedDevices.Uncategorized}}
-                                <tr>
-                                    <td><code>{{.DeviceID}}</code></td>
-                                    <td>{{if .Product}}{{.Product.Name}}{{else}}-{{end}}</td>
-                                    <td>{{derefString .SerialNumber}}</td>
-                                    <td>
-                                        {{if eq .Status "free"}}
-                                            <span class="badge bg-success">Free</span>
-                                        {{else if eq .Status "rented"}}
-                                            <span class="badge bg-warning">Rented</span>
-                                        {{else if eq .Status "maintenance"}}
-                                            <span class="badge bg-danger">Maintenance</span>
-                                        {{else}}
-                                            <span class="badge bg-secondary">{{.Status}}</span>
-                                        {{end}}
-                                    </td>
-                                    <td>
-                                        {{if .IsAssigned}}
-                                            <span class="badge bg-info">Job {{.JobID}}</span>
-                                            {{if .JobTitle}}<br><small class="text-muted">{{.JobTitle}}</small>{{end}}
-                                        {{else}}
-                                            <span class="badge bg-success">Available</span>
-                                        {{end}}
-                                    </td>
-                                    <td>
-                                        <div class="btn-group btn-group-sm">
-                                            <a href="/devices/{{.DeviceID}}" class="btn btn-outline-primary">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            <a href="/devices/{{.DeviceID}}/qr" class="btn btn-outline-secondary" target="_blank">
-                                                <i class="bi bi-qr-code"></i>
-                                            </a>
-                                            <a href="/devices/{{.DeviceID}}/barcode" class="btn btn-outline-secondary" target="_blank">
-                                                <i class="bi bi-upc"></i>
-                                            </a>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {{end}}
-                            </tbody>
-                        </table>
+                    <!-- Summary -->
+                    <div class="rc-text-sm rc-text-muted" style="margin-top: var(--space-md);">
+                        Total devices: {{.categorizedDevices.TotalDevices}}
                     </div>
-                </div>
-            </div>
-        </div>
-        {{end}}
-
-        <!-- Summary -->
-        <div class="mt-3">
-            <small class="text-muted">
-                Total devices: {{.categorizedDevices.TotalDevices}}
-            </small>
-        </div>
-    {{else}}
-        <div class="card">
-            <div class="card-body text-center py-5">
-                <i class="bi bi-cpu display-1 text-muted"></i>
-                <h4 class="text-muted">No devices found</h4>
-                <p class="text-muted">Add your first device to get started.</p>
-                <a href="/devices/new" class="btn btn-primary">
-                    <i class="bi bi-plus-lg"></i> Add Device
-                </a>
-            </div>
-        </div>
-    {{end}}
-{{else}}
-    <!-- Regular List View -->
-    <div class="card">
-        <div class="card-body">
-            {{if .devices}}
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>Device ID</th>
-                            <th>Product</th>
-                            <th>Serial Number</th>
-                            <th>Status</th>
-                            <th>Job Assignment</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{range .devices}}
-                        <tr>
-                            <td><code>{{.DeviceID}}</code></td>
-                            <td>{{if .Product}}{{.Product.Name}}{{else}}-{{end}}</td>
-                            <td>{{derefString .SerialNumber}}</td>
-                            <td>
-                                {{if eq .Status "free"}}
-                                    <span class="badge bg-success">Free</span>
-                                {{else if eq .Status "rented"}}
-                                    <span class="badge bg-warning">Rented</span>
-                                {{else if eq .Status "maintenance"}}
-                                    <span class="badge bg-danger">Maintenance</span>
-                                {{else}}
-                                    <span class="badge bg-secondary">{{.Status}}</span>
-                                {{end}}
-                            </td>
-                            <td>
-                                {{if .IsAssigned}}
-                                    <span class="badge bg-info">Job {{.JobID}}</span>
-                                    {{if .JobTitle}}<br><small class="text-muted">{{.JobTitle}}</small>{{end}}
-                                {{else}}
-                                    <span class="badge bg-success">Available</span>
-                                {{end}}
-                            </td>
-                            <td>
-                                <div class="btn-group btn-group-sm">
-                                    <a href="/devices/{{.DeviceID}}" class="btn btn-outline-primary">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <a href="/devices/{{.DeviceID}}/qr" class="btn btn-outline-secondary" target="_blank">
-                                        <i class="bi bi-qr-code"></i>
-                                    </a>
-                                    <a href="/devices/{{.DeviceID}}/barcode" class="btn btn-outline-secondary" target="_blank">
-                                        <i class="bi bi-upc"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        {{end}}
-                    </tbody>
-                </table>
-            </div>
+                {{else}}
+                    <div class="rc-card">
+                        <div class="rc-card-body">
+                            <div class="rc-empty-state">
+                                <i class="bi bi-cpu rc-empty-icon"></i>
+                                <h3 class="rc-heading-3">No devices found</h3>
+                                <p class="rc-text">Add your first device to get started.</p>
+                                <a href="/devices/new" class="rc-btn rc-btn-primary">
+                                    <i class="bi bi-plus-lg"></i> Add Device
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {{end}}
             {{else}}
-            <div class="text-center py-5">
-                <i class="bi bi-cpu display-1 text-muted"></i>
-                <h4 class="text-muted">No devices found</h4>
-                <p class="text-muted">Add your first device to get started.</p>
-                <a href="/devices/new" class="btn btn-primary">
-                    <i class="bi bi-plus-lg"></i> Add Device
-                </a>
-            </div>
+                <!-- Regular List View -->
+                <div class="rc-card">
+                    <div class="rc-card-body">
+                        {{if .devices}}
+                        <div class="rc-table-responsive">
+                            <table class="rc-table">
+                                <thead>
+                                    <tr>
+                                        <th>Device ID</th>
+                                        <th>Product</th>
+                                        <th>Serial Number</th>
+                                        <th>Status</th>
+                                        <th>Job Assignment</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{range .devices}}
+                                    <tr>
+                                        <td><span class="rc-text-mono">{{.DeviceID}}</span></td>
+                                        <td>{{if .Product}}{{.Product.Name}}{{else}}-{{end}}</td>
+                                        <td><span class="rc-text-mono">{{derefString .SerialNumber}}</span></td>
+                                        <td>
+                                            {{if eq .Status "free"}}
+                                                <span class="rc-badge rc-badge-success">Free</span>
+                                            {{else if eq .Status "rented"}}
+                                                <span class="rc-badge rc-badge-warning">Rented</span>
+                                            {{else if eq .Status "maintenance"}}
+                                                <span class="rc-badge rc-badge-danger">Maintenance</span>
+                                            {{else}}
+                                                <span class="rc-badge rc-badge-secondary">{{.Status}}</span>
+                                            {{end}}
+                                        </td>
+                                        <td>
+                                            {{if .IsAssigned}}
+                                                <span class="rc-badge rc-badge-info">Job {{.JobID}}</span>
+                                                {{if .JobTitle}}<br><small class="rc-text-sm">{{.JobTitle}}</small>{{end}}
+                                            {{else}}
+                                                <span class="rc-badge rc-badge-success">Available</span>
+                                            {{end}}
+                                        </td>
+                                        <td>
+                                            <div class="rc-button-group">
+                                                <a href="/devices/{{.DeviceID}}" class="rc-btn rc-btn-info rc-btn-sm">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a href="/devices/{{.DeviceID}}/qr" class="rc-btn rc-btn-secondary rc-btn-sm" target="_blank">
+                                                    <i class="bi bi-qr-code"></i>
+                                                </a>
+                                                <a href="/devices/{{.DeviceID}}/barcode" class="rc-btn rc-btn-secondary rc-btn-sm" target="_blank">
+                                                    <i class="bi bi-upc"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {{end}}
+                                </tbody>
+                            </table>
+                        </div>
+                        {{else}}
+                        <div class="rc-empty-state">
+                            <i class="bi bi-cpu rc-empty-icon"></i>
+                            <h3 class="rc-heading-3">No devices found</h3>
+                            <p class="rc-text">Add your first device to get started.</p>
+                            <a href="/devices/new" class="rc-btn rc-btn-primary">
+                                <i class="bi bi-plus-lg"></i> Add Device
+                            </a>
+                        </div>
+                        {{end}}
+                    </div>
+                </div>
             {{end}}
         </div>
-    </div>
-{{end}}
-{{end}}
+    </main>
+
+    <!-- Footer -->
+    <footer class="rc-footer">
+        <div class="rc-container">
+            <div class="rc-footer-content">
+                <div class="rc-footer-brand">
+                    <i class="bi bi-gear-wide-connected"></i>
+                    RentalCore - The core of your rental business
+                </div>
+                <div class="rc-footer-info">
+                    <i class="bi bi-code-slash"></i>
+                    RentalCore Design System 1.0
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="/static/js/app.js"></script>
+    
+    <!-- Collapse functionality -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simple collapse toggle functionality
+            document.querySelectorAll('.rc-collapse-toggle').forEach(button => {
+                button.addEventListener('click', function() {
+                    const target = document.getElementById(this.dataset.target);
+                    const icon = this.querySelector('i');
+                    
+                    if (target.classList.contains('rc-collapse-show')) {
+                        target.classList.remove('rc-collapse-show');
+                        icon.classList.remove('bi-chevron-up');
+                        icon.classList.add('bi-chevron-down');
+                    } else {
+                        target.classList.add('rc-collapse-show');
+                        icon.classList.remove('bi-chevron-down');
+                        icon.classList.add('bi-chevron-up');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

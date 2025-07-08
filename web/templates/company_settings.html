@@ -1,0 +1,1065 @@
+{{template "base.html" .}}
+{{define "content"}}
+<div class="container-fluid">
+    <!-- Mobile-Optimized Company Settings -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1">
+                <i class="bi bi-building me-2 text-primary"></i>
+                Firmeneinstellungen
+            </h1>
+            <p class="text-muted mb-0">Verwalten Sie Ihre Unternehmensdaten und Rechnungseinstellungen</p>
+        </div>
+        <div class="d-none d-md-block">
+            <a href="/" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Zurück
+            </a>
+        </div>
+    </div>
+
+    <!-- Success/Error Messages -->
+    <div id="messageContainer" class="mb-4" style="display: none;">
+        <div class="alert" role="alert">
+            <div class="d-flex align-items-center">
+                <i class="bi me-2" id="messageIcon"></i>
+                <span id="messageText"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Form Card -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex align-items-center">
+                <i class="bi bi-building me-2"></i>
+                <h5 class="mb-0">Unternehmensdaten</h5>
+            </div>
+        </div>
+        
+        <div class="card-body p-0">
+            <form id="companySettingsForm" enctype="multipart/form-data" class="mobile-form-stack">
+                
+                <!-- Basic Company Information -->
+                <div class="border-bottom">
+                    <div class="p-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            Grunddaten
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           id="companyName" 
+                                           name="companyName" 
+                                           class="form-control" 
+                                           placeholder="Firmenname"
+                                           value="{{if .company}}{{.company.CompanyName}}{{end}}" 
+                                           required>
+                                    <label for="companyName">
+                                        <i class="bi bi-building me-1"></i>
+                                        Firmenname *
+                                    </label>
+                                </div>
+                                <div class="form-text mt-1">
+                                    <i class="bi bi-info-circle me-1 text-primary"></i>
+                                    Offizieller Name wie im Handelsregister
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           id="companyType" 
+                                           name="companyType" 
+                                           class="form-control" 
+                                           placeholder="Rechtsform"
+                                           value="{{if .company}}{{.company.CompanyType}}{{end}}">
+                                    <label for="companyType">
+                                        <i class="bi bi-shield-check me-1"></i>
+                                        Rechtsform
+                                    </label>
+                                </div>
+                                <div class="form-text mt-1">z.B. GmbH, AG, e.K.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address Information -->
+                <div class="border-bottom">
+                    <div class="p-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-geo-alt me-2"></i>
+                            Adresse
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           id="addressLine1" 
+                                           name="addressLine1" 
+                                           class="form-control" 
+                                           placeholder="Straße und Hausnummer"
+                                           value="{{if .company}}{{.company.AddressLine1}}{{end}}">
+                                    <label for="addressLine1">
+                                        <i class="bi bi-house me-1"></i>
+                                        Straße und Hausnummer
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           id="addressLine2" 
+                                           name="addressLine2" 
+                                           class="form-control" 
+                                           placeholder="Adresszusatz"
+                                           value="{{if .company}}{{.company.AddressLine2}}{{end}}">
+                                    <label for="addressLine2">
+                                        <i class="bi bi-plus-circle me-1"></i>
+                                        Adresszusatz (optional)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           id="postalCode" 
+                                           name="postalCode" 
+                                           class="form-control" 
+                                           placeholder="PLZ"
+                                           pattern="[0-9]{5}"
+                                           value="{{if .company}}{{.company.PostalCode}}{{end}}">
+                                    <label for="postalCode">PLZ</label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           id="city" 
+                                           name="city" 
+                                           class="form-control" 
+                                           placeholder="Stadt"
+                                           value="{{if .company}}{{.company.City}}{{end}}">
+                                    <label for="city">Stadt</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           id="state" 
+                                           name="state" 
+                                           class="form-control" 
+                                           placeholder="Bundesland"
+                                           value="{{if .company}}{{.company.State}}{{end}}">
+                                    <label for="state">Bundesland</label>
+                                </div>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <select id="country" name="country" class="form-select">
+                                        <option value="Deutschland" {{if eq .company.Country "Deutschland"}}selected{{end}}>Deutschland</option>
+                                        <option value="Österreich" {{if eq .company.Country "Österreich"}}selected{{end}}>Österreich</option>
+                                        <option value="Schweiz" {{if eq .company.Country "Schweiz"}}selected{{end}}>Schweiz</option>
+                                        <option value="Andere" {{if and .company.Country (ne .company.Country "Deutschland") (ne .company.Country "Österreich") (ne .company.Country "Schweiz")}}selected{{end}}>Andere</option>
+                                    </select>
+                                    <label for="country">
+                                        <i class="bi bi-globe me-1"></i>
+                                        Land
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="border-bottom">
+                    <div class="p-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-telephone me-2"></i>
+                            Kontaktdaten
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="tel" 
+                                           id="phone" 
+                                           name="phone" 
+                                           class="form-control" 
+                                           placeholder="Telefon"
+                                           value="{{if .company}}{{.company.Phone}}{{end}}">
+                                    <label for="phone">
+                                        <i class="bi bi-telephone me-1"></i>
+                                        Telefon
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="tel" 
+                                           id="fax" 
+                                           name="fax" 
+                                           class="form-control" 
+                                           placeholder="Fax"
+                                           value="{{if .company}}{{.company.Fax}}{{end}}">
+                                    <label for="fax">
+                                        <i class="bi bi-printer me-1"></i>
+                                        Fax
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="email" 
+                                           id="email" 
+                                           name="email" 
+                                           class="form-control" 
+                                           placeholder="E-Mail"
+                                           value="{{if .company}}{{.company.Email}}{{end}}">
+                                    <label for="email">
+                                        <i class="bi bi-envelope me-1"></i>
+                                        E-Mail
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="url" 
+                                           id="website" 
+                                           name="website" 
+                                           class="form-control" 
+                                           placeholder="Website"
+                                           value="{{if .company}}{{.company.Website}}{{end}}">
+                                    <label for="website">
+                                        <i class="bi bi-globe me-1"></i>
+                                        Website
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tax Information -->
+                <div class="border-bottom">
+                    <div class="p-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-calculator me-2"></i>
+                            Steuerliche Angaben
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           id="taxNumber" 
+                                           name="taxNumber" 
+                                           class="form-control" 
+                                           placeholder="Steuernummer"
+                                           value="{{if .company}}{{.company.TaxNumber}}{{end}}">
+                                    <label for="taxNumber">
+                                        <i class="bi bi-hash me-1"></i>
+                                        Steuernummer
+                                    </label>
+                                </div>
+                                <div class="form-text mt-1">Format: 123/456/78910</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           id="vatNumber" 
+                                           name="vatNumber" 
+                                           class="form-control" 
+                                           placeholder="USt-IdNr."
+                                           pattern="DE[0-9]{9}"
+                                           value="{{if .company}}{{.company.VATNumber}}{{end}}">
+                                    <label for="vatNumber">
+                                        <i class="bi bi-shield-check me-1"></i>
+                                        USt-IdNr.
+                                    </label>
+                                </div>
+                                <div class="form-text mt-1">Format: DE123456789</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Banking Information -->
+                <div class="border-bottom">
+                    <div class="p-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-bank me-2"></i>
+                            Bankverbindung
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           id="bankName" 
+                                           name="bankName" 
+                                           class="form-control" 
+                                           placeholder="Bank Name"
+                                           value="{{if .company}}{{.company.BankName}}{{end}}">
+                                    <label for="bankName">
+                                        <i class="bi bi-bank me-1"></i>
+                                        Bank Name
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           id="accountHolder" 
+                                           name="accountHolder" 
+                                           class="form-control" 
+                                           placeholder="Kontoinhaber"
+                                           value="{{if .company}}{{.company.AccountHolder}}{{end}}">
+                                    <label for="accountHolder">
+                                        <i class="bi bi-person me-1"></i>
+                                        Kontoinhaber
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           id="iban" 
+                                           name="iban" 
+                                           class="form-control" 
+                                           placeholder="IBAN"
+                                           pattern="DE[0-9]{20}"
+                                           data-type="iban"
+                                           value="{{if .company}}{{.company.IBAN}}{{end}}">
+                                    <label for="iban">
+                                        <i class="bi bi-credit-card me-1"></i>
+                                        IBAN
+                                    </label>
+                                </div>
+                                <div class="form-text mt-1">
+                                    <i class="bi bi-info-circle me-1 text-primary"></i>
+                                    Wird auf Rechnungen für Überweisungen angezeigt
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           id="bic" 
+                                           name="bic" 
+                                           class="form-control" 
+                                           placeholder="BIC"
+                                           pattern="[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?"
+                                           value="{{if .company}}{{.company.BIC}}{{end}}">
+                                    <label for="bic">
+                                        <i class="bi bi-bank2 me-1"></i>
+                                        BIC
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Legal Information -->
+                <div class="border-bottom">
+                    <div class="p-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-file-text me-2"></i>
+                            Rechtliche Angaben
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           id="ceoName" 
+                                           name="ceoName" 
+                                           class="form-control" 
+                                           placeholder="Geschäftsführer"
+                                           value="{{if .company}}{{.company.CEOName}}{{end}}">
+                                    <label for="ceoName">
+                                        <i class="bi bi-person-badge me-1"></i>
+                                        Geschäftsführer
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           id="registerCourt" 
+                                           name="registerCourt" 
+                                           class="form-control" 
+                                           placeholder="Registergericht"
+                                           value="{{if .company}}{{.company.RegisterCourt}}{{end}}">
+                                    <label for="registerCourt">
+                                        <i class="bi bi-building me-1"></i>
+                                        Registergericht
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input type="text" 
+                                           id="registerNumber" 
+                                           name="registerNumber" 
+                                           class="form-control" 
+                                           placeholder="HRB-Nummer"
+                                           value="{{if .company}}{{.company.RegisterNumber}}{{end}}">
+                                    <label for="registerNumber">
+                                        <i class="bi bi-hash me-1"></i>
+                                        HRB-Nummer
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Invoice Texts -->
+                <div class="border-bottom">
+                    <div class="p-4">
+                        <h6 class="text-primary mb-3">
+                            <i class="bi bi-file-earmark-text me-2"></i>
+                            Rechnungstexte
+                        </h6>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <textarea id="footerText" 
+                                              name="footerText" 
+                                              class="form-control textarea-auto" 
+                                              placeholder="Fußzeile"
+                                              style="min-height: 100px;">{{if .company}}{{.company.FooterText}}{{end}}</textarea>
+                                    <label for="footerText">
+                                        <i class="bi bi-file-text me-1"></i>
+                                        Fußzeile auf Rechnungen
+                                    </label>
+                                </div>
+                                <div class="form-text mt-1">Wird am Ende jeder Rechnung angezeigt</div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-floating">
+                                    <textarea id="paymentTermsText" 
+                                              name="paymentTermsText" 
+                                              class="form-control textarea-auto" 
+                                              placeholder="Zahlungsbedingungen"
+                                              style="min-height: 100px;">{{if .company}}{{.company.PaymentTermsText}}{{end}}</textarea>
+                                    <label for="paymentTermsText">
+                                        <i class="bi bi-credit-card me-1"></i>
+                                        Zahlungsbedingungen
+                                    </label>
+                                </div>
+                                <div class="form-text mt-1">Standard-Zahlungsbedingungen für neue Rechnungen</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logo Upload -->
+                <div class="p-4">
+                    <h6 class="text-primary mb-3">
+                        <i class="bi bi-image me-2"></i>
+                        Firmenlogo
+                    </h6>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="logoFile" class="form-label">
+                                    <i class="bi bi-upload me-1"></i>
+                                    Neues Logo hochladen
+                                </label>
+                                <input type="file" 
+                                       id="logoFile" 
+                                       name="logoFile" 
+                                       class="form-control" 
+                                       accept="image/*" 
+                                       onchange="previewLogo(this)">
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1 text-primary"></i>
+                                    Empfohlen: PNG oder JPEG, maximal 2MB, optimale Größe 300x100px
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="text-center">
+                                <div id="logoPreview" class="border rounded p-3" style="min-height: 120px; display: flex; align-items: center; justify-content: center;">
+                                    {{if .company.LogoPath}}
+                                    <div>
+                                        <img src="{{.company.LogoPath}}" alt="Current Logo" class="img-fluid" style="max-height: 100px;">
+                                        <div class="mt-2">
+                                            <small class="text-muted">Aktuelles Logo</small>
+                                            <br>
+                                            <button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="removeLogo()">
+                                                <i class="bi bi-trash me-1"></i> Entfernen
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {{else}}
+                                    <div class="text-muted">
+                                        <i class="bi bi-image display-4 d-block mb-2"></i>
+                                        Kein Logo hochgeladen
+                                    </div>
+                                    {{end}}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="mobile-form-actions bg-light border-top">
+                    <div class="btn-group w-100" role="group">
+                        <button type="submit" class="btn btn-primary btn-lg" id="saveButton">
+                            <i class="bi bi-check-lg me-2"></i>
+                            Einstellungen speichern
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-lg" onclick="previewCompanyInfo()">
+                            <i class="bi bi-eye me-2"></i>
+                            Vorschau
+                        </button>
+                    </div>
+                    <div class="text-center mt-2">
+                        <small class="text-muted">
+                            <i class="bi bi-keyboard me-1"></i>
+                            Tastenkürzel: Strg+S zum Speichern
+                        </small>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mobile Back Button -->
+    <div class="d-md-none mt-3 text-center">
+        <a href="/" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Zurück zur Startseite
+        </a>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="previewModalLabel">
+                    <i class="bi bi-eye me-2"></i>
+                    Rechnungsvorschau - Firmeninformationen
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="companyPreview" class="border rounded p-4">
+                    <!-- Preview content will be inserted here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg me-1"></i>
+                    Schließen
+                </button>
+                <button type="button" class="btn btn-primary" onclick="window.print()">
+                    <i class="bi bi-printer me-1"></i>
+                    Drucken
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize company settings data
+    initializeCompanySettings();
+    
+    // Set up form submission
+    const form = document.getElementById('companySettingsForm');
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        submitCompanySettings();
+    });
+
+    // Keyboard shortcut for save
+    document.addEventListener('keydown', function(e) {
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            submitCompanySettings();
+        }
+    });
+
+    // IBAN formatting
+    const ibanInput = document.getElementById('iban');
+    if (ibanInput) {
+        ibanInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '').toUpperCase();
+            let formattedValue = value.replace(/(.{4})/g, '$1 ').trim();
+            if (formattedValue.length > 27) {
+                formattedValue = formattedValue.substring(0, 27);
+            }
+            e.target.value = formattedValue;
+        });
+    }
+});
+
+function showMessage(text, type = 'success') {
+    const container = document.getElementById('messageContainer');
+    const alert = container.querySelector('.alert');
+    const icon = document.getElementById('messageIcon');
+    const message = document.getElementById('messageText');
+    
+    // Remove existing classes
+    alert.className = 'alert';
+    
+    // Add new classes based on type
+    if (type === 'success') {
+        alert.classList.add('alert-success');
+        icon.className = 'bi bi-check-circle-fill me-2';
+    } else if (type === 'error') {
+        alert.classList.add('alert-danger');
+        icon.className = 'bi bi-exclamation-triangle-fill me-2';
+    } else if (type === 'warning') {
+        alert.classList.add('alert-warning');
+        icon.className = 'bi bi-exclamation-circle-fill me-2';
+    } else {
+        alert.classList.add('alert-info');
+        icon.className = 'bi bi-info-circle-fill me-2';
+    }
+    
+    message.textContent = text;
+    container.style.display = 'block';
+    
+    // Auto-hide success messages
+    if (type === 'success') {
+        setTimeout(() => {
+            container.style.display = 'none';
+        }, 5000);
+    }
+}
+
+function previewLogo(input) {
+    const file = input.files[0];
+    if (file) {
+        // Check file size (2MB limit)
+        if (file.size > 2 * 1024 * 1024) {
+            showMessage('Die Datei ist zu groß. Maximal 2MB sind erlaubt.', 'error');
+            input.value = '';
+            return;
+        }
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('logoPreview');
+            preview.innerHTML = `
+                <div>
+                    <img src="${e.target.result}" alt="Logo Vorschau" class="img-fluid" style="max-height: 100px;">
+                    <div class="mt-2">
+                        <small class="text-muted">Neue Logo Vorschau</small>
+                        <br>
+                        <button type="button" class="btn btn-sm btn-outline-secondary mt-1" onclick="clearLogoPreview()">
+                            <i class="bi bi-x-lg me-1"></i> Zurücksetzen
+                        </button>
+                    </div>
+                </div>
+            `;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function clearLogoPreview() {
+    document.getElementById('logoFile').value = '';
+    const preview = document.getElementById('logoPreview');
+    {{if .company.LogoPath}}
+    preview.innerHTML = '<div><img src="{{.company.LogoPath}}" alt="Current Logo" class="img-fluid" style="max-height: 100px;"><div class="mt-2"><small class="text-muted">Aktuelles Logo</small><br><button type="button" class="btn btn-sm btn-outline-danger mt-1" onclick="removeLogo()"><i class="bi bi-trash me-1"></i> Entfernen</button></div></div>';
+    {{else}}
+    preview.innerHTML = '<div class="text-muted"><i class="bi bi-image display-4 d-block mb-2"></i>Kein Logo hochgeladen</div>';
+    {{end}}
+}
+
+function removeLogo() {
+    if (confirm('Sind Sie sicher, dass Sie das Firmenlogo entfernen möchten?')) {
+        fetch('/settings/company/logo', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showMessage('Fehler beim Entfernen des Logos: ' + data.error, 'error');
+            } else {
+                document.getElementById('logoPreview').innerHTML = `
+                    <div class="text-muted">
+                        <i class="bi bi-image display-4 d-block mb-2"></i>
+                        Kein Logo hochgeladen
+                    </div>
+                `;
+                showMessage('Logo erfolgreich entfernt', 'success');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Fehler beim Entfernen des Logos', 'error');
+        });
+    }
+}
+
+function submitCompanySettings() {
+    const saveButton = document.getElementById('saveButton');
+    const originalText = saveButton.innerHTML;
+    
+    // Show loading state
+    saveButton.disabled = true;
+    saveButton.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Speichern...';
+    
+    const formData = new FormData(document.getElementById('companySettingsForm'));
+    
+    // Convert FormData to JSON for non-file fields
+    const company = {
+        companyName: formData.get('companyName') || '',
+        addressLine1: formData.get('addressLine1') || '',
+        addressLine2: formData.get('addressLine2') || '',
+        city: formData.get('city') || '',
+        state: formData.get('state') || '',
+        postalCode: formData.get('postalCode') || '',
+        country: formData.get('country') || '',
+        phone: formData.get('phone') || '',
+        email: formData.get('email') || '',
+        website: formData.get('website') || '',
+        taxNumber: formData.get('taxNumber') || '',
+        vatNumber: formData.get('vatNumber') || '',
+        bankName: formData.get('bankName') || '',
+        iban: formData.get('iban') || '',
+        bic: formData.get('bic') || '',
+        accountHolder: formData.get('accountHolder') || '',
+        ceoName: formData.get('ceoName') || '',
+        registerCourt: formData.get('registerCourt') || '',
+        registerNumber: formData.get('registerNumber') || '',
+        footerText: formData.get('footerText') || '',
+        paymentTermsText: formData.get('paymentTermsText') || ''
+    };
+    
+    // Handle logo upload separately if file is selected
+    const logoFile = formData.get('logoFile');
+    if (logoFile && logoFile.size > 0) {
+        const logoFormData = new FormData();
+        logoFormData.append('logo', logoFile);
+        
+        fetch('/settings/company/logo', {
+            method: 'POST',
+            body: logoFormData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showMessage('Fehler beim Hochladen des Logos: ' + data.error, 'error');
+                saveButton.disabled = false;
+                saveButton.innerHTML = originalText;
+            } else {
+                company.logoPath = data.logoPath;
+                updateCompanySettings(company, saveButton, originalText);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('Fehler beim Hochladen des Logos', 'error');
+            saveButton.disabled = false;
+            saveButton.innerHTML = originalText;
+        });
+    } else {
+        updateCompanySettings(company, saveButton, originalText);
+    }
+}
+
+function updateCompanySettings(company, saveButton, originalText) {
+    fetch('/settings/company/api', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(company)
+    })
+    .then(response => response.json())
+    .then(data => {
+        saveButton.disabled = false;
+        saveButton.innerHTML = originalText;
+        
+        if (data.error) {
+            showMessage('Fehler beim Speichern: ' + data.error, 'error');
+        } else {
+            showMessage('Firmeneinstellungen erfolgreich gespeichert!', 'success');
+            // Scroll to top to show success message
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        saveButton.disabled = false;
+        saveButton.innerHTML = originalText;
+        showMessage('Fehler beim Speichern der Einstellungen', 'error');
+    });
+}
+
+function previewCompanyInfo() {
+    const company = {
+        companyName: document.getElementById('companyName').value,
+        addressLine1: document.getElementById('addressLine1').value,
+        addressLine2: document.getElementById('addressLine2').value,
+        city: document.getElementById('city').value,
+        state: document.getElementById('state').value,
+        postalCode: document.getElementById('postalCode').value,
+        country: document.getElementById('country').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value,
+        website: document.getElementById('website').value,
+        taxNumber: document.getElementById('taxNumber').value,
+        vatNumber: document.getElementById('vatNumber').value,
+        bankName: document.getElementById('bankName').value,
+        iban: document.getElementById('iban').value,
+        bic: document.getElementById('bic').value,
+        accountHolder: document.getElementById('accountHolder').value,
+        ceoName: document.getElementById('ceoName').value,
+        registerCourt: document.getElementById('registerCourt').value,
+        registerNumber: document.getElementById('registerNumber').value,
+        footerText: document.getElementById('footerText').value,
+        paymentTermsText: document.getElementById('paymentTermsText').value
+    };
+    
+    let previewHTML = '<div class="invoice-preview">';
+    
+    // Logo section
+    {{if .company.LogoPath}}
+    previewHTML += '<div class="text-center mb-3"><img src="{{.company.LogoPath}}" alt="' + company.companyName + '" style="max-height: 80px;" class="img-fluid"></div>';
+    {{end}}
+    
+    // Company header
+    previewHTML += '<div class="text-center mb-4">';
+    previewHTML += '<h4 class="mb-1">' + (company.companyName || 'Firmenname') + '</h4>';
+    previewHTML += '</div>';
+    
+    // Address section
+    previewHTML += '<div class="row mb-4"><div class="col-md-6">';
+    previewHTML += '<h6 class="text-primary mb-2">Adresse</h6>';
+    if (company.addressLine1) previewHTML += '<div>' + company.addressLine1 + '</div>';
+    if (company.addressLine2) previewHTML += '<div>' + company.addressLine2 + '</div>';
+    if (company.postalCode || company.city) {
+        previewHTML += '<div>';
+        if (company.postalCode) previewHTML += company.postalCode + ' ';
+        if (company.city) previewHTML += company.city;
+        if (company.state) previewHTML += ', ' + company.state;
+        previewHTML += '</div>';
+    }
+    if (company.country) previewHTML += '<div>' + company.country + '</div>';
+    previewHTML += '</div>';
+    
+    // Contact section
+    previewHTML += '<div class="col-md-6">';
+    previewHTML += '<h6 class="text-primary mb-2">Kontakt</h6>';
+    if (company.phone) previewHTML += '<div><strong>Tel:</strong> ' + company.phone + '</div>';
+    if (company.fax) previewHTML += '<div><strong>Fax:</strong> ' + company.fax + '</div>';
+    if (company.email) previewHTML += '<div><strong>E-Mail:</strong> ' + company.email + '</div>';
+    if (company.website) previewHTML += '<div><strong>Web:</strong> ' + company.website + '</div>';
+    previewHTML += '</div></div>';
+    
+    // Banking information
+    if (company.iban || company.bankName) {
+        previewHTML += '<div class="row mb-4"><div class="col-12">';
+        previewHTML += '<h6 class="text-primary mb-2">Bankverbindung</h6>';
+        previewHTML += '<div class="row"><div class="col-md-6">';
+        if (company.bankName) previewHTML += '<div><strong>Bank:</strong> ' + company.bankName + '</div>';
+        if (company.accountHolder) previewHTML += '<div><strong>Kontoinhaber:</strong> ' + company.accountHolder + '</div>';
+        previewHTML += '</div><div class="col-md-6">';
+        if (company.iban) previewHTML += '<div><strong>IBAN:</strong> ' + company.iban + '</div>';
+        if (company.bic) previewHTML += '<div><strong>BIC:</strong> ' + company.bic + '</div>';
+        previewHTML += '</div></div></div></div>';
+    }
+    
+    // Legal information
+    if (company.ceoName || company.registerCourt || company.registerNumber) {
+        previewHTML += '<div class="row mb-4"><div class="col-12">';
+        previewHTML += '<h6 class="text-primary mb-2">Rechtliche Angaben</h6>';
+        if (company.ceoName) previewHTML += '<div><strong>Geschäftsführer:</strong> ' + company.ceoName + '</div>';
+        if (company.registerCourt) previewHTML += '<div><strong>Registergericht:</strong> ' + company.registerCourt + '</div>';
+        if (company.registerNumber) previewHTML += '<div><strong>HRB:</strong> ' + company.registerNumber + '</div>';
+        previewHTML += '</div></div>';
+    }
+    
+    // Tax information
+    if (company.taxNumber || company.vatNumber) {
+        previewHTML += '<div class="text-center mt-4 pt-3 border-top">';
+        previewHTML += '<small class="text-muted">';
+        if (company.taxNumber) previewHTML += '<strong>Steuernummer:</strong> ' + company.taxNumber;
+        if (company.taxNumber && company.vatNumber) previewHTML += ' | ';
+        if (company.vatNumber) previewHTML += '<strong>USt-IdNr.:</strong> ' + company.vatNumber;
+        previewHTML += '</small></div>';
+    }
+    
+    // Footer text
+    if (company.footerText) {
+        previewHTML += '<div class="text-center mt-3 pt-2 border-top">';
+        previewHTML += '<small class="text-muted"><em>' + company.footerText + '</em></small>';
+        previewHTML += '</div>';
+    }
+    
+    previewHTML += '</div>';
+    
+    document.getElementById('companyPreview').innerHTML = previewHTML;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+    modal.show();
+}
+
+// Load company settings when the form is ready
+function initializeCompanySettings() {
+    loadCompanySettings();
+}
+
+function loadCompanySettings() {
+    fetch('/settings/company/api', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.company) {
+            populateForm(data.company);
+        } else {
+            console.error('Failed to load company settings:', data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error loading company settings:', error);
+    });
+}
+
+function populateForm(company) {
+    // Basic company information
+    setFieldValue('companyName', company.companyName);
+    setFieldValue('addressLine1', company.addressLine1);
+    setFieldValue('addressLine2', company.addressLine2);
+    setFieldValue('city', company.city);
+    setFieldValue('state', company.state);
+    setFieldValue('postalCode', company.postalCode);
+    setFieldValue('country', company.country);
+    setFieldValue('phone', company.phone);
+    setFieldValue('email', company.email);
+    setFieldValue('website', company.website);
+    setFieldValue('taxNumber', company.taxNumber);
+    setFieldValue('vatNumber', company.vatNumber);
+    
+    // Banking information
+    setFieldValue('bankName', company.bankName);
+    setFieldValue('iban', company.iban);
+    setFieldValue('bic', company.bic);
+    setFieldValue('accountHolder', company.accountHolder);
+    
+    // Legal information
+    setFieldValue('ceoName', company.ceoName);
+    setFieldValue('registerCourt', company.registerCourt);
+    setFieldValue('registerNumber', company.registerNumber);
+    
+    // Invoice text fields
+    setFieldValue('footerText', company.footerText);
+    setFieldValue('paymentTermsText', company.paymentTermsText);
+    
+    // Update logo display if exists
+    if (company.logoPath) {
+        const logoPreview = document.getElementById('logoPreview');
+        const logoImg = document.getElementById('logoImg');
+        const logoActions = document.getElementById('logoActions');
+        const logoUpload = document.getElementById('logoUpload');
+        
+        if (logoPreview && logoImg) {
+            logoImg.src = company.logoPath;
+            logoPreview.style.display = 'block';
+        }
+        if (logoActions) logoActions.style.display = 'block';
+        if (logoUpload) logoUpload.style.display = 'none';
+    }
+}
+
+function setFieldValue(fieldId, value) {
+    const field = document.getElementById(fieldId);
+    if (field && value !== null && value !== undefined) {
+        field.value = value;
+    }
+}
+</script>
+
+<style>
+.invoice-preview {
+    background: white;
+    color: #333;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.invoice-preview h4, .invoice-preview h6 {
+    color: #333;
+}
+
+.form-floating textarea.textarea-auto {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.mobile-form-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
+    margin: 0 -1rem -1rem;
+    padding: 1rem;
+}
+
+@media (max-width: 767px) {
+    .card-body {
+        padding: 0;
+    }
+    
+    .mobile-form-actions .btn-group {
+        flex-direction: column;
+    }
+    
+    .mobile-form-actions .btn {
+        border-radius: 0.375rem !important;
+        margin-bottom: 0.5rem;
+    }
+    
+    .mobile-form-actions .btn:last-child {
+        margin-bottom: 0;
+    }
+}
+
+/* Required field indicator */
+.form-label.required::after {
+    content: " *";
+    color: #dc3545;
+}
+
+/* Form validation styles */
+.form-control:valid {
+    border-color: #28a745;
+}
+
+.form-control:invalid {
+    border-color: #dc3545;
+}
+
+/* IBAN formatting */
+.form-control[data-type="iban"] {
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+</style>
+{{end}}

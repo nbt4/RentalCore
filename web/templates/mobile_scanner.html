@@ -2,16 +2,20 @@
 <html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Mobile Scanner - RentalCore</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="/static/css/app.css" rel="stylesheet">
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0d6efd">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="TS Manager">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RentalCore Scanner">
+    <meta name="format-detection" content="telephone=no">
+    <title>Mobile Scanner - RentalCore</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="/static/css/app-new.css" rel="stylesheet">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#1e293b">
+    <meta name="msapplication-TileColor" content="#1e293b">
+    <meta name="apple-touch-fullscreen" content="yes">
     
     <style>
         body {
@@ -281,6 +285,139 @@
             0%, 100% { transform: translate(-50%, -50%); }
             25% { transform: translate(-52%, -50%); }
             75% { transform: translate(-48%, -50%); }
+        }
+        
+        /* Enhanced Mobile Scanner Styles */
+        @media (max-width: 767px) {
+            .mobile-scanner {
+                background: #000;
+                height: 100vh;
+                height: 100dvh; /* Dynamic viewport height for better mobile support */
+            }
+            
+            .scanner-container {
+                height: calc(100vh - 200px);
+                height: calc(100dvh - 200px);
+            }
+            
+            .mobile-header {
+                background: linear-gradient(135deg, rgba(0,0,0,0.9) 0%, rgba(30, 41, 59, 0.9) 100%);
+                backdrop-filter: blur(20px);
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                padding: calc(15px + env(safe-area-inset-top)) 20px 15px;
+            }
+            
+            .scanner-frame {
+                width: min(80vw, 280px);
+                height: min(80vw, 280px);
+                border: 3px solid #3b82f6;
+                box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+            }
+            
+            .scan-controls {
+                padding: 20px calc(20px + env(safe-area-inset-bottom)) calc(20px + env(safe-area-inset-bottom));
+                background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            }
+            
+            .scan-button {
+                width: 80px;
+                height: 80px;
+                background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+                box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4);
+                transform: scale(1);
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            
+            .scan-button:active {
+                transform: scale(0.95);
+            }
+            
+            .torch-btn {
+                background: rgba(0,0,0,0.7);
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                width: 48px;
+                height: 48px;
+                top: calc(80px + env(safe-area-inset-top));
+                right: calc(20px + env(safe-area-inset-right));
+            }
+            
+            .scan-result {
+                max-width: calc(100vw - 2rem);
+                margin: 1rem;
+                border-radius: 20px;
+                backdrop-filter: blur(20px);
+                background: rgba(255, 255, 255, 0.95);
+                box-shadow: 0 20px 64px rgba(0, 0, 0, 0.4);
+            }
+            
+            .scanner-tips {
+                background: rgba(0, 0, 0, 0.7);
+                padding: 0.75rem 1.5rem;
+                border-radius: 25px;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+        }
+        
+        /* Landscape orientation adjustments */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .scanner-container {
+                height: calc(100vh - 120px);
+                height: calc(100dvh - 120px);
+            }
+            
+            .mobile-header {
+                padding: calc(8px + env(safe-area-inset-top)) 15px 8px;
+            }
+            
+            .scan-controls {
+                padding: 10px calc(10px + env(safe-area-inset-bottom));
+            }
+            
+            .scan-button {
+                width: 60px;
+                height: 60px;
+            }
+        }
+        
+        /* PWA standalone mode */
+        @media (display-mode: standalone) {
+            .mobile-header {
+                padding-top: calc(15px + env(safe-area-inset-top));
+            }
+            
+            .scan-controls {
+                padding-bottom: calc(20px + env(safe-area-inset-bottom));
+            }
+        }
+        
+        /* High contrast mode support */
+        @media (prefers-contrast: high) {
+            .scanner-frame {
+                border-width: 4px;
+                border-color: #ffffff;
+            }
+            
+            .corner {
+                border-width: 5px;
+                border-color: #ffffff;
+            }
+        }
+        
+        /* Reduced motion support */
+        @media (prefers-reduced-motion: reduce) {
+            .scan-button,
+            .vibration-feedback,
+            .scan-result {
+                animation: none !important;
+                transition: none !important;
+            }
+            
+            .scan-button.scanning {
+                animation: none;
+                background: #dc3545;
+            }
         }
     </style>
 </head>

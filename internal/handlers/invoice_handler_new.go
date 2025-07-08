@@ -236,7 +236,7 @@ func (h *InvoiceHandlerNew) ListInvoices(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "invoices_list.html", gin.H{
+	c.HTML(http.StatusOK, "base.html", gin.H{
 		"title":    "Invoices",
 		"invoices": invoices,
 		"user":     user,

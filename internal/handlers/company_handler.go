@@ -44,11 +44,11 @@ func (h *CompanyHandler) CompanySettingsForm(c *gin.Context) {
 		}
 	}
 
-	log.Printf("DEBUG: CompanySettingsForm handler called successfully")
-	c.HTML(http.StatusOK, "company_settings_FIXED.html", gin.H{
-		"title":   "Company Settings",
-		"user":    user,
-		"company": company,
+	log.Printf("DEBUG: CompanySettingsForm handler called successfully - rendering company_settings_beautiful.html")
+	c.HTML(http.StatusOK, "company_settings_beautiful.html", gin.H{
+		"title":        "Firmeneinstellungen",
+		"user":         user,
+		"company":      company,
 	})
 }
 
@@ -100,7 +100,7 @@ func (h *CompanyHandler) UpdateCompanySettings(c *gin.Context) {
 		company = &models.CompanySettings{}
 	}
 
-	// Update fields
+	// Update basic fields
 	company.CompanyName = strings.TrimSpace(request.CompanyName)
 	company.AddressLine1 = h.trimStringPointer(request.AddressLine1)
 	company.AddressLine2 = h.trimStringPointer(request.AddressLine2)
@@ -113,6 +113,22 @@ func (h *CompanyHandler) UpdateCompanySettings(c *gin.Context) {
 	company.Website = h.trimStringPointer(request.Website)
 	company.TaxNumber = h.trimStringPointer(request.TaxNumber)
 	company.VATNumber = h.trimStringPointer(request.VATNumber)
+	
+	// Update German banking fields
+	company.BankName = h.trimStringPointer(request.BankName)
+	company.IBAN = h.trimStringPointer(request.IBAN)
+	company.BIC = h.trimStringPointer(request.BIC)
+	company.AccountHolder = h.trimStringPointer(request.AccountHolder)
+	
+	// Update German legal fields
+	company.CEOName = h.trimStringPointer(request.CEOName)
+	company.RegisterCourt = h.trimStringPointer(request.RegisterCourt)
+	company.RegisterNumber = h.trimStringPointer(request.RegisterNumber)
+	
+	// Update invoice text fields
+	company.FooterText = h.trimStringPointer(request.FooterText)
+	company.PaymentTermsText = h.trimStringPointer(request.PaymentTermsText)
+	
 	company.UpdatedAt = time.Now()
 
 	// If updating existing record, preserve logo path if not provided

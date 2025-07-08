@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"runtime"
 	"strconv"
@@ -41,6 +42,7 @@ func NewMonitoringHandler(
 
 // Dashboard displays the monitoring dashboard
 func (h *MonitoringHandler) Dashboard(c *gin.Context) {
+	log.Printf("⚠️ MONITORING DASHBOARD HANDLER CALLED - URL: %s", c.Request.URL.Path)
 	user, exists := GetCurrentUser(c)
 	if !exists {
 		c.Redirect(http.StatusSeeOther, "/login")
@@ -56,7 +58,7 @@ func (h *MonitoringHandler) Dashboard(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "monitoring_dashboard.html", gin.H{
+	c.HTML(http.StatusOK, "monitoring_dashboard_standalone.html", gin.H{
 		"title": "System Monitoring Dashboard",
 		"user":  user,
 	})

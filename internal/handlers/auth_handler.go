@@ -4,6 +4,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -543,4 +544,178 @@ func parseUserID(userIDStr string) uint {
 	}
 	
 	return 0
+}
+
+// Profile Settings Handlers
+
+// ProfileSettingsForm displays the profile settings page
+func (h *AuthHandler) ProfileSettingsForm(c *gin.Context) {
+	currentUser, exists := GetCurrentUser(c)
+	if !exists || currentUser == nil {
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+
+	// Get or create user preferences
+	var preferences models.UserPreferences
+	if err := h.db.Where("user_id = ?", currentUser.UserID).First(&preferences).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// Create default preferences
+			preferences = models.UserPreferences{
+				UserID:                   currentUser.UserID,
+				Language:                 "de",
+				Theme:                    "dark",
+				TimeZone:                 "Europe/Berlin",
+				DateFormat:               "DD.MM.YYYY",
+				TimeFormat:               "24h",
+				EmailNotifications:       true,
+				SystemNotifications:      true,
+				JobStatusNotifications:   true,
+				DeviceAlertNotifications: true,
+				ItemsPerPage:             25,
+				DefaultView:              "list",
+				ShowAdvancedOptions:      false,
+				AutoSaveEnabled:          true,
+				CreatedAt:                time.Now(),
+				UpdatedAt:                time.Now(),
+			}
+			if err := h.db.Create(&preferences).Error; err != nil {
+				c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+					"error": "Failed to create user preferences",
+					"user":  currentUser,
+				})
+				return
+			}
+		} else {
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"error": "Failed to load user preferences",
+				"user":  currentUser,
+			})
+			return
+		}
+	}
+
+	log.Printf("👤 PROFILE SETTINGS ROUTE CALLED - URL: %s, rendering profile_settings.html", c.Request.URL.Path)
+	c.HTML(http.StatusOK, "profile_settings.html", gin.H{
+		"title":       "Profile Settings",
+		"user":        currentUser,
+		"preferences": preferences,
+	})
+}
+
+// UpdateProfileSettings handles profile settings updates
+func (h *AuthHandler) UpdateProfileSettings(c *gin.Context) {
+	currentUser, exists := GetCurrentUser(c)
+	if !exists || currentUser == nil {
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+
+	// Get current preferences
+	var preferences models.UserPreferences
+	if err := h.db.Where("user_id = ?", currentUser.UserID).First(&preferences).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load preferences"})
+		return
+	}
+
+	// Update preferences from form data
+	preferences.Language = c.PostForm("language")
+	preferences.Theme = c.PostForm("theme")
+	preferences.TimeZone = c.PostForm("time_zone")
+	preferences.DateFormat = c.PostForm("date_format")
+	preferences.TimeFormat = c.PostForm("time_format")
+	
+	// Parse boolean values
+	preferences.EmailNotifications = c.PostForm("email_notifications") == "on"
+	preferences.SystemNotifications = c.PostForm("system_notifications") == "on"
+	preferences.JobStatusNotifications = c.PostForm("job_status_notifications") == "on"
+	preferences.DeviceAlertNotifications = c.PostForm("device_alert_notifications") == "on"
+	preferences.ShowAdvancedOptions = c.PostForm("show_advanced_options") == "on"
+	preferences.AutoSaveEnabled = c.PostForm("auto_save_enabled") == "on"
+	
+	// Parse integer values
+	if itemsPerPage, err := strconv.Atoi(c.PostForm("items_per_page")); err == nil && itemsPerPage > 0 {
+		preferences.ItemsPerPage = itemsPerPage
+	}
+	
+	preferences.DefaultView = c.PostForm("default_view")
+	preferences.UpdatedAt = time.Now()
+
+	// Save preferences
+	if err := h.db.Save(&preferences).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save preferences"})
+		return
+	}
+
+	// Also update user profile information if provided
+	if firstName := c.PostForm("first_name"); firstName != "" {
+		currentUser.FirstName = firstName
+	}
+	if lastName := c.PostForm("last_name"); lastName != "" {
+		currentUser.LastName = lastName
+	}
+	if email := c.PostForm("email"); email != "" {
+		// Check if email is already taken by another user
+		var existingUser models.User
+		if err := h.db.Where("email = ? AND userID != ?", email, currentUser.UserID).First(&existingUser).Error; err == nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Email is already taken"})
+			return
+		}
+		currentUser.Email = email
+	}
+	
+	// Update password if provided
+	if password := c.PostForm("password"); password != "" {
+		hashedPassword, err := HashPassword(password)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+			return
+		}
+		currentUser.PasswordHash = hashedPassword
+	}
+	
+	currentUser.UpdatedAt = time.Now()
+	if err := h.db.Save(currentUser).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user profile"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Profile settings updated successfully"})
+}
+
+// GetUserPreferences returns user preferences for the current user
+func (h *AuthHandler) GetUserPreferences(c *gin.Context) {
+	currentUser, exists := GetCurrentUser(c)
+	if !exists || currentUser == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	var preferences models.UserPreferences
+	if err := h.db.Where("user_id = ?", currentUser.UserID).First(&preferences).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			// Return default preferences
+			preferences = models.UserPreferences{
+				UserID:                   currentUser.UserID,
+				Language:                 "de",
+				Theme:                    "dark",
+				TimeZone:                 "Europe/Berlin",
+				DateFormat:               "DD.MM.YYYY",
+				TimeFormat:               "24h",
+				EmailNotifications:       true,
+				SystemNotifications:      true,
+				JobStatusNotifications:   true,
+				DeviceAlertNotifications: true,
+				ItemsPerPage:             25,
+				DefaultView:              "list",
+				ShowAdvancedOptions:      false,
+				AutoSaveEnabled:          true,
+			}
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load preferences"})
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, preferences)
 }

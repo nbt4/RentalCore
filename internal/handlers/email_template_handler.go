@@ -41,6 +41,7 @@ func (h *EmailTemplateHandler) ListEmailTemplates(c *gin.Context) {
 		return
 	}
 
+	log.Printf("📧 EMAIL TEMPLATES ROUTE CALLED - URL: %s, rendering email_templates_list.html", c.Request.URL.Path)
 	c.HTML(http.StatusOK, "email_templates_list.html", gin.H{
 		"title":     "E-Mail Vorlagen",
 		"templates": templates,

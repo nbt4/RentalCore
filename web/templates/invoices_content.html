@@ -1,0 +1,101 @@
+{{define "content"}}
+{{template "invoices-content" .}}
+{{end}}
+
+{{define "invoices-content"}}
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h3 class="card-title">
+            <i class="bi bi-file-text"></i> Rechnungen
+        </h3>
+        <div>
+            <a href="/invoices/new" class="btn btn-primary btn-new" aria-label="Neue Rechnung erstellen">
+                <i class="bi bi-plus-lg"></i> Neue Rechnung
+            </a>
+            <button class="btn btn-outline-secondary dropdown-toggle" type="button" 
+                    data-bs-toggle="dropdown" aria-expanded="false" aria-label="Weitere Aktionen">
+                <i class="bi bi-three-dots"></i>
+            </button>
+            <ul class="dropdown-menu">
+                <li><a class="dropdown-item" href="/invoices/export">
+                    <i class="bi bi-download"></i> Export CSV
+                </a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><h6 class="dropdown-header">Templates</h6></li>
+                <li><a class="dropdown-item" href="/invoice-templates">
+                    <i class="bi bi-file-earmark-text"></i> Invoice Templates
+                </a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="card-body">
+        {{if .invoices}}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Rechnungsnummer</th>
+                        <th>Kunde</th>
+                        <th>Datum</th>
+                        <th>Betrag</th>
+                        <th>Status</th>
+                        <th>Aktionen</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{range .invoices}}
+                    <tr>
+                        <td>
+                            <a href="/invoices/{{.ID}}" class="text-decoration-none">
+                                <strong>{{.InvoiceNumber}}</strong>
+                            </a>
+                        </td>
+                        <td>{{.CustomerName}}</td>
+                        <td>{{.InvoiceDate.Format "02.01.2006"}}</td>
+                        <td class="text-end">
+                            <span class="badge bg-success">
+                                €{{printf "%.2f" .TotalAmount}}
+                            </span>
+                        </td>
+                        <td>
+                            {{if eq .Status "paid"}}
+                                <span class="badge bg-success">Bezahlt</span>
+                            {{else if eq .Status "sent"}}
+                                <span class="badge bg-info">Gesendet</span>
+                            {{else if eq .Status "draft"}}
+                                <span class="badge bg-warning">Entwurf</span>
+                            {{else}}
+                                <span class="badge bg-secondary">{{.Status}}</span>
+                            {{end}}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <a href="/invoices/{{.ID}}" class="btn btn-outline-primary" title="Anzeigen">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="/invoices/{{.ID}}/pdf" class="btn btn-outline-secondary" title="PDF herunterladen">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                                <a href="/invoices/{{.ID}}/edit" class="btn btn-outline-warning" title="Bearbeiten">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {{end}}
+                </tbody>
+            </table>
+        </div>
+        {{else}}
+        <div class="text-center py-5">
+            <i class="bi bi-file-text text-muted" style="font-size: 3rem;"></i>
+            <h4 class="text-muted mt-3">Keine Rechnungen gefunden</h4>
+            <p class="text-muted">Erstellen Sie Ihre erste Rechnung, um loszulegen.</p>
+            <a href="/invoices/new" class="btn btn-primary">
+                <i class="bi bi-plus-lg"></i> Erste Rechnung erstellen
+            </a>
+        </div>
+        {{end}}
+    </div>
+</div>
+{{end}}

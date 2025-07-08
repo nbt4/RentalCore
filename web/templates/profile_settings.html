@@ -1,0 +1,354 @@
+{{template "base.html" .}}
+
+{{define "content"}}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-xl-8 offset-xl-2">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div>
+                        <h4 class="mb-0">
+                            <i class="bi bi-person-gear me-2"></i>Profile Settings
+                        </h4>
+                        <small class="text-muted">Manage your personal profile and global preferences</small>
+                    </div>
+                    <div class="badge bg-primary">
+                        <i class="bi bi-person-circle me-1"></i>{{if .user}}{{.user.Username}}{{else}}User{{end}}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Success/Error Messages -->
+                    <div id="alert-container"></div>
+
+                    <form id="profileSettingsForm" method="POST" action="/profile/settings">
+                        <!-- Personal Information Section -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="bi bi-person-lines-fill me-2"></i>Personal Information
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="first_name" class="form-label">First Name</label>
+                                            <input type="text" class="form-control" id="first_name" name="first_name" 
+                                                   value="{{.user.FirstName}}" placeholder="Enter your first name">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="last_name" class="form-label">Last Name</label>
+                                            <input type="text" class="form-control" id="last_name" name="last_name" 
+                                                   value="{{.user.LastName}}" placeholder="Enter your last name">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="email" class="form-label">Email Address</label>
+                                            <input type="email" class="form-control" id="email" name="email" 
+                                                   value="{{.user.Email}}" placeholder="Enter your email address">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="password" class="form-label">
+                                                New Password
+                                                <small class="text-muted">(leave blank to keep current)</small>
+                                            </label>
+                                            <input type="password" class="form-control" id="password" name="password" 
+                                                   placeholder="Enter new password">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Display Preferences Section -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="bi bi-palette me-2"></i>Display Preferences
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="language" class="form-label">Language</label>
+                                            <select class="form-select" id="language" name="language">
+                                                <option value="de" {{if eq .preferences.Language "de"}}selected{{end}}>Deutsch</option>
+                                                <option value="en" {{if eq .preferences.Language "en"}}selected{{end}}>English</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="theme" class="form-label">Theme</label>
+                                            <select class="form-select" id="theme" name="theme">
+                                                <option value="dark" {{if eq .preferences.Theme "dark"}}selected{{end}}>Dark</option>
+                                                <option value="light" {{if eq .preferences.Theme "light"}}selected{{end}}>Light</option>
+                                                <option value="auto" {{if eq .preferences.Theme "auto"}}selected{{end}}>Auto (System)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label for="time_zone" class="form-label">Time Zone</label>
+                                            <select class="form-select" id="time_zone" name="time_zone">
+                                                <option value="Europe/Berlin" {{if eq .preferences.TimeZone "Europe/Berlin"}}selected{{end}}>Europe/Berlin (CET)</option>
+                                                <option value="Europe/London" {{if eq .preferences.TimeZone "Europe/London"}}selected{{end}}>Europe/London (GMT)</option>
+                                                <option value="America/New_York" {{if eq .preferences.TimeZone "America/New_York"}}selected{{end}}>America/New_York (EST)</option>
+                                                <option value="UTC" {{if eq .preferences.TimeZone "UTC"}}selected{{end}}>UTC</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="date_format" class="form-label">Date Format</label>
+                                            <select class="form-select" id="date_format" name="date_format">
+                                                <option value="DD.MM.YYYY" {{if eq .preferences.DateFormat "DD.MM.YYYY"}}selected{{end}}>DD.MM.YYYY (German)</option>
+                                                <option value="MM/DD/YYYY" {{if eq .preferences.DateFormat "MM/DD/YYYY"}}selected{{end}}>MM/DD/YYYY (US)</option>
+                                                <option value="YYYY-MM-DD" {{if eq .preferences.DateFormat "YYYY-MM-DD"}}selected{{end}}>YYYY-MM-DD (ISO)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="time_format" class="form-label">Time Format</label>
+                                            <select class="form-select" id="time_format" name="time_format">
+                                                <option value="24h" {{if eq .preferences.TimeFormat "24h"}}selected{{end}}>24 Hour (13:45)</option>
+                                                <option value="12h" {{if eq .preferences.TimeFormat "12h"}}selected{{end}}>12 Hour (1:45 PM)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Interface Preferences Section -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="bi bi-layout-text-window-reverse me-2"></i>Interface Preferences
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="items_per_page" class="form-label">Items per Page</label>
+                                            <select class="form-select" id="items_per_page" name="items_per_page">
+                                                <option value="10" {{if eq .preferences.ItemsPerPage 10}}selected{{end}}>10</option>
+                                                <option value="25" {{if eq .preferences.ItemsPerPage 25}}selected{{end}}>25</option>
+                                                <option value="50" {{if eq .preferences.ItemsPerPage 50}}selected{{end}}>50</option>
+                                                <option value="100" {{if eq .preferences.ItemsPerPage 100}}selected{{end}}>100</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="default_view" class="form-label">Default View</label>
+                                            <select class="form-select" id="default_view" name="default_view">
+                                                <option value="list" {{if eq .preferences.DefaultView "list"}}selected{{end}}>List View</option>
+                                                <option value="grid" {{if eq .preferences.DefaultView "grid"}}selected{{end}}>Grid View</option>
+                                                <option value="table" {{if eq .preferences.DefaultView "table"}}selected{{end}}>Table View</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="show_advanced_options" 
+                                                       name="show_advanced_options" {{if .preferences.ShowAdvancedOptions}}checked{{end}}>
+                                                <label class="form-check-label" for="show_advanced_options">
+                                                    Show Advanced Options
+                                                    <small class="text-muted d-block">Display expert-level features and options</small>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="auto_save_enabled" 
+                                                       name="auto_save_enabled" {{if .preferences.AutoSaveEnabled}}checked{{end}}>
+                                                <label class="form-check-label" for="auto_save_enabled">
+                                                    Auto-Save Enabled
+                                                    <small class="text-muted d-block">Automatically save form changes</small>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Notification Preferences Section -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <h5 class="text-primary mb-3">
+                                    <i class="bi bi-bell me-2"></i>Notification Preferences
+                                </h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="email_notifications" 
+                                                       name="email_notifications" {{if .preferences.EmailNotifications}}checked{{end}}>
+                                                <label class="form-check-label" for="email_notifications">
+                                                    Email Notifications
+                                                    <small class="text-muted d-block">Receive notifications via email</small>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="system_notifications" 
+                                                       name="system_notifications" {{if .preferences.SystemNotifications}}checked{{end}}>
+                                                <label class="form-check-label" for="system_notifications">
+                                                    System Notifications
+                                                    <small class="text-muted d-block">Show in-app system messages</small>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="job_status_notifications" 
+                                                       name="job_status_notifications" {{if .preferences.JobStatusNotifications}}checked{{end}}>
+                                                <label class="form-check-label" for="job_status_notifications">
+                                                    Job Status Updates
+                                                    <small class="text-muted d-block">Notify when job status changes</small>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="mb-3">
+                                            <div class="form-check form-switch">
+                                                <input class="form-check-input" type="checkbox" id="device_alert_notifications" 
+                                                       name="device_alert_notifications" {{if .preferences.DeviceAlertNotifications}}checked{{end}}>
+                                                <label class="form-check-label" for="device_alert_notifications">
+                                                    Device Alerts
+                                                    <small class="text-muted d-block">Alert for maintenance and issues</small>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="mt-4">
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="text-muted">
+                                <small>
+                                    <i class="bi bi-info-circle me-1"></i>
+                                    Settings are automatically applied to your profile
+                                </small>
+                            </div>
+                            <div>
+                                <button type="button" class="btn btn-outline-secondary me-2" onclick="resetForm()">
+                                    <i class="bi bi-arrow-clockwise"></i> Reset
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check-lg"></i> Save Settings
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('profileSettingsForm');
+    const alertContainer = document.getElementById('alert-container');
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(form);
+        
+        // Show loading state
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
+        submitBtn.disabled = true;
+
+        fetch('/profile/settings', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                showAlert('danger', data.error);
+            } else {
+                showAlert('success', data.message || 'Profile settings saved successfully!');
+                // Apply theme change immediately if changed
+                const theme = formData.get('theme');
+                if (theme && theme !== 'auto') {
+                    document.documentElement.setAttribute('data-theme', theme);
+                    localStorage.setItem('theme', theme);
+                    updateThemeIcon(theme);
+                }
+            }
+        })
+        .catch(error => {
+            showAlert('danger', 'An error occurred while saving your settings. Please try again.');
+            console.error('Error:', error);
+        })
+        .finally(() => {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    });
+
+    function showAlert(type, message) {
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-dismissible fade show`;
+        alert.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        alertContainer.innerHTML = '';
+        alertContainer.appendChild(alert);
+        
+        // Auto-dismiss success alerts after 5 seconds
+        if (type === 'success') {
+            setTimeout(() => {
+                if (alert.parentNode) {
+                    alert.remove();
+                }
+            }, 5000);
+        }
+    }
+
+    function updateThemeIcon(theme) {
+        const themeIcon = document.getElementById('theme-icon');
+        if (themeIcon) {
+            themeIcon.className = theme === 'light' ? 'bi bi-sun-fill' : 'bi bi-moon-fill';
+        }
+    }
+});
+
+function resetForm() {
+    if (confirm('Are you sure you want to reset all changes? This will reload the page with your current saved settings.')) {
+        location.reload();
+    }
+}
+</script>
+{{end}}

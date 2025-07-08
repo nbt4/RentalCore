@@ -1,12 +1,12 @@
 {{template "base.html" .}}
 
-{{define "content"}}
+{{define "company-settings-content"}}
 <div class="container-fluid">
     <div class="row">
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <h3 class="card-title">Company Settings</h3>
+                    <h3 class="card-title">🏢 COMPANY SETTINGS TEMPLATE - NOT MONITORING! 🏢</h3>
                     <a href="/invoices" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Back to Invoices
                     </a>
@@ -335,17 +335,7 @@ function previewLogo(input) {
 
 function clearLogoPreview() {
     document.getElementById('logoFile').value = '';
-    document.getElementById('logoPreview').innerHTML = `
-        {{if .company.LogoPath}}
-        <img src="{{.company.LogoPath}}" alt="Current Logo" class="img-thumbnail" style="max-height: 100px;">
-        <br><small class="text-muted">Current Logo</small>
-        <br><button type="button" class="btn btn-sm btn-danger mt-1" onclick="removeLogo()">
-            <i class="fas fa-trash"></i> Remove Logo
-        </button>
-        {{else}}
-        <div class="text-muted">No logo uploaded</div>
-        {{end}}
-    `;
+    document.getElementById('logoPreview').innerHTML = {{if .company.LogoPath}}'<img src="{{.company.LogoPath}}" alt="Current Logo" class="img-thumbnail" style="max-height: 100px;"><br><small class="text-muted">Current Logo</small><br><button type="button" class="btn btn-sm btn-danger mt-1" onclick="removeLogo()"><i class="fas fa-trash"></i> Remove Logo</button>'{{else}}'<div class="text-muted">No logo uploaded</div>'{{end}};
 }
 
 function removeLogo() {
@@ -484,16 +474,14 @@ function previewCompanyInfo() {
         paymentTermsText: document.getElementById('paymentTermsText').value
     };
     
-    let previewHTML = `
-        <div class="border p-3">
-            {{if .company.LogoPath}}
-            <img src="{{.company.LogoPath}}" alt="${company.companyName}" class="img-fluid mb-3" style="max-height: 80px;">
-            {{end}}
-            <h5>${company.companyName}</h5>
-    `;
+    let previewHTML = '<div class="border p-3">';
+    {{if .company.LogoPath}}
+    previewHTML += '<img src="{{.company.LogoPath}}" alt="' + company.companyName + '" class="img-fluid mb-3" style="max-height: 80px;">';
+    {{end}}
+    previewHTML += '<h5>' + company.companyName + '</h5>';
     
-    if (company.addressLine1) previewHTML += `<p class="mb-1">${company.addressLine1}</p>`;
-    if (company.addressLine2) previewHTML += `<p class="mb-1">${company.addressLine2}</p>`;
+    if (company.addressLine1) previewHTML += '<p class="mb-1">' + company.addressLine1 + '</p>';
+    if (company.addressLine2) previewHTML += '<p class="mb-1">' + company.addressLine2 + '</p>';
     
     if (company.city || company.postalCode) {
         previewHTML += '<p class="mb-1">';
@@ -503,10 +491,10 @@ function previewCompanyInfo() {
         previewHTML += '</p>';
     }
     
-    if (company.country) previewHTML += `<p class="mb-1">${company.country}</p>`;
-    if (company.phone) previewHTML += `<p class="mb-1"><strong>Phone:</strong> ${company.phone}</p>`;
-    if (company.email) previewHTML += `<p class="mb-1"><strong>Email:</strong> ${company.email}</p>`;
-    if (company.website) previewHTML += `<p class="mb-1"><strong>Website:</strong> ${company.website}</p>`;
+    if (company.country) previewHTML += '<p class="mb-1">' + company.country + '</p>';
+    if (company.phone) previewHTML += '<p class="mb-1"><strong>Phone:</strong> ' + company.phone + '</p>';
+    if (company.email) previewHTML += '<p class="mb-1"><strong>Email:</strong> ' + company.email + '</p>';
+    if (company.website) previewHTML += '<p class="mb-1"><strong>Website:</strong> ' + company.website + '</p>';
     
     previewHTML += '</div>';
     
@@ -514,10 +502,10 @@ function previewCompanyInfo() {
     if (company.iban || company.bankName) {
         previewHTML += '<hr><div class="small">';
         previewHTML += '<h6 class="text-muted mb-2">Bankverbindung</h6>';
-        if (company.bankName) previewHTML += `<p class="mb-1"><strong>Bank:</strong> ${company.bankName}</p>`;
-        if (company.iban) previewHTML += `<p class="mb-1"><strong>IBAN:</strong> ${company.iban}</p>`;
-        if (company.bic) previewHTML += `<p class="mb-1"><strong>BIC:</strong> ${company.bic}</p>`;
-        if (company.accountHolder) previewHTML += `<p class="mb-1"><strong>Kontoinhaber:</strong> ${company.accountHolder}</p>`;
+        if (company.bankName) previewHTML += '<p class="mb-1"><strong>Bank:</strong> ' + company.bankName + '</p>';
+        if (company.iban) previewHTML += '<p class="mb-1"><strong>IBAN:</strong> ' + company.iban + '</p>';
+        if (company.bic) previewHTML += '<p class="mb-1"><strong>BIC:</strong> ' + company.bic + '</p>';
+        if (company.accountHolder) previewHTML += '<p class="mb-1"><strong>Kontoinhaber:</strong> ' + company.accountHolder + '</p>';
         previewHTML += '</div>';
     }
     
@@ -525,18 +513,18 @@ function previewCompanyInfo() {
     if (company.ceoName || company.registerCourt || company.registerNumber) {
         previewHTML += '<hr><div class="small">';
         previewHTML += '<h6 class="text-muted mb-2">Rechtliche Angaben</h6>';
-        if (company.ceoName) previewHTML += `<p class="mb-1"><strong>Geschäftsführer:</strong> ${company.ceoName}</p>`;
-        if (company.registerCourt) previewHTML += `<p class="mb-1"><strong>Registergericht:</strong> ${company.registerCourt}</p>`;
-        if (company.registerNumber) previewHTML += `<p class="mb-1"><strong>HRB:</strong> ${company.registerNumber}</p>`;
+        if (company.ceoName) previewHTML += '<p class="mb-1"><strong>Geschäftsführer:</strong> ' + company.ceoName + '</p>';
+        if (company.registerCourt) previewHTML += '<p class="mb-1"><strong>Registergericht:</strong> ' + company.registerCourt + '</p>';
+        if (company.registerNumber) previewHTML += '<p class="mb-1"><strong>HRB:</strong> ' + company.registerNumber + '</p>';
         previewHTML += '</div>';
     }
     
     // Tax Information
     if (company.taxNumber || company.vatNumber) {
         previewHTML += '<hr><div class="text-center small text-muted">';
-        if (company.taxNumber) previewHTML += `<strong>Steuernummer:</strong> ${company.taxNumber}`;
+        if (company.taxNumber) previewHTML += '<strong>Steuernummer:</strong> ' + company.taxNumber;
         if (company.taxNumber && company.vatNumber) previewHTML += ' | ';
-        if (company.vatNumber) previewHTML += `<strong>USt-IdNr.:</strong> ${company.vatNumber}`;
+        if (company.vatNumber) previewHTML += '<strong>USt-IdNr.:</strong> ' + company.vatNumber;
         previewHTML += '</div>';
     }
     

@@ -299,6 +299,39 @@ func (Session) TableName() string {
 	return "sessions"
 }
 
+// UserPreferences represents global user profile settings
+type UserPreferences struct {
+	PreferenceID uint      `json:"preferenceID" gorm:"primaryKey;column:preference_id"`
+	UserID       uint      `json:"userID" gorm:"not null;unique;column:user_id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
+	User         User      `json:"user,omitempty" gorm:"foreignKey:UserID;references:UserID"`
+	
+	// Display Preferences
+	Language     string    `json:"language" gorm:"not null;default:'de';column:language"`
+	Theme        string    `json:"theme" gorm:"not null;default:'dark';column:theme"`
+	TimeZone     string    `json:"timeZone" gorm:"not null;default:'Europe/Berlin';column:time_zone"`
+	DateFormat   string    `json:"dateFormat" gorm:"not null;default:'DD.MM.YYYY';column:date_format"`
+	TimeFormat   string    `json:"timeFormat" gorm:"not null;default:'24h';column:time_format"`
+	
+	// Notification Preferences
+	EmailNotifications       bool `json:"emailNotifications" gorm:"not null;default:true;column:email_notifications"`
+	SystemNotifications      bool `json:"systemNotifications" gorm:"not null;default:true;column:system_notifications"`
+	JobStatusNotifications   bool `json:"jobStatusNotifications" gorm:"not null;default:true;column:job_status_notifications"`
+	DeviceAlertNotifications bool `json:"deviceAlertNotifications" gorm:"not null;default:true;column:device_alert_notifications"`
+	
+	// Interface Preferences
+	ItemsPerPage        int    `json:"itemsPerPage" gorm:"not null;default:25;column:items_per_page"`
+	DefaultView         string `json:"defaultView" gorm:"not null;default:'list';column:default_view"`
+	ShowAdvancedOptions bool   `json:"showAdvancedOptions" gorm:"not null;default:false;column:show_advanced_options"`
+	AutoSaveEnabled     bool   `json:"autoSaveEnabled" gorm:"not null;default:true;column:auto_save_enabled"`
+	
+	CreatedAt time.Time `json:"createdAt" gorm:"column:created_at"`
+	UpdatedAt time.Time `json:"updatedAt" gorm:"column:updated_at"`
+}
+
+func (UserPreferences) TableName() string {
+	return "user_preferences"
+}
+
 type Case struct {
 	CaseID      uint            `json:"caseID" gorm:"primaryKey;column:caseID"`
 	Name        string          `json:"name" gorm:"not null;column:name"`

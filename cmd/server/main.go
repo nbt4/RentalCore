@@ -154,6 +154,10 @@ func main() {
 	if err := db.AutoMigrate(&models.EmailTemplate{}); err != nil {
 		log.Printf("Failed to auto-migrate email_templates table: %v", err)
 	}
+	
+	if err := db.AutoMigrate(&models.UserPreferences{}); err != nil {
+		log.Printf("Failed to auto-migrate user_preferences table: %v", err)
+	}
 
 	// Initialize handlers
 	jobHandler := handlers.NewJobHandler(jobRepo, deviceRepo, customerRepo, statusRepo, jobCategoryRepo)
@@ -676,7 +680,7 @@ func setupRoutes(r *gin.Engine,
 		{
 			// Company settings form route with enhanced debugging
 			settings.GET("/company", func(c *gin.Context) {
-				log.Printf("DEBUG: /settings/company route called directly - URL: %s, Method: %s", c.Request.URL.Path, c.Request.Method)
+				log.Printf("🏢 COMPANY SETTINGS ROUTE CALLED - URL: %s, Method: %s", c.Request.URL.Path, c.Request.Method)
 				companyHandler.CompanySettingsForm(c)
 			})
 			settings.GET("/company/api", companyHandler.GetCompanySettings)
@@ -804,6 +808,14 @@ func setupRoutes(r *gin.Engine,
 				"jobName": "Job #" + jobID,
 			})
 		})
+
+		// Profile Settings routes
+		profile := protected.Group("/profile")
+		{
+			profile.GET("/settings", authHandler.ProfileSettingsForm)
+			profile.POST("/settings", authHandler.UpdateProfileSettings)
+			profile.GET("/preferences", authHandler.GetUserPreferences)
+		}
 
 		// User Management - Use explicit routing without parameter conflicts
 		
