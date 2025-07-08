@@ -836,6 +836,55 @@ body {
     animation: rc-glow-pulse 2s ease-in-out infinite;
 }
 
+/* Accordion Styles */
+.accordion-category, .accordion-subcategory {
+    background: var(--surface-2);
+    border: 1px solid var(--surface-3);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-sm);
+    overflow: hidden;
+}
+
+.accordion-header {
+    background: var(--surface-3);
+    padding: var(--space-md);
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color var(--transition-fast);
+}
+
+.accordion-header:hover {
+    background: var(--surface-4);
+}
+
+.accordion-header.active {
+    background: var(--primary-600);
+}
+
+.accordion-header h3, .accordion-header h4 {
+    color: var(--text-primary);
+    font-weight: 600;
+    margin: 0;
+}
+
+.accordion-content {
+    padding: var(--space-md);
+    display: none;
+    background: var(--surface-1);
+}
+
+.accordion-icon {
+    font-size: 1.2rem;
+    color: var(--accent-electric);
+    transition: transform var(--transition-normal);
+}
+
+.accordion-header.active .accordion-icon {
+    transform: rotate(45deg);
+}
+
 /* Theme Toggle Button */
 [data-theme-toggle] {
     transition: all var(--transition-normal) ease;

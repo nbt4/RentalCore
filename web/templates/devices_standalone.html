@@ -183,155 +183,146 @@
 
         <!-- Devices View -->
         {{if .categorized}}
-            <div class="rc-accordion">
+            <div class="accordion">
                 {{range .categorizedDevices.Categories}}
-                <div class="rc-accordion-item">
-                    <h2 class="rc-accordion-header">
-                        <button class="rc-accordion-button" type="button">
-                            <i class="bi bi-folder-fill rc-mr-sm"></i> {{.Category.Name}} <span class="rc-badge rc-badge-secondary rc-ml-sm">{{.DeviceCount}}</span>
-                        </button>
-                    </h2>
-                    <div class="rc-accordion-collapse">
-                        <div class="rc-accordion-body">
-                            {{range .Subcategories}}
-                            <div class="rc-accordion-item">
-                                <h3 class="rc-accordion-header">
-                                    <button class="rc-accordion-button" type="button">
-                                        <i class="bi bi-folder rc-mr-sm"></i> {{.Subcategory.Name}} <span class="rc-badge rc-badge-ghost rc-ml-sm">{{.DeviceCount}}</span>
-                                    </button>
-                                </h3>
-                                <div class="rc-accordion-collapse">
-                                    <div class="rc-accordion-body">
-                                        {{if .Devices}}
-                                        <div class="rc-table-responsive">
-                                            <table class="rc-table">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Device ID</th>
-                                                        <th>Product</th>
-                                                        <th>Serial Number</th>
-                                                        <th>Status</th>
-                                                        <th>Assignment</th>
-                                                        <th>Actions</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {{range .Devices}}
-                                                    <tr>
-                                                        <td><code class="rc-code">{{.Device.DeviceID}}</code></td>
-                                                        <td class="rc-text-semibold">{{if .Device.Product}}{{.Device.Product.Name}}{{else}}-{{end}}</td>
-                                                        <td><code class="rc-code">{{derefString .Device.SerialNumber}}</code></td>
-                                                        <td>
-                                                            {{if eq .Device.Status "free"}}
-                                                                <span class="rc-badge rc-badge-success">Free</span>
-                                                            {{else if eq .Device.Status "rented"}}
-                                                                <span class="rc-badge rc-badge-warning">Rented</span>
-                                                            {{else if eq .Device.Status "maintenance"}}
-                                                                <span class="rc-badge rc-badge-danger">Maintenance</span>
-                                                            {{else}}
-                                                                <span class="rc-badge rc-badge-secondary">{{.Device.Status}}</span>
-                                                            {{end}}
-                                                        </td>
-                                                        <td>
-                                                            {{if .IsAssigned}}
-                                                                <span class="rc-badge rc-badge-info">Job {{.JobID}}</span>
-                                                            {{else}}
-                                                                <span class="rc-badge rc-badge-success">Available</span>
-                                                            {{end}}
-                                                        </td>
-                                                        <td>
-                                                            <div class="rc-flex rc-flex-gap-sm">
-                                                                <a href="/devices/{{.Device.DeviceID}}" class="rc-btn rc-btn-outline rc-btn-sm" title="View">
-                                                                    <i class="bi bi-eye"></i>
-                                                                </a>
-                                                                <a href="/devices/{{.Device.DeviceID}}/qr" class="rc-btn rc-btn-outline rc-btn-sm" title="QR Code" target="_blank">
-                                                                    <i class="bi bi-qr-code"></i>
-                                                                </a>
-                                                                <a href="/devices/{{.Device.DeviceID}}/barcode" class="rc-btn rc-btn-outline rc-btn-sm" title="Barcode" target="_blank">
-                                                                    <i class="bi bi-upc"></i>
-                                                                </a>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    {{end}}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        {{else}}
-                                        <p class="rc-text-muted">No devices in this subcategory.</p>
-                                        {{end}}
-                                    </div>
-                                </div>
+                <div class="accordion-category">
+                    <div class="accordion-header">
+                        <h3><i class="bi bi-folder-fill"></i> {{.Category.Name}} <span class="rc-badge rc-badge-secondary">{{.DeviceCount}}</span></h3>
+                        <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        {{range .Subcategories}}
+                        <div class="accordion-subcategory">
+                            <div class="accordion-header">
+                                <h4><i class="bi bi-folder"></i> {{.Subcategory.Name}} <span class="rc-badge rc-badge-ghost">{{.DeviceCount}}</span></h4>
+                                <span class="accordion-icon">+</span>
                             </div>
-                            {{end}}
+                            <div class="accordion-content">
+                                {{if .Devices}}
+                                <div class="rc-table-responsive">
+                                    <table class="rc-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Device ID</th>
+                                                <th>Product</th>
+                                                <th>Serial Number</th>
+                                                <th>Status</th>
+                                                <th>Assignment</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {{range .Devices}}
+                                            <tr>
+                                                <td><code class="rc-code">{{.Device.DeviceID}}</code></td>
+                                                <td class="rc-text-semibold">{{if .Device.Product}}{{.Device.Product.Name}}{{else}}-{{end}}</td>
+                                                <td><code class="rc-code">{{derefString .Device.SerialNumber}}</code></td>
+                                                <td>
+                                                    {{if eq .Device.Status "free"}}
+                                                        <span class="rc-badge rc-badge-success">Free</span>
+                                                    {{else if eq .Device.Status "rented"}}
+                                                        <span class="rc-badge rc-badge-warning">Rented</span>
+                                                    {{else if eq .Device.Status "maintenance"}}
+                                                        <span class="rc-badge rc-badge-danger">Maintenance</span>
+                                                    {{else}}
+                                                        <span class="rc-badge rc-badge-secondary">{{.Device.Status}}</span>
+                                                    {{end}}
+                                                </td>
+                                                <td>
+                                                    {{if .IsAssigned}}
+                                                        <span class="rc-badge rc-badge-info">Job {{.JobID}}</span>
+                                                    {{else}}
+                                                        <span class="rc-badge rc-badge-success">Available</span>
+                                                    {{end}}
+                                                </td>
+                                                <td>
+                                                    <div class="rc-flex rc-flex-gap-sm">
+                                                        <a href="/devices/{{.Device.DeviceID}}" class="rc-btn rc-btn-outline rc-btn-sm" title="View">
+                                                            <i class="bi bi-eye"></i>
+                                                        </a>
+                                                        <a href="/devices/{{.Device.DeviceID}}/qr" class="rc-btn rc-btn-outline rc-btn-sm" title="QR Code" target="_blank">
+                                                            <i class="bi bi-qr-code"></i>
+                                                        </a>
+                                                        <a href="/devices/{{.Device.DeviceID}}/barcode" class="rc-btn rc-btn-outline rc-btn-sm" title="Barcode" target="_blank">
+                                                            <i class="bi bi-upc"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            {{end}}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {{else}}
+                                <p class="rc-text-muted">No devices in this subcategory.</p>
+                                {{end}}
+                            </div>
                         </div>
+                        {{end}}
                     </div>
                 </div>
                 {{end}}
 
                 {{if .categorizedDevices.Uncategorized}}
-                <div class="rc-accordion-item">
-                    <h2 class="rc-accordion-header">
-                        <button class="rc-accordion-button" type="button">
-                            <i class="bi bi-question-circle-fill rc-mr-sm"></i> Uncategorized <span class="rc-badge rc-badge-secondary rc-ml-sm">{{len .categorizedDevices.Uncategorized}}</span>
-                        </button>
-                    </h2>
-                    <div class="rc-accordion-collapse">
-                        <div class="rc-accordion-body">
-                           <div class="rc-table-responsive">
-                                <table class="rc-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Device ID</th>
-                                            <th>Product</th>
-                                            <th>Serial Number</th>
-                                            <th>Status</th>
-                                            <th>Assignment</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {{range .categorizedDevices.Uncategorized}}
-                                        <tr>
-                                            <td><code class="rc-code">{{.Device.DeviceID}}</code></td>
-                                            <td class="rc-text-semibold">{{if .Device.Product}}{{.Device.Product.Name}}{{else}}-{{end}}</td>
-                                            <td><code class="rc-code">{{derefString .Device.SerialNumber}}</code></td>
-                                            <td>
-                                                {{if eq .Device.Status "free"}}
-                                                    <span class="rc-badge rc-badge-success">Free</span>
-                                                {{else if eq .Device.Status "rented"}}
-                                                    <span class="rc-badge rc-badge-warning">Rented</span>
-                                                {{else if eq .Device.Status "maintenance"}}
-                                                    <span class="rc-badge rc-badge-danger">Maintenance</span>
-                                                {{else}}
-                                                    <span class="rc-badge rc-badge-secondary">{{.Device.Status}}</span>
-                                                {{end}}
-                                            </td>
-                                            <td>
-                                                {{if .IsAssigned}}
-                                                    <span class="rc-badge rc-badge-info">Job {{.JobID}}</span>
-                                                {{else}}
-                                                    <span class="rc-badge rc-badge-success">Available</span>
-                                                {{end}}
-                                            </td>
-                                            <td>
-                                                <div class="rc-flex rc-flex-gap-sm">
-                                                    <a href="/devices/{{.Device.DeviceID}}" class="rc-btn rc-btn-outline rc-btn-sm" title="View">
-                                                        <i class="bi bi-eye"></i>
-                                                    </a>
-                                                    <a href="/devices/{{.Device.DeviceID}}/qr" class="rc-btn rc-btn-outline rc-btn-sm" title="QR Code" target="_blank">
-                                                        <i class="bi bi-qr-code"></i>
-                                                    </a>
-                                                    <a href="/devices/{{.Device.DeviceID}}/barcode" class="rc-btn rc-btn-outline rc-btn-sm" title="Barcode" target="_blank">
-                                                        <i class="bi bi-upc"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        {{end}}
-                                    </tbody>
-                                </table>
-                            </div>
+                <div class="accordion-category">
+                    <div class="accordion-header">
+                        <h3><i class="bi bi-question-circle-fill"></i> Uncategorized <span class="rc-badge rc-badge-secondary">{{len .categorizedDevices.Uncategorized}}</span></h3>
+                        <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content">
+                       <div class="rc-table-responsive">
+                            <table class="rc-table">
+                                <thead>
+                                    <tr>
+                                        <th>Device ID</th>
+                                        <th>Product</th>
+                                        <th>Serial Number</th>
+                                        <th>Status</th>
+                                        <th>Assignment</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{range .categorizedDevices.Uncategorized}}
+                                    <tr>
+                                        <td><code class="rc-code">{{.Device.DeviceID}}</code></td>
+                                        <td class="rc-text-semibold">{{if .Device.Product}}{{.Device.Product.Name}}{{else}}-{{end}}</td>
+                                        <td><code class="rc-code">{{derefString .Device.SerialNumber}}</code></td>
+                                        <td>
+                                            {{if eq .Device.Status "free"}}
+                                                <span class="rc-badge rc-badge-success">Free</span>
+                                            {{else if eq .Device.Status "rented"}}
+                                                <span class="rc-badge rc-badge-warning">Rented</span>
+                                            {{else if eq .Device.Status "maintenance"}}
+                                                <span class="rc-badge rc-badge-danger">Maintenance</span>
+                                            {{else}}
+                                                <span class="rc-badge rc-badge-secondary">{{.Device.Status}}</span>
+                                            {{end}}
+                                        </td>
+                                        <td>
+                                            {{if .IsAssigned}}
+                                                <span class="rc-badge rc-badge-info">Job {{.JobID}}</span>
+                                            {{else}}
+                                                <span class="rc-badge rc-badge-success">Available</span>
+                                            {{end}}
+                                        </td>
+                                        <td>
+                                            <div class="rc-flex rc-flex-gap-sm">
+                                                <a href="/devices/{{.Device.DeviceID}}" class="rc-btn rc-btn-outline rc-btn-sm" title="View">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a href="/devices/{{.Device.DeviceID}}/qr" class="rc-btn rc-btn-outline rc-btn-sm" title="QR Code" target="_blank">
+                                                    <i class="bi bi-qr-code"></i>
+                                                </a>
+                                                <a href="/devices/{{.Device.DeviceID}}/barcode" class="rc-btn rc-btn-outline rc-btn-sm" title="Barcode" target="_blank">
+                                                    <i class="bi bi-upc"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {{end}}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -487,20 +478,21 @@
     <script src="/static/js/rental-core-design.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function () {
-        const accordions = document.querySelectorAll('.rc-accordion-button');
+        const accordionHeaders = document.querySelectorAll('.accordion-header');
 
-        accordions.forEach(button => {
-            button.addEventListener('click', () => {
-                const collapse = button.parentElement.nextElementSibling;
-                const parentAccordionItem = button.closest('.rc-accordion-item');
+        accordionHeaders.forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                const icon = header.querySelector('.accordion-icon');
 
-                // Toggle active class for styling
-                parentAccordionItem.classList.toggle('rc-accordion-item-active');
+                header.classList.toggle('active');
 
-                if (collapse.style.maxHeight) {
-                    collapse.style.maxHeight = null;
+                if (content.style.display === 'block') {
+                    content.style.display = 'none';
+                    if (icon) icon.textContent = '+';
                 } else {
-                    collapse.style.maxHeight = collapse.scrollHeight + "px";
+                    content.style.display = 'block';
+                    if (icon) icon.textContent = '-';
                 }
             });
         });
