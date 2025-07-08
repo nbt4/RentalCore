@@ -209,6 +209,9 @@ func (r *DeviceRepository) GetAvailableDevicesForCaseManagement() ([]models.Devi
 func (r *DeviceRepository) GetDevicesGroupedByCategory(params *models.FilterParams) (*models.CategorizedDevicesResponse, error) {
 	var devices []models.Device
 	
+	// DEBUG: Log the search term received by the repository
+	log.Printf("🔍 GetDevicesGroupedByCategory called with SearchTerm: '%s'", params.SearchTerm)
+
 	query := r.db.Model(&models.Device{}).
 		Preload("Product").
 		Preload("Product.Category").
@@ -233,8 +236,12 @@ func (r *DeviceRepository) GetDevicesGroupedByCategory(params *models.FilterPara
 
 	err := query.Find(&devices).Error
 	if err != nil {
+		log.Printf("❌ Error fetching devices: %v", err)
 		return nil, err
 	}
+
+	// DEBUG: Log the number of devices found after applying the search query
+	log.Printf("🔍 Found %d devices after search query", len(devices))
 
 	// --- Performance Optimization ---
 	// 1. Get all device IDs from the current list

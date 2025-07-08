@@ -3,6 +3,7 @@ package handlers
 import (
 	"net/http"
 	"strconv"
+	"log"
 
 	"go-barcode-webapp/internal/models"
 	"go-barcode-webapp/internal/repository"
@@ -34,6 +35,9 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
+
+	// DEBUG: Log the received search term and view type
+	log.Printf("🔍 ListDevices handler called with SearchTerm: '%s' and View: '%s'", params.SearchTerm, c.Query("view"))
 
 	viewType := c.DefaultQuery("view", "list") // Default to list view
 
