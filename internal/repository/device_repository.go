@@ -260,13 +260,18 @@ func (r *DeviceRepository) GetDevicesGroupedByCategory(params *models.FilterPara
 		}
 
 		// Group by category and subcategory
-		if device.Product != nil && device.Product.Category != nil && device.Product.Subcategory != nil {
+		if device.Product != nil && device.Product.Category != nil {
 			categoryID := device.Product.Category.CategoryID
-			subcategoryID := device.Product.Subcategory.SubcategoryID
+			var subcategoryID string
+			if device.Product.Subcategory != nil {
+				subcategoryID = device.Product.Subcategory.SubcategoryID
+			}
 
 			// Store category and subcategory references
 			categoryMap[categoryID] = device.Product.Category
-			subcategoryMap[subcategoryID] = device.Product.Subcategory
+			if device.Product.Subcategory != nil {
+				subcategoryMap[subcategoryID] = device.Product.Subcategory
+			}
 
 			// Initialize maps if needed
 			if deviceMap[categoryID] == nil {
@@ -293,7 +298,12 @@ func (r *DeviceRepository) GetDevicesGroupedByCategory(params *models.FilterPara
 		categoryDeviceCount := 0
 
 		for subcategoryID, devices := range subcategoryDevices {
-			subcategory := subcategoryMap[subcategoryID]
+			var subcategory *models.Subcategory
+			if subcategoryID != "" {
+				subcategory = subcategoryMap[subcategoryID]
+			} else {
+				subcategory = &models.Subcategory{Name: "General"}
+			}
 			subcategories = append(subcategories, models.DeviceSubcategoryGroup{
 				Subcategory: subcategory,
 				Devices:     devices,
