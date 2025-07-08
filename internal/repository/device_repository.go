@@ -218,7 +218,8 @@ func (r *DeviceRepository) GetDevicesGroupedByCategory(params *models.FilterPara
 
 	if params.SearchTerm != "" {
 		searchPattern := "%" + params.SearchTerm + "%"
-		query = query.Where("deviceID LIKE ? OR serialnumber LIKE ?", searchPattern, searchPattern)
+		query = query.Joins("LEFT JOIN products ON products.product_id = devices.product_id").
+			Where("devices.deviceID LIKE ? OR devices.serialnumber LIKE ? OR products.name LIKE ?", searchPattern, searchPattern, searchPattern)
 	}
 
 	if params.Limit > 0 {

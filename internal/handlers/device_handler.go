@@ -35,52 +35,37 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 		return
 	}
 
-	// Check if categorized view is requested
-	viewType := c.Query("view")
+	viewType := c.DefaultQuery("view", "list") // Default to list view
+
 	if viewType == "categorized" {
-		h.ListDevicesCategorized(c)
-		return
+		categorizedDevices, err := h.deviceRepo.GetDevicesGroupedByCategory(params)
+		if err != nil {
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
+			return
+		}
+		c.HTML(http.StatusOK, "devices_standalone.html", gin.H{
+			"title":              "Devices by Category",
+			"categorizedDevices": categorizedDevices,
+			"params":             params,
+			"user":               user,
+			"viewType":           "categorized",
+			"categorized":        true,
+		})
+	} else {
+		devices, err := h.deviceRepo.List(params)
+		if err != nil {
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
+			return
+		}
+		c.HTML(http.StatusOK, "devices_standalone.html", gin.H{
+			"title":       "Devices",
+			"devices":     devices,
+			"params":      params,
+			"user":        user,
+			"viewType":    "list",
+			"categorized": false,
+		})
 	}
-
-	devices, err := h.deviceRepo.List(params)
-	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
-		return
-	}
-
-	c.HTML(http.StatusOK, "devices_standalone.html", gin.H{
-		"title":        "Devices",
-		"devices":      devices,
-		"params":       params,
-		"user":         user,
-		"viewType":     "list",
-		"categorized":  false,
-	})
-}
-
-func (h *DeviceHandler) ListDevicesCategorized(c *gin.Context) {
-	user, _ := GetCurrentUser(c)
-	
-	params := &models.FilterParams{}
-	if err := c.ShouldBindQuery(params); err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": err.Error(), "user": user})
-		return
-	}
-
-	categorizedDevices, err := h.deviceRepo.GetDevicesGroupedByCategory(params)
-	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
-		return
-	}
-
-	c.HTML(http.StatusOK, "devices_standalone.html", gin.H{
-		"title":               "Devices by Category",
-		"categorizedDevices":  categorizedDevices,
-		"params":              params,
-		"user":                user,
-		"viewType":            "categorized",
-		"categorized":         true,
-	})
 }
 
 func (h *DeviceHandler) NewDeviceForm(c *gin.Context) {
