@@ -72,7 +72,8 @@ func (r *DeviceRepository) List(params *models.FilterParams) ([]models.DeviceWit
 
 	if params.SearchTerm != "" {
 		searchPattern := "%" + params.SearchTerm + "%"
-		query = query.Where("deviceID LIKE ? OR serialnumber LIKE ?", searchPattern, searchPattern)
+		query = query.Joins("LEFT JOIN products ON products.product_id = devices.product_id").
+			Where("devices.deviceID LIKE ? OR devices.serialnumber LIKE ? OR products.name LIKE ?", searchPattern, searchPattern, searchPattern)
 	}
 
 	if params.Limit > 0 {
@@ -128,7 +129,8 @@ func (r *DeviceRepository) ListWithCategories(params *models.FilterParams) ([]mo
 
 	if params.SearchTerm != "" {
 		searchPattern := "%" + params.SearchTerm + "%"
-		query = query.Where("deviceID LIKE ? OR serialnumber LIKE ?", searchPattern, searchPattern)
+		query = query.Joins("JOIN products ON products.product_id = devices.product_id").
+			Where("devices.deviceID LIKE ? OR devices.serialnumber LIKE ? OR products.name LIKE ?", searchPattern, searchPattern, searchPattern)
 	}
 
 	if params.Limit > 0 {
@@ -233,6 +235,26 @@ func (r *DeviceRepository) GetDevicesGroupedByCategory(params *models.FilterPara
 		return nil, err
 	}
 
+	// --- Performance Optimization ---
+	// 1. Get all device IDs from the current list
+	deviceIDs := make([]string, len(devices))
+	for i, d := range devices {
+		deviceIDs[i] = d.DeviceID
+	}
+
+	// 2. Fetch all relevant job assignments in a single query
+	var jobDevices []models.JobDevice
+	if len(deviceIDs) > 0 {
+		r.db.Where("deviceID IN ?", deviceIDs).Find(&jobDevices)
+	}
+
+	// 3. Create a map for quick lookup of job assignments
+	jobDeviceMap := make(map[string]*models.JobDevice)
+	for i, jd := range jobDevices {
+		jobDeviceMap[jd.DeviceID] = &jobDevices[i]
+	}
+	// --- End of Performance Optimization ---
+
 	// Convert to DeviceWithJobInfo and group by categories
 	deviceMap := make(map[uint]map[string][]models.DeviceWithJobInfo) // categoryID -> subcategoryID -> devices
 	categoryMap := make(map[uint]*models.Category)
@@ -240,17 +262,11 @@ func (r *DeviceRepository) GetDevicesGroupedByCategory(params *models.FilterPara
 	var uncategorized []models.DeviceWithJobInfo
 
 	for _, device := range devices {
-		// Check if device is assigned to any job
-		var jobDevice models.JobDevice
-		isAssigned := false
+		// Check if device is assigned using the optimized map
+		jobDevice, isAssigned := jobDeviceMap[device.DeviceID]
 		var jobID *uint
-		
-		err := r.db.Where("deviceID = ?", device.DeviceID).First(&jobDevice).Error
-		if err == nil {
-			isAssigned = true
+		if isAssigned {
 			jobID = &jobDevice.JobID
-		} else if err != gorm.ErrRecordNotFound {
-			// If there's an error other than "not found", continue and assume not assigned
 		}
 
 		deviceWithJob := models.DeviceWithJobInfo{
