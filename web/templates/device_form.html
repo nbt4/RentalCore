@@ -11,148 +11,244 @@
     <!-- Theme Colors -->
     <meta name="theme-color" content="#030712">
     <meta name="msapplication-TileColor" content="#030712">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/rental-core-design.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="/static/css/rental-core-design.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <i class="bi bi-gear-wide-connected"></i> RentalCore
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <div class="navbar-nav me-auto">
-                    <a class="nav-link" href="/jobs">
+<body class="rc-animate-fade-in">
+    <!-- Navigation -->
+    <nav class="rc-navbar">
+        <div class="rc-container">
+            <div class="rc-navbar-content">
+                <a href="/" class="rc-navbar-brand">
+                    <i class="bi bi-gear-wide-connected"></i>
+                    RentalCore
+                </a>
+                
+                <!-- Mobile toggle -->
+                <button class="rc-navbar-toggle">
+                    <i class="bi bi-list"></i>
+                </button>
+                
+                <!-- Main navigation -->
+                <ul class="rc-navbar-nav">
+                    <li><a href="/jobs" class="rc-nav-link">
                         <i class="bi bi-briefcase"></i> Jobs
-                    </a>
-                    <a class="nav-link active" href="/devices">
+                    </a></li>
+                    <li><a href="/devices" class="rc-nav-link rc-nav-link-active">
                         <i class="bi bi-cpu"></i> Devices
-                    </a>
-                    <a class="nav-link" href="/customers">
+                    </a></li>
+                    <li><a href="/customers" class="rc-nav-link">
                         <i class="bi bi-people"></i> Customers
-                    </a>
-                    <a class="nav-link" href="/cases">
+                    </a></li>
+                    <li><a href="/cases" class="rc-nav-link">
                         <i class="bi bi-box"></i> Cases
-                    </a>
-                </div>
-                <div class="navbar-nav">
-                    <button class="btn btn-outline-light btn-sm" onclick="toggleTheme()">
-                        <i class="bi bi-moon-fill" id="theme-icon"></i>
-                    </button>
-                </div>
+                    </a></li>
+                    
+                    <!-- Tools Dropdown -->
+                    <li class="rc-dropdown">
+                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
+                            <i class="bi bi-tools"></i> Tools
+                        </a>
+                        <div class="rc-dropdown-menu">
+                            <div class="rc-dropdown-header">
+                                <i class="bi bi-folder"></i> Management
+                            </div>
+                            <a href="/workflow/templates" class="rc-dropdown-item">
+                                <i class="bi bi-file-earmark-text"></i> Job Templates
+                            </a>
+                            <a href="/workflow/packages" class="rc-dropdown-item">
+                                <i class="bi bi-box-seam"></i> Equipment Packages
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">
+                                <i class="bi bi-building"></i> Business
+                            </div>
+                            <a href="/invoices" class="rc-dropdown-item">
+                                <i class="bi bi-file-text"></i> Invoices
+                            </a>
+                            <a href="/analytics" class="rc-dropdown-item">
+                                <i class="bi bi-graph-up"></i> Analytics
+                            </a>
+                            <a href="/financial" class="rc-dropdown-item">
+                                <i class="bi bi-calculator"></i> Financial
+                            </a>
+                        </div>
+                    </li>
+                    
+                    <!-- User Dropdown -->
+                    {{if .user}}
+                    <li class="rc-dropdown">
+                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
+                            <i class="bi bi-person-circle"></i> {{.user.Username}}
+                        </a>
+                        <div class="rc-dropdown-menu">
+                            <div class="rc-dropdown-header">
+                                <i class="bi bi-person"></i> {{.user.FirstName}} {{.user.LastName}}
+                            </div>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">Personal</div>
+                            <a href="/profile/settings" class="rc-dropdown-item">
+                                <i class="bi bi-person-gear"></i> Profile Settings
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">Company</div>
+                            <a href="/settings/company" class="rc-dropdown-item">
+                                <i class="bi bi-building-gear"></i> Company Settings
+                            </a>
+                            <a href="/settings/email-templates" class="rc-dropdown-item">
+                                <i class="bi bi-envelope-gear"></i> E-Mail Templates
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">System</div>
+                            <a href="/users" class="rc-dropdown-item">
+                                <i class="bi bi-people-fill"></i> User Management
+                            </a>
+                            <a href="/security" class="rc-dropdown-item">
+                                <i class="bi bi-shield-check"></i> Security & Audit
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <a href="/logout" class="rc-dropdown-item">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a>
+                        </div>
+                    </li>
+                    {{else}}
+                    <li>
+                        <a href="/login" class="rc-btn rc-btn-primary rc-btn-sm">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </li>
+                    {{end}}
+                    
+                    <!-- Theme Toggle -->
+                    <li>
+                        <button class="rc-btn rc-btn-ghost rc-btn-sm" data-theme-toggle title="Toggle theme">
+                            <i class="bi bi-moon-fill"></i>
+                        </button>
+                    </li>
+                </ul>
             </div>
         </div>
     </nav>
 
-    <main class="container mt-4">
-        <div class="row justify-content-center">
-            <div class="col-md-10">
-                <div class="card">
-                    <div class="card-header">
-                        <h5>{{.title}}</h5>
-                    </div>
-                    <div class="card-body">
-                        {{if .error}}
-                        <div class="alert alert-danger">{{.error}}</div>
-                        {{end}}
-                        
-                        <form method="POST" action="{{if .device.DeviceID}}/devices/{{.device.DeviceID}}{{else}}/devices{{end}}">
-                            {{if .device.DeviceID}}
-                            <input type="hidden" name="_method" value="PUT">
-                            {{end}}
-                            
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Product *</label>
-                                        <select class="form-select" name="productID" required>
-                                            <option value="">Select Product</option>
-                                            {{range .products}}
-                                            <option value="{{.ProductID}}" {{if eq .ProductID (deref $.device.ProductID)}}selected{{end}}>
-                                                {{.Name}}
-                                            </option>
-                                            {{end}}
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Serial Number</label>
-                                        <input type="text" class="form-control" name="serialnumber" value="{{derefString .device.SerialNumber}}" placeholder="Optional">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label class="form-label">Purchase Date</label>
-                                        <input type="date" class="form-control" name="purchase_date" value="{{if .device.PurchaseDate}}{{.device.PurchaseDate.Format "2006-01-02"}}{{end}}">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label class="form-label">Last Maintenance</label>
-                                        <input type="date" class="form-control" name="last_maintenance" value="{{if .device.LastMaintenance}}{{.device.LastMaintenance.Format "2006-01-02"}}{{end}}">
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="mb-3">
-                                        <label class="form-label">Next Maintenance</label>
-                                        <input type="date" class="form-control" name="next_maintenance" value="{{if .device.NextMaintenance}}{{.device.NextMaintenance.Format "2006-01-02"}}{{end}}">
-                                    </div>
-                                </div>
-                            </div>
+    <!-- Main Content -->
+    <main class="rc-container rc-mt-lg">
+        <div class="rc-flex rc-flex-between rc-mb-xl">
+            <div>
+                <h1 class="rc-heading-2">
+                    <i class="bi bi-cpu"></i> {{.title}}
+                </h1>
+                <p class="rc-text">
+                    {{if .device.DeviceID}}
+                        Update the details for device <code class="rc-code">{{.device.DeviceID}}</code>.
+                    {{else}}
+                        Add a new device to your inventory.
+                    {{end}}
+                </p>
+            </div>
+            <div>
+                <a href="/devices" class="rc-btn rc-btn-outline">
+                    <i class="bi bi-arrow-left"></i> Back to Devices
+                </a>
+            </div>
+        </div>
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Status</label>
-                                        <select class="form-select" name="status">
-                                            <option value="free" {{if eq .device.Status "free"}}selected{{end}}>Free</option>
-                                            <option value="rented" {{if eq .device.Status "rented"}}selected{{end}}>Rented</option>
-                                            <option value="maintenance" {{if eq .device.Status "maintenance"}}selected{{end}}>Maintenance</option>
-                                            <option value="blocked" {{if eq .device.Status "blocked"}}selected{{end}}>Blocked</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="mb-3">
-                                        <label class="form-label">Insurance Number</label>
-                                        <input type="text" class="form-control" name="insurance_number" value="{{derefString .device.InsuranceNumber}}">
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="d-flex justify-content-between">
-                                <a href="/devices" class="btn btn-secondary">Cancel</a>
-                                <button type="submit" class="btn btn-primary">
-                                    {{if .device.DeviceID}}Update{{else}}Create{{end}} Device
-                                </button>
-                            </div>
-                        </form>
+        <div class="rc-card">
+            <div class="rc-card-body">
+                {{if .error}}
+                <div class="rc-alert rc-alert-danger">{{.error}}</div>
+                {{end}}
+                
+                <form method="POST" action="{{if .device.DeviceID}}/devices/{{.device.DeviceID}}{{else}}/devices{{end}}">
+                    {{if .device.DeviceID}}
+                    <input type="hidden" name="_method" value="PUT">
+                    {{end}}
+                    
+                    <div class="rc-grid rc-grid-2 rc-gap-lg">
+                        <div class="rc-form-group">
+                            <label class="rc-label">Product *</label>
+                            <select class="rc-input" name="productID" required>
+                                <option value="">Select Product</option>
+                                {{range .products}}
+                                <option value="{{.ProductID}}" {{if and $.device.ProductID (eq .ProductID (deref $.device.ProductID))}}selected{{end}}>
+                                    {{.Name}}
+                                </option>
+                                {{end}}
+                            </select>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Serial Number</label>
+                            <input type="text" class="rc-input" name="serialnumber" value="{{derefString .device.SerialNumber}}" placeholder="Optional">
+                        </div>
                     </div>
-                </div>
+                    
+                    <div class="rc-grid rc-grid-3 rc-gap-lg rc-mt-lg">
+                        <div class="rc-form-group">
+                            <label class="rc-label">Purchase Date</label>
+                            <input type="date" class="rc-input" name="purchase_date" value="{{if .device.PurchaseDate}}{{.device.PurchaseDate.Format "2006-01-02"}}{{end}}">
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Last Maintenance</label>
+                            <input type="date" class="rc-input" name="last_maintenance" value="{{if .device.LastMaintenance}}{{.device.LastMaintenance.Format "2006-01-02"}}{{end}}">
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Status</label>
+                            <select class="rc-input" name="status">
+                                <option value="free" {{if eq .device.Status "free"}}selected{{end}}>Free</option>
+                                <option value="rented" {{if eq .device.Status "rented"}}selected{{end}}>Rented</option>
+                                <option value="maintenance" {{if eq .device.Status "maintenance"}}selected{{end}}>Maintenance</option>
+                                <option value="other" {{if eq .device.Status "other"}}selected{{end}}>Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="rc-form-group rc-mt-lg">
+                        <label class="rc-label">Notes</label>
+                        <textarea class="rc-input" name="notes" rows="4" placeholder="Add any relevant notes about the device...">{{if .device.Notes}}{{.device.Notes}}{{end}}</textarea>
+                    </div>
+
+                    <hr class="rc-divider rc-my-xl">
+
+                    <div class="rc-flex rc-flex-end">
+                        <button type="submit" class="rc-btn rc-btn-primary">
+                            <i class="bi bi-check-lg"></i> 
+                            {{if .device.DeviceID}}
+                                Save Changes
+                            {{else}}
+                                Create Device
+                            {{end}}
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </main>
 
-    <footer class="bg-light mt-5 py-3">
-        <div class="container text-center">
-            <small class="text-muted">RentalCore - Equipment Management System</small>
+    <!-- Footer -->
+    <footer style="margin-top: var(--space-3xl); padding: var(--space-xl) 0; border-top: 1px solid var(--surface-3);">
+        <div class="rc-container">
+            <div class="rc-flex rc-flex-between" style="align-items: center;">
+                <div class="rc-text-sm" style="color: var(--text-muted);">
+                    <i class="bi bi-gear-wide-connected"></i>
+                    RentalCore - Advanced Equipment Management System
+                </div>
+                <div class="rc-flex" style="gap: var(--space-lg);">
+                    <a href="/help" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-question-circle"></i> Help
+                    </a>
+                    <a href="/about" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-info-circle"></i> About
+                    </a>
+                    <a href="/contact" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-envelope"></i> Contact
+                    </a>
+                </div>
+            </div>
         </div>
     </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- JavaScript -->
     <script src="/static/js/rental-core-design.js"></script>
-    {{if .scripts}}
-        {{range .scripts}}
-            <script src="{{.}}"></script>
-        {{end}}
-    {{end}}
 </body>
 </html>
