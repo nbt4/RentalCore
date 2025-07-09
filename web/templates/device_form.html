@@ -210,19 +210,19 @@
 
                     <hr class="rc-divider rc-my-xl">
 
-                    <div class="rc-flex rc-flex-between" style="margin-top: 20px;">
+                    <div class="rc-flex rc-flex-between" style="margin-top: 20px; align-items: flex-end; min-height: 80px;">
                         <div>
                             <a href="/devices" class="rc-btn rc-btn-outline">
                                 <i class="bi bi-x-lg"></i> Cancel
                             </a>
                         </div>
-                        <div>
-                            <button type="submit" class="rc-btn rc-btn-primary rc-btn-lg" style="background-color: #007bff; color: white; padding: 15px 32px; border: none; border-radius: 5px; font-size: 1.2rem; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                        <div style="display: flex; align-items: flex-end; height: 100%;">
+                            <button type="submit" class="rc-btn rc-btn-primary rc-btn-lg" style="background-color: #00d084; color: white; padding: 18px 40px; border: none; border-radius: 6px; font-size: 1.3rem; font-weight: 700; box-shadow: 0 4px 16px rgba(0,0,0,0.12); display: block;">
                                 <i class="bi bi-check-lg"></i> 
                                 {{if .device.DeviceID}}
                                     Save Changes
                                 {{else}}
-                                    Save Device
+                                    Gerät speichern
                                 {{end}}
                             </button>
                         </div>
