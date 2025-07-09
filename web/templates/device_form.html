@@ -217,22 +217,15 @@
                             </a>
                         </div>
                         <div>
-                            <button type="submit" class="rc-btn rc-btn-primary" style="background-color: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 5px;">
+                            <button type="submit" class="rc-btn rc-btn-primary rc-btn-lg" style="background-color: #007bff; color: white; padding: 15px 32px; border: none; border-radius: 5px; font-size: 1.2rem; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
                                 <i class="bi bi-check-lg"></i> 
                                 {{if .device.DeviceID}}
                                     Save Changes
                                 {{else}}
-                                    Create Device
+                                    Save Device
                                 {{end}}
                             </button>
                         </div>
-                    </div>
-                    
-                    <!-- DEBUG: Force visible button -->
-                    <div style="margin-top: 20px; text-align: center;">
-                        <button type="submit" style="background-color: #28a745; color: white; padding: 15px 30px; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">
-                            🔥 SAVE DEVICE (DEBUG)
-                        </button>
                     </div>
                 </form>
             </div>
