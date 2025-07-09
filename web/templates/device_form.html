@@ -210,19 +210,19 @@
 
                     <hr class="rc-divider rc-my-xl">
 
-                    <div class="rc-flex rc-flex-between" style="margin-top: 20px; align-items: center; min-height: 80px; padding: 20px 0;">
+                    <div class="rc-flex rc-flex-between rc-mt-xl" style="align-items: center;">
                         <div>
                             <a href="/devices" class="rc-btn rc-btn-outline">
                                 <i class="bi bi-x-lg"></i> Cancel
                             </a>
                         </div>
                         <div>
-                            <button type="submit" class="rc-btn rc-btn-primary rc-btn-lg" style="background-color: #ff0055; color: white; padding: 15px 30px; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: 600; cursor: pointer;">
-                                <i class="bi bi-check-lg"></i> 
+                            <button type="submit" class="rc-btn rc-btn-primary rc-btn-lg">
+                                <i class="bi bi-check-lg"></i>
                                 {{if .device.DeviceID}}
-                                    Save Changes
+                                Save Changes
                                 {{else}}
-                                    GERÄT SPEICHERN
+                                GERÄT SPEICHERN
                                 {{end}}
                             </button>
                         </div>
