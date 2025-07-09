@@ -443,6 +443,7 @@ func setupRoutes(r *gin.Engine,
 		c.String(http.StatusOK, "Route Debug:\n/settings/company -> Company Settings\n/monitoring -> Monitoring Dashboard\nTime: %s", time.Now().Format("2006-01-02 15:04:05"))
 	})
 	
+	
 
 	// Protected routes - require authentication
 	protected := r.Group("/")

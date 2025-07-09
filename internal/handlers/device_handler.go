@@ -26,18 +26,23 @@ func NewDeviceHandler(deviceRepo *repository.DeviceRepository, barcodeService *s
 	}
 }
 
+
 // Web interface handlers
 func (h *DeviceHandler) ListDevices(c *gin.Context) {
 	user, _ := GetCurrentUser(c)
 	
 	params := &models.FilterParams{}
 	if err := c.ShouldBindQuery(params); err != nil {
+		log.Printf("❌ Error binding query parameters: %v", err)
 		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
-
-	// DEBUG: Log the received search term and view type
-	log.Printf("🔍 ListDevices handler called with SearchTerm: '%s' and View: '%s'", params.SearchTerm, c.Query("view"))
+	
+	// FIX: Ensure search parameter is properly handled
+	searchParam := c.Query("search")
+	if searchParam != "" {
+		params.SearchTerm = searchParam
+	}
 
 	viewType := c.DefaultQuery("view", "list") // Default to list view
 
@@ -90,7 +95,6 @@ func (h *DeviceHandler) NewDeviceForm(c *gin.Context) {
 }
 
 func (h *DeviceHandler) CreateDevice(c *gin.Context) {
-	deviceID := c.PostForm("deviceID")
 	serialNumber := c.PostForm("serialnumber")
 	status := c.PostForm("status")
 	if status == "" {
@@ -106,7 +110,7 @@ func (h *DeviceHandler) CreateDevice(c *gin.Context) {
 	}
 	
 	device := models.Device{
-		DeviceID:     deviceID,
+		DeviceID:     "", // Let database generate the ID automatically
 		ProductID:    productID,
 		SerialNumber: &serialNumber,
 		Status:       status,

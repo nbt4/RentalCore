@@ -166,11 +166,18 @@
         <!-- Search Card -->
         <div class="rc-card rc-mb-lg">
             <div class="rc-card-body">
-                <form method="GET" action="/devices">
-                    <input type="hidden" name="view" value="{{.viewType}}">
+                {{if and .params .params.SearchTerm}}
+                <div class="rc-alert rc-alert-info rc-mb-md">
+                    <i class="bi bi-search"></i> 
+                    <strong>Search Active:</strong> Showing results for "<strong>{{.params.SearchTerm}}</strong>"
+                    <a href="/devices?view={{.viewType}}" class="rc-alert-link">Clear Search</a>
+                </div>
+                {{end}}
+                <form method="GET" action="/devices" id="searchForm">
+                    <input type="hidden" name="view" value="{{if .viewType}}{{.viewType}}{{else}}list{{end}}">
                     <div class="rc-flex rc-flex-gap-md">
                         <div class="rc-flex-1">
-                            <input type="text" class="rc-input" name="search" value="{{.params.SearchTerm}}" placeholder="Search devices by ID, product, or serial number...">
+                            <input type="text" class="rc-input" name="search" id="searchInput" value="{{if .params}}{{.params.SearchTerm}}{{end}}" placeholder="Search devices by ID, product, or serial number...">
                         </div>
                         <div>
                             <button type="submit" class="rc-btn rc-btn-primary">
@@ -328,6 +335,24 @@
                     </div>
                 </div>
                 {{end}}
+                
+                <!-- Show "No search results" message if searching but no devices found -->
+                {{if and .params .params.SearchTerm (not .categorizedDevices.Categories) (not .categorizedDevices.Uncategorized)}}
+                <div class="rc-card">
+                    <div class="rc-card-body">
+                        <div class="rc-text-center">
+                            <div style="font-size: 4rem; color: var(--text-muted); margin-bottom: var(--space-lg);">
+                                <i class="bi bi-search"></i>
+                            </div>
+                            <h3 style="color: var(--text-secondary);">No devices found</h3>
+                            <p class="rc-text-sm">No devices match your search term: <strong>"{{.params.SearchTerm}}"</strong></p>
+                            <a href="/devices?view=categorized" class="rc-btn rc-btn-outline">
+                                <i class="bi bi-arrow-clockwise"></i> Clear Search
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {{end}}
             </div>
         {{else}}
         <div class="rc-card">
@@ -395,6 +420,16 @@
                 </div>
                 {{else}}
                 <div class="rc-text-center">
+                    {{if and .params .params.SearchTerm}}
+                    <div style="font-size: 4rem; color: var(--text-muted); margin-bottom: var(--space-lg);">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h3 style="color: var(--text-secondary);">No devices found</h3>
+                    <p class="rc-text-sm">No devices match your search term: <strong>"{{.params.SearchTerm}}"</strong></p>
+                    <a href="/devices?view=list" class="rc-btn rc-btn-outline">
+                        <i class="bi bi-arrow-clockwise"></i> Clear Search
+                    </a>
+                    {{else}}
                     <div style="font-size: 4rem; color: var(--text-muted); margin-bottom: var(--space-lg);">
                         <i class="bi bi-cpu"></i>
                     </div>
@@ -403,6 +438,7 @@
                     <a href="/devices/new" class="rc-btn rc-btn-primary">
                         <i class="bi bi-plus-lg"></i> Add Device
                     </a>
+                    {{end}}
                 </div>
                 {{end}}
             </div>
@@ -480,6 +516,64 @@
     <script>
     document.addEventListener('DOMContentLoaded', function () {
         const accordionHeaders = document.querySelectorAll('.accordion-header');
+        const searchTerm = '{{.params.SearchTerm}}';
+        
+        // Search form handling
+        const searchForm = document.getElementById('searchForm');
+        if (searchForm) {
+            // Add event listener to form submit
+            searchForm.addEventListener('submit', function(e) {
+                e.preventDefault(); // Prevent default form submission
+                
+                const searchInput = document.getElementById('searchInput');
+                const searchValue = searchInput ? searchInput.value.trim() : '';
+                
+                if (!searchValue) {
+                    return false;
+                }
+                
+                // Manual URL construction to ensure it works
+                const viewType = document.querySelector('input[name="view"]').value || 'list';
+                const newUrl = `/devices?search=${encodeURIComponent(searchValue)}&view=${encodeURIComponent(viewType)}`;
+                window.location.href = newUrl;
+                return false;
+            });
+            
+            // Also add event listener to submit button specifically
+            const submitButton = searchForm.querySelector('button[type="submit"]');
+            if (submitButton) {
+                submitButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    const searchInput = document.getElementById('searchInput');
+                    const searchValue = searchInput ? searchInput.value.trim() : '';
+                    
+                    if (!searchValue) {
+                        return false;
+                    }
+                    
+                    const viewType = document.querySelector('input[name="view"]').value || 'list';
+                    const newUrl = `/devices?search=${encodeURIComponent(searchValue)}&view=${encodeURIComponent(viewType)}`;
+                    window.location.href = newUrl;
+                });
+            }
+        }
+
+        // If there's a search term, expand all accordion sections with results
+        if (searchTerm && searchTerm.trim() !== '') {
+            accordionHeaders.forEach(header => {
+                const content = header.nextElementSibling;
+                const icon = header.querySelector('.accordion-icon');
+                const table = content.querySelector('table tbody');
+                
+                // Check if this section has any devices (table rows)
+                if (table && table.children.length > 0) {
+                    content.style.display = 'block';
+                    header.classList.add('active');
+                    if (icon) icon.textContent = '-';
+                }
+            });
+        }
 
         accordionHeaders.forEach(header => {
             header.addEventListener('click', () => {

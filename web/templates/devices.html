@@ -166,10 +166,17 @@
         <!-- Search Card -->
         <div class="rc-card rc-mb-lg">
             <div class="rc-card-body">
+                {{if and .params .params.SearchTerm}}
+                <div class="rc-alert rc-alert-info rc-mb-md">
+                    <i class="bi bi-search"></i> 
+                    <strong>Search Active:</strong> Showing results for "<strong>{{.params.SearchTerm}}</strong>"
+                    <a href="/devices" class="rc-alert-link">Clear Search</a>
+                </div>
+                {{end}}
                 <form method="GET" action="/devices">
                     <div class="rc-flex rc-flex-gap-md">
                         <div class="rc-flex-1">
-                            <input type="text" class="rc-input" name="search" value="{{.params.SearchTerm}}" placeholder="Search devices by ID, product, or serial number...">
+                            <input type="text" class="rc-input" name="search" value="{{if .params}}{{.params.SearchTerm}}{{end}}" placeholder="Search devices by ID, product, or serial number...">
                         </div>
                         <div>
                             <button type="submit" class="rc-btn rc-btn-primary">
@@ -247,6 +254,16 @@
                 </div>
                 {{else}}
                 <div class="rc-text-center">
+                    {{if and .params .params.SearchTerm}}
+                    <div style="font-size: 4rem; color: var(--text-muted); margin-bottom: var(--space-lg);">
+                        <i class="bi bi-search"></i>
+                    </div>
+                    <h3 style="color: var(--text-secondary);">No devices found</h3>
+                    <p class="rc-text-sm">No devices match your search term: <strong>"{{.params.SearchTerm}}"</strong></p>
+                    <a href="/devices" class="rc-btn rc-btn-outline">
+                        <i class="bi bi-arrow-clockwise"></i> Clear Search
+                    </a>
+                    {{else}}
                     <div style="font-size: 4rem; color: var(--text-muted); margin-bottom: var(--space-lg);">
                         <i class="bi bi-cpu"></i>
                     </div>
@@ -255,6 +272,7 @@
                     <a href="/devices/new" class="rc-btn rc-btn-primary">
                         <i class="bi bi-plus-lg"></i> Add Device
                     </a>
+                    {{end}}
                 </div>
                 {{end}}
             </div>

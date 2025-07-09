@@ -68,12 +68,19 @@ func (r *DeviceRepository) Delete(deviceID string) error {
 func (r *DeviceRepository) List(params *models.FilterParams) ([]models.DeviceWithJobInfo, error) {
 	var devices []models.Device
 
+	// DEBUG: Check total device count first
+	var totalCount int64
+	r.db.Model(&models.Device{}).Count(&totalCount)
+	log.Printf("🔍 Total devices in database: %d", totalCount)
+
 	query := r.db.Model(&models.Device{}).Preload("Product")
 
 	if params.SearchTerm != "" {
 		searchPattern := "%" + params.SearchTerm + "%"
-		query = query.Joins("LEFT JOIN products ON products.product_id = devices.product_id").
+		log.Printf("🔍 Adding search filter with pattern: '%s'", searchPattern)
+		query = query.Joins("LEFT JOIN products ON products.productID = devices.productID").
 			Where("devices.deviceID LIKE ? OR devices.serialnumber LIKE ? OR products.name LIKE ?", searchPattern, searchPattern, searchPattern)
+		log.Printf("🔍 SQL query will search in: devices.deviceID, devices.serialnumber, products.name")
 	}
 
 	if params.Limit > 0 {
@@ -87,6 +94,8 @@ func (r *DeviceRepository) List(params *models.FilterParams) ([]models.DeviceWit
 
 	err := query.Find(&devices).Error
 	if err != nil {
+		log.Printf("❌ Error executing devices search query: %v", err)
+		log.Printf("🔍 Search term was: '%s'", params.SearchTerm)
 		return nil, err
 	}
 
@@ -221,8 +230,10 @@ func (r *DeviceRepository) GetDevicesGroupedByCategory(params *models.FilterPara
 
 	if params.SearchTerm != "" {
 		searchPattern := "%" + params.SearchTerm + "%"
-		query = query.Joins("LEFT JOIN products ON products.product_id = devices.product_id").
+		log.Printf("🔍 Adding search filter with pattern: '%s'", searchPattern)
+		query = query.Joins("LEFT JOIN products ON products.productID = devices.productID").
 			Where("devices.deviceID LIKE ? OR devices.serialnumber LIKE ? OR products.name LIKE ?", searchPattern, searchPattern, searchPattern)
+		log.Printf("🔍 SQL query will search in: devices.deviceID, devices.serialnumber, products.name")
 	}
 
 	if params.Limit > 0 {
@@ -236,7 +247,8 @@ func (r *DeviceRepository) GetDevicesGroupedByCategory(params *models.FilterPara
 
 	err := query.Find(&devices).Error
 	if err != nil {
-		log.Printf("❌ Error fetching devices: %v", err)
+		log.Printf("❌ Error fetching devices in categorized view: %v", err)
+		log.Printf("🔍 Search term was: '%s'", params.SearchTerm)
 		return nil, err
 	}
 

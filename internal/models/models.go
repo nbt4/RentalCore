@@ -244,7 +244,6 @@ type FilterParams struct {
 	SortOrder          string `form:"sort_order"`
 	Status             string `form:"status"`
 	ProductID          *uint  `form:"product_id"`
-	Search             string `form:"search"`
 	AssignmentStatus   string `form:"assignment_status"`
 	JobID              *uint  `form:"job_id"`
 }
