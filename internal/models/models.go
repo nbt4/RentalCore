@@ -75,17 +75,27 @@ func (Job) TableName() string {
 }
 
 type Device struct {
-	DeviceID         string      `json:"deviceID" gorm:"primaryKey;column:deviceID"`
-	ProductID        *uint       `json:"productID" gorm:"column:productID"`
-	Product          *Product    `json:"product,omitempty" gorm:"foreignKey:ProductID;references:ProductID"`
-	SerialNumber     *string     `json:"serialnumber" gorm:"column:serialnumber"`
-	PurchaseDate     *time.Time  `json:"purchaseDate" gorm:"column:purchaseDate;type:date"`
-	LastMaintenance  *time.Time  `json:"lastmaintenance" gorm:"column:lastmaintenance;type:date"`
-	NextMaintenance  *time.Time  `json:"nextmaintenance" gorm:"column:nextmaintenance;type:date"`
-	InsuranceNumber  *string     `json:"insurancenumber" gorm:"column:insurancenumber"`
-	Status           string      `json:"status" gorm:"column:status;default:free"`
-	InsuranceID      *uint       `json:"insuranceID" gorm:"column:insuranceID"`
-	JobDevices       []JobDevice `json:"job_devices,omitempty" gorm:"foreignKey:DeviceID;references:DeviceID"`
+	DeviceID             string      `json:"deviceID" gorm:"primaryKey;column:deviceID"`
+	ProductID            *uint       `json:"productID" gorm:"column:productID"`
+	Product              *Product    `json:"product,omitempty" gorm:"foreignKey:ProductID;references:ProductID"`
+	SerialNumber         *string     `json:"serialnumber" gorm:"column:serialnumber"`
+	PurchaseDate         *time.Time  `json:"purchaseDate" gorm:"column:purchaseDate;type:date"`
+	LastMaintenance      *time.Time  `json:"lastmaintenance" gorm:"column:lastmaintenance;type:date"`
+	NextMaintenance      *time.Time  `json:"nextmaintenance" gorm:"column:nextmaintenance;type:date"`
+	InsuranceNumber      *string     `json:"insurancenumber" gorm:"column:insurancenumber"`
+	Status               string      `json:"status" gorm:"column:status;default:free"`
+	InsuranceID          *uint       `json:"insuranceID" gorm:"column:insuranceID"`
+	QRCode               *string     `json:"qrCode" gorm:"column:qr_code"`
+	CurrentLocation      *string     `json:"currentLocation" gorm:"column:current_location"`
+	GPSLatitude          *float64    `json:"gpsLatitude" gorm:"column:gps_latitude"`
+	GPSLongitude         *float64    `json:"gpsLongitude" gorm:"column:gps_longitude"`
+	ConditionRating      *float64    `json:"conditionRating" gorm:"column:condition_rating;default:5.0"`
+	UsageHours           *float64    `json:"usageHours" gorm:"column:usage_hours;default:0.00"`
+	TotalRevenue         *float64    `json:"totalRevenue" gorm:"column:total_revenue;default:0.00"`
+	LastMaintenanceCost  *float64    `json:"lastMaintenanceCost" gorm:"column:last_maintenance_cost"`
+	Notes                *string     `json:"notes" gorm:"column:notes"`
+	Barcode              *string     `json:"barcode" gorm:"column:barcode"`
+	JobDevices           []JobDevice `json:"job_devices,omitempty" gorm:"foreignKey:DeviceID;references:DeviceID"`
 }
 
 func (Device) TableName() string {

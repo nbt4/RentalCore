@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"strconv"
 	"log"
+	"time"
 
 	"go-barcode-webapp/internal/models"
 	"go-barcode-webapp/internal/repository"
@@ -97,6 +98,8 @@ func (h *DeviceHandler) NewDeviceForm(c *gin.Context) {
 func (h *DeviceHandler) CreateDevice(c *gin.Context) {
 	serialNumber := c.PostForm("serialnumber")
 	status := c.PostForm("status")
+	notes := c.PostForm("notes")
+	
 	if status == "" {
 		status = "free"
 	}
@@ -114,6 +117,26 @@ func (h *DeviceHandler) CreateDevice(c *gin.Context) {
 		ProductID:    productID,
 		SerialNumber: &serialNumber,
 		Status:       status,
+	}
+	
+	// Handle optional string fields
+	if serialNumber != "" {
+		device.SerialNumber = &serialNumber
+	}
+	if notes != "" {
+		device.Notes = &notes
+	}
+	
+	// Handle date fields
+	if purchaseDateStr := c.PostForm("purchase_date"); purchaseDateStr != "" {
+		if purchaseDate, err := time.Parse("2006-01-02", purchaseDateStr); err == nil {
+			device.PurchaseDate = &purchaseDate
+		}
+	}
+	if lastMaintenanceStr := c.PostForm("last_maintenance"); lastMaintenanceStr != "" {
+		if lastMaintenance, err := time.Parse("2006-01-02", lastMaintenanceStr); err == nil {
+			device.LastMaintenance = &lastMaintenance
+		}
 	}
 
 	if err := h.deviceRepo.Create(&device); err != nil {
@@ -178,6 +201,7 @@ func (h *DeviceHandler) UpdateDevice(c *gin.Context) {
 	deviceID := c.Param("id")
 	serialNumber := c.PostForm("serialnumber")
 	status := c.PostForm("status")
+	notes := c.PostForm("notes")
 	
 	var productID *uint
 	if productIDStr := c.PostForm("productID"); productIDStr != "" {
@@ -188,10 +212,29 @@ func (h *DeviceHandler) UpdateDevice(c *gin.Context) {
 	}
 	
 	device := models.Device{
-		DeviceID:     deviceID,
-		ProductID:    productID,
-		SerialNumber: &serialNumber,
-		Status:       status,
+		DeviceID:  deviceID,
+		ProductID: productID,
+		Status:    status,
+	}
+	
+	// Handle optional string fields
+	if serialNumber != "" {
+		device.SerialNumber = &serialNumber
+	}
+	if notes != "" {
+		device.Notes = &notes
+	}
+	
+	// Handle date fields
+	if purchaseDateStr := c.PostForm("purchase_date"); purchaseDateStr != "" {
+		if purchaseDate, err := time.Parse("2006-01-02", purchaseDateStr); err == nil {
+			device.PurchaseDate = &purchaseDate
+		}
+	}
+	if lastMaintenanceStr := c.PostForm("last_maintenance"); lastMaintenanceStr != "" {
+		if lastMaintenance, err := time.Parse("2006-01-02", lastMaintenanceStr); err == nil {
+			device.LastMaintenance = &lastMaintenance
+		}
 	}
 
 	if err := h.deviceRepo.Update(&device); err != nil {

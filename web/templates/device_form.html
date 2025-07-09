@@ -205,7 +205,7 @@
 
                     <div class="rc-form-group rc-mt-lg">
                         <label class="rc-label">Notes</label>
-                        <textarea class="rc-input" name="notes" rows="4" placeholder="Add any relevant notes about the device...">{{if .device.Notes}}{{.device.Notes}}{{end}}</textarea>
+                        <textarea class="rc-input" name="notes" rows="4" placeholder="Add any relevant notes about the device...">{{if .device.Notes}}{{deref .device.Notes}}{{end}}</textarea>
                     </div>
 
                     <hr class="rc-divider rc-my-xl">
