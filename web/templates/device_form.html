@@ -210,19 +210,19 @@
 
                     <hr class="rc-divider rc-my-xl">
 
-                    <div class="rc-flex rc-flex-between rc-mt-xl" style="align-items: center;">
+                    <div class="rc-flex rc-flex-between rc-mt-xl">
                         <div>
                             <a href="/devices" class="rc-btn rc-btn-outline">
-                                <i class="bi bi-x-lg"></i> Cancel
+                                <i class="bi bi-arrow-left"></i> Cancel
                             </a>
                         </div>
                         <div>
-                            <button type="submit" class="rc-btn rc-btn-primary rc-btn-lg">
-                                <i class="bi bi-check-lg"></i>
+                            <button type="submit" id="saveDeviceBtn" class="rc-btn rc-btn-primary rc-btn-lg">
+                                <i class="bi bi-check-lg"></i> 
                                 {{if .device.DeviceID}}
-                                Save Changes
+                                    Save Changes
                                 {{else}}
-                                GERÄT SPEICHERN
+                                    Create Device
                                 {{end}}
                             </button>
                         </div>
@@ -257,5 +257,34 @@
 
     <!-- JavaScript -->
     <script src="/static/js/rental-core-design.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const saveButton = document.getElementById('saveDeviceBtn');
+            const form = document.querySelector('form');
+            
+            if (saveButton) {
+                saveButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Validate required fields
+                    const productSelect = document.querySelector('select[name="productID"]');
+                    if (!productSelect || !productSelect.value) {
+                        alert('Please select a product!');
+                        return;
+                    }
+                    
+                    // Change button text to show saving
+                    const originalText = saveButton.innerHTML;
+                    saveButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
+                    saveButton.disabled = true;
+                    
+                    // Submit form
+                    if (form) {
+                        form.submit();
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>

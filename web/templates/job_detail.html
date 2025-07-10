@@ -40,18 +40,10 @@
                 
                 <!-- Main navigation -->
                 <ul class="rc-navbar-nav">
-                    <li><a href="/jobs" class="rc-nav-link">
-                        <i class="bi bi-briefcase"></i> Jobs
-                    </a></li>
-                    <li><a href="/devices" class="rc-nav-link">
-                        <i class="bi bi-cpu"></i> Devices
-                    </a></li>
-                    <li><a href="/customers" class="rc-nav-link">
-                        <i class="bi bi-people"></i> Customers
-                    </a></li>
-                    <li><a href="/cases" class="rc-nav-link">
-                        <i class="bi bi-box"></i> Cases
-                    </a></li>
+                    <li><a href="/jobs" class="rc-nav-link rc-nav-link-active">Jobs</a></li>
+                    <li><a href="/devices" class="rc-nav-link">Devices</a></li>
+                    <li><a href="/customers" class="rc-nav-link">Customers</a></li>
+                    <li><a href="/cases" class="rc-nav-link">Cases</a></li>
                     
                     <!-- Tools Dropdown -->
                     <li class="rc-dropdown">
@@ -144,91 +136,103 @@
     <main class="rc-container rc-mt-lg">
         
         <!-- Job Header -->
-        <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="rc-flex rc-flex-between rc-mb-xl">
             <div>
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="/jobs">Jobs</a></li>
-                        <li class="breadcrumb-item active">Job #{{.job.JobID}}</li>
-                    </ol>
+                <!-- Breadcrumb -->
+                <nav class="rc-breadcrumb rc-mb-md">
+                    <a href="/jobs" class="rc-breadcrumb-item">Jobs</a>
+                    <span class="rc-breadcrumb-separator"><i class="bi bi-chevron-right"></i></span>
+                    <span class="rc-breadcrumb-item rc-breadcrumb-current">Job #{{.job.JobID}}</span>
                 </nav>
-                <h1>{{.job.Description}}</h1>
-                <p class="text-muted mb-0">
-                    <i class="bi bi-person"></i> {{.job.Customer.GetDisplayName}} | 
-                    <span class="badge bg-{{if eq .job.Status.Status "open"}}warning{{else if eq .job.Status.Status "in progress"}}info{{else if eq .job.Status.Status "paid"}}success{{else}}secondary{{end}}">
+                
+                <h1 class="rc-heading-1 rc-mb-sm">{{.job.Description}}</h1>
+                <div class="rc-flex rc-flex-gap-md" style="align-items: center;">
+                    <span class="rc-text-secondary">
+                        <i class="bi bi-person"></i> {{.job.Customer.GetDisplayName}}
+                    </span>
+                    <span class="rc-badge {{if eq .job.Status.Status "open"}}rc-badge-warning{{else if eq .job.Status.Status "in progress"}}rc-badge-info{{else if eq .job.Status.Status "paid"}}rc-badge-success{{else}}rc-badge-secondary{{end}}">
                         {{.job.Status.Status}}
                     </span>
-                </p>
+                </div>
             </div>
-            <div class="btn-group">
-                <a href="/jobs/{{.job.JobID}}/edit" class="btn btn-outline-primary">
+            <div class="rc-flex rc-flex-gap-sm">
+                <a href="/jobs/{{.job.JobID}}/edit" class="rc-btn rc-btn-outline rc-btn-sm">
                     <i class="bi bi-pencil"></i> Edit
                 </a>
-                <a href="/scan/{{.job.JobID}}" class="btn btn-warning">
+                <a href="/scan/{{.job.JobID}}" class="rc-btn rc-btn-primary rc-btn-sm">
                     <i class="bi bi-qr-code-scan"></i> Scan Devices
                 </a>
             </div>
         </div>
 
-        <div class="row">
+        <div class="rc-grid rc-grid-cols-1 rc-grid-cols-lg-4 rc-grid-gap-lg">
             <!-- Job Information -->
-            <div class="col-lg-4">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h6><i class="bi bi-info-circle"></i> Job Details</h6>
+            <div class="rc-grid-span-1">
+                <div class="rc-card rc-mb-lg">
+                    <div class="rc-card-header">
+                        <h3 class="rc-heading-3"><i class="bi bi-info-circle"></i> Job Details</h3>
                     </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-6">
-                                <small class="text-muted">Start Date</small>
-                                <p class="mb-2">{{if .job.StartDate}}{{.job.StartDate.Format "02.01.2006"}}{{else}}-{{end}}</p>
+                    <div class="rc-card-body">
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <label>Start Date</label>
+                                <span>{{if .job.StartDate}}{{.job.StartDate.Format "02.01.2006"}}{{else}}-{{end}}</span>
                             </div>
-                            <div class="col-6">
-                                <small class="text-muted">End Date</small>
-                                <p class="mb-2">{{if .job.EndDate}}{{.job.EndDate.Format "02.01.2006"}}{{else}}-{{end}}</p>
+                            <div class="info-item">
+                                <label>End Date</label>
+                                <span>{{if .job.EndDate}}{{.job.EndDate.Format "02.01.2006"}}{{else}}-{{end}}</span>
                             </div>
+                            <div class="info-item">
+                                <label>Revenue</label>
+                                <span class="rc-text-accent">€{{printf "%.2f" .job.Revenue}}</span>
+                            </div>
+                            <div class="info-item">
+                                <label>Final Revenue</label>
+                                <span class="rc-text-accent">€{{printf "%.2f" (derefFloat .job.FinalRevenue)}}</span>
+                            </div>
+                            {{if .job.JobCategory}}
+                            <div class="info-item">
+                                <label>Category</label>
+                                <span>{{.job.JobCategory.Name}}</span>
+                            </div>
+                            {{end}}
                         </div>
-                        <div class="row">
-                            <div class="col-6">
-                                <small class="text-muted">Revenue</small>
-                                <p class="mb-2"><strong>€{{printf "%.2f" .job.Revenue}}</strong></p>
-                            </div>
-                            <div class="col-6">
-                                <small class="text-muted">Final Revenue</small>
-                                <p class="mb-2"><strong>€{{printf "%.2f" (derefFloat .job.FinalRevenue)}}</strong></p>
-                            </div>
-                        </div>
-                        {{if .job.JobCategory}}
-                        <div class="mb-2">
-                            <small class="text-muted">Category</small>
-                            <p class="mb-0">{{.job.JobCategory.Name}}</p>
-                        </div>
-                        {{end}}
                     </div>
                 </div>
 
                 <!-- Quick Stats -->
-                <div class="card">
-                    <div class="card-header">
-                        <h6><i class="bi bi-bar-chart"></i> Quick Stats</h6>
+                <div class="rc-card">
+                    <div class="rc-card-header">
+                        <h3 class="rc-heading-3"><i class="bi bi-bar-chart"></i> Quick Stats</h3>
                     </div>
-                    <div class="card-body">
-                        <div class="row text-center">
-                            <div class="col-4">
-                                <div class="border-end">
-                                    <h4 class="text-primary">{{len .productGroups}}</h4>
-                                    <small class="text-muted">Products</small>
+                    <div class="rc-card-body">
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="bi bi-box"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-value">{{len .productGroups}}</div>
+                                    <div class="stat-label">Products</div>
                                 </div>
                             </div>
-                            <div class="col-4">
-                                <div class="border-end">
-                                    <h4 class="text-success">{{.totalDevices}}</h4>
-                                    <small class="text-muted">Devices</small>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="bi bi-cpu"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-value">{{.totalDevices}}</div>
+                                    <div class="stat-label">Devices</div>
                                 </div>
                             </div>
-                            <div class="col-4">
-                                <h4 class="text-info">€{{printf "%.0f" .totalValue}}</h4>
-                                <small class="text-muted">Value</small>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="bi bi-currency-euro"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-value">€{{printf "%.0f" .totalValue}}</div>
+                                    <div class="stat-label">Value</div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -236,61 +240,66 @@
             </div>
 
             <!-- Equipment List -->
-            <div class="col-lg-8">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h6><i class="bi bi-list-ul"></i> Equipment Assignment</h6>
-                        <div class="btn-group btn-group-sm">
-                            <a href="/scan/{{.job.JobID}}" class="btn btn-outline-warning">
-                                <i class="bi bi-qr-code-scan"></i> Scanner
-                            </a>
-                            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addDeviceModal">
-                                <i class="bi bi-plus-lg"></i> Add
-                            </button>
+            <div class="rc-grid-span-3">
+                <div class="rc-card">
+                    <div class="rc-card-header">
+                        <div class="rc-flex rc-flex-between">
+                            <h3 class="rc-heading-3"><i class="bi bi-list-ul"></i> Equipment Assignment</h3>
+                            <div class="rc-flex rc-flex-gap-sm">
+                                <a href="/scan/{{.job.JobID}}" class="rc-btn rc-btn-warning rc-btn-sm">
+                                    <i class="bi bi-qr-code-scan"></i> Scanner
+                                </a>
+                                <button class="rc-btn rc-btn-outline rc-btn-sm" onclick="showAddDeviceModal()">
+                                    <i class="bi bi-plus-lg"></i> Add
+                                </button>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <div class="rc-card-body">
                         {{if .productGroups}}
-                        <!-- Desktop Product Groups -->
-                        <div id="product-groups" class="d-none d-lg-block">
+                        <!-- Product Groups -->
+                        <div class="equipment-groups">
                             {{range $productName, $group := .productGroups}}
-                            <div class="product-group" data-product="{{$productName}}">
-                                <div class="product-header" onclick="toggleProductGroup('{{$productName}}')">
-                                    <div class="product-summary">
-                                        <div class="product-info">
-                                            <h6>{{$productName}} 
-                                                <span class="quantity-badge badge bg-primary">{{len $group.Devices}}x</span>
-                                            </h6>
-                                            <div class="product-meta">
+                            <div class="equipment-group rc-mb-lg" data-product="{{$productName}}">
+                                <div class="equipment-header" onclick="toggleProductGroup('{{$productName}}')">
+                                    <div class="rc-flex rc-flex-between">
+                                        <div class="equipment-info">
+                                            <h4 class="rc-heading-4 rc-mb-xs">
+                                                {{$productName}} 
+                                                <span class="rc-badge rc-badge-primary">{{len $group.Devices}}x</span>
+                                            </h4>
+                                            <div class="rc-text-secondary rc-text-sm">
                                                 {{if $group.Product.Brand}}{{$group.Product.Brand.Name}} | {{end}}
                                                 {{if $group.Product.Category}}{{$group.Product.Category.Name}} | {{end}}
                                                 €{{printf "%.2f" $group.Product.ItemCostPerDay}}/day
                                             </div>
                                         </div>
-                                        <div class="product-actions">
-                                            <span class="text-muted me-3">€{{printf "%.2f" $group.TotalValue}}</span>
-                                            <i class="bi bi-chevron-down toggle-icon"></i>
+                                        <div class="equipment-actions">
+                                            <span class="rc-text-accent rc-text-lg rc-me-md">€{{printf "%.2f" $group.TotalValue}}</span>
+                                            <i class="bi bi-chevron-down toggle-icon rc-text-secondary"></i>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="device-list collapse" id="devices-{{$productName}}">
+                                <div class="equipment-devices" id="devices-{{$productName}}" style="display: none;">
                                     {{range $group.Devices}}
-                                    <div class="device-item">
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <div>
-                                                <strong>{{.Device.DeviceID}}</strong>
-                                                {{if .Device.SerialNumber}}<br><small class="text-muted">SN: {{.Device.SerialNumber}}</small>{{end}}
+                                    <div class="equipment-device rc-mb-md">
+                                        <div class="rc-flex rc-flex-between">
+                                            <div class="device-info">
+                                                <div class="rc-text-lg rc-text-primary">{{.Device.DeviceID}}</div>
+                                                {{if .Device.SerialNumber}}
+                                                <div class="rc-text-sm rc-text-secondary">SN: {{derefString .Device.SerialNumber}}</div>
+                                                {{end}}
                                             </div>
-                                            <div class="text-end">
-                                                <span class="text-muted">€{{printf "%.2f" .CustomPrice}}</span>
-                                                <div class="btn-group btn-group-sm ms-2">
-                                                    <a href="/devices/{{.Device.DeviceID}}" class="btn btn-outline-info btn-sm">
+                                            <div class="device-actions">
+                                                <span class="rc-text-accent rc-me-md">€{{printf "%.2f" .CustomPrice}}</span>
+                                                <div class="rc-flex rc-flex-gap-xs">
+                                                    <button type="button" class="rc-btn rc-btn-outline rc-btn-sm" title="View Details" onclick="showDeviceDetails('{{.Device.DeviceID}}')">
                                                         <i class="bi bi-eye"></i>
-                                                    </a>
-                                                    <a href="/devices/{{.Device.DeviceID}}/qr" target="_blank" class="btn btn-outline-secondary btn-sm">
+                                                    </button>
+                                                    <a href="/devices/{{.Device.DeviceID}}/qr" target="_blank" class="rc-btn rc-btn-outline rc-btn-sm" title="QR Code">
                                                         <i class="bi bi-qr-code"></i>
                                                     </a>
-                                                    <button class="btn btn-outline-danger btn-sm" onclick="removeDevice('{{.Device.DeviceID}}')">
+                                                    <button class="rc-btn rc-btn-outline rc-btn-sm" title="Remove" onclick="removeDevice('{{.Device.DeviceID}}')">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </div>
@@ -302,56 +311,16 @@
                             </div>
                             {{end}}
                         </div>
-                        
-                        <!-- Mobile Product Groups -->
-                        <div id="product-groups-mobile" class="d-lg-none">
-                            {{range $productName, $group := .productGroups}}
-                            <div class="product-group-mobile" data-product="{{$productName}}">
-                                <div class="product-header-mobile" onclick="toggleProductGroupMobile('{{$productName}}')">
-                                    <div class="product-info-mobile">
-                                        <h6>{{$productName}} <span class="quantity-badge-mobile">{{len $group.Devices}}x</span></h6>
-                                        <div class="product-meta-mobile">
-                                            {{if $group.Product.Brand}}{{$group.Product.Brand.Name}} | {{end}}
-                                            €{{printf "%.2f" $group.Product.ItemCostPerDay}}/day | €{{printf "%.2f" $group.TotalValue}} total
-                                        </div>
-                                    </div>
-                                    <i class="bi bi-chevron-down toggle-icon-mobile"></i>
-                                </div>
-                                <div class="device-list-mobile collapse" id="devices-mobile-{{$productName}}">
-                                    {{range $group.Devices}}
-                                    <div class="device-item-mobile">
-                                        <div class="device-item-info-mobile">
-                                            <strong>{{.Device.DeviceID}}</strong>
-                                            {{if .Device.SerialNumber}}<br><small class="text-muted">SN: {{.Device.SerialNumber}}</small>{{end}}
-                                            <br><small class="text-muted">€{{printf "%.2f" .CustomPrice}}</small>
-                                        </div>
-                                        <div class="device-item-actions-mobile">
-                                            <a href="/devices/{{.Device.DeviceID}}" class="btn btn-outline-info">
-                                                <i class="bi bi-eye"></i>
-                                            </a>
-                                            <a href="/devices/{{.Device.DeviceID}}/qr" target="_blank" class="btn btn-outline-secondary">
-                                                <i class="bi bi-qr-code"></i>
-                                            </a>
-                                            <button class="btn btn-outline-danger" onclick="removeDevice('{{.Device.DeviceID}}')">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                    {{end}}
-                                </div>
-                            </div>
-                            {{end}}
-                        </div>
                         {{else}}
-                        <div class="text-center py-5">
-                            <i class="bi bi-box display-1 text-muted"></i>
-                            <h5 class="text-muted mt-3">No equipment assigned</h5>
-                            <p class="text-muted">Start by scanning device barcodes or adding them manually</p>
-                            <div class="mt-4">
-                                <a href="/scan/{{.job.JobID}}" class="btn btn-warning me-2">
+                        <div class="rc-text-center rc-py-xl">
+                            <i class="bi bi-box" style="font-size: 4rem; color: var(--text-muted);"></i>
+                            <h4 class="rc-heading-4 rc-text-secondary rc-mt-lg">No equipment assigned</h4>
+                            <p class="rc-text-secondary">Start by scanning device barcodes or adding them manually</p>
+                            <div class="rc-flex rc-flex-gap-md rc-justify-center rc-mt-lg">
+                                <a href="/scan/{{.job.JobID}}" class="rc-btn rc-btn-warning">
                                     <i class="bi bi-qr-code-scan"></i> Start Scanning
                                 </a>
-                                <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addDeviceModal">
+                                <button class="rc-btn rc-btn-outline" onclick="showAddDeviceModal()">
                                     <i class="bi bi-plus-lg"></i> Add Manually
                                 </button>
                             </div>
@@ -363,28 +332,53 @@
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer style="margin-top: var(--space-3xl); padding: var(--space-xl) 0; border-top: 1px solid var(--surface-3);">
-        <div class="rc-container">
-            <div class="rc-flex rc-flex-between" style="align-items: center;">
-                <div class="rc-text-sm" style="color: var(--text-muted);">
-                    <i class="bi bi-gear-wide-connected"></i>
-                    RentalCore - Advanced Equipment Management System
-                </div>
-                <div class="rc-flex" style="gap: var(--space-lg);">
-                    <a href="/help" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
-                        <i class="bi bi-question-circle"></i> Help
-                    </a>
-                    <a href="/about" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
-                        <i class="bi bi-info-circle"></i> About
-                    </a>
-                    <a href="/contact" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
-                        <i class="bi bi-envelope"></i> Contact
-                    </a>
-                </div>
-            </div>
-        </div>
-    </footer>
+    <!-- JavaScript for Job Details -->
+    <script>
+    function toggleProductGroup(productName) {
+        const devicesElement = document.getElementById('devices-' + productName);
+        const toggleIcon = document.querySelector('[data-product="' + productName + '"] .toggle-icon');
+        
+        if (devicesElement.style.display === 'none' || devicesElement.style.display === '') {
+            devicesElement.style.display = 'block';
+            toggleIcon.classList.remove('bi-chevron-down');
+            toggleIcon.classList.add('bi-chevron-up');
+        } else {
+            devicesElement.style.display = 'none';
+            toggleIcon.classList.remove('bi-chevron-up');
+            toggleIcon.classList.add('bi-chevron-down');
+        }
+    }
+
+    function removeDevice(deviceID) {
+        if (confirm('Remove device ' + deviceID + ' from this job?')) {
+            fetch('/jobs/{{.job.JobID}}/devices/' + deviceID, {
+                method: 'DELETE',
+                headers: {'Content-Type': 'application/json'}
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message || data.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                alert('Error removing device');
+            });
+        }
+    }
+
+    function showAddDeviceModal() {
+        alert('Add Device Modal - Feature coming soon!');
+    }
+
+    // Device details modal (reuse from devices page)
+    function showDeviceDetails(deviceID) {
+        // This function can be imported from the devices page if needed
+        window.open('/devices/' + deviceID, '_blank');
+    }
+    </script>
 
     <!-- JavaScript -->
     <script src="/static/js/rental-core-design.js"></script>

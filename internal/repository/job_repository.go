@@ -24,13 +24,64 @@ func (r *JobRepository) GetByID(id uint) (*models.Job, error) {
 	var job models.Job
 	err := r.db.Preload("Customer").Preload("Status").Preload("JobDevices.Device.Product").First(&job, id).Error
 	if err != nil {
+		fmt.Printf("🔧 DEBUG JobRepo.GetByID: Error loading job %d: %v\n", id, err)
 		return nil, err
 	}
+	
+	fmt.Printf("🔧 DEBUG JobRepo.GetByID: Loaded job %d with description: '%s'\n", id, func() string {
+		if job.Description == nil {
+			return "<nil>"
+		}
+		return *job.Description
+	}())
+	
 	return &job, nil
 }
 
 func (r *JobRepository) Update(job *models.Job) error {
-	return r.db.Save(job).Error
+	fmt.Printf("🔧 DEBUG JobRepo.Update: Saving job ID %d with description: '%s'\n", job.JobID, func() string {
+		if job.Description == nil {
+			return "<nil>"
+		}
+		return *job.Description
+	}())
+	
+	// Use Updates instead of Save to ensure all fields are updated
+	result := r.db.Model(job).Where("jobID = ?", job.JobID).Updates(map[string]interface{}{
+		"customerID":     job.CustomerID,
+		"statusID":       job.StatusID,
+		"description":    job.Description,
+		"startDate":      job.StartDate,
+		"endDate":        job.EndDate,
+		"revenue":        job.Revenue,
+		"discount":       job.Discount,
+		"discount_type":  job.DiscountType,
+		"jobcategoryID":  job.JobCategoryID,
+		"final_revenue":  job.FinalRevenue,
+	})
+	
+	if result.Error != nil {
+		fmt.Printf("🔧 DEBUG JobRepo.Update: Error: %v\n", result.Error)
+		return result.Error
+	}
+	
+	fmt.Printf("🔧 DEBUG JobRepo.Update: Success! Rows affected: %d\n", result.RowsAffected)
+	
+	// Verify the update by reading the job back from DB
+	var verifyJob models.Job
+	verifyResult := r.db.Where("jobID = ?", job.JobID).First(&verifyJob)
+	if verifyResult.Error == nil {
+		fmt.Printf("🔧 DEBUG JobRepo.Update: Verification - DB now has description: '%s'\n", func() string {
+			if verifyJob.Description == nil {
+				return "<nil>"
+			}
+			return *verifyJob.Description
+		}())
+	} else {
+		fmt.Printf("🔧 DEBUG JobRepo.Update: Verification failed: %v\n", verifyResult.Error)
+	}
+	
+	return nil
 }
 
 func (r *JobRepository) Delete(id uint) error {

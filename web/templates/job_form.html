@@ -155,6 +155,7 @@
             </a>
         </div>
 
+
         <!-- Job Form -->
         <div class="rc-card">
             <div class="rc-card-header">
@@ -170,10 +171,7 @@
                 </div>
                 {{end}}
                 
-                <form method="POST" action="{{if .job.JobID}}/jobs/{{.job.JobID}}{{else}}/jobs{{end}}">
-                    {{if .job.JobID}}
-                    <input type="hidden" name="_method" value="PUT">
-                    {{end}}
+                <form method="POST" action="{{if .job.JobID}}/jobs/{{.job.JobID}}/update{{else}}/jobs{{end}}">
                     
                     <div class="rc-grid rc-grid-2 rc-mb-lg">
                         <div class="rc-form-group">
@@ -301,6 +299,7 @@
             </div>
         </div>
     </footer>
+
 
     <!-- JavaScript -->
     <script src="/static/js/rental-core-design.js"></script>

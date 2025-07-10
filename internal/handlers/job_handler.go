@@ -238,6 +238,7 @@ func (h *JobHandler) EditJobForm(c *gin.Context) {
 		return
 	}
 
+
 	job, err := h.jobRepo.GetByID(uint(id))
 	if err != nil {
 		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Job not found", "user": user})
@@ -262,6 +263,7 @@ func (h *JobHandler) EditJobForm(c *gin.Context) {
 		return
 	}
 
+
 	c.HTML(http.StatusOK, "job_form.html", gin.H{
 		"title":        "Edit Job",
 		"job":          job,
@@ -281,12 +283,14 @@ func (h *JobHandler) UpdateJob(c *gin.Context) {
 		return
 	}
 
+
 	// Load existing job first
 	job, err := h.jobRepo.GetByID(uint(id))
 	if err != nil {
 		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Job not found", "user": user})
 		return
 	}
+
 
 	// Update fields from form
 	customerID, _ := strconv.ParseUint(c.PostForm("customer_id"), 10, 32)
@@ -361,7 +365,7 @@ func (h *JobHandler) UpdateJob(c *gin.Context) {
 		h.jobRepo.UpdateFinalRevenue(uint(id))
 	}
 
-	c.Redirect(http.StatusFound, "/jobs")
+	c.Redirect(http.StatusFound, fmt.Sprintf("/jobs/%d", id))
 }
 
 func (h *JobHandler) DeleteJob(c *gin.Context) {

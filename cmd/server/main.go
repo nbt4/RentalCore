@@ -64,6 +64,11 @@ func main() {
 		log.Fatalf("Failed to ping database: %v", err)
 	}
 
+	// Apply performance indexes for optimal database performance (commented out for faster startup)
+	// if err := config.ApplyPerformanceIndexes(db.DB); err != nil {
+	//	log.Printf("Warning: Failed to apply performance indexes: %v", err)
+	// }
+
 	// Initialize structured logger
 	environment := "development"
 	if os.Getenv("GIN_MODE") == "release" {
@@ -461,6 +466,7 @@ func setupRoutes(r *gin.Engine,
 			jobs.GET("/:id", jobHandler.GetJob)
 			jobs.GET("/:id/edit", jobHandler.EditJobForm)
 			jobs.PUT("/:id", jobHandler.UpdateJob)
+			jobs.POST("/:id/update", jobHandler.UpdateJob) // Additional POST route for form updates
 			jobs.DELETE("/:id", jobHandler.DeleteJob)
 			jobs.GET("/:id/devices", jobHandler.GetJobDevices)
 			jobs.POST("/:id/devices", jobHandler.AssignDevice)
@@ -480,6 +486,7 @@ func setupRoutes(r *gin.Engine,
 			devices.DELETE("/:id", deviceHandler.DeleteDevice)
 			devices.GET("/:id/qr", deviceHandler.GetDeviceQR)
 			devices.GET("/:id/barcode", deviceHandler.GetDeviceBarcode)
+			devices.GET("/:id/stats", deviceHandler.GetDeviceStatsAPI)
 			devices.GET("/available", deviceHandler.GetAvailableDevices)
 		}
 

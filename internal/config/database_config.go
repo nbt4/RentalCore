@@ -119,67 +119,47 @@ func createLogger(config *DatabaseConfig) logger.Interface {
 func ApplyPerformanceIndexes(db *gorm.DB) error {
 	log.Println("Applying performance indexes...")
 
-	indexes := []string{
-		// Device indexes
-		"CREATE INDEX IF NOT EXISTS idx_devices_productid ON devices(productID)",
-		"CREATE INDEX IF NOT EXISTS idx_devices_status ON devices(status)",
-		"CREATE INDEX IF NOT EXISTS idx_devices_search ON devices(deviceID, serialnumber)",
+	// Helper function to create index with error handling
+	createIndex := func(indexName, tableName, columns string) {
+		// First check if index exists
+		var exists bool
+		checkSQL := fmt.Sprintf("SHOW INDEX FROM %s WHERE Key_name = '%s'", tableName, indexName)
 		
-		// Job-Device relationship indexes
-		"CREATE INDEX IF NOT EXISTS idx_jobdevices_deviceid ON jobdevices(deviceID)",
-		"CREATE INDEX IF NOT EXISTS idx_jobdevices_jobid ON jobdevices(jobID)",
-		"CREATE INDEX IF NOT EXISTS idx_jobdevices_composite ON jobdevices(deviceID, jobID)",
+		rows, err := db.Raw(checkSQL).Rows()
+		if err == nil {
+			if rows.Next() {
+				exists = true
+			}
+			rows.Close()
+		}
 		
-		// Jobs indexes
-		"CREATE INDEX IF NOT EXISTS idx_jobs_customerid ON jobs(customerID)",
-		"CREATE INDEX IF NOT EXISTS idx_jobs_statusid ON jobs(statusID)",
-		"CREATE INDEX IF NOT EXISTS idx_jobs_dates ON jobs(startDate, endDate)",
-		"CREATE INDEX IF NOT EXISTS idx_jobs_customer_status ON jobs(customerID, statusID)",
-		
-		// Invoice indexes
-		"CREATE INDEX IF NOT EXISTS idx_invoices_customerid ON invoices(customer_id)",
-		"CREATE INDEX IF NOT EXISTS idx_invoices_status ON invoices(status)",
-		"CREATE INDEX IF NOT EXISTS idx_invoices_dates ON invoices(issue_date, due_date)",
-		"CREATE INDEX IF NOT EXISTS idx_invoices_number ON invoices(invoice_number)",
-		
-		// Customer indexes
-		"CREATE INDEX IF NOT EXISTS idx_customers_search_company ON customers(companyname)",
-		"CREATE INDEX IF NOT EXISTS idx_customers_search_name ON customers(firstname, lastname)",
-		"CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email)",
-		
-		// Product indexes
-		"CREATE INDEX IF NOT EXISTS idx_products_categoryid ON products(categoryID)",
-		"CREATE INDEX IF NOT EXISTS idx_products_status ON products(status)",
-		
-		// Composite indexes for complex queries
-		"CREATE INDEX IF NOT EXISTS idx_devices_product_status ON devices(productID, status)",
-		"CREATE INDEX IF NOT EXISTS idx_jobs_status_dates ON jobs(statusID, startDate, endDate)",
-		
-		// Invoice line items
-		"CREATE INDEX IF NOT EXISTS idx_invoice_line_items_invoice ON invoice_line_items(invoice_id)",
-		"CREATE INDEX IF NOT EXISTS idx_invoice_line_items_device ON invoice_line_items(device_id)",
-		
-		// Session management
-		"CREATE INDEX IF NOT EXISTS idx_sessions_userid ON sessions(user_id)",
-		"CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions(expires_at)",
-		
-		// Email and invoice templates
-		"CREATE INDEX IF NOT EXISTS idx_email_templates_type ON email_templates(template_type)",
-		"CREATE INDEX IF NOT EXISTS idx_email_templates_default ON email_templates(template_type, is_default)",
-		"CREATE INDEX IF NOT EXISTS idx_invoice_templates_default ON invoice_templates(is_default)",
-		"CREATE INDEX IF NOT EXISTS idx_invoice_templates_active ON invoice_templates(is_active)",
-	}
-
-	successCount := 0
-	for _, indexSQL := range indexes {
-		if err := db.Exec(indexSQL).Error; err != nil {
-			log.Printf("Warning: Failed to create index: %v", err)
-		} else {
-			successCount++
+		if !exists {
+			indexSQL := fmt.Sprintf("CREATE INDEX %s ON %s(%s)", indexName, tableName, columns)
+			if err := db.Exec(indexSQL).Error; err != nil {
+				log.Printf("Warning: Failed to create index %s: %v", indexName, err)
+			} else {
+				log.Printf("Created index: %s", indexName)
+			}
 		}
 	}
 
-	log.Printf("Successfully applied %d/%d performance indexes", successCount, len(indexes))
+	// Apply indexes
+	createIndex("idx_devices_productid", "devices", "productID")
+	createIndex("idx_devices_status", "devices", "status")
+	createIndex("idx_devices_search", "devices", "deviceID, serialnumber")
+	createIndex("idx_jobdevices_deviceid", "jobdevices", "deviceID")
+	createIndex("idx_jobdevices_jobid", "jobdevices", "jobID")
+	createIndex("idx_jobdevices_composite", "jobdevices", "deviceID, jobID")
+	createIndex("idx_jobs_customerid", "jobs", "customerID")
+	createIndex("idx_jobs_statusid", "jobs", "statusID")
+	createIndex("idx_customers_search_company", "customers", "companyname")
+	createIndex("idx_customers_search_name", "customers", "firstname, lastname")
+	createIndex("idx_customers_email", "customers", "email")
+	createIndex("idx_products_categoryid", "products", "categoryID")
+	createIndex("idx_products_status", "products", "status")
+	createIndex("idx_devices_product_status", "devices", "productID, status")
+
+	log.Println("Performance indexes applied successfully")
 	return nil
 }
 

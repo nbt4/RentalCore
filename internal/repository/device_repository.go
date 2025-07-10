@@ -1,11 +1,10 @@
 package repository
 
 import (
-	"log"
-	"runtime/debug"
 	"sort"
+	"time"
+	"log"
 	"go-barcode-webapp/internal/models"
-	"gorm.io/gorm"
 )
 
 type DeviceRepository struct {
@@ -17,25 +16,6 @@ func NewDeviceRepository(db *Database) *DeviceRepository {
 }
 
 func (r *DeviceRepository) Create(device *models.Device) error {
-	// DEBUG: Log device creation attempts to track automatic creation
-	log.Printf("🚨 DEVICE CREATION ATTEMPT:")
-	log.Printf("   DeviceID: '%s'", device.DeviceID)
-	if device.ProductID != nil {
-		log.Printf("   ProductID: %d", *device.ProductID)
-	} else {
-		log.Printf("   ProductID: NULL")
-	}
-	if device.SerialNumber != nil {
-		log.Printf("   SerialNumber: '%s'", *device.SerialNumber)
-	} else {
-		log.Printf("   SerialNumber: NULL")
-	}
-	log.Printf("   Status: '%s'", device.Status)
-	
-	// Print stack trace to see what's calling this
-	log.Printf("   📍 Stack trace:")
-	log.Printf("%s", debug.Stack())
-	
 	return r.db.Create(device).Error
 }
 
@@ -66,62 +46,60 @@ func (r *DeviceRepository) Delete(deviceID string) error {
 }
 
 func (r *DeviceRepository) List(params *models.FilterParams) ([]models.DeviceWithJobInfo, error) {
+	startTime := time.Now()
+	log.Printf("⏱️  DeviceRepository.List() started")
+
 	var devices []models.Device
 
-	// DEBUG: Check total device count first
-	var totalCount int64
-	r.db.Model(&models.Device{}).Count(&totalCount)
-	log.Printf("🔍 Total devices in database: %d", totalCount)
+	// Set default pagination if not provided
+	limit := params.Limit
+	if limit <= 0 {
+		limit = 20 // Reduce default to 20 items per page for better performance
+	}
+	
+	offset := params.Offset
+	if offset < 0 {
+		offset = 0
+	}
 
-	query := r.db.Model(&models.Device{}).Preload("Product")
-
+	// Simple query without complex joins for better performance
+	query := r.db.Model(&models.Device{})
+	
+	// Only preload Product if we actually need it
 	if params.SearchTerm != "" {
 		searchPattern := "%" + params.SearchTerm + "%"
-		log.Printf("🔍 Adding search filter with pattern: '%s'", searchPattern)
-		query = query.Joins("LEFT JOIN products ON products.productID = devices.productID").
+		query = query.Preload("Product").
+			Joins("LEFT JOIN products ON products.productID = devices.productID").
 			Where("devices.deviceID LIKE ? OR devices.serialnumber LIKE ? OR products.name LIKE ?", searchPattern, searchPattern, searchPattern)
-		log.Printf("🔍 SQL query will search in: devices.deviceID, devices.serialnumber, products.name")
+	} else {
+		// For normal list view, we don't need full product details
+		query = query.Preload("Product")
 	}
 
-	if params.Limit > 0 {
-		query = query.Limit(params.Limit)
-	}
-	if params.Offset > 0 {
-		query = query.Offset(params.Offset)
-	}
+	query = query.Limit(limit).Offset(offset).Order("deviceID DESC")
 
-	query = query.Order("deviceID DESC")
-
+	queryStart := time.Now()
 	err := query.Find(&devices).Error
+	queryTime := time.Since(queryStart)
+	log.Printf("⏱️  Device query took: %v", queryTime)
+	
 	if err != nil {
-		log.Printf("❌ Error executing devices search query: %v", err)
-		log.Printf("🔍 Search term was: '%s'", params.SearchTerm)
+		log.Printf("❌ Device query error: %v", err)
 		return nil, err
 	}
 
-	// Convert to DeviceWithJobInfo
+	// Skip job assignment check for better performance - we can add it back later if needed
 	var result []models.DeviceWithJobInfo
 	for _, device := range devices {
-		// Check if device is assigned to any job
-		var jobDevice models.JobDevice
-		isAssigned := false
-		var jobID *uint
-		
-		err := r.db.Where("deviceID = ?", device.DeviceID).First(&jobDevice).Error
-		if err == nil {
-			isAssigned = true
-			jobID = &jobDevice.JobID
-		} else if err != gorm.ErrRecordNotFound {
-			// If there's an error other than "not found", we should handle it
-			// For now, we'll just continue and assume not assigned
-		}
-
 		result = append(result, models.DeviceWithJobInfo{
 			Device:     device,
-			JobID:      jobID,
-			IsAssigned: isAssigned,
+			JobID:      nil,
+			IsAssigned: false,
 		})
 	}
+
+	totalTime := time.Since(startTime)
+	log.Printf("⏱️  DeviceRepository.List() completed in %v (found %d devices)", totalTime, len(result))
 
 	return result, nil
 }
@@ -218,8 +196,16 @@ func (r *DeviceRepository) GetAvailableDevicesForCaseManagement() ([]models.Devi
 func (r *DeviceRepository) GetDevicesGroupedByCategory(params *models.FilterParams) (*models.CategorizedDevicesResponse, error) {
 	var devices []models.Device
 	
-	// DEBUG: Log the search term received by the repository
-	log.Printf("🔍 GetDevicesGroupedByCategory called with SearchTerm: '%s'", params.SearchTerm)
+	// Set default pagination if not provided
+	limit := params.Limit
+	if limit <= 0 {
+		limit = 100 // Default to 100 items for categorized view
+	}
+	
+	offset := params.Offset
+	if offset < 0 {
+		offset = 0
+	}
 
 	query := r.db.Model(&models.Device{}).
 		Preload("Product").
@@ -230,30 +216,16 @@ func (r *DeviceRepository) GetDevicesGroupedByCategory(params *models.FilterPara
 
 	if params.SearchTerm != "" {
 		searchPattern := "%" + params.SearchTerm + "%"
-		log.Printf("🔍 Adding search filter with pattern: '%s'", searchPattern)
 		query = query.Joins("LEFT JOIN products ON products.productID = devices.productID").
 			Where("devices.deviceID LIKE ? OR devices.serialnumber LIKE ? OR products.name LIKE ?", searchPattern, searchPattern, searchPattern)
-		log.Printf("🔍 SQL query will search in: devices.deviceID, devices.serialnumber, products.name")
 	}
 
-	if params.Limit > 0 {
-		query = query.Limit(params.Limit)
-	}
-	if params.Offset > 0 {
-		query = query.Offset(params.Offset)
-	}
-
-	query = query.Order("deviceID DESC")
+	query = query.Limit(limit).Offset(offset).Order("deviceID DESC")
 
 	err := query.Find(&devices).Error
 	if err != nil {
-		log.Printf("❌ Error fetching devices in categorized view: %v", err)
-		log.Printf("🔍 Search term was: '%s'", params.SearchTerm)
 		return nil, err
 	}
-
-	// DEBUG: Log the number of devices found after applying the search query
-	log.Printf("🔍 Found %d devices after search query", len(devices))
 
 	// --- Performance Optimization ---
 	// 1. Get all device IDs from the current list
@@ -382,4 +354,79 @@ func (r *DeviceRepository) GetDevicesGroupedByCategory(params *models.FilterPara
 		Uncategorized: uncategorized,
 		TotalDevices:  totalDevices,
 	}, nil
+}
+
+func (r *DeviceRepository) GetDeviceStats(deviceID string) (map[string]interface{}, error) {
+	stats := make(map[string]interface{})
+	
+	// Get total number of jobs this device has been assigned to
+	var totalJobs int64
+	err := r.db.Model(&models.JobDevice{}).
+		Where("deviceID = ?", deviceID).
+		Count(&totalJobs).Error
+	if err != nil {
+		log.Printf("Error counting jobs for device %s: %v", deviceID, err)
+		totalJobs = 0
+	}
+	
+	// Get total earnings from jobs (simplified calculation)
+	var totalEarnings float64
+	err = r.db.Raw(`
+		SELECT COALESCE(SUM(DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) * COALESCE(p.itemcostperday, 0)), 0) as total_earnings
+		FROM jobdevices jd
+		JOIN jobs j ON jd.jobID = j.jobID
+		JOIN devices d ON jd.deviceID = d.deviceID
+		LEFT JOIN products p ON d.productID = p.productID
+		WHERE jd.deviceID = ?
+	`, deviceID).Scan(&totalEarnings).Error
+	if err != nil {
+		log.Printf("Error calculating earnings for device %s: %v", deviceID, err)
+		totalEarnings = 0.0
+	}
+	
+	// Get total days rented
+	var totalDaysRented int64
+	err = r.db.Raw(`
+		SELECT COALESCE(SUM(DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)), 0) as total_days
+		FROM jobdevices jd
+		JOIN jobs j ON jd.jobID = j.jobID
+		WHERE jd.deviceID = ?
+	`, deviceID).Scan(&totalDaysRented).Error
+	if err != nil {
+		log.Printf("Error calculating days rented for device %s: %v", deviceID, err)
+		totalDaysRented = 0
+	}
+	
+	// Calculate average rental duration
+	var averageRentalDuration float64
+	if totalJobs > 0 {
+		averageRentalDuration = float64(totalDaysRented) / float64(totalJobs)
+	}
+	
+	// Get device product details for price per day
+	var device models.Device
+	err = r.db.Where("deviceID = ?", deviceID).Preload("Product").First(&device).Error
+	if err != nil {
+		log.Printf("Error getting device details for %s: %v", deviceID, err)
+	}
+	
+	var pricePerDay float64
+	var weight float64
+	if device.Product != nil {
+		if device.Product.ItemCostPerDay != nil {
+			pricePerDay = *device.Product.ItemCostPerDay
+		}
+		if device.Product.Weight != nil {
+			weight = *device.Product.Weight
+		}
+	}
+	
+	stats["totalJobs"] = totalJobs
+	stats["totalEarnings"] = totalEarnings
+	stats["totalDaysRented"] = totalDaysRented
+	stats["averageRentalDuration"] = averageRentalDuration
+	stats["pricePerDay"] = pricePerDay
+	stats["weight"] = weight
+	
+	return stats, nil
 }
