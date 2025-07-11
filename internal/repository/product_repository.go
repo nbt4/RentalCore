@@ -1,6 +1,9 @@
 package repository
 
-import "go-barcode-webapp/internal/models"
+import (
+	"log"
+	"go-barcode-webapp/internal/models"
+)
 
 type ProductRepository struct {
 	db *Database
@@ -56,4 +59,18 @@ func (r *ProductRepository) List(params *models.FilterParams) ([]models.Product,
 
 	err := query.Find(&products).Error
 	return products, err
+}
+
+func (r *ProductRepository) GetAllCategories() ([]models.Category, error) {
+	var categories []models.Category
+	err := r.db.Order("name ASC").Find(&categories).Error
+	if err != nil {
+		log.Printf("❌ GetAllCategories error: %v", err)
+		return nil, err
+	}
+	log.Printf("🔧 GetAllCategories: Found %d categories in database", len(categories))
+	for _, cat := range categories {
+		log.Printf("🔧 Category from DB: %s (ID: %d)", cat.Name, cat.CategoryID)
+	}
+	return categories, err
 }

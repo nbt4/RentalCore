@@ -16,16 +16,109 @@
                     <i class="bi bi-gear-wide-connected"></i>
                     RentalCore
                 </a>
+                
+                <!-- Mobile toggle -->
+                <button class="rc-navbar-toggle">
+                    <i class="bi bi-list"></i>
+                </button>
+                
+                <!-- Main navigation -->
                 <ul class="rc-navbar-nav">
-                    <li><a href="/jobs" class="rc-nav-link">Jobs</a></li>
-                    <li><a href="/devices" class="rc-nav-link rc-nav-link-active">Devices</a></li>
-                    <li><a href="/customers" class="rc-nav-link">Customers</a></li>
-                    <li><a href="/cases" class="rc-nav-link">Cases</a></li>
+                    <li><a href="/jobs" class="rc-nav-link">
+                        <i class="bi bi-briefcase"></i> Jobs
+                    </a></li>
+                    <li><a href="/devices" class="rc-nav-link active">
+                        <i class="bi bi-cpu"></i> Devices
+                    </a></li>
+                    <li><a href="/customers" class="rc-nav-link">
+                        <i class="bi bi-people"></i> Customers
+                    </a></li>
+                    <li><a href="/cases" class="rc-nav-link">
+                        <i class="bi bi-box"></i> Cases
+                    </a></li>
+                    
+                    <!-- Tools Dropdown -->
+                    <li class="rc-dropdown">
+                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
+                            <i class="bi bi-tools"></i> Tools
+                        </a>
+                        <div class="rc-dropdown-menu">
+                            <div class="rc-dropdown-header">
+                                <i class="bi bi-folder"></i> Management
+                            </div>
+                            <a href="/workflow/templates" class="rc-dropdown-item">
+                                <i class="bi bi-file-earmark-text"></i> Job Templates
+                            </a>
+                            <a href="/workflow/packages" class="rc-dropdown-item">
+                                <i class="bi bi-box-seam"></i> Equipment Packages
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">
+                                <i class="bi bi-building"></i> Business
+                            </div>
+                            <a href="/invoices" class="rc-dropdown-item">
+                                <i class="bi bi-file-text"></i> Invoices
+                            </a>
+                            <a href="/analytics" class="rc-dropdown-item">
+                                <i class="bi bi-graph-up"></i> Analytics
+                            </a>
+                            <a href="/financial" class="rc-dropdown-item">
+                                <i class="bi bi-calculator"></i> Financial
+                            </a>
+                        </div>
+                    </li>
+                    
+                    <!-- User Dropdown -->
                     {{if .user}}
-                    <li><a href="/logout" class="rc-nav-link">Logout</a></li>
+                    <li class="rc-dropdown">
+                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
+                            <i class="bi bi-person-circle"></i> {{.user.Username}}
+                        </a>
+                        <div class="rc-dropdown-menu">
+                            <div class="rc-dropdown-header">
+                                <i class="bi bi-person"></i> {{.user.FirstName}} {{.user.LastName}}
+                            </div>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">Personal</div>
+                            <a href="/profile/settings" class="rc-dropdown-item">
+                                <i class="bi bi-person-gear"></i> Profile Settings
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">Company</div>
+                            <a href="/settings/company" class="rc-dropdown-item">
+                                <i class="bi bi-building-gear"></i> Company Settings
+                            </a>
+                            <a href="/settings/email-templates" class="rc-dropdown-item">
+                                <i class="bi bi-envelope-gear"></i> E-Mail Templates
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <div class="rc-dropdown-header">System</div>
+                            <a href="/users" class="rc-dropdown-item">
+                                <i class="bi bi-people-fill"></i> User Management
+                            </a>
+                            <a href="/security" class="rc-dropdown-item">
+                                <i class="bi bi-shield-check"></i> Security & Audit
+                            </a>
+                            <hr class="rc-dropdown-divider">
+                            <a href="/logout" class="rc-dropdown-item">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a>
+                        </div>
+                    </li>
                     {{else}}
-                    <li><a href="/login" class="rc-btn rc-btn-primary rc-btn-sm">Login</a></li>
+                    <li>
+                        <a href="/login" class="rc-btn rc-btn-primary rc-btn-sm">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                    </li>
                     {{end}}
+                    
+                    <!-- Theme Toggle -->
+                    <li>
+                        <button class="rc-btn rc-btn-ghost rc-btn-sm" data-theme-toggle title="Toggle theme">
+                            <i class="bi bi-moon-fill"></i>
+                        </button>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -46,14 +139,29 @@
             </div>
         </div>
 
-        <!-- Search -->
+        <!-- Search and Filters -->
         <div class="rc-card rc-mb-lg">
             <div class="rc-card-body">
                 <form method="GET" action="/devices">
                     <input type="hidden" name="view" value="{{.viewType}}">
-                    <div class="rc-flex rc-flex-gap-md">
-                        <input type="text" class="rc-input" name="search" placeholder="Search devices..." value="{{.params.SearchTerm}}" style="flex: 1;">
-                        <button type="submit" class="rc-btn rc-btn-primary">Search</button>
+                    <div class="rc-flex rc-flex-gap-sm rc-flex-wrap" style="align-items: stretch;">
+                        <input type="text" class="rc-input" name="search" placeholder="Search devices..." value="{{.params.SearchTerm}}" style="max-width: 300px;">
+                        {{if eq .viewType "categorized"}}
+                        <select class="rc-select" name="category" style="min-width: 150px;">
+                            <option value="">All Categories</option>
+                            {{range .categories}}
+                            <option value="{{.Name}}" {{if eq .Name $.params.Category}}selected{{end}}>{{.Name}}</option>
+                            {{end}}
+                        </select>
+                        {{end}}
+                        <button type="submit" class="rc-btn rc-btn-primary" style="padding: 0 var(--space-md); min-width: 50px;">
+                            <i class="bi bi-search"></i>
+                        </button>
+                        {{if or .params.SearchTerm .params.Category}}
+                        <a href="/devices?view={{.viewType}}" class="rc-btn rc-btn-outline" style="padding: 0 var(--space-md); min-width: 50px;">
+                            <i class="bi bi-x-lg"></i>
+                        </a>
+                        {{end}}
                     </div>
                 </form>
             </div>
@@ -84,7 +192,7 @@
                                 {{if and .Device.Product .Device.Product.Category}}
                                     {{.Device.Product.Category.Name}}
                                 {{else}}
-                                    Uncategorized
+                                    <span class="rc-text-muted">Unkategorisiert</span>
                                 {{end}}
                             </td>
                             {{end}}
@@ -105,9 +213,9 @@
                                     <button type="button" class="rc-btn rc-btn-outline rc-btn-sm" title="View Details" onclick="showDeviceDetails('{{.Device.DeviceID}}')">
                                         <i class="bi bi-eye"></i>
                                     </button>
-                                    <a href="/devices/{{.Device.DeviceID}}/edit" class="rc-btn rc-btn-outline rc-btn-sm" title="Edit">
+                                    <button type="button" class="rc-btn rc-btn-outline rc-btn-sm" title="Edit Device" onclick="showEditDevice('{{.Device.DeviceID}}')">
                                         <i class="bi bi-pencil"></i>
-                                    </a>
+                                    </button>
                                     <a href="/devices/{{.Device.DeviceID}}/qr" class="rc-btn rc-btn-outline rc-btn-sm" title="QR" target="_blank">
                                         <i class="bi bi-qr-code"></i>
                                     </a>
@@ -145,6 +253,27 @@
         </div>
         {{end}}
     </main>
+
+    <!-- Device Edit Modal -->
+    <div id="deviceEditModal" class="rc-modal" style="display: none;">
+        <div class="rc-modal-overlay" onclick="closeDeviceEditModal()"></div>
+        <div class="rc-modal-content" style="max-width: 700px;">
+            <div class="rc-modal-header">
+                <h3 class="rc-modal-title">
+                    <i class="bi bi-pencil"></i> Edit Device
+                </h3>
+                <button class="rc-modal-close" onclick="closeDeviceEditModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="rc-modal-body" id="deviceEditContent">
+                <div class="rc-text-center rc-py-xl">
+                    <div class="rc-spinner"></div>
+                    <p class="rc-text-muted rc-mt-md">Loading device form...</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Device Details Modal -->
     <div id="deviceDetailsModal" class="modal-overlay" style="display: none;">
@@ -306,6 +435,189 @@
     window.closeDeviceDetailsModal = function() {
         document.getElementById('deviceDetailsModal').style.display = 'none';
     };
+
+    // Device Edit Modal Function
+    window.showEditDevice = function(deviceID) {
+        const modal = document.getElementById('deviceEditModal');
+        const content = document.getElementById('deviceEditContent');
+        
+        // Show modal with loading state
+        modal.style.display = 'flex';
+        content.innerHTML = `
+            <div class="rc-text-center rc-py-xl">
+                <div class="rc-spinner"></div>
+                <p class="rc-text-muted rc-mt-md">Loading device form...</p>
+            </div>
+        `;
+        
+        // Fetch device data for editing
+        fetch('/api/v1/devices/' + deviceID)
+            .then(response => {
+                console.log('Device API Response status:', response.status);
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        console.log('Error response body:', text);
+                        throw new Error(`HTTP ${response.status}: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Device data received:', data);
+                const device = data.device || data; // Handle both response formats
+                
+                content.innerHTML = `
+                    <form id="editDeviceForm">
+                        <div class="rc-grid rc-grid-cols-1 rc-grid-cols-md-2 rc-grid-gap-md rc-mb-lg">
+                            <div class="rc-form-group">
+                                <label class="rc-label">Device ID *</label>
+                                <input type="text" class="rc-input" name="deviceID" value="${device.deviceID || ''}" readonly style="background: var(--surface-2);">
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label">Serial Number</label>
+                                <input type="text" class="rc-input" name="serialnumber" value="${device.serialnumber || ''}">
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label">Status</label>
+                                <select class="rc-select" name="status">
+                                    <option value="free" ${device.status === 'free' ? 'selected' : ''}>Free</option>
+                                    <option value="rented" ${device.status === 'rented' ? 'selected' : ''}>Rented</option>
+                                    <option value="maintenance" ${device.status === 'maintenance' ? 'selected' : ''}>Maintenance</option>
+                                    <option value="damaged" ${device.status === 'damaged' ? 'selected' : ''}>Damaged</option>
+                                </select>
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label">Current Location</label>
+                                <input type="text" class="rc-input" name="currentLocation" value="${device.currentLocation || ''}">
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label">Purchase Date</label>
+                                <input type="date" class="rc-input" name="purchaseDate" value="${device.purchaseDate ? device.purchaseDate.split('T')[0] : ''}">
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label">Last Maintenance</label>
+                                <input type="date" class="rc-input" name="lastmaintenance" value="${device.lastmaintenance ? device.lastmaintenance.split('T')[0] : ''}">
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label">Next Maintenance</label>
+                                <input type="date" class="rc-input" name="nextmaintenance" value="${device.nextmaintenance ? device.nextmaintenance.split('T')[0] : ''}">
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label">Insurance Number</label>
+                                <input type="text" class="rc-input" name="insurancenumber" value="${device.insurancenumber || ''}">
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label">Condition Rating (1-5)</label>
+                                <input type="number" class="rc-input" name="conditionRating" value="${device.conditionRating || ''}" min="1" max="5" step="0.1">
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label">Usage Hours</label>
+                                <input type="number" class="rc-input" name="usageHours" value="${device.usageHours || ''}" step="0.1" min="0">
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label">Last Maintenance Cost (€)</label>
+                                <input type="number" class="rc-input" name="lastMaintenanceCost" value="${device.lastMaintenanceCost || ''}" step="0.01" min="0">
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label">Barcode</label>
+                                <input type="text" class="rc-input" name="barcode" value="${device.barcode || ''}">
+                            </div>
+                            <div class="rc-form-group rc-grid-span-2">
+                                <label class="rc-label">Notes</label>
+                                <textarea class="rc-textarea" name="notes" rows="3">${device.notes || ''}</textarea>
+                            </div>
+                        </div>
+                        <div class="rc-flex rc-flex-between">
+                            <button type="button" onclick="closeDeviceEditModal()" class="rc-btn rc-btn-secondary">
+                                <i class="bi bi-x-lg"></i> Cancel
+                            </button>
+                            <button type="submit" class="rc-btn rc-btn-primary">
+                                <i class="bi bi-check-lg"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                `;
+                
+                // Handle form submission
+                document.getElementById('editDeviceForm').addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    saveDevice(deviceID, new FormData(this));
+                });
+            })
+            .catch(error => {
+                console.error('Error loading device:', error);
+                content.innerHTML = `
+                    <div class="rc-alert rc-alert-error">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        Error loading device form: ${error.message}
+                    </div>
+                `;
+            });
+    };
+
+    window.closeDeviceEditModal = function() {
+        document.getElementById('deviceEditModal').style.display = 'none';
+    };
+
+    function saveDevice(deviceID, formData) {
+        const submitBtn = document.querySelector('#editDeviceForm button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        // Show loading state
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
+        submitBtn.disabled = true;
+        
+        // Convert FormData to JSON
+        const data = {};
+        for (let [key, value] of formData.entries()) {
+            // Convert date strings and numbers
+            if (key.includes('Date') || key.includes('maintenance')) {
+                data[key] = value ? value : null;
+            } else if (key === 'conditionRating' || key === 'usageHours' || key === 'lastMaintenanceCost') {
+                data[key] = value ? parseFloat(value) : null;
+            } else {
+                data[key] = value || null;
+            }
+        }
+        
+        console.log('Saving device data:', data);
+        
+        fetch('/api/v1/devices/' + deviceID, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            console.log('Save response status:', response.status);
+            if (!response.ok) {
+                return response.text().then(text => {
+                    console.log('Save error response:', text);
+                    throw new Error(`HTTP ${response.status}: ${text}`);
+                });
+            }
+            return response.json();
+        })
+        .then(result => {
+            console.log('Save result:', result);
+            if (result.error) {
+                throw new Error(result.error);
+            }
+            
+            // Success - close modal and reload page
+            closeDeviceEditModal();
+            window.location.reload();
+        })
+        .catch(error => {
+            console.error('Save error:', error);
+            // Restore button and show error
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            
+            alert('Error saving device: ' + error.message);
+        });
+    }
 
     // Close modal when clicking outside
     window.onclick = function(event) {

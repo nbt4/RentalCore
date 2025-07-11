@@ -157,8 +157,9 @@ class RentalCoreDesign {
         const buttons = document.querySelectorAll('.rc-btn');
         
         buttons.forEach(button => {
-            button.addEventListener('click', function() {
-                if (this.type === 'submit' || this.dataset.loading === 'true') {
+            button.addEventListener('click', function(e) {
+                // Only apply loading state if explicitly requested via data-loading attribute
+                if (this.dataset.loading === 'true') {
                     this.classList.add('rc-loading');
                     
                     // Store original content
@@ -179,6 +180,8 @@ class RentalCoreDesign {
                         }
                     }, 5000);
                 }
+                // For submit buttons, don't interfere with normal form submission
+                // Let the form handle the submission naturally
             });
         });
     }

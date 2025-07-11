@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -34,11 +35,27 @@ func (h *CaseHandler) ListCases(c *gin.Context) {
 		return
 	}
 
+	// DEBUG: Log all query parameters
+	fmt.Printf("DEBUG Case Handler: All query params: %+v\n", c.Request.URL.Query())
+	
+	// Manual parameter extraction to ensure search works
+	searchParam := c.Query("search")
+	fmt.Printf("DEBUG Case Handler: Raw search parameter: '%s'\n", searchParam)
+	if searchParam != "" {
+		params.SearchTerm = searchParam
+		fmt.Printf("DEBUG Case Handler: Search parameter SET to: '%s'\n", searchParam)
+	}
+	
+	// DEBUG: Log params after binding
+	fmt.Printf("DEBUG Case Handler: Final params: SearchTerm='%s'\n", params.SearchTerm)
+
 	cases, err := h.caseRepo.List(params)
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
 	}
+
+	fmt.Printf("DEBUG: Found %d cases with search term '%s'\n", len(cases), params.SearchTerm)
 
 	c.HTML(http.StatusOK, "cases_list.html", gin.H{
 		"title": "Cases",

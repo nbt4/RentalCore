@@ -40,6 +40,26 @@ func (h *JobHandler) ListJobs(c *gin.Context) {
 		return
 	}
 
+	// DEBUG: Log all query parameters
+	fmt.Printf("DEBUG Job Handler: All query params: %+v\n", c.Request.URL.Query())
+	
+	// Manual parameter extraction to ensure search works
+	searchParam := c.Query("search")
+	fmt.Printf("DEBUG Job Handler: Raw search parameter: '%s'\n", searchParam)
+	if searchParam != "" {
+		params.SearchTerm = searchParam
+		fmt.Printf("DEBUG Job Handler: Search parameter SET to: '%s'\n", searchParam)
+	}
+	
+	// DEBUG: Log params after binding
+	fmt.Printf("DEBUG Job Handler: Final params: SearchTerm='%s', StartDate=%v, EndDate=%v\n", params.SearchTerm, params.StartDate, params.EndDate)
+
+	// For /scan page, only show open jobs - for /jobs page, show all
+	// Check if this is called from scan page
+	if c.Request.URL.Path == "/scan" || c.Request.URL.Path == "/scan/" {
+		params.Status = "Open"
+	}
+	
 	jobs, err := h.jobRepo.List(params)
 	if err != nil {
 		// Log the error for debugging
@@ -49,7 +69,7 @@ func (h *JobHandler) ListJobs(c *gin.Context) {
 	}
 
 	// Debug: Log how many jobs were found
-	fmt.Printf("DEBUG: Found %d jobs\n", len(jobs))
+	fmt.Printf("DEBUG: Found %d jobs with search term '%s'\n", len(jobs), params.SearchTerm)
 	if len(jobs) > 0 {
 		fmt.Printf("DEBUG: First job: %+v\n", jobs[0])
 	}
@@ -220,6 +240,7 @@ func (h *JobHandler) GetJob(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "job_detail.html", gin.H{
+		"title":         "Job Details",
 		"job":           job,
 		"jobDevices":    jobDevices,
 		"productGroups": productGroups,

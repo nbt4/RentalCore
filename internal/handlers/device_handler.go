@@ -126,16 +126,45 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 	
 	templateStart := time.Now()
 	if viewType == "categorized" {
-		// For categorized view, we still use the same data but render it differently
+		// For categorized view, we need to load devices with category information
+		categorizedDevices, err := h.deviceRepo.ListWithCategories(params)
+		if err != nil {
+			log.Printf("❌ Database error loading categorized devices: %v", err)
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
+			return
+		}
+		
+		// Get all available categories for filter dropdown
+		allCategories, err := h.productRepo.GetAllCategories()
+		if err != nil {
+			log.Printf("❌ Error loading categories: %v", err)
+			allCategories = []models.Category{} // Empty slice as fallback
+		}
+		log.Printf("🔧 DEBUG: Found %d categories", len(allCategories))
+		for _, cat := range allCategories {
+			log.Printf("🔧 DEBUG: Category: %s (ID: %d)", cat.Name, cat.CategoryID)
+		}
+		
+		// Convert to DeviceWithJobInfo format for template compatibility
+		var categorizedDevicesWithJobInfo []models.DeviceWithJobInfo
+		for _, device := range categorizedDevices {
+			categorizedDevicesWithJobInfo = append(categorizedDevicesWithJobInfo, models.DeviceWithJobInfo{
+				Device:     device,
+				JobID:      nil,
+				IsAssigned: false,
+			})
+		}
+		
 		c.HTML(http.StatusOK, "devices_standalone.html", gin.H{
 			"title":       "Devices by Category",
-			"devices":     devices,
+			"devices":     categorizedDevicesWithJobInfo,
 			"params":      params,
 			"user":        user,
 			"viewType":    "categorized",
 			"categorized": true,
+			"categories":  allCategories,
 			"currentPage": page,
-			"hasNextPage": len(devices) == limit,
+			"hasNextPage": len(categorizedDevicesWithJobInfo) == limit,
 		})
 	} else {
 		c.HTML(http.StatusOK, "devices_standalone.html", gin.H{

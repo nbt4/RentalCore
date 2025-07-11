@@ -30,8 +30,10 @@ func NewScannerHandler(jobRepo *repository.JobRepository, deviceRepo *repository
 func (h *ScannerHandler) ScanJobSelection(c *gin.Context) {
 	user, _ := GetCurrentUser(c)
 	
-	// Get active jobs for selection
-	jobs, err := h.jobRepo.List(&models.FilterParams{})
+	// Get active jobs for selection (only Open status)
+	jobs, err := h.jobRepo.List(&models.FilterParams{
+		Status: "Open",
+	})
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return

@@ -539,6 +539,7 @@ func setupRoutes(r *gin.Engine,
 		// Scanner routes
 		scan := protected.Group("/scan")
 		{
+			scan.GET("", scannerHandler.ScanJobSelection)  // Direct /scan route
 			scan.GET("/select", scannerHandler.ScanJobSelection)
 			scan.GET("/:jobId", scannerHandler.ScanJob)
 			scan.POST("/:jobId/assign", scannerHandler.ScanDevice)

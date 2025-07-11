@@ -114,10 +114,18 @@ func (r *DeviceRepository) ListWithCategories(params *models.FilterParams) ([]mo
 		Preload("Product.Brand").
 		Preload("Product.Manufacturer")
 
+	// Join products table for search and category filtering
+	query = query.Joins("JOIN products ON products.productID = devices.productID")
+
 	if params.SearchTerm != "" {
 		searchPattern := "%" + params.SearchTerm + "%"
-		query = query.Joins("JOIN products ON products.product_id = devices.product_id").
-			Where("devices.deviceID LIKE ? OR devices.serialnumber LIKE ? OR products.name LIKE ?", searchPattern, searchPattern, searchPattern)
+		query = query.Where("devices.deviceID LIKE ? OR devices.serialnumber LIKE ? OR products.name LIKE ?", searchPattern, searchPattern, searchPattern)
+	}
+
+	// Category filter
+	if params.Category != "" {
+		query = query.Joins("JOIN categories ON categories.categoryID = products.categoryID").
+			Where("categories.name = ?", params.Category)
 	}
 
 	if params.Limit > 0 {
