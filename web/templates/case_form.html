@@ -284,5 +284,73 @@
 
     <!-- JavaScript -->
     <script src="/static/js/rental-core-design.js"></script>
+    
+    <script>
+        let selectedDevices = [];
+        
+        function addDevice() {
+            const deviceSelect = document.getElementById('deviceSelect');
+            const deviceID = deviceSelect.value;
+            
+            if (!deviceID) {
+                alert('Please select a device first');
+                return;
+            }
+            
+            // Check if device is already added
+            if (selectedDevices.includes(deviceID)) {
+                alert('This device is already added to this case');
+                return;
+            }
+            
+            // Get device name from the select option
+            const selectedOption = deviceSelect.options[deviceSelect.selectedIndex];
+            const deviceName = selectedOption.text;
+            
+            // Add to selected devices array
+            selectedDevices.push(deviceID);
+            
+            // Add to the selected devices list
+            const selectedDevicesContainer = document.getElementById('selectedDevices');
+            
+            // Create device item
+            const deviceItem = document.createElement('div');
+            deviceItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+            deviceItem.innerHTML = `
+                <span>${deviceName} (${deviceID})</span>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeDevice('${deviceID}')">
+                    <i class="bi bi-trash"></i>
+                </button>
+                <input type="hidden" name="devices[]" value="${deviceID}">
+            `;
+            
+            selectedDevicesContainer.appendChild(deviceItem);
+            
+            // Reset select
+            deviceSelect.value = '';
+        }
+        
+        function removeDevice(deviceID) {
+            // Remove from selected devices array
+            selectedDevices = selectedDevices.filter(id => id !== deviceID);
+            
+            // Remove from DOM
+            const deviceItems = document.querySelectorAll('.list-group-item');
+            deviceItems.forEach(item => {
+                const hiddenInput = item.querySelector('input[type="hidden"]');
+                if (hiddenInput && hiddenInput.value === deviceID) {
+                    item.remove();
+                }
+            });
+        }
+        
+        // Initialize existing devices in the selectedDevices array
+        document.addEventListener('DOMContentLoaded', function() {
+            const existingDevices = document.querySelectorAll('input[name="devices[]"]');
+            existingDevices.forEach(input => {
+                selectedDevices.push(input.value);
+            });
+        });
+    </script>
 </body>
 </html>

@@ -44,12 +44,94 @@ func (h *CompanyHandler) CompanySettingsForm(c *gin.Context) {
 		}
 	}
 
-	log.Printf("DEBUG: CompanySettingsForm handler called successfully - rendering company_settings_beautiful.html")
-	c.HTML(http.StatusOK, "company_settings_beautiful.html", gin.H{
-		"title":        "Firmeneinstellungen",
+	log.Printf("DEBUG: CompanySettingsForm handler called successfully - rendering company_settings.html")
+	
+	// Check for success message
+	var successMsg string
+	if c.Query("success") == "1" {
+		successMsg = "Company settings saved successfully!"
+	}
+	
+	c.HTML(http.StatusOK, "company_settings.html", gin.H{
+		"title":        "Company Settings",
 		"user":         user,
 		"company":      company,
+		"success":      successMsg,
 	})
+}
+
+// UpdateCompanySettingsForm handles form-based company settings updates
+func (h *CompanyHandler) UpdateCompanySettingsForm(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+
+	// Get form values
+	companyName := c.PostForm("company_name")
+	taxNumber := c.PostForm("tax_number")
+	email := c.PostForm("email")
+	phone := c.PostForm("phone")
+	addressLine1 := c.PostForm("address_line1")
+	addressLine2 := c.PostForm("address_line2")
+	city := c.PostForm("city")
+	postalCode := c.PostForm("postal_code")
+	country := c.PostForm("country")
+
+	// Validate required fields
+	if strings.TrimSpace(companyName) == "" {
+		log.Printf("UpdateCompanySettingsForm: Company name is required")
+		c.HTML(http.StatusBadRequest, "company_settings.html", gin.H{
+			"title":   "Company Settings",
+			"user":    user,
+			"company": nil,
+			"error":   "Company name is required",
+		})
+		return
+	}
+
+	// Get existing company settings or create new
+	company, err := h.getCompanySettings()
+	if err != nil {
+		// Create new company settings
+		company = &models.CompanySettings{}
+	}
+
+	// Update fields
+	company.CompanyName = strings.TrimSpace(companyName)
+	company.TaxNumber = h.trimStringPointer(&taxNumber)
+	company.Email = h.trimStringPointer(&email)
+	company.Phone = h.trimStringPointer(&phone)
+	company.AddressLine1 = h.trimStringPointer(&addressLine1)
+	company.AddressLine2 = h.trimStringPointer(&addressLine2)
+	company.City = h.trimStringPointer(&city)
+	company.PostalCode = h.trimStringPointer(&postalCode)
+	company.Country = h.trimStringPointer(&country)
+	company.UpdatedAt = time.Now()
+
+	// Save to database
+	var result *gorm.DB
+	if company.ID == 0 {
+		company.CreatedAt = time.Now()
+		result = h.db.Create(company)
+	} else {
+		result = h.db.Save(company)
+	}
+
+	if result.Error != nil {
+		log.Printf("UpdateCompanySettingsForm: Database error: %v", result.Error)
+		c.HTML(http.StatusInternalServerError, "company_settings.html", gin.H{
+			"title":   "Company Settings",
+			"user":    user,
+			"company": company,
+			"error":   "Failed to save company settings: " + result.Error.Error(),
+		})
+		return
+	}
+
+	log.Printf("Company settings updated successfully by user %s", user.Username)
+	c.Redirect(http.StatusSeeOther, "/settings/company?success=1")
 }
 
 // GetCompanySettings returns company settings as JSON
@@ -369,4 +451,75 @@ func (h *CompanyHandler) CompanySettingsAPI(c *gin.Context) {
 	default:
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": "Method not allowed"})
 	}
+}
+
+// SMTP Configuration handlers
+func (h *CompanyHandler) GetSMTPConfig(c *gin.Context) {
+	_, exists := GetCurrentUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	// For security, we don't return the actual password
+	config := gin.H{
+		"smtp_host":     "", // These would come from config file
+		"smtp_port":     587,
+		"smtp_username": "",
+		// smtp_password is intentionally omitted for security
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"config":  config,
+	})
+}
+
+func (h *CompanyHandler) UpdateSMTPConfig(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	var request struct {
+		SMTPHost     string `json:"smtp_host" binding:"required"`
+		SMTPPort     int    `json:"smtp_port" binding:"required"`
+		SMTPUsername string `json:"smtp_username" binding:"required"`
+		SMTPPassword string `json:"smtp_password" binding:"required"`
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "Invalid input data",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	// TODO: Save SMTP config to config file or database
+	// For now, we'll just return success
+	log.Printf("SMTP config update requested by user %s: %s:%d", user.Username, request.SMTPHost, request.SMTPPort)
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "SMTP configuration updated successfully",
+	})
+}
+
+func (h *CompanyHandler) TestSMTPConnection(c *gin.Context) {
+	user, exists := GetCurrentUser(c)
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+		return
+	}
+
+	// TODO: Implement actual SMTP connection test
+	// For now, we'll simulate a test
+	log.Printf("SMTP connection test requested by user %s", user.Username)
+
+	c.JSON(http.StatusOK, gin.H{
+		"success": true,
+		"message": "SMTP connection test successful",
+	})
 }

@@ -129,11 +129,9 @@ func NewGoBDCompliance(db *gorm.DB, archivePath string) (*GoBDCompliance, error)
 
 // migrate auto-migrates GoBD compliance tables
 func (gbc *GoBDCompliance) migrate() error {
-	return gbc.db.AutoMigrate(
-		&GoBDRecord{},
-		&AuditEvent{},
-		&RetentionPolicy{},
-	)
+	// Migration disabled - tables should be created manually
+	log.Printf("GoBD compliance table migration disabled")
+	return nil
 }
 
 // ArchiveInvoice archives an invoice in GoBD-compliant format

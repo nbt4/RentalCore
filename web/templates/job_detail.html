@@ -211,9 +211,9 @@
                 <div class="rc-card">
                     <div class="rc-card-header">
                         <h3 class="rc-card-title"><i class="bi bi-box-seam"></i> Equipment</h3>
-                        <button class="rc-btn rc-btn-primary rc-btn-sm" onclick="showAddDeviceModal()">
-                            <i class="bi bi-plus-lg"></i> Add Device
-                        </button>
+                        <a href="/scan/{{.job.JobID}}" class="rc-btn rc-btn-primary rc-btn-sm">
+                            <i class="bi bi-plus-lg"></i> Add Devices
+                        </a>
                     </div>
                     <div class="rc-card-body">
                         {{if .productGroups}}
@@ -229,11 +229,11 @@
                                         <i class="bi bi-chevron-down toggle-icon"></i>
                                     </div>
                                 </div>
-                                <div class="equipment-devices" style="display: none;">
+                                <div class="equipment-devices" style="display: block;">
                                     {{range $group.Devices}}
                                     <div class="equipment-device rc-flex rc-flex-between rc-mb-sm">
                                         <div class="device-info">
-                                            <strong>{{.Device.SerialNo}}</strong>
+                                            <strong>{{if .Device.SerialNumber}}{{derefString .Device.SerialNumber}}{{else}}{{.Device.DeviceID}}{{end}}</strong>
                                             <div class="rc-text-sm rc-text-secondary">
                                                 {{if .Device.Product}}{{.Device.Product.Name}}{{else}}No Product{{end}}
                                             </div>
@@ -296,10 +296,6 @@
         }
     }
 
-    // Add device modal placeholder
-    function showAddDeviceModal() {
-        alert('Add Device Modal - Feature coming soon!');
-    }
 
     // Device details modal (reuse from devices page)
     function showDeviceDetails(deviceID) {

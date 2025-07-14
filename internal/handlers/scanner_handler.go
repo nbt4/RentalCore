@@ -30,13 +30,26 @@ func NewScannerHandler(jobRepo *repository.JobRepository, deviceRepo *repository
 func (h *ScannerHandler) ScanJobSelection(c *gin.Context) {
 	user, _ := GetCurrentUser(c)
 	
-	// Get active jobs for selection (only Open status)
-	jobs, err := h.jobRepo.List(&models.FilterParams{
-		Status: "Open",
-	})
+	// Free devices from completed jobs first
+	err := h.jobRepo.FreeDevicesFromCompletedJobs()
+	if err != nil {
+		// Log error but don't fail the request
+		fmt.Printf("Warning: Failed to free devices from completed jobs: %v\n", err)
+	}
+	
+	// Get all jobs first
+	allJobs, err := h.jobRepo.List(&models.FilterParams{})
 	if err != nil {
 		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
 		return
+	}
+	
+	// Filter out paid jobs - only show open and in progress jobs
+	var jobs []models.JobWithDetails
+	for _, job := range allJobs {
+		if job.StatusName != "paid" {
+			jobs = append(jobs, job)
+		}
 	}
 
 	// Get device statistics for the dashboard

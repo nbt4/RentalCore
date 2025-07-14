@@ -1,567 +1,566 @@
-2025/07/09 10:14:26 Database connection established successfully
+2025/07/11 13:42:17 Database connection established successfully
 
-2025/07/09 10:14:26 [31;1m/opt/dev/go-barcode-webapp/internal/compliance/audit_logger.go:39 [35;1mrecord not found
-[0m[33m[18.628ms] [34;1m[rows:0][0m SELECT * FROM `audit_events` ORDER BY timestamp DESC,`audit_events`.`id` LIMIT 1
+2025/07/11 13:42:17 [31;1m/opt/dev/go-barcode-webapp/internal/compliance/audit_logger.go:39 [35;1mrecord not found
+[0m[33m[20.634ms] [34;1m[rows:0][0m SELECT * FROM `audit_events` ORDER BY timestamp DESC,`audit_events`.`id` LIMIT 1
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.552ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:17 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.700ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[36.181ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:17 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.167ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.345ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND table_type = 'BASE TABLE'
+2025/07/11 13:42:17 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.891ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND table_type = 'BASE TABLE'
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.311ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:17 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.764ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.005ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:17 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.181ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.872ms] [34;1m[rows:-][0m SELECT * FROM `gobd_records` LIMIT 1
+2025/07/11 13:42:17 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.801ms] [34;1m[rows:-][0m SELECT * FROM `gobd_records` LIMIT 1
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[36.590ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' ORDER BY ORDINAL_POSITION
+2025/07/11 13:42:17 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[41.175ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' ORDER BY ORDINAL_POSITION
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[24.976ms] [34;1m[rows:0][0m ALTER TABLE `gobd_records` MODIFY COLUMN `is_immutable` boolean DEFAULT true
+2025/07/11 13:42:17 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[25.111ms] [34;1m[rows:0][0m ALTER TABLE `gobd_records` MODIFY COLUMN `is_immutable` boolean DEFAULT true
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.735ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:17 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.361ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.011ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:17 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.657ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.980ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_archive_date'
+2025/07/11 13:42:17 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.445ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_user_id'
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.352ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:17 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[20.103ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[36.032ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:17 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.710ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.810ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_retention_date'
+2025/07/11 13:42:17 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.949ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_company_id'
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.838ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:17 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.846ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.590ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:17 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.123ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.848ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_user_id'
+2025/07/11 13:42:17 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.992ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_document_type'
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.413ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[20.167ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[36.081ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.622ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[36.267ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_company_id'
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.336ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_document_id'
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.396ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.457ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.984ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.057ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.866ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_document_type'
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.904ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_data_hash'
 
-2025/07/09 10:14:26 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.662ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.594ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.730ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.635ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.832ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_document_id'
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.693ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_archive_date'
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.429ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[20.086ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.434ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.024ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.853ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_data_hash'
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.539ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_retention_date'
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.890ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.470ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[36.042ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.609ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.878ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND table_type = 'BASE TABLE'
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.555ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND table_type = 'BASE TABLE'
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.351ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.879ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.454ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.367ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.460ms] [34;1m[rows:-][0m SELECT * FROM `audit_events` LIMIT 1
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.907ms] [34;1m[rows:-][0m SELECT * FROM `audit_events` LIMIT 1
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.977ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' ORDER BY ORDINAL_POSITION
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[42.351ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' ORDER BY ORDINAL_POSITION
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[24.147ms] [34;1m[rows:0][0m ALTER TABLE `audit_events` MODIFY COLUMN `is_compliant` boolean DEFAULT true
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[27.021ms] [34;1m[rows:0][0m ALTER TABLE `audit_events` MODIFY COLUMN `is_compliant` boolean DEFAULT true
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.353ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.475ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[36.043ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[41.225ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.295ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_user_id'
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.902ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_retention_date'
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.944ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.430ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.992ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.748ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.328ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_session_id'
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.178ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_timestamp'
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.755ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.300ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.550ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.522ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.927ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_previous_hash'
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.351ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_event_type'
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.281ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.415ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[34.969ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:18 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.723ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.375ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_retention_date'
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.396ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_object_type'
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.393ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.824ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.202ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.228ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.437ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_timestamp'
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.218ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_object_id'
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.304ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[20.511ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.060ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.355ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[36.651ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_event_type'
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.901ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_user_id'
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[18.417ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.762ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.156ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.716ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:27 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.928ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_object_type'
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.323ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_session_id'
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.274ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.368ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.171ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.427ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.369ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_object_id'
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.006ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_previous_hash'
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.817ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.933ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[36.111ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.087ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.658ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'retention_policies' AND table_type = 'BASE TABLE'
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.857ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'retention_policies' AND table_type = 'BASE TABLE'
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.591ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.888ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[35.506ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.155ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[17.785ms] [34;1m[rows:-][0m SELECT * FROM `retention_policies` LIMIT 1
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.789ms] [34;1m[rows:-][0m SELECT * FROM `retention_policies` LIMIT 1
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
-[0m[33m[36.209ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'retention_policies' ORDER BY ORDINAL_POSITION
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[41.101ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'retention_policies' ORDER BY ORDINAL_POSITION
 
-2025/07/09 10:14:28 [31;1m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132 [35;1mError 1062 (23000): Duplicate entry '' for key 'retention_policies.document_type'
-[0m[33m[73.720ms] [34;1m[rows:0][0m ALTER TABLE `retention_policies` ADD `document_type` varchar(191) NOT NULL UNIQUE
-2025/07/09 10:14:28 Warning: Failed to create compliance middleware: failed to create GoBD compliance: failed to migrate GoBD tables: Error 1062 (23000): Duplicate entry '' for key 'retention_policies.document_type'
+2025/07/11 13:42:19 [31;1m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132 [35;1mError 1062 (23000): Duplicate entry '' for key 'retention_policies.document_type'
+[0m[33m[33.041ms] [34;1m[rows:0][0m ALTER TABLE `retention_policies` ADD `document_type` varchar(191) NOT NULL UNIQUE
+2025/07/11 13:42:19 Warning: Failed to create compliance middleware: failed to create GoBD compliance: failed to migrate GoBD tables: Error 1062 (23000): Duplicate entry '' for key 'retention_policies.document_type'
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:134
-[0m[33m[17.723ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:139
+[0m[33m[19.675ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:134
-[0m[33m[35.608ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:139
+[0m[33m[40.588ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:134
-[0m[33m[35.399ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:139
+[0m[33m[39.810ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:134
-[0m[33m[17.411ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:139
+[0m[33m[19.845ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:134
-[0m[33m[35.472ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:139
+[0m[33m[40.998ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:134
-[0m[33m[17.845ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:139
+[0m[33m[19.828ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:134
-[0m[33m[35.614ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:139
+[0m[33m[40.583ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:134
-[0m[33m[39.670ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:139
+[0m[33m[40.146ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:138
-[0m[33m[17.347ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:19 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:143
+[0m[33m[20.962ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:138
-[0m[33m[35.899ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:143
+[0m[33m[39.870ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:138
-[0m[33m[35.997ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:143
+[0m[33m[40.280ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:138
-[0m[33m[17.941ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:143
+[0m[33m[19.465ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:138
-[0m[33m[36.076ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:143
+[0m[33m[40.043ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:138
-[0m[33m[17.698ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:143
+[0m[33m[19.774ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:138
-[0m[33m[36.181ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:143
+[0m[33m[40.304ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[17.705ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[19.582ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[36.051ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[39.230ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[35.467ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[40.381ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[17.743ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[19.920ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[35.156ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[39.987ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[17.661ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[19.862ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
 
-2025/07/09 10:14:28 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[36.119ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[40.626ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[17.184ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[20.934ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[35.939ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[39.764ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[35.450ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[39.982ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[17.410ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[20.374ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[36.055ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[40.920ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[17.780ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[20.474ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[36.012ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[42.705ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[41.238ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[53.479ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[17.814ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[19.611ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[35.582ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[40.101ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:142
-[0m[33m[35.192ms] [34;1m[rows:-][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'TS-Lager' AND table_name = 'users' AND constraint_name = 'fk_sessions_user'
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[39.953ms] [34;1m[rows:-][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'TS-Lager' AND table_name = 'users' AND constraint_name = 'fk_sessions_user'
 
-2025/07/09 10:14:29 [31;1m/opt/dev/go-barcode-webapp/cmd/server/main.go:142 [35;1mError 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
-[0m[33m[17.774ms] [34;1m[rows:0][0m ALTER TABLE `users` ADD CONSTRAINT `fk_sessions_user` FOREIGN KEY (`userID`) REFERENCES `sessions`(`user_id`)
-2025/07/09 10:14:29 Failed to auto-migrate equipment_packages table: Error 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
+2025/07/11 13:42:20 [31;1m/opt/dev/go-barcode-webapp/cmd/server/main.go:147 [35;1mError 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
+[0m[33m[84.966ms] [34;1m[rows:0][0m ALTER TABLE `users` ADD CONSTRAINT `fk_sessions_user` FOREIGN KEY (`userID`) REFERENCES `sessions`(`user_id`)
+2025/07/11 13:42:20 Failed to auto-migrate equipment_packages table: Error 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[17.338ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[19.797ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[35.568ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[40.327ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[36.415ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[40.553ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[17.759ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:20 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[19.788ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[35.624ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[40.699ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[17.743ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[19.741ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[37.034ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[41.215ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[17.543ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[19.681ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[36.167ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[40.050ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[35.786ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[40.425ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[17.848ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[19.878ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[36.105ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[40.429ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[17.761ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[19.533ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[36.423ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[39.974ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[40.420ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[40.763ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[17.377ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[19.819ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[36.229ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[40.570ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:146
-[0m[33m[35.865ms] [34;1m[rows:-][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'TS-Lager' AND table_name = 'users' AND constraint_name = 'fk_sessions_user'
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[40.045ms] [34;1m[rows:-][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'TS-Lager' AND table_name = 'users' AND constraint_name = 'fk_sessions_user'
 
-2025/07/09 10:14:29 [31;1m/opt/dev/go-barcode-webapp/cmd/server/main.go:146 [35;1mError 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
-[0m[33m[18.081ms] [34;1m[rows:0][0m ALTER TABLE `users` ADD CONSTRAINT `fk_sessions_user` FOREIGN KEY (`userID`) REFERENCES `sessions`(`user_id`)
-2025/07/09 10:14:29 Failed to auto-migrate invoice_templates table: Error 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
+2025/07/11 13:42:21 [31;1m/opt/dev/go-barcode-webapp/cmd/server/main.go:151 [35;1mError 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
+[0m[33m[19.809ms] [34;1m[rows:0][0m ALTER TABLE `users` ADD CONSTRAINT `fk_sessions_user` FOREIGN KEY (`userID`) REFERENCES `sessions`(`user_id`)
+2025/07/11 13:42:21 Failed to auto-migrate invoice_templates table: Error 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:150
-[0m[33m[17.297ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:155
+[0m[33m[19.826ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:150
-[0m[33m[35.643ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:155
+[0m[33m[40.197ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:150
-[0m[33m[35.870ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'company_settings' AND table_type = 'BASE TABLE'
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:155
+[0m[33m[40.355ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'company_settings' AND table_type = 'BASE TABLE'
 
-2025/07/09 10:14:29 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:150
-[0m[33m[17.857ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:155
+[0m[33m[19.375ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:150
-[0m[33m[35.980ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:155
+[0m[33m[40.053ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:150
-[0m[33m[17.860ms] [34;1m[rows:-][0m SELECT * FROM `company_settings` LIMIT 1
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:155
+[0m[33m[20.383ms] [34;1m[rows:-][0m SELECT * FROM `company_settings` LIMIT 1
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:150
-[0m[33m[36.069ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'company_settings' ORDER BY ORDINAL_POSITION
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:155
+[0m[33m[40.619ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'company_settings' ORDER BY ORDINAL_POSITION
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[17.196ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[20.356ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[35.115ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[42.215ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[35.449ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[41.853ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[17.721ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[19.794ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[35.656ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[39.901ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[17.757ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[20.758ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[37.169ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[41.643ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[17.509ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[20.298ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[36.076ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:21 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[40.651ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[35.915ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[41.398ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[17.287ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[19.987ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[35.655ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[40.126ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[17.906ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[19.973ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[36.560ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[41.533ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[39.650ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[47.721ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[17.980ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[20.303ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[35.888ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[39.594ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:154
-[0m[33m[36.328ms] [34;1m[rows:-][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'TS-Lager' AND table_name = 'users' AND constraint_name = 'fk_sessions_user'
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[39.963ms] [34;1m[rows:-][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'TS-Lager' AND table_name = 'users' AND constraint_name = 'fk_sessions_user'
 
-2025/07/09 10:14:30 [31;1m/opt/dev/go-barcode-webapp/cmd/server/main.go:154 [35;1mError 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
-[0m[33m[17.777ms] [34;1m[rows:0][0m ALTER TABLE `users` ADD CONSTRAINT `fk_sessions_user` FOREIGN KEY (`userID`) REFERENCES `sessions`(`user_id`)
-2025/07/09 10:14:30 Failed to auto-migrate email_templates table: Error 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
+2025/07/11 13:42:22 [31;1m/opt/dev/go-barcode-webapp/cmd/server/main.go:159 [35;1mError 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
+[0m[33m[19.795ms] [34;1m[rows:0][0m ALTER TABLE `users` ADD CONSTRAINT `fk_sessions_user` FOREIGN KEY (`userID`) REFERENCES `sessions`(`user_id`)
+2025/07/11 13:42:22 Failed to auto-migrate email_templates table: Error 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:158
-[0m[33m[18.656ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[19.824ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:158
-[0m[33m[35.578ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[39.561ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:158
-[0m[33m[36.401ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'user_preferences' AND table_type = 'BASE TABLE'
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[39.989ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'user_preferences' AND table_type = 'BASE TABLE'
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:158
-[0m[33m[17.824ms] [34;1m[rows:-][0m SELECT DATABASE()
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[19.442ms] [34;1m[rows:-][0m SELECT DATABASE()
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:158
-[0m[33m[36.513ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[39.227ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:158
-[0m[33m[17.883ms] [34;1m[rows:-][0m SELECT * FROM `user_preferences` LIMIT 1
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[19.791ms] [34;1m[rows:-][0m SELECT * FROM `user_preferences` LIMIT 1
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:158
-[0m[33m[36.051ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'user_preferences' ORDER BY ORDINAL_POSITION
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[40.206ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'user_preferences' ORDER BY ORDINAL_POSITION
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:158
-[0m[33m[22.061ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `email_notifications` boolean NOT NULL DEFAULT true
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[24.033ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `email_notifications` boolean NOT NULL DEFAULT true
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:158
-[0m[33m[22.878ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `system_notifications` boolean NOT NULL DEFAULT true
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[24.326ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `system_notifications` boolean NOT NULL DEFAULT true
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:158
-[0m[33m[21.912ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `job_status_notifications` boolean NOT NULL DEFAULT true
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[23.518ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `job_status_notifications` boolean NOT NULL DEFAULT true
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:158
-[0m[33m[22.406ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `device_alert_notifications` boolean NOT NULL DEFAULT true
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[23.431ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `device_alert_notifications` boolean NOT NULL DEFAULT true
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:158
-[0m[33m[23.262ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `show_advanced_options` boolean NOT NULL DEFAULT false
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[23.873ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `show_advanced_options` boolean NOT NULL DEFAULT false
 
-2025/07/09 10:14:30 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:158
-[0m[33m[22.396ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `auto_save_enabled` boolean NOT NULL DEFAULT true
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[23.257ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `auto_save_enabled` boolean NOT NULL DEFAULT true
 
-2025/07/09 10:14:31 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository.go:510
-[0m[33m[130.521ms] [34;1m[rows:1][0m SELECT * FROM `invoice_templates` ORDER BY is_default DESC, name ASC
-2025/07/09 10:14:31 Templates already exist (1), skipping default template creation
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository.go:510
+[0m[33m[145.130ms] [34;1m[rows:1][0m SELECT * FROM `invoice_templates` ORDER BY is_default DESC, name ASC
+2025/07/11 13:42:22 Templates already exist (1), skipping default template creation
 [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
  - using env:	export GIN_MODE=release
  - using code:	gin.SetMode(gin.ReleaseMode)
 
-[GIN-debug] Loaded HTML Templates (64): 
-	- error.html
-	- home.html
-	- profile_settings.html
-	- search_results.html
-	- content
-	- email_templates_list.html
-	- invoice_template_designer_basic.html
-	- invoice_templates_list.html
+[GIN-debug] Loaded HTML Templates (63): 
+	- invoice_template_designer.html
 	- job_detail.html
-	- users_list.html
-	- base.html
+	- financial_dashboard.html
+	- financial_reports.html
+	- invoice_settings_form.html
+	- scan_job.html
+	- transactions_list.html
+	- user_form.html
+	- css
+	- customers.html
+	- job_template_detail.html
+	- cases_list.html
+	- error.html
+	- login.html
+	- transaction_detail.html
+	- jobs.html
+	- user_detail.html
+	- email_templates_list.html
+	- job_form.html
+	- js
+	- devices_standalone.html
+	- email_template_preview.html
+	- invoice_detail.html
+	- invoices_content.html
+	- invoices_list.html
 	- 
-	- invoices-content
-	- security_roles.html
-	- devices.html
+	- analytics_dashboard.html
+	- users_list.html
+	- security_audit.html
+	- signature_form.html
+	- base.html
+	- customer_detail.html
 	- transaction_form.html
-	- customer_form.html
+	- case_detail.html
+	- company_settings.html
+	- security_roles.html
+	- invoices-content
+	- search_results.html
+	- monitoring_dashboard.html
+	- device_form.html
+	- documents_list.html
+	- mobile_scanner.html
+	- invoice_templates_list.html
+	- job_templates_list.html
+	- profile_settings.html
+	- scan_select_job.html
+	- document_upload_form.html
+	- invoice_preview.html
+	- bulk_operations.html
+	- case_device_mapping.html
 	- equipment_package_form.html
 	- equipment_packages_list.html
-	- job_form.html
-	- job_template_form.html
-	- job_templates_list.html
-	- login.html
-	- mobile_scanner.html
-	- scan_select_job.html
-	- security_audit.html
-	- js
-	- case_device_mapping.html
-	- email_template_form.html
-	- invoices_content.html
-	- analytics_dashboard.html
-	- document_upload_form.html
-	- invoice_detail.html
 	- invoice_form.html
-	- invoice_preview.html
-	- user_form.html
-	- case_detail.html
-	- email_template_preview.html
+	- invoice_template_designer_basic.html
 	- invoice_template_german.html
-	- scan_job.html
-	- case_form.html
-	- company_settings.html
-	- user_detail.html
-	- customers.html
-	- financial_reports.html
-	- job_template_detail.html
-	- jobs.html
-	- transactions_list.html
-	- css
-	- invoice_template_designer.html
-	- signature_form.html
-	- bulk_operations.html
-	- cases_list.html
-	- device_form.html
-	- devices_standalone.html
-	- documents_list.html
-	- equipment_package_detail.html
-	- transaction_detail.html
-	- customer_detail.html
+	- job_template_form.html
 	- device_detail.html
-	- financial_dashboard.html
-	- invoice_settings_form.html
-	- invoices_list.html
-	- monitoring_dashboard.html
+	- email_template_form.html
+	- customer_form.html
+	- equipment_package_detail.html
+	- home.html
+	- content
+	- case_form.html
 
 [GIN-debug] GET    /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (6 handlers)
 [GIN-debug] HEAD   /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (6 handlers)
@@ -570,17 +569,17 @@
 [GIN-debug] GET    /sw.js                    --> main.main.func18 (7 handlers)
 [GIN-debug] GET    /manifest.json            --> main.main.func19 (7 handlers)
 
-2025/07/09 10:14:31 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
-[0m[33m[35.672ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'admin' ORDER BY `roles`.`roleID` LIMIT 1
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
+[0m[33m[39.689ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'admin' ORDER BY `roles`.`roleID` LIMIT 1
 
-2025/07/09 10:14:31 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
-[0m[33m[34.977ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'manager' ORDER BY `roles`.`roleID` LIMIT 1
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
+[0m[33m[39.395ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'manager' ORDER BY `roles`.`roleID` LIMIT 1
 
-2025/07/09 10:14:31 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
-[0m[33m[35.561ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'employee' ORDER BY `roles`.`roleID` LIMIT 1
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
+[0m[33m[39.907ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'employee' ORDER BY `roles`.`roleID` LIMIT 1
 
-2025/07/09 10:14:31 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
-[0m[33m[35.118ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'viewer' ORDER BY `roles`.`roleID` LIMIT 1
+2025/07/11 13:42:22 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
+[0m[33m[39.945ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'viewer' ORDER BY `roles`.`roleID` LIMIT 1
 [GIN-debug] GET    /                         --> main.setupRoutes.func1 (7 handlers)
 [GIN-debug] GET    /login                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).LoginForm-fm (7 handlers)
 [GIN-debug] POST   /login                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).Login-fm (7 handlers)
@@ -595,6 +594,7 @@
 [GIN-debug] GET    /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).GetJob-fm (8 handlers)
 [GIN-debug] GET    /jobs/:id/edit            --> go-barcode-webapp/internal/handlers.(*JobHandler).EditJobForm-fm (8 handlers)
 [GIN-debug] PUT    /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).UpdateJob-fm (8 handlers)
+[GIN-debug] POST   /jobs/:id/update          --> go-barcode-webapp/internal/handlers.(*JobHandler).UpdateJob-fm (8 handlers)
 [GIN-debug] DELETE /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).DeleteJob-fm (8 handlers)
 [GIN-debug] GET    /jobs/:id/devices         --> go-barcode-webapp/internal/handlers.(*JobHandler).GetJobDevices-fm (8 handlers)
 [GIN-debug] POST   /jobs/:id/devices         --> go-barcode-webapp/internal/handlers.(*JobHandler).AssignDevice-fm (8 handlers)
@@ -609,6 +609,7 @@
 [GIN-debug] DELETE /devices/:id              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).DeleteDevice-fm (8 handlers)
 [GIN-debug] GET    /devices/:id/qr           --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceQR-fm (8 handlers)
 [GIN-debug] GET    /devices/:id/barcode      --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceBarcode-fm (8 handlers)
+[GIN-debug] GET    /devices/:id/stats        --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceStatsAPI-fm (8 handlers)
 [GIN-debug] GET    /devices/available        --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetAvailableDevices-fm (8 handlers)
 [GIN-debug] GET    /customers                --> go-barcode-webapp/internal/handlers.(*CustomerHandler).ListCustomers-fm (8 handlers)
 [GIN-debug] GET    /customers/new            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).NewCustomerForm-fm (8 handlers)
@@ -631,6 +632,7 @@
 [GIN-debug] DELETE /cases/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*CaseHandler).RemoveDeviceFromCase-fm (8 handlers)
 [GIN-debug] GET    /barcodes/device/:serialNo/qr --> go-barcode-webapp/internal/handlers.(*BarcodeHandler).GenerateDeviceQR-fm (8 handlers)
 [GIN-debug] GET    /barcodes/device/:serialNo/barcode --> go-barcode-webapp/internal/handlers.(*BarcodeHandler).GenerateDeviceBarcode-fm (8 handlers)
+[GIN-debug] GET    /scan                     --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanJobSelection-fm (8 handlers)
 [GIN-debug] GET    /scan/select              --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanJobSelection-fm (8 handlers)
 [GIN-debug] GET    /scan/:jobId              --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanJob-fm (8 handlers)
 [GIN-debug] POST   /scan/:jobId/assign       --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanDevice-fm (8 handlers)
@@ -842,23 +844,128 @@
 [GIN-debug] GET    /api/security/audit/export --> go-barcode-webapp/internal/handlers.(*SecurityHandler).ExportAuditLogs-fm (8 handlers)
 [GIN-debug] GET    /api/security/permissions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissions-fm (8 handlers)
 [GIN-debug] GET    /api/security/check-permission --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CheckPermission-fm (8 handlers)
-2025/07/09 10:14:31 Server starting on 0.0.0.0:8080
-2025/07/09 10:25:16 Route Debug: GET /devices/new
-DEBUG: AuthMiddleware called for URL: /devices/new
-DEBUG: Found session cookie: 791cb4127716c8ccd190c59edb6200c6e1b78b14675cd77de094faf008f7bf3d
+2025/07/11 13:42:22 Server starting on 0.0.0.0:8080
+2025/07/11 13:42:50 Route Debug: GET /jobs/1004
+DEBUG: AuthMiddleware called for URL: /jobs/1004
+DEBUG: Found session cookie: 0a1cc80ec93c541ba06f25d199d474476c66c67b067e35177f255efef0e0088f
 
-2025/07/09 10:25:16 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:142
-[0m[33m[35.310ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '791cb4127716c8ccd190c59edb6200c6e1b78b14675cd77de094faf008f7bf3d' AND expires_at > '2025-07-09 10:25:16.887' ORDER BY `sessions`.`session_id` LIMIT 1
+2025/07/11 13:42:50 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:142
+[0m[33m[40.739ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '0a1cc80ec93c541ba06f25d199d474476c66c67b067e35177f255efef0e0088f' AND expires_at > '2025-07-11 13:42:50.666' ORDER BY `sessions`.`session_id` LIMIT 1
 
-2025/07/09 10:25:16 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:153
-[0m[33m[35.629ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+2025/07/11 13:42:50 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:153
+[0m[33m[40.106ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
 DEBUG: Session valid for user: admin (ID: 5)
 
-2025/07/09 10:25:16 [32m/opt/dev/go-barcode-webapp/internal/repository/product_repository.go:57
-[0m[33m[18.409ms] [34;1m[rows:43][0m SELECT * FROM `products` ORDER BY name ASC
-{"timestamp":"2025-07-09T08:25:16.98917759Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1752049516887933972","method":"GET","path":"/devices/new","status_code":200,"duration":"101.236222ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0","fields":{"bytes_in":0,"bytes_out":17001,"errors":"Error #01: template: device_form.html:208:142: executing \"device_form.html\" at \u003c.device.Notes\u003e: can't evaluate field Notes in type interface {}\n"}}
-2025/07/09 10:25:17 Route Debug: GET /static/css/rental-core-design.css
-2025/07/09 10:25:17 Route Debug: GET /favicon.ico
-2025/07/09 10:25:17 NotFoundHandler: 404 for path: /favicon.ico
-2025/07/09 10:25:17 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
-{"timestamp":"2025-07-09T08:25:17.617301743Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1752049517607415678","method":"GET","path":"/favicon.ico","status_code":404,"duration":"9.882345ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0","fields":{"bytes_in":0,"bytes_out":6348,"errors":"Error #01: template: profile_settings.html:35:65: executing \"content\" at \u003c.user.FirstName\u003e: nil pointer evaluating interface {}.FirstName\n"}}
+2025/07/11 13:42:50 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:25
+[0m[33m[39.052ms] [34;1m[rows:1][0m SELECT * FROM `customers` WHERE `customers`.`customerID` = 52
+
+2025/07/11 13:42:50 [32m
+[0m[33m[39.504ms] [34;1m[rows:3][0m SELECT * FROM `products` WHERE `products`.`productID` IN (10,1,2)
+
+2025/07/11 13:42:50 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:25
+[0m[33m[80.565ms] [34;1m[rows:8][0m SELECT * FROM `devices` WHERE `devices`.`deviceID` IN ('MHD1001','MHD1002','MHD1003','MHD1004','SUB1001','SUB1002','TOP1001','TOP1002')
+
+2025/07/11 13:42:50 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:25
+[0m[33m[119.675ms] [34;1m[rows:8][0m SELECT * FROM `jobdevices` WHERE `jobdevices`.`jobID` = 1004
+
+2025/07/11 13:42:50 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:25
+[0m[33m[39.779ms] [34;1m[rows:1][0m SELECT * FROM `status` WHERE `status`.`statusID` = 1001
+
+2025/07/11 13:42:50 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:25 [33mSLOW SQL >= 200ms
+[0m[31;1m[239.091ms] [33m[rows:1][35m SELECT * FROM `jobs` WHERE `jobs`.`jobID` = 1004 ORDER BY `jobs`.`jobID` LIMIT 1[0m
+🔧 DEBUG JobRepo.GetByID: Loaded job 1004 with description: ''
+
+2025/07/11 13:42:51 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:168
+[0m[33m[40.092ms] [34;1m[rows:3][0m SELECT * FROM `products` WHERE `products`.`productID` IN (10,1,2)
+
+2025/07/11 13:42:51 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:168
+[0m[33m[80.460ms] [34;1m[rows:8][0m SELECT * FROM `devices` WHERE `devices`.`deviceID` IN ('MHD1001','MHD1002','MHD1003','MHD1004','SUB1001','SUB1002','TOP1001','TOP1002')
+
+2025/07/11 13:42:51 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:168
+[0m[33m[120.772ms] [34;1m[rows:8][0m SELECT * FROM `jobdevices` WHERE jobID = 1004
+{"timestamp":"2025-07-11T11:42:51.11815713Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1752234170666521459","method":"GET","path":"/jobs/1004","status_code":200,"duration":"451.632638ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0","fields":{"bytes_in":0,"bytes_out":24383}}
+2025/07/11 13:48:01 Route Debug: GET /
+{"timestamp":"2025-07-11T11:48:01.085677799Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1752234481085350311","method":"GET","path":"/","status_code":307,"duration":"324.469µs","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0","fields":{"bytes_in":0,"bytes_out":46}}
+2025/07/11 13:48:01 Route Debug: GET /dashboard
+DEBUG: AuthMiddleware called for URL: /dashboard
+DEBUG: Found session cookie: 0a1cc80ec93c541ba06f25d199d474476c66c67b067e35177f255efef0e0088f
+
+2025/07/11 13:48:01 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:142
+[0m[33m[39.622ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '0a1cc80ec93c541ba06f25d199d474476c66c67b067e35177f255efef0e0088f' AND expires_at > '2025-07-11 13:48:01.11' ORDER BY `sessions`.`session_id` LIMIT 1
+
+2025/07/11 13:48:01 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:153
+[0m[33m[40.042ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Session valid for user: admin (ID: 5)
+
+2025/07/11 13:48:01 [32m/opt/dev/go-barcode-webapp/internal/handlers/home_handler.go:41
+[0m[33m[23.457ms] [34;1m[rows:1][0m SELECT count(*) FROM `jobs`
+
+2025/07/11 13:48:01 [32m/opt/dev/go-barcode-webapp/internal/handlers/home_handler.go:42
+[0m[33m[20.147ms] [34;1m[rows:1][0m SELECT count(*) FROM `devices`
+
+2025/07/11 13:48:01 [32m/opt/dev/go-barcode-webapp/internal/handlers/home_handler.go:43
+[0m[33m[19.484ms] [34;1m[rows:1][0m SELECT count(*) FROM `customers`
+
+2025/07/11 13:48:01 [32m/opt/dev/go-barcode-webapp/internal/handlers/home_handler.go:44
+[0m[33m[20.327ms] [34;1m[rows:1][0m SELECT count(*) FROM `cases`
+
+2025/07/11 13:48:01 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:160
+[0m[33m[20.737ms] [34;1m[rows:3][0m SELECT j.jobID, j.customerID, j.statusID, 
+			j.description, j.startDate, j.endDate, 
+			j.revenue, j.final_revenue,
+			CONCAT(COALESCE(c.companyname, ''), ' ', COALESCE(c.firstname, ''), ' ', COALESCE(c.lastname, '')) as customer_name, 
+			s.status as status_name,
+			COUNT(DISTINCT jd.deviceID) as device_count,
+			COALESCE(j.final_revenue, j.revenue) as total_revenue
+		FROM jobs j 
+		LEFT JOIN customers c ON j.customerID = c.customerID
+		LEFT JOIN status s ON j.statusID = s.statusID
+		LEFT JOIN jobdevices jd ON j.jobID = jd.jobID GROUP BY j.jobID, j.customerID, j.statusID, j.description, j.startDate, j.endDate, j.revenue, j.final_revenue, customer_name, s.status ORDER BY j.jobID DESC LIMIT 5
+{"timestamp":"2025-07-11T11:48:01.304771048Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1752234481110377598","method":"GET","path":"/dashboard","status_code":200,"duration":"194.39172ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0","fields":{"bytes_in":0,"bytes_out":18958}}
+2025/07/11 13:48:01 Route Debug: GET /static/images/icon-180.png
+2025/07/11 13:48:01 NotFoundHandler: 404 for path: /static/images/icon-180.png
+2025/07/11 13:48:01 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/07/11 13:48:01 Route Debug: GET /favicon.ico
+2025/07/11 13:48:01 NotFoundHandler: 404 for path: /favicon.ico
+2025/07/11 13:48:01 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+{"timestamp":"2025-07-11T11:48:01.403801065Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1752234481390656247","method":"GET","path":"/favicon.ico","status_code":404,"duration":"13.135724ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0","fields":{"bytes_in":0,"bytes_out":6348,"errors":"Error #01: template: profile_settings.html:35:65: executing \"content\" at \u003c.user.FirstName\u003e: nil pointer evaluating interface {}.FirstName\n"}}
+2025/07/11 13:48:06 Route Debug: GET /scan
+DEBUG: AuthMiddleware called for URL: /scan
+DEBUG: Found session cookie: 0a1cc80ec93c541ba06f25d199d474476c66c67b067e35177f255efef0e0088f
+
+2025/07/11 13:48:06 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:142
+[0m[33m[39.619ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '0a1cc80ec93c541ba06f25d199d474476c66c67b067e35177f255efef0e0088f' AND expires_at > '2025-07-11 13:48:06.493' ORDER BY `sessions`.`session_id` LIMIT 1
+
+2025/07/11 13:48:06 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:153
+[0m[33m[39.515ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Session valid for user: admin (ID: 5)
+
+2025/07/11 13:48:06 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository_extension.go:15
+[0m[33m[40.030ms] [34;1m[rows:1][0m SELECT `jobs`.`jobID`,`jobs`.`customerID`,`jobs`.`statusID`,`jobs`.`jobcategoryID`,`jobs`.`description`,`jobs`.`discount`,`jobs`.`discount_type`,`jobs`.`revenue`,`jobs`.`final_revenue`,`jobs`.`startDate`,`jobs`.`endDate`,`jobs`.`templateID` FROM `jobs` JOIN status ON jobs.statusID = status.statusID WHERE status.status = 'paid'
+
+2025/07/11 13:48:06 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository_extension.go:32
+[0m[33m[38.756ms] [34;1m[rows:0][0m SELECT * FROM `jobdevices` WHERE jobID IN (1002)
+
+2025/07/11 13:48:06 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:160
+[0m[33m[21.355ms] [34;1m[rows:3][0m SELECT j.jobID, j.customerID, j.statusID, 
+			j.description, j.startDate, j.endDate, 
+			j.revenue, j.final_revenue,
+			CONCAT(COALESCE(c.companyname, ''), ' ', COALESCE(c.firstname, ''), ' ', COALESCE(c.lastname, '')) as customer_name, 
+			s.status as status_name,
+			COUNT(DISTINCT jd.deviceID) as device_count,
+			COALESCE(j.final_revenue, j.revenue) as total_revenue
+		FROM jobs j 
+		LEFT JOIN customers c ON j.customerID = c.customerID
+		LEFT JOIN status s ON j.statusID = s.statusID
+		LEFT JOIN jobdevices jd ON j.jobID = jd.jobID GROUP BY j.jobID, j.customerID, j.statusID, j.description, j.startDate, j.endDate, j.revenue, j.final_revenue, customer_name, s.status ORDER BY j.jobID DESC
+2025/07/11 13:48:06 ⏱️  DeviceRepository.List() started
+
+2025/07/11 13:48:06 [32m/opt/dev/go-barcode-webapp/internal/repository/device_repository.go:82
+[0m[33m[40.125ms] [34;1m[rows:9][0m SELECT * FROM `products` WHERE `products`.`productID` IN (32,29,25,24,23,4,2,3,1)
+
+2025/07/11 13:48:06 [32m/opt/dev/go-barcode-webapp/internal/repository/device_repository.go:82
+[0m[33m[60.697ms] [34;1m[rows:20][0m SELECT * FROM `devices` ORDER BY deviceID DESC LIMIT 20
+2025/07/11 13:48:06 ⏱️  Device query took: 60.711009ms
+2025/07/11 13:48:06 ⏱️  DeviceRepository.List() completed in 60.747495ms (found 20 devices)
+{"timestamp":"2025-07-11T11:48:06.784961413Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1752234486493463034","method":"GET","path":"/scan","status_code":200,"duration":"291.49676ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0","fields":{"bytes_in":0,"bytes_out":20374}}
+signal: killed

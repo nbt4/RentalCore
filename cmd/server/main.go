@@ -135,34 +135,8 @@ func main() {
 	// Initialize services
 	barcodeService := services.NewBarcodeService()
 
-	// Auto-migrate database tables in correct order (User first, then Session)
-	if err := db.AutoMigrate(&models.User{}); err != nil {
-		log.Printf("Failed to auto-migrate users table: %v", err)
-	}
-	
-	if err := db.AutoMigrate(&models.Session{}); err != nil {
-		log.Printf("Failed to auto-migrate sessions table: %v", err)
-	}
-	
-	if err := db.AutoMigrate(&models.EquipmentPackage{}); err != nil {
-		log.Printf("Failed to auto-migrate equipment_packages table: %v", err)
-	}
-	
-	if err := db.AutoMigrate(&models.InvoiceTemplate{}); err != nil {
-		log.Printf("Failed to auto-migrate invoice_templates table: %v", err)
-	}
-	
-	if err := db.AutoMigrate(&models.CompanySettings{}); err != nil {
-		log.Printf("Failed to auto-migrate company_settings table: %v", err)
-	}
-	
-	if err := db.AutoMigrate(&models.EmailTemplate{}); err != nil {
-		log.Printf("Failed to auto-migrate email_templates table: %v", err)
-	}
-	
-	if err := db.AutoMigrate(&models.UserPreferences{}); err != nil {
-		log.Printf("Failed to auto-migrate user_preferences table: %v", err)
-	}
+	// Auto-migration disabled - database schema managed manually
+	log.Printf("Database auto-migration disabled - using manual schema management")
 
 	// Initialize handlers
 	jobHandler := handlers.NewJobHandler(jobRepo, deviceRepo, customerRepo, statusRepo, jobCategoryRepo)
@@ -692,6 +666,7 @@ func setupRoutes(r *gin.Engine,
 				log.Printf("🏢 COMPANY SETTINGS ROUTE CALLED - URL: %s, Method: %s", c.Request.URL.Path, c.Request.Method)
 				companyHandler.CompanySettingsForm(c)
 			})
+			settings.POST("/company", companyHandler.UpdateCompanySettingsForm)
 			settings.GET("/company/api", companyHandler.GetCompanySettings)
 			settings.PUT("/company/api", companyHandler.UpdateCompanySettings)
 			settings.POST("/company/logo", companyHandler.UploadCompanyLogo)
@@ -894,6 +869,8 @@ func setupRoutes(r *gin.Engine,
 				apiCases.PUT("/:id", caseHandler.UpdateCaseAPI)
 				apiCases.DELETE("/:id", caseHandler.DeleteCaseAPI)
 				apiCases.GET("/:id/devices", caseHandler.GetCaseDevicesAPI)
+				apiCases.POST("/:id/devices", caseHandler.ScanDeviceToCase)
+				apiCases.DELETE("/:id/devices/:deviceId", caseHandler.RemoveDeviceFromCase)
 			}
 
 			// Workflow API
@@ -983,6 +960,14 @@ func setupRoutes(r *gin.Engine,
 			legacyAPI.PUT("/company-settings", companyHandler.UpdateCompanySettings)
 			legacyAPI.POST("/company-settings/logo", companyHandler.UploadCompanyLogo)
 			legacyAPI.DELETE("/company-settings/logo", companyHandler.DeleteCompanyLogo)
+			
+			// SMTP Configuration API
+			settingsAPI := legacyAPI.Group("/settings")
+			{
+				settingsAPI.GET("/smtp", companyHandler.GetSMTPConfig)
+				settingsAPI.POST("/smtp", companyHandler.UpdateSMTPConfig)
+				settingsAPI.POST("/smtp/test", companyHandler.TestSMTPConnection)
+			}
 			
 			// TODO: Invoice settings API - temporarily disabled
 			// Will be re-implemented in new system when needed  

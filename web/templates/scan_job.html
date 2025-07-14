@@ -98,6 +98,7 @@
         .scanner-status-area {
             margin: 12px 0;
         }
+
         
         .scanner-status {
             background: var(--bg-secondary);
@@ -703,6 +704,24 @@
                             </div>
                         </div>
 
+                        <!-- Bulk Scan Toggle -->
+                        <div class="manual-input-section rc-mb-md">
+                            <h6><i class="bi bi-toggles"></i> Scan Mode</h6>
+                            <div class="rc-flex rc-flex-gap-md rc-flex-between">
+                                <div class="rc-flex rc-flex-gap-sm rc-flex-center">
+                                    <input type="checkbox" id="bulk-mode-toggle" class="rc-switch" checked>
+                                    <label for="bulk-mode-toggle" class="rc-label">
+                                        <span id="bulk-mode-label">Bulk Mode</span>
+                                        <small class="rc-text-muted rc-block">Scan multiple devices, then assign all at once</small>
+                                    </label>
+                                </div>
+                                <button id="finish-bulk-btn" class="rc-btn rc-btn-success rc-btn-sm" 
+                                        onclick="finishBulkScan()" style="display: none;">
+                                    <i class="bi bi-check-lg"></i> Assign All (<span id="bulk-count">0</span>)
+                                </button>
+                            </div>
+                        </div>
+
                         <!-- Manual Input -->
                         <div class="manual-input-section">
                             <h6><i class="bi bi-keyboard"></i> Manual Input</h6>
@@ -841,35 +860,36 @@
 
     <!-- Custom Price Modal -->
     <div class="rc-modal" id="priceModal" tabindex="-1" style="display: none;">
-        <div class="rc-modal-dialog">
+        <div class="rc-modal-dialog" style="width: 90vw; max-width: 40rem; margin: 1.75rem auto;">
             <div class="rc-modal-content">
-                <div class="rc-modal-header">
+                <div class="rc-modal-header" style="padding: 1.5rem;">
                     <h5 class="rc-modal-title">Set Custom Price</h5>
                     <button type="button" class="rc-modal-close"></button>
                 </div>
-                <div class="rc-modal-body">
-                    <div class="rc-mb-md">
+                <div class="rc-modal-body" style="padding: 1.5rem;">
+                    <div class="rc-mb-lg">
                         <label class="rc-label">Device</label>
-                        <div class="rc-p-md rc-bg-secondary rc-rounded">
-                            <div class="device-id" id="modal-device-id">-</div>
-                            <div class="device-name" id="modal-device-name">-</div>
+                        <div class="rc-p-lg rc-bg-secondary rc-rounded" style="padding: 1rem;">
+                            <div class="device-id" id="modal-device-id" style="font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem;">-</div>
+                            <div class="device-name" id="modal-device-name" style="color: #6c757d;">-</div>
                         </div>
                     </div>
                     <div class="rc-mb-md">
                         <label for="customPrice" class="rc-label">Custom Price (EUR)</label>
-                        <div class="rc-input-group">
+                        <div class="rc-input-group" style="margin-top: 0.5rem;">
                             <span class="rc-input-group-text">€</span>
                             <input type="number" class="rc-input" id="customPrice" 
-                                   placeholder="Leave empty for default" step="0.01" min="0">
+                                   placeholder="Leave empty for default" step="0.01" min="0"
+                                   style="padding: 0.75rem 1rem; font-size: 1rem;">
                         </div>
-                        <div class="rc-form-text" id="default-price-info">
+                        <div class="rc-form-text" id="default-price-info" style="margin-top: 0.5rem; padding: 0.5rem 0.75rem; background: rgba(108, 117, 125, 0.1); border-radius: 0.375rem;">
                             Default price will be used if left empty
                         </div>
                     </div>
                 </div>
-                <div class="rc-modal-footer">
-                    <button type="button" class="rc-btn rc-btn-secondary rc-modal-close">Cancel</button>
-                    <button type="button" class="rc-btn rc-btn-primary" id="confirm-assign">Assign Device</button>
+                <div class="rc-modal-footer" style="padding: 1.5rem; gap: 0.75rem;">
+                    <button type="button" class="rc-btn rc-btn-secondary rc-modal-close" style="padding: 0.75rem 1.5rem;">Cancel</button>
+                    <button type="button" class="rc-btn rc-btn-primary" id="confirm-assign" style="padding: 0.75rem 1.5rem;">Assign Device</button>
                 </div>
             </div>
         </div>
@@ -926,7 +946,7 @@
             
             initializeScanner();
             setupEventListeners();
-            // toggleBulkMode(); // Disabled - no checkbox present
+            initializeBulkMode();
         });
 
         function initializeScanner() {
@@ -1234,15 +1254,8 @@
             }
             
             if (isBulkMode) {
-                // Bulk mode (default) - add to bulk list
-                bulkDevices.push({
-                    deviceId: code,
-                    deviceName: device.product ? device.product.name : 'Unknown Product',
-                    defaultPrice: device.product ? device.product.itemcostperday : null
-                });
-                
-                addScanResult(code, 'success', `Added to bulk (${bulkDevices.length})`);
-                updateStatus(`${bulkDevices.length} devices scanned`, 'success');
+                // Bulk mode - directly assign device to job without popup
+                await assignDevice(code, null); // No custom price in bulk mode
                 // Keep scanning in bulk mode
             } else {
                 // Custom price mode - show price modal
@@ -1286,8 +1299,13 @@
                 const result = await response.json();
                 
                 if (response.ok) {
-                    addScanResult(deviceId, 'success', 'Device assigned successfully');
-                    updateStatus('Added successfully', 'success');
+                    if (isBulkMode) {
+                        addScanResult(deviceId, 'success', 'Device assigned to job');
+                        updateStatus('Device assigned - ready for next scan', 'success');
+                    } else {
+                        addScanResult(deviceId, 'success', 'Device assigned successfully');
+                        updateStatus('Added successfully', 'success');
+                    }
                     // Don't reload page - keep camera running
                 } else {
                     addScanResult(deviceId, 'error', result.error || 'Failed to assign device');
@@ -1348,11 +1366,48 @@
             };
         }
 
+        function initializeBulkMode() {
+            const bulkToggle = document.getElementById('bulk-mode-toggle');
+            const bulkLabel = document.getElementById('bulk-mode-label');
+            const finishBulkBtn = document.getElementById('finish-bulk-btn');
+            
+            // Set initial state
+            isBulkMode = bulkToggle.checked;
+            updateBulkModeUI();
+            
+            // Add event listener for toggle
+            bulkToggle.addEventListener('change', function() {
+                isBulkMode = this.checked;
+                updateBulkModeUI();
+                toggleBulkMode();
+            });
+        }
+
+        function updateBulkModeUI() {
+            const bulkLabel = document.getElementById('bulk-mode-label');
+            const finishBulkBtn = document.getElementById('finish-bulk-btn');
+            const bulkCount = document.getElementById('bulk-count');
+            
+            if (isBulkMode) {
+                bulkLabel.textContent = 'Bulk Mode - Direct Assignment';
+                finishBulkBtn.style.display = 'none'; // Hide bulk button since devices are assigned directly
+            } else {
+                bulkLabel.textContent = 'Individual Mode - Custom Price';
+                finishBulkBtn.style.display = 'none';
+            }
+            
+            if (bulkCount) {
+                bulkCount.textContent = '0'; // Not used in direct assignment mode
+            }
+        }
+
         function toggleBulkMode() {
-            // Default to bulk mode since no UI controls are present
-            isBulkMode = true;
-            bulkDevices = [];
-            console.log('Bulk mode enabled by default');
+            if (isBulkMode) {
+                console.log('Bulk mode enabled - devices will be assigned directly');
+            } else {
+                console.log('Individual mode enabled - custom price popup will be shown');
+            }
+            updateBulkModeUI();
         }
 
         async function finishBulkScan() {

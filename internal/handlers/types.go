@@ -6,5 +6,6 @@ import "go-barcode-webapp/internal/models"
 type ProductGroup struct {
 	Product    *models.Product    `json:"product"`
 	Devices    []models.JobDevice `json:"devices"`
+	Count      int                `json:"count"`
 	TotalValue float64            `json:"total_value"`
 }

@@ -1,0 +1,896 @@
+2025/07/11 13:38:53 Database connection established successfully
+
+2025/07/11 13:38:53 [31;1m/opt/dev/go-barcode-webapp/internal/compliance/audit_logger.go:39 [35;1mrecord not found
+[0m[33m[20.701ms] [34;1m[rows:0][0m SELECT * FROM `audit_events` ORDER BY timestamp DESC,`audit_events`.`id` LIMIT 1
+
+2025/07/11 13:38:53 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.541ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:53 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.847ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:53 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.476ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND table_type = 'BASE TABLE'
+
+2025/07/11 13:38:53 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.870ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:53 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.982ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:53 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.819ms] [34;1m[rows:-][0m SELECT * FROM `gobd_records` LIMIT 1
+
+2025/07/11 13:38:53 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.836ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' ORDER BY ORDINAL_POSITION
+
+2025/07/11 13:38:53 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[25.326ms] [34;1m[rows:0][0m ALTER TABLE `gobd_records` MODIFY COLUMN `is_immutable` boolean DEFAULT true
+
+2025/07/11 13:38:53 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.804ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:53 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.021ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:53 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.748ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_user_id'
+
+2025/07/11 13:38:53 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.407ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.834ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.968ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_company_id'
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.258ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.956ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.870ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_document_type'
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.964ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.087ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.434ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_document_id'
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.963ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.963ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.962ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_data_hash'
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.538ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.961ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.155ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_archive_date'
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.369ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.650ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.423ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'gobd_records' AND index_name = 'idx_gobd_records_retention_date'
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.935ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.086ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.007ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND table_type = 'BASE TABLE'
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.557ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.498ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[20.344ms] [34;1m[rows:-][0m SELECT * FROM `audit_events` LIMIT 1
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[41.915ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' ORDER BY ORDINAL_POSITION
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[29.127ms] [34;1m[rows:0][0m ALTER TABLE `audit_events` MODIFY COLUMN `is_compliant` boolean DEFAULT true
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[20.410ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.016ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.057ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_previous_hash'
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[20.000ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:54 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.484ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.324ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_retention_date'
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.882ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[41.548ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.918ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_timestamp'
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.400ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.018ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.478ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_event_type'
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.852ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.006ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.644ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_object_type'
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[20.011ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.000ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.195ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_object_id'
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.976ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.069ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.367ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_user_id'
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.797ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.947ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.754ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.statistics WHERE table_schema = 'TS-Lager' AND table_name = 'audit_events' AND index_name = 'idx_audit_events_session_id'
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[20.010ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[40.162ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.989ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'retention_policies' AND table_type = 'BASE TABLE'
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.965ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[39.963ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[19.850ms] [34;1m[rows:-][0m SELECT * FROM `retention_policies` LIMIT 1
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132
+[0m[33m[41.095ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'retention_policies' ORDER BY ORDINAL_POSITION
+
+2025/07/11 13:38:55 [31;1m/opt/dev/go-barcode-webapp/internal/compliance/gobd_compliance.go:132 [35;1mError 1062 (23000): Duplicate entry '' for key 'retention_policies.document_type'
+[0m[33m[34.590ms] [34;1m[rows:0][0m ALTER TABLE `retention_policies` ADD `document_type` varchar(191) NOT NULL UNIQUE
+2025/07/11 13:38:55 Warning: Failed to create compliance middleware: failed to create GoBD compliance: failed to migrate GoBD tables: Error 1062 (23000): Duplicate entry '' for key 'retention_policies.document_type'
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:139
+[0m[33m[19.746ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:139
+[0m[33m[40.666ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:139
+[0m[33m[39.861ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
+
+2025/07/11 13:38:55 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:139
+[0m[33m[19.976ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:139
+[0m[33m[39.978ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:139
+[0m[33m[19.980ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:139
+[0m[33m[40.422ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:139
+[0m[33m[46.272ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:143
+[0m[33m[20.717ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:143
+[0m[33m[40.103ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:143
+[0m[33m[40.543ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:143
+[0m[33m[19.515ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:143
+[0m[33m[41.152ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:143
+[0m[33m[20.490ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:143
+[0m[33m[41.179ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[19.190ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[40.055ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[40.485ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[19.694ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[40.063ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[19.974ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[41.472ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[19.675ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[40.125ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[41.390ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[19.396ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[40.578ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[19.941ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[41.020ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[50.641ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[19.897ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[40.435ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:147
+[0m[33m[40.150ms] [34;1m[rows:-][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'TS-Lager' AND table_name = 'users' AND constraint_name = 'fk_sessions_user'
+
+2025/07/11 13:38:56 [31;1m/opt/dev/go-barcode-webapp/cmd/server/main.go:147 [35;1mError 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
+[0m[33m[19.861ms] [34;1m[rows:0][0m ALTER TABLE `users` ADD CONSTRAINT `fk_sessions_user` FOREIGN KEY (`userID`) REFERENCES `sessions`(`user_id`)
+2025/07/11 13:38:56 Failed to auto-migrate equipment_packages table: Error 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
+
+2025/07/11 13:38:56 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[20.821ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[41.722ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[41.441ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[20.254ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[41.637ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[19.874ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[41.163ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[20.598ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[40.624ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[40.300ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[19.871ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[40.218ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[19.847ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[41.462ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[52.139ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[19.928ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[40.431ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:151
+[0m[33m[40.497ms] [34;1m[rows:-][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'TS-Lager' AND table_name = 'users' AND constraint_name = 'fk_sessions_user'
+
+2025/07/11 13:38:57 [31;1m/opt/dev/go-barcode-webapp/cmd/server/main.go:151 [35;1mError 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
+[0m[33m[19.681ms] [34;1m[rows:0][0m ALTER TABLE `users` ADD CONSTRAINT `fk_sessions_user` FOREIGN KEY (`userID`) REFERENCES `sessions`(`user_id`)
+2025/07/11 13:38:57 Failed to auto-migrate invoice_templates table: Error 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:155
+[0m[33m[19.202ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:155
+[0m[33m[40.568ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:155
+[0m[33m[40.074ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'company_settings' AND table_type = 'BASE TABLE'
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:155
+[0m[33m[19.955ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:155
+[0m[33m[40.104ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:155
+[0m[33m[19.896ms] [34;1m[rows:-][0m SELECT * FROM `company_settings` LIMIT 1
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:155
+[0m[33m[41.069ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'company_settings' ORDER BY ORDINAL_POSITION
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[19.494ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[40.087ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[41.016ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' AND table_type = 'BASE TABLE'
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[20.034ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:57 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[40.489ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[19.916ms] [34;1m[rows:-][0m SELECT * FROM `sessions` LIMIT 1
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[41.995ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'sessions' ORDER BY ORDINAL_POSITION
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[20.201ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[41.009ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[40.434ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'users' AND table_type = 'BASE TABLE'
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[19.987ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[41.113ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[19.813ms] [34;1m[rows:-][0m SELECT * FROM `users` LIMIT 1
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[41.432ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'users' ORDER BY ORDINAL_POSITION
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[41.735ms] [34;1m[rows:0][0m ALTER TABLE `users` MODIFY COLUMN `is_active` boolean DEFAULT true
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[20.318ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[41.011ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:159
+[0m[33m[40.825ms] [34;1m[rows:-][0m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE constraint_schema = 'TS-Lager' AND table_name = 'users' AND constraint_name = 'fk_sessions_user'
+
+2025/07/11 13:38:58 [31;1m/opt/dev/go-barcode-webapp/cmd/server/main.go:159 [35;1mError 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
+[0m[33m[20.375ms] [34;1m[rows:0][0m ALTER TABLE `users` ADD CONSTRAINT `fk_sessions_user` FOREIGN KEY (`userID`) REFERENCES `sessions`(`user_id`)
+2025/07/11 13:38:58 Failed to auto-migrate email_templates table: Error 1142 (42000): REFERENCES command denied to user 'tsweb'@'93.209.253.229' for table 'TS-Lager.sessions'
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[19.944ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[41.607ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[40.854ms] [34;1m[rows:-][0m SELECT count(*) FROM information_schema.tables WHERE table_schema = 'TS-Lager' AND table_name = 'user_preferences' AND table_type = 'BASE TABLE'
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[19.869ms] [34;1m[rows:-][0m SELECT DATABASE()
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[40.011ms] [34;1m[rows:1][0m SELECT SCHEMA_NAME from Information_schema.SCHEMATA where SCHEMA_NAME LIKE 'TS-Lager%' ORDER BY SCHEMA_NAME='TS-Lager' DESC,SCHEMA_NAME limit 1
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[25.955ms] [34;1m[rows:-][0m SELECT * FROM `user_preferences` LIMIT 1
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[40.537ms] [34;1m[rows:-][0m SELECT column_name, column_default, is_nullable = 'YES', data_type, character_maximum_length, column_type, column_key, extra, column_comment, numeric_precision, numeric_scale , datetime_precision FROM information_schema.columns WHERE table_schema = 'TS-Lager' AND table_name = 'user_preferences' ORDER BY ORDINAL_POSITION
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[26.236ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `email_notifications` boolean NOT NULL DEFAULT true
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[31.938ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `system_notifications` boolean NOT NULL DEFAULT true
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[50.938ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `job_status_notifications` boolean NOT NULL DEFAULT true
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[26.343ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `device_alert_notifications` boolean NOT NULL DEFAULT true
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[26.804ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `show_advanced_options` boolean NOT NULL DEFAULT false
+
+2025/07/11 13:38:58 [32m/opt/dev/go-barcode-webapp/cmd/server/main.go:163
+[0m[33m[29.844ms] [34;1m[rows:0][0m ALTER TABLE `user_preferences` MODIFY COLUMN `auto_save_enabled` boolean NOT NULL DEFAULT true
+
+2025/07/11 13:38:59 [32m/opt/dev/go-barcode-webapp/internal/repository/invoice_repository.go:510
+[0m[33m[144.511ms] [34;1m[rows:1][0m SELECT * FROM `invoice_templates` ORDER BY is_default DESC, name ASC
+2025/07/11 13:38:59 Templates already exist (1), skipping default template creation
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] Loaded HTML Templates (63): 
+	- login.html
+	- security_roles.html
+	- analytics_dashboard.html
+	- invoice_preview.html
+	- invoice_settings_form.html
+	- profile_settings.html
+	- scan_select_job.html
+	- search_results.html
+	- transaction_detail.html
+	- bulk_operations.html
+	- home.html
+	- transactions_list.html
+	- js
+	- error.html
+	- job_form.html
+	- devices_standalone.html
+	- invoice_form.html
+	- email_template_preview.html
+	- user_form.html
+	- content
+	- cases_list.html
+	- documents_list.html
+	- invoice_template_german.html
+	- email_template_form.html
+	- equipment_package_form.html
+	- invoice_templates_list.html
+	- job_detail.html
+	- job_template_detail.html
+	- user_detail.html
+	- 
+	- base.html
+	- financial_reports.html
+	- invoice_template_designer_basic.html
+	- job_template_form.html
+	- monitoring_dashboard.html
+	- transaction_form.html
+	- users_list.html
+	- customer_form.html
+	- equipment_package_detail.html
+	- case_device_mapping.html
+	- company_settings.html
+	- invoices_list.html
+	- invoice_template_designer.html
+	- scan_job.html
+	- device_form.html
+	- equipment_packages_list.html
+	- email_templates_list.html
+	- customer_detail.html
+	- device_detail.html
+	- customers.html
+	- invoices-content
+	- css
+	- case_detail.html
+	- jobs.html
+	- mobile_scanner.html
+	- financial_dashboard.html
+	- invoices_content.html
+	- security_audit.html
+	- signature_form.html
+	- document_upload_form.html
+	- job_templates_list.html
+	- case_form.html
+	- invoice_detail.html
+
+[GIN-debug] GET    /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (6 handlers)
+[GIN-debug] HEAD   /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (6 handlers)
+[GIN-debug] GET    /uploads/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (6 handlers)
+[GIN-debug] HEAD   /uploads/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (6 handlers)
+[GIN-debug] GET    /sw.js                    --> main.main.func18 (7 handlers)
+[GIN-debug] GET    /manifest.json            --> main.main.func19 (7 handlers)
+
+2025/07/11 13:38:59 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
+[0m[33m[40.285ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'admin' ORDER BY `roles`.`roleID` LIMIT 1
+
+2025/07/11 13:38:59 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
+[0m[33m[39.627ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'manager' ORDER BY `roles`.`roleID` LIMIT 1
+
+2025/07/11 13:38:59 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
+[0m[33m[40.637ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'employee' ORDER BY `roles`.`roleID` LIMIT 1
+
+2025/07/11 13:38:59 [32m/opt/dev/go-barcode-webapp/internal/handlers/security_handler.go:867
+[0m[33m[39.300ms] [34;1m[rows:1][0m SELECT * FROM `roles` WHERE name = 'viewer' ORDER BY `roles`.`roleID` LIMIT 1
+[GIN-debug] GET    /                         --> main.setupRoutes.func1 (7 handlers)
+[GIN-debug] GET    /login                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).LoginForm-fm (7 handlers)
+[GIN-debug] POST   /login                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).Login-fm (7 handlers)
+[GIN-debug] GET    /logout                   --> go-barcode-webapp/internal/handlers.(*AuthHandler).Logout-fm (7 handlers)
+[GIN-debug] GET    /debug/invoice-test       --> main.setupRoutes.func2 (7 handlers)
+[GIN-debug] GET    /debug/customer-selection --> main.setupRoutes.func3 (7 handlers)
+[GIN-debug] GET    /debug/routes             --> main.setupRoutes.func4 (7 handlers)
+[GIN-debug] GET    /dashboard                --> go-barcode-webapp/internal/handlers.(*HomeHandler).Dashboard-fm (8 handlers)
+[GIN-debug] GET    /jobs                     --> go-barcode-webapp/internal/handlers.(*JobHandler).ListJobs-fm (8 handlers)
+[GIN-debug] GET    /jobs/new                 --> go-barcode-webapp/internal/handlers.(*JobHandler).NewJobForm-fm (8 handlers)
+[GIN-debug] POST   /jobs                     --> go-barcode-webapp/internal/handlers.(*JobHandler).CreateJob-fm (8 handlers)
+[GIN-debug] GET    /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).GetJob-fm (8 handlers)
+[GIN-debug] GET    /jobs/:id/edit            --> go-barcode-webapp/internal/handlers.(*JobHandler).EditJobForm-fm (8 handlers)
+[GIN-debug] PUT    /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).UpdateJob-fm (8 handlers)
+[GIN-debug] POST   /jobs/:id/update          --> go-barcode-webapp/internal/handlers.(*JobHandler).UpdateJob-fm (8 handlers)
+[GIN-debug] DELETE /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).DeleteJob-fm (8 handlers)
+[GIN-debug] GET    /jobs/:id/devices         --> go-barcode-webapp/internal/handlers.(*JobHandler).GetJobDevices-fm (8 handlers)
+[GIN-debug] POST   /jobs/:id/devices         --> go-barcode-webapp/internal/handlers.(*JobHandler).AssignDevice-fm (8 handlers)
+[GIN-debug] DELETE /jobs/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*JobHandler).RemoveDevice-fm (8 handlers)
+[GIN-debug] POST   /jobs/:id/bulk-scan       --> go-barcode-webapp/internal/handlers.(*JobHandler).BulkScanDevices-fm (8 handlers)
+[GIN-debug] GET    /devices                  --> go-barcode-webapp/internal/handlers.(*DeviceHandler).ListDevices-fm (8 handlers)
+[GIN-debug] GET    /devices/new              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).NewDeviceForm-fm (8 handlers)
+[GIN-debug] POST   /devices                  --> go-barcode-webapp/internal/handlers.(*DeviceHandler).CreateDevice-fm (8 handlers)
+[GIN-debug] GET    /devices/:id              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDevice-fm (8 handlers)
+[GIN-debug] GET    /devices/:id/edit         --> go-barcode-webapp/internal/handlers.(*DeviceHandler).EditDeviceForm-fm (8 handlers)
+[GIN-debug] PUT    /devices/:id              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).UpdateDevice-fm (8 handlers)
+[GIN-debug] DELETE /devices/:id              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).DeleteDevice-fm (8 handlers)
+[GIN-debug] GET    /devices/:id/qr           --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceQR-fm (8 handlers)
+[GIN-debug] GET    /devices/:id/barcode      --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceBarcode-fm (8 handlers)
+[GIN-debug] GET    /devices/:id/stats        --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceStatsAPI-fm (8 handlers)
+[GIN-debug] GET    /devices/available        --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetAvailableDevices-fm (8 handlers)
+[GIN-debug] GET    /customers                --> go-barcode-webapp/internal/handlers.(*CustomerHandler).ListCustomers-fm (8 handlers)
+[GIN-debug] GET    /customers/new            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).NewCustomerForm-fm (8 handlers)
+[GIN-debug] POST   /customers                --> go-barcode-webapp/internal/handlers.(*CustomerHandler).CreateCustomer-fm (8 handlers)
+[GIN-debug] GET    /customers/:id            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).GetCustomer-fm (8 handlers)
+[GIN-debug] GET    /customers/:id/edit       --> go-barcode-webapp/internal/handlers.(*CustomerHandler).EditCustomerForm-fm (8 handlers)
+[GIN-debug] PUT    /customers/:id            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).UpdateCustomer-fm (8 handlers)
+[GIN-debug] DELETE /customers/:id            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).DeleteCustomer-fm (8 handlers)
+[GIN-debug] GET    /statuses                 --> go-barcode-webapp/internal/handlers.(*StatusHandler).ListStatuses-fm (8 handlers)
+[GIN-debug] GET    /products                 --> go-barcode-webapp/internal/handlers.(*ProductHandler).ListProducts-fm (8 handlers)
+[GIN-debug] GET    /cases                    --> go-barcode-webapp/internal/handlers.(*CaseHandler).ListCases-fm (8 handlers)
+[GIN-debug] GET    /cases/new                --> go-barcode-webapp/internal/handlers.(*CaseHandler).NewCaseForm-fm (8 handlers)
+[GIN-debug] POST   /cases                    --> go-barcode-webapp/internal/handlers.(*CaseHandler).CreateCase-fm (8 handlers)
+[GIN-debug] GET    /cases/:id                --> go-barcode-webapp/internal/handlers.(*CaseHandler).GetCase-fm (8 handlers)
+[GIN-debug] GET    /cases/:id/edit           --> go-barcode-webapp/internal/handlers.(*CaseHandler).EditCaseForm-fm (8 handlers)
+[GIN-debug] PUT    /cases/:id                --> go-barcode-webapp/internal/handlers.(*CaseHandler).UpdateCase-fm (8 handlers)
+[GIN-debug] DELETE /cases/:id                --> go-barcode-webapp/internal/handlers.(*CaseHandler).DeleteCase-fm (8 handlers)
+[GIN-debug] GET    /cases/:id/devices        --> go-barcode-webapp/internal/handlers.(*CaseHandler).CaseDeviceMapping-fm (8 handlers)
+[GIN-debug] POST   /cases/:id/devices        --> go-barcode-webapp/internal/handlers.(*CaseHandler).ScanDeviceToCase-fm (8 handlers)
+[GIN-debug] DELETE /cases/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*CaseHandler).RemoveDeviceFromCase-fm (8 handlers)
+[GIN-debug] GET    /barcodes/device/:serialNo/qr --> go-barcode-webapp/internal/handlers.(*BarcodeHandler).GenerateDeviceQR-fm (8 handlers)
+[GIN-debug] GET    /barcodes/device/:serialNo/barcode --> go-barcode-webapp/internal/handlers.(*BarcodeHandler).GenerateDeviceBarcode-fm (8 handlers)
+[GIN-debug] GET    /scan                     --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanJobSelection-fm (8 handlers)
+[GIN-debug] GET    /scan/select              --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanJobSelection-fm (8 handlers)
+[GIN-debug] GET    /scan/:jobId              --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanJob-fm (8 handlers)
+[GIN-debug] POST   /scan/:jobId/assign       --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanDevice-fm (8 handlers)
+[GIN-debug] DELETE /scan/:jobId/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*ScannerHandler).RemoveDevice-fm (8 handlers)
+[GIN-debug] GET    /analytics                --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).Dashboard-fm (8 handlers)
+[GIN-debug] GET    /analytics/revenue        --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).GetRevenueAPI-fm (8 handlers)
+[GIN-debug] GET    /analytics/equipment      --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).GetEquipmentAPI-fm (8 handlers)
+[GIN-debug] GET    /analytics/export         --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).ExportAnalytics-fm (8 handlers)
+[GIN-debug] GET    /search/global            --> go-barcode-webapp/internal/handlers.(*SearchHandler).GlobalSearch-fm (8 handlers)
+[GIN-debug] POST   /search/advanced          --> go-barcode-webapp/internal/handlers.(*SearchHandler).AdvancedSearch-fm (8 handlers)
+[GIN-debug] GET    /search/suggestions       --> go-barcode-webapp/internal/handlers.(*SearchHandler).SearchSuggestions-fm (8 handlers)
+[GIN-debug] GET    /search/saved             --> go-barcode-webapp/internal/handlers.(*SearchHandler).SavedSearches-fm (8 handlers)
+[GIN-debug] DELETE /search/saved/:id         --> go-barcode-webapp/internal/handlers.(*SearchHandler).DeleteSavedSearch-fm (8 handlers)
+[GIN-debug] POST   /pwa/subscribe            --> go-barcode-webapp/internal/handlers.(*PWAHandler).SubscribePush-fm (8 handlers)
+[GIN-debug] POST   /pwa/unsubscribe          --> go-barcode-webapp/internal/handlers.(*PWAHandler).UnsubscribePush-fm (8 handlers)
+[GIN-debug] POST   /pwa/sync                 --> go-barcode-webapp/internal/handlers.(*PWAHandler).SyncOfflineData-fm (8 handlers)
+[GIN-debug] GET    /pwa/manifest             --> go-barcode-webapp/internal/handlers.(*PWAHandler).GetOfflineManifest-fm (8 handlers)
+[GIN-debug] GET    /pwa/install              --> go-barcode-webapp/internal/handlers.(*PWAHandler).InstallPrompt-fm (8 handlers)
+[GIN-debug] GET    /pwa/status               --> go-barcode-webapp/internal/handlers.(*PWAHandler).GetConnectionStatus-fm (8 handlers)
+[GIN-debug] GET    /workflow/templates       --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).ListJobTemplates-fm (8 handlers)
+[GIN-debug] GET    /workflow/templates/new   --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).NewJobTemplateForm-fm (8 handlers)
+[GIN-debug] POST   /workflow/templates       --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).CreateJobTemplate-fm (8 handlers)
+[GIN-debug] GET    /workflow/templates/:id   --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetJobTemplate-fm (8 handlers)
+[GIN-debug] GET    /workflow/templates/:id/edit --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).EditJobTemplateForm-fm (8 handlers)
+[GIN-debug] PUT    /workflow/templates/:id   --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).UpdateJobTemplate-fm (8 handlers)
+[GIN-debug] DELETE /workflow/templates/:id   --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).DeleteJobTemplate-fm (8 handlers)
+[GIN-debug] POST   /workflow/templates/:id/create-job --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).CreateJobFromTemplate-fm (8 handlers)
+[GIN-debug] GET    /workflow/packages        --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).ListEquipmentPackages-fm (8 handlers)
+[GIN-debug] GET    /workflow/packages/new    --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).NewEquipmentPackageForm-fm (8 handlers)
+[GIN-debug] GET    /workflow/packages/debug  --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).DebugPackageForm-fm (8 handlers)
+[GIN-debug] POST   /workflow/packages        --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).CreateEquipmentPackage-fm (8 handlers)
+[GIN-debug] GET    /workflow/packages/:id    --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetEquipmentPackage-fm (8 handlers)
+[GIN-debug] GET    /workflow/bulk            --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkOperationsForm-fm (8 handlers)
+[GIN-debug] POST   /workflow/bulk/update-status --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkUpdateDeviceStatus-fm (8 handlers)
+[GIN-debug] POST   /workflow/bulk/assign-job --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkAssignToJob-fm (8 handlers)
+[GIN-debug] POST   /workflow/bulk/generate-qr --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkGenerateQRCodes-fm (8 handlers)
+[GIN-debug] GET    /workflow/stats           --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetWorkflowStats-fm (8 handlers)
+[GIN-debug] GET    /documents                --> go-barcode-webapp/internal/handlers.(*DocumentHandler).ListDocuments-fm (8 handlers)
+[GIN-debug] GET    /documents/upload         --> go-barcode-webapp/internal/handlers.(*DocumentHandler).UploadDocumentForm-fm (8 handlers)
+[GIN-debug] POST   /documents/upload         --> go-barcode-webapp/internal/handlers.(*DocumentHandler).UploadDocument-fm (8 handlers)
+[GIN-debug] GET    /documents/:id            --> go-barcode-webapp/internal/handlers.(*DocumentHandler).GetDocument-fm (8 handlers)
+[GIN-debug] GET    /documents/:id/view       --> go-barcode-webapp/internal/handlers.(*DocumentHandler).ViewDocument-fm (8 handlers)
+[GIN-debug] GET    /documents/:id/download   --> go-barcode-webapp/internal/handlers.(*DocumentHandler).DownloadDocument-fm (8 handlers)
+[GIN-debug] DELETE /documents/:id            --> go-barcode-webapp/internal/handlers.(*DocumentHandler).DeleteDocument-fm (8 handlers)
+[GIN-debug] GET    /documents/:id/sign       --> go-barcode-webapp/internal/handlers.(*DocumentHandler).SignatureForm-fm (8 handlers)
+[GIN-debug] POST   /documents/:id/sign       --> go-barcode-webapp/internal/handlers.(*DocumentHandler).AddSignature-fm (8 handlers)
+[GIN-debug] GET    /documents/signatures/:id/verify --> go-barcode-webapp/internal/handlers.(*DocumentHandler).VerifySignature-fm (8 handlers)
+[GIN-debug] GET    /financial                --> go-barcode-webapp/internal/handlers.(*FinancialHandler).FinancialDashboard-fm (8 handlers)
+[GIN-debug] GET    /financial/transactions   --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ListTransactions-fm (8 handlers)
+[GIN-debug] GET    /financial/transactions/new --> go-barcode-webapp/internal/handlers.(*FinancialHandler).NewTransactionForm-fm (8 handlers)
+[GIN-debug] POST   /financial/transactions   --> go-barcode-webapp/internal/handlers.(*FinancialHandler).CreateTransaction-fm (8 handlers)
+[GIN-debug] GET    /financial/transactions/:id --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetTransaction-fm (8 handlers)
+[GIN-debug] PUT    /financial/transactions/:id/status --> go-barcode-webapp/internal/handlers.(*FinancialHandler).UpdateTransactionStatus-fm (8 handlers)
+[GIN-debug] POST   /financial/jobs/:jobId/invoice --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GenerateInvoice-fm (8 handlers)
+[GIN-debug] GET    /financial/reports        --> go-barcode-webapp/internal/handlers.(*FinancialHandler).FinancialReports-fm (8 handlers)
+[GIN-debug] GET    /financial/api/revenue-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetRevenueReport-fm (8 handlers)
+[GIN-debug] GET    /financial/api/payment-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetPaymentReport-fm (8 handlers)
+[GIN-debug] GET    /financial/api/export/transactions --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ExportTransactions-fm (8 handlers)
+[GIN-debug] GET    /financial/api/export/revenue --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ExportRevenue-fm (8 handlers)
+[GIN-debug] GET    /financial/api/export/tax-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ExportTaxReportCSV-fm (8 handlers)
+[GIN-debug] GET    /invoices                 --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).ListInvoices-fm (8 handlers)
+[GIN-debug] GET    /invoices/new             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).NewInvoiceForm-fm (8 handlers)
+[GIN-debug] POST   /invoices                 --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).CreateInvoice-fm (8 handlers)
+[GIN-debug] GET    /invoices/:id             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoice-fm (8 handlers)
+[GIN-debug] GET    /invoices/:id/edit        --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).EditInvoiceForm-fm (8 handlers)
+[GIN-debug] GET    /invoices/:id/preview     --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).PreviewInvoice-fm (8 handlers)
+[GIN-debug] PUT    /invoices/:id             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoice-fm (8 handlers)
+[GIN-debug] PUT    /invoices/:id/status      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoiceStatus-fm (8 handlers)
+[GIN-debug] DELETE /invoices/:id             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).DeleteInvoice-fm (8 handlers)
+[GIN-debug] GET    /invoices/:id/pdf         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GenerateInvoicePDF-fm (8 handlers)
+[GIN-debug] GET    /invoice-templates        --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).ListTemplates-fm (8 handlers)
+[GIN-debug] GET    /invoice-templates/new    --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).NewTemplateForm-fm (8 handlers)
+[GIN-debug] POST   /invoice-templates        --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).CreateTemplate-fm (8 handlers)
+[GIN-debug] GET    /invoice-templates/:id/edit --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).EditTemplateForm-fm (8 handlers)
+[GIN-debug] PUT    /invoice-templates/:id    --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).UpdateTemplate-fm (8 handlers)
+[GIN-debug] DELETE /invoice-templates/:id    --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).DeleteTemplate-fm (8 handlers)
+[GIN-debug] GET    /invoice-templates/:id/preview --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).PreviewTemplate-fm (8 handlers)
+[GIN-debug] POST   /invoice-templates/:id/set-default --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).SetDefaultTemplate-fm (8 handlers)
+[GIN-debug] GET    /settings/company         --> main.setupRoutes.func5 (8 handlers)
+[GIN-debug] GET    /settings/company/api     --> go-barcode-webapp/internal/handlers.(*CompanyHandler).GetCompanySettings-fm (8 handlers)
+[GIN-debug] PUT    /settings/company/api     --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UpdateCompanySettings-fm (8 handlers)
+[GIN-debug] POST   /settings/company/logo    --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UploadCompanyLogo-fm (8 handlers)
+[GIN-debug] DELETE /settings/company/logo    --> go-barcode-webapp/internal/handlers.(*CompanyHandler).DeleteCompanyLogo-fm (8 handlers)
+[GIN-debug] GET    /settings/email-templates --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).ListEmailTemplates-fm (8 handlers)
+[GIN-debug] GET    /settings/email-templates/new --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).NewEmailTemplateForm-fm (8 handlers)
+[GIN-debug] POST   /settings/email-templates --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).CreateEmailTemplate-fm (8 handlers)
+[GIN-debug] GET    /settings/email-templates/:id --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).GetEmailTemplate-fm (8 handlers)
+[GIN-debug] GET    /settings/email-templates/:id/edit --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).EditEmailTemplateForm-fm (8 handlers)
+[GIN-debug] PUT    /settings/email-templates/:id --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).UpdateEmailTemplate-fm (8 handlers)
+[GIN-debug] DELETE /settings/email-templates/:id --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).DeleteEmailTemplate-fm (8 handlers)
+[GIN-debug] GET    /settings/email-templates/:id/preview --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).PreviewEmailTemplate-fm (8 handlers)
+[GIN-debug] POST   /settings/email-templates/:id/set-default --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).SetDefaultEmailTemplate-fm (8 handlers)
+[GIN-debug] POST   /settings/email-templates/:id/test --> go-barcode-webapp/internal/handlers.(*EmailTemplateHandler).TestEmailTemplate-fm (8 handlers)
+[GIN-debug] GET    /security/roles           --> main.setupRoutes.func6 (8 handlers)
+[GIN-debug] GET    /security/audit           --> main.setupRoutes.func7 (8 handlers)
+[GIN-debug] GET    /security/api/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRoles-fm (8 handlers)
+[GIN-debug] GET    /security/api/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRole-fm (8 handlers)
+[GIN-debug] POST   /security/api/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CreateRole-fm (8 handlers)
+[GIN-debug] PUT    /security/api/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).UpdateRole-fm (8 handlers)
+[GIN-debug] DELETE /security/api/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).DeleteRole-fm (8 handlers)
+[GIN-debug] GET    /security/api/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetUserRoles-fm (8 handlers)
+[GIN-debug] POST   /security/api/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).AssignUserRole-fm (8 handlers)
+[GIN-debug] DELETE /security/api/users/:userId/roles/:roleId --> go-barcode-webapp/internal/handlers.(*SecurityHandler).RevokeUserRole-fm (8 handlers)
+[GIN-debug] GET    /security/api/audit       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLogs-fm (8 handlers)
+[GIN-debug] GET    /security/api/audit/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLog-fm (8 handlers)
+[GIN-debug] GET    /security/api/audit/export --> go-barcode-webapp/internal/handlers.(*SecurityHandler).ExportAuditLogs-fm (8 handlers)
+[GIN-debug] GET    /security/api/permissions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissions-fm (8 handlers)
+[GIN-debug] GET    /security/api/permissions/definitions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissionDefinitionsAPI-fm (8 handlers)
+[GIN-debug] GET    /security/api/permissions/check --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CheckPermission-fm (8 handlers)
+[GIN-debug] GET    /monitoring               --> main.setupRoutes.func8 (8 handlers)
+[GIN-debug] GET    /monitoring/health        --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetApplicationHealth-fm (8 handlers)
+[GIN-debug] GET    /monitoring/metrics       --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetSystemMetrics-fm (8 handlers)
+[GIN-debug] GET    /monitoring/metrics/prometheus --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).ExportMetrics-fm (8 handlers)
+[GIN-debug] GET    /monitoring/performance   --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetPerformanceMetrics-fm (8 handlers)
+[GIN-debug] GET    /monitoring/errors        --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetErrorDetails-fm (8 handlers)
+[GIN-debug] POST   /monitoring/errors/:fingerprint/resolve --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).ResolveError-fm (8 handlers)
+[GIN-debug] POST   /monitoring/test-error    --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).TriggerTestError-fm (8 handlers)
+[GIN-debug] GET    /monitoring/logs          --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetLogStream-fm (8 handlers)
+[GIN-debug] GET    /mobile/scanner/:jobId    --> main.setupRoutes.func9 (8 handlers)
+[GIN-debug] GET    /mobile/scanner/:jobId/enhanced --> main.setupRoutes.func10 (8 handlers)
+[GIN-debug] GET    /profile/settings         --> go-barcode-webapp/internal/handlers.(*AuthHandler).ProfileSettingsForm-fm (8 handlers)
+[GIN-debug] POST   /profile/settings         --> go-barcode-webapp/internal/handlers.(*AuthHandler).UpdateProfileSettings-fm (8 handlers)
+[GIN-debug] GET    /profile/preferences      --> go-barcode-webapp/internal/handlers.(*AuthHandler).GetUserPreferences-fm (8 handlers)
+[GIN-debug] GET    /users                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).ListUsers-fm (8 handlers)
+[GIN-debug] POST   /users                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).CreateUserWeb-fm (8 handlers)
+[GIN-debug] GET    /user-management/new      --> go-barcode-webapp/internal/handlers.(*AuthHandler).NewUserForm-fm (8 handlers)
+[GIN-debug] GET    /user-management/:id/edit --> go-barcode-webapp/internal/handlers.(*AuthHandler).EditUserForm-fm (8 handlers)
+[GIN-debug] GET    /user-management/:id/view --> go-barcode-webapp/internal/handlers.(*AuthHandler).GetUser-fm (8 handlers)
+[GIN-debug] PUT    /user-management/:id      --> go-barcode-webapp/internal/handlers.(*AuthHandler).UpdateUser-fm (8 handlers)
+[GIN-debug] DELETE /user-management/:id      --> go-barcode-webapp/internal/handlers.(*AuthHandler).DeleteUser-fm (8 handlers)
+[GIN-debug] GET    /users/new                --> main.setupRoutes.func11 (8 handlers)
+[GIN-debug] GET    /api/v1/jobs              --> go-barcode-webapp/internal/handlers.(*JobHandler).ListJobsAPI-fm (8 handlers)
+[GIN-debug] POST   /api/v1/jobs              --> go-barcode-webapp/internal/handlers.(*JobHandler).CreateJobAPI-fm (8 handlers)
+[GIN-debug] GET    /api/v1/jobs/:id          --> go-barcode-webapp/internal/handlers.(*JobHandler).GetJobAPI-fm (8 handlers)
+[GIN-debug] PUT    /api/v1/jobs/:id          --> go-barcode-webapp/internal/handlers.(*JobHandler).UpdateJobAPI-fm (8 handlers)
+[GIN-debug] DELETE /api/v1/jobs/:id          --> go-barcode-webapp/internal/handlers.(*JobHandler).DeleteJobAPI-fm (8 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*JobHandler).AssignDeviceAPI-fm (8 handlers)
+[GIN-debug] DELETE /api/v1/jobs/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*JobHandler).RemoveDeviceAPI-fm (8 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/bulk-scan --> go-barcode-webapp/internal/handlers.(*JobHandler).BulkScanDevicesAPI-fm (8 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/assign-device --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanDevice-fm (8 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/assign-case --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanCase-fm (8 handlers)
+[GIN-debug] GET    /api/v1/devices           --> go-barcode-webapp/internal/handlers.(*DeviceHandler).ListDevicesAPI-fm (8 handlers)
+[GIN-debug] POST   /api/v1/devices           --> go-barcode-webapp/internal/handlers.(*DeviceHandler).CreateDeviceAPI-fm (8 handlers)
+[GIN-debug] GET    /api/v1/devices/:id       --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceAPI-fm (8 handlers)
+[GIN-debug] PUT    /api/v1/devices/:id       --> go-barcode-webapp/internal/handlers.(*DeviceHandler).UpdateDeviceAPI-fm (8 handlers)
+[GIN-debug] DELETE /api/v1/devices/:id       --> go-barcode-webapp/internal/handlers.(*DeviceHandler).DeleteDeviceAPI-fm (8 handlers)
+[GIN-debug] GET    /api/v1/devices/available --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetAvailableDevicesAPI-fm (8 handlers)
+[GIN-debug] GET    /api/v1/customers         --> go-barcode-webapp/internal/handlers.(*CustomerHandler).ListCustomersAPI-fm (8 handlers)
+[GIN-debug] POST   /api/v1/customers         --> go-barcode-webapp/internal/handlers.(*CustomerHandler).CreateCustomerAPI-fm (8 handlers)
+[GIN-debug] GET    /api/v1/customers/:id     --> go-barcode-webapp/internal/handlers.(*CustomerHandler).GetCustomerAPI-fm (8 handlers)
+[GIN-debug] PUT    /api/v1/customers/:id     --> go-barcode-webapp/internal/handlers.(*CustomerHandler).UpdateCustomerAPI-fm (8 handlers)
+[GIN-debug] DELETE /api/v1/customers/:id     --> go-barcode-webapp/internal/handlers.(*CustomerHandler).DeleteCustomerAPI-fm (8 handlers)
+[GIN-debug] GET    /api/v1/cases             --> go-barcode-webapp/internal/handlers.(*CaseHandler).ListCasesAPI-fm (8 handlers)
+[GIN-debug] POST   /api/v1/cases             --> go-barcode-webapp/internal/handlers.(*CaseHandler).CreateCaseAPI-fm (8 handlers)
+[GIN-debug] GET    /api/v1/cases/:id         --> go-barcode-webapp/internal/handlers.(*CaseHandler).GetCaseAPI-fm (8 handlers)
+[GIN-debug] PUT    /api/v1/cases/:id         --> go-barcode-webapp/internal/handlers.(*CaseHandler).UpdateCaseAPI-fm (8 handlers)
+[GIN-debug] DELETE /api/v1/cases/:id         --> go-barcode-webapp/internal/handlers.(*CaseHandler).DeleteCaseAPI-fm (8 handlers)
+[GIN-debug] GET    /api/v1/cases/:id/devices --> go-barcode-webapp/internal/handlers.(*CaseHandler).GetCaseDevicesAPI-fm (8 handlers)
+[GIN-debug] GET    /api/v1/workflow/templates --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).ListJobTemplatesAPI-fm (8 handlers)
+[GIN-debug] POST   /api/v1/workflow/templates --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).CreateJobTemplate-fm (8 handlers)
+[GIN-debug] GET    /api/v1/workflow/templates/most-used --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetMostUsedTemplatesAPI-fm (8 handlers)
+[GIN-debug] GET    /api/v1/workflow/templates/category/:categoryId --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetTemplatesByCategoryAPI-fm (8 handlers)
+[GIN-debug] GET    /api/v1/workflow/templates/:id --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetJobTemplate-fm (8 handlers)
+[GIN-debug] PUT    /api/v1/workflow/templates/:id --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).UpdateJobTemplate-fm (8 handlers)
+[GIN-debug] DELETE /api/v1/workflow/templates/:id --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).DeleteJobTemplate-fm (8 handlers)
+[GIN-debug] POST   /api/v1/workflow/templates/:id/create-job --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).CreateJobFromTemplate-fm (8 handlers)
+[GIN-debug] GET    /api/v1/documents         --> go-barcode-webapp/internal/handlers.(*DocumentHandler).ListDocumentsAPI-fm (8 handlers)
+[GIN-debug] GET    /api/v1/documents/stats   --> go-barcode-webapp/internal/handlers.(*DocumentHandler).GetDocumentStats-fm (8 handlers)
+[GIN-debug] GET    /api/v1/documents/:id     --> go-barcode-webapp/internal/handlers.(*DocumentHandler).GetDocument-fm (8 handlers)
+[GIN-debug] DELETE /api/v1/documents/:id     --> go-barcode-webapp/internal/handlers.(*DocumentHandler).DeleteDocument-fm (8 handlers)
+[GIN-debug] GET    /api/v1/financial/transactions --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ListTransactionsAPI-fm (8 handlers)
+[GIN-debug] GET    /api/v1/financial/stats   --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetFinancialStatsAPI-fm (8 handlers)
+[GIN-debug] GET    /api/v1/financial/revenue-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetRevenueReport-fm (8 handlers)
+[GIN-debug] GET    /api/v1/financial/payment-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetPaymentReport-fm (8 handlers)
+[GIN-debug] GET    /api/v1/invoices          --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoicesAPI-fm (8 handlers)
+[GIN-debug] POST   /api/v1/invoices          --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).CreateInvoice-fm (8 handlers)
+[GIN-debug] GET    /api/v1/invoices/:id      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoice-fm (8 handlers)
+[GIN-debug] PUT    /api/v1/invoices/:id      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoice-fm (8 handlers)
+[GIN-debug] PUT    /api/v1/invoices/:id/status --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoiceStatus-fm (8 handlers)
+[GIN-debug] DELETE /api/v1/invoices/:id      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).DeleteInvoice-fm (8 handlers)
+[GIN-debug] GET    /api/v1/invoices/stats    --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoiceStatsAPI-fm (8 handlers)
+[GIN-debug] GET    /api/v1/invoices/products/:productId --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetProductDetails-fm (8 handlers)
+[GIN-debug] GET    /api/v1/invoices/products/:productId/devices --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetDevicesByProduct-fm (8 handlers)
+[GIN-debug] GET    /api/v1/security/audit    --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLogs-fm (8 handlers)
+[GIN-debug] GET    /api/v1/security/audit/:id --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLog-fm (8 handlers)
+[GIN-debug] GET    /api/v1/security/audit/export --> go-barcode-webapp/internal/handlers.(*SecurityHandler).ExportAuditLogs-fm (8 handlers)
+[GIN-debug] GET    /api/v1/security/auth/users --> go-barcode-webapp/internal/handlers.(*AuthHandler).ListUsersAPI-fm (8 handlers)
+[GIN-debug] GET    /api/invoices             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoicesAPI-fm (8 handlers)
+[GIN-debug] POST   /api/invoices             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).CreateInvoice-fm (8 handlers)
+[GIN-debug] GET    /api/invoices/:id         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoice-fm (8 handlers)
+[GIN-debug] PUT    /api/invoices/:id         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoice-fm (8 handlers)
+[GIN-debug] PUT    /api/invoices/:id/status  --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoiceStatus-fm (8 handlers)
+[GIN-debug] DELETE /api/invoices/:id         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).DeleteInvoice-fm (8 handlers)
+[GIN-debug] GET    /api/invoices/stats       --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoiceStatsAPI-fm (8 handlers)
+[GIN-debug] GET    /api/company-settings     --> go-barcode-webapp/internal/handlers.(*CompanyHandler).GetCompanySettings-fm (8 handlers)
+[GIN-debug] PUT    /api/company-settings     --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UpdateCompanySettings-fm (8 handlers)
+[GIN-debug] POST   /api/company-settings/logo --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UploadCompanyLogo-fm (8 handlers)
+[GIN-debug] DELETE /api/company-settings/logo --> go-barcode-webapp/internal/handlers.(*CompanyHandler).DeleteCompanyLogo-fm (8 handlers)
+[GIN-debug] GET    /api/security/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRoles-fm (8 handlers)
+[GIN-debug] GET    /api/security/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRole-fm (8 handlers)
+[GIN-debug] POST   /api/security/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CreateRole-fm (8 handlers)
+[GIN-debug] PUT    /api/security/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).UpdateRole-fm (8 handlers)
+[GIN-debug] DELETE /api/security/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).DeleteRole-fm (8 handlers)
+[GIN-debug] GET    /api/security/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetUserRoles-fm (8 handlers)
+[GIN-debug] POST   /api/security/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).AssignUserRole-fm (8 handlers)
+[GIN-debug] DELETE /api/security/users/:userId/roles/:roleId --> go-barcode-webapp/internal/handlers.(*SecurityHandler).RevokeUserRole-fm (8 handlers)
+[GIN-debug] GET    /api/security/audit       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLogs-fm (8 handlers)
+[GIN-debug] GET    /api/security/audit/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLog-fm (8 handlers)
+[GIN-debug] GET    /api/security/audit/export --> go-barcode-webapp/internal/handlers.(*SecurityHandler).ExportAuditLogs-fm (8 handlers)
+[GIN-debug] GET    /api/security/permissions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissions-fm (8 handlers)
+[GIN-debug] GET    /api/security/check-permission --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CheckPermission-fm (8 handlers)
+2025/07/11 13:38:59 Server starting on 0.0.0.0:8080
+2025/07/11 13:40:00 Route Debug: GET /jobs/1004
+DEBUG: AuthMiddleware called for URL: /jobs/1004
+DEBUG: Found session cookie: 0a1cc80ec93c541ba06f25d199d474476c66c67b067e35177f255efef0e0088f
+
+2025/07/11 13:40:00 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:142
+[0m[33m[40.312ms] [34;1m[rows:1][0m SELECT * FROM `sessions` WHERE session_id = '0a1cc80ec93c541ba06f25d199d474476c66c67b067e35177f255efef0e0088f' AND expires_at > '2025-07-11 13:40:00.036' ORDER BY `sessions`.`session_id` LIMIT 1
+
+2025/07/11 13:40:00 [32m/opt/dev/go-barcode-webapp/internal/handlers/auth_handler.go:153
+[0m[33m[40.645ms] [34;1m[rows:1][0m SELECT * FROM `users` WHERE userID = 5 AND is_active = true ORDER BY `users`.`userID` LIMIT 1
+DEBUG: Session valid for user: admin (ID: 5)
+
+2025/07/11 13:40:00 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:25
+[0m[33m[39.983ms] [34;1m[rows:1][0m SELECT * FROM `customers` WHERE `customers`.`customerID` = 52
+
+2025/07/11 13:40:00 [32m
+[0m[33m[41.052ms] [34;1m[rows:3][0m SELECT * FROM `products` WHERE `products`.`productID` IN (10,1,2)
+
+2025/07/11 13:40:00 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:25
+[0m[33m[82.158ms] [34;1m[rows:8][0m SELECT * FROM `devices` WHERE `devices`.`deviceID` IN ('MHD1001','MHD1002','MHD1003','MHD1004','SUB1001','SUB1002','TOP1001','TOP1002')
+
+2025/07/11 13:40:00 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:25
+[0m[33m[128.935ms] [34;1m[rows:8][0m SELECT * FROM `jobdevices` WHERE `jobdevices`.`jobID` = 1004
+
+2025/07/11 13:40:00 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:25
+[0m[33m[40.283ms] [34;1m[rows:1][0m SELECT * FROM `status` WHERE `status`.`statusID` = 1001
+
+2025/07/11 13:40:00 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:25 [33mSLOW SQL >= 200ms
+[0m[31;1m[250.573ms] [33m[rows:1][35m SELECT * FROM `jobs` WHERE `jobs`.`jobID` = 1004 ORDER BY `jobs`.`jobID` LIMIT 1[0m
+🔧 DEBUG JobRepo.GetByID: Loaded job 1004 with description: ''
+
+2025/07/11 13:40:00 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:168
+[0m[33m[40.478ms] [34;1m[rows:3][0m SELECT * FROM `products` WHERE `products`.`productID` IN (10,1,2)
+
+2025/07/11 13:40:00 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:168
+[0m[33m[82.255ms] [34;1m[rows:8][0m SELECT * FROM `devices` WHERE `devices`.`deviceID` IN ('MHD1001','MHD1002','MHD1003','MHD1004','SUB1001','SUB1002','TOP1001','TOP1002')
+
+2025/07/11 13:40:00 [32m/opt/dev/go-barcode-webapp/internal/repository/job_repository.go:168
+[0m[33m[122.282ms] [34;1m[rows:8][0m SELECT * FROM `jobdevices` WHERE jobID = 1004
+{"timestamp":"2025-07-11T11:40:00.505059611Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1752234000036331048","method":"GET","path":"/jobs/1004","status_code":200,"duration":"468.726431ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0","fields":{"bytes_in":0,"bytes_out":24415}}
+2025/07/11 13:40:00 Route Debug: GET /static/css/rental-core-design.css
+2025/07/11 13:40:00 Route Debug: GET /static/js/rental-core-design.js
+2025/07/11 13:40:00 Route Debug: GET /favicon.ico
+2025/07/11 13:40:00 NotFoundHandler: 404 for path: /favicon.ico
+2025/07/11 13:40:00 Route Debug: GET /static/images/icon-180.png
+2025/07/11 13:40:00 NotFoundHandler: 404 for path: /static/images/icon-180.png
+2025/07/11 13:40:00 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/07/11 13:40:00 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+{"timestamp":"2025-07-11T11:40:00.794848713Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1752234000780487525","method":"GET","path":"/favicon.ico","status_code":404,"duration":"14.335303ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:140.0) Gecko/20100101 Firefox/140.0","fields":{"bytes_in":0,"bytes_out":6348,"errors":"Error #01: template: profile_settings.html:35:65: executing \"content\" at \u003c.user.FirstName\u003e: nil pointer evaluating interface {}.FirstName\n"}}
+signal: killed

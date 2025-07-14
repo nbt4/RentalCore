@@ -59,9 +59,9 @@ type InvoiceTemplate struct {
 	CreatedAt    time.Time `gorm:"column:created_at" json:"createdAt"`
 	UpdatedAt    time.Time `gorm:"column:updated_at" json:"updatedAt"`
 
-	// Relationships
-	Creator  *User     `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
-	Invoices []Invoice `gorm:"foreignKey:TemplateID" json:"invoices,omitempty"`
+	// Relationships disabled to prevent foreign key constraints
+	Creator  *User     `gorm:"-" json:"creator,omitempty"`
+	Invoices []Invoice `gorm:"-" json:"invoices,omitempty"`
 }
 
 func (InvoiceTemplate) TableName() string {
@@ -101,13 +101,13 @@ type Invoice struct {
 	CreatedAt time.Time  `gorm:"column:created_at" json:"createdAt"`
 	UpdatedAt time.Time  `gorm:"column:updated_at" json:"updatedAt"`
 
-	// Relationships
-	Customer     *Customer           `gorm:"foreignKey:CustomerID;references:CustomerID" json:"customer,omitempty"`
-	Job          *Job                `gorm:"foreignKey:JobID" json:"job,omitempty"`
-	Template     *InvoiceTemplate    `gorm:"foreignKey:TemplateID" json:"template,omitempty"`
-	Creator      *User               `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
-	LineItems    []InvoiceLineItem   `gorm:"foreignKey:InvoiceID" json:"lineItems,omitempty"`
-	Payments     []InvoicePayment    `gorm:"foreignKey:InvoiceID" json:"payments,omitempty"`
+	// Relationships disabled to prevent foreign key constraints
+	Customer     *Customer           `gorm:"-" json:"customer,omitempty"`
+	Job          *Job                `gorm:"-" json:"job,omitempty"`
+	Template     *InvoiceTemplate    `gorm:"-" json:"template,omitempty"`
+	Creator      *User               `gorm:"-" json:"creator,omitempty"`
+	LineItems    []InvoiceLineItem   `gorm:"-" json:"lineItems,omitempty"`
+	Payments     []InvoicePayment    `gorm:"-" json:"payments,omitempty"`
 }
 
 func (Invoice) TableName() string {
@@ -161,10 +161,10 @@ type InvoiceLineItem struct {
 	CreatedAt       time.Time `gorm:"column:created_at" json:"createdAt"`
 	UpdatedAt       time.Time `gorm:"column:updated_at" json:"updatedAt"`
 
-	// Relationships
-	Invoice *Invoice           `gorm:"foreignKey:InvoiceID" json:"invoice,omitempty"`
-	Device  *Device            `gorm:"foreignKey:DeviceID" json:"device,omitempty"`
-	Package *EquipmentPackage  `gorm:"foreignKey:PackageID" json:"package,omitempty"`
+	// Relationships disabled to prevent foreign key constraints
+	Invoice *Invoice           `gorm:"-" json:"invoice,omitempty"`
+	Device  *Device            `gorm:"-" json:"device,omitempty"`
+	Package *EquipmentPackage  `gorm:"-" json:"package,omitempty"`
 }
 
 func (InvoiceLineItem) TableName() string {
@@ -204,8 +204,8 @@ type InvoiceSetting struct {
 	UpdatedBy    *uint     `gorm:"column:updated_by" json:"updatedBy"`
 	UpdatedAt    time.Time `gorm:"column:updated_at" json:"updatedAt"`
 
-	// Relationships
-	Updater *User `gorm:"foreignKey:UpdatedBy" json:"updater,omitempty"`
+	// Relationships disabled to prevent foreign key constraints
+	Updater *User `gorm:"-" json:"updater,omitempty"`
 }
 
 func (InvoiceSetting) TableName() string {
@@ -224,9 +224,9 @@ type InvoicePayment struct {
 	CreatedBy       *uint     `gorm:"column:created_by" json:"createdBy"`
 	CreatedAt       time.Time `gorm:"column:created_at" json:"createdAt"`
 
-	// Relationships
-	Invoice *Invoice `gorm:"foreignKey:InvoiceID" json:"invoice,omitempty"`
-	Creator *User    `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
+	// Relationships disabled to prevent foreign key constraints
+	Invoice *Invoice `gorm:"-" json:"invoice,omitempty"`
+	Creator *User    `gorm:"-" json:"creator,omitempty"`
 }
 
 func (InvoicePayment) TableName() string {
@@ -389,7 +389,7 @@ type EmailTemplate struct {
 	UpdatedAt    time.Time `gorm:"column:updated_at" json:"updatedAt"`
 
 	// Relationships
-	Creator *User `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
+	Creator *User `gorm:"-" json:"creator,omitempty"`
 }
 
 func (EmailTemplate) TableName() string {

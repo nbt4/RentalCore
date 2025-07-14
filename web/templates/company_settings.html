@@ -160,54 +160,66 @@
                 </h3>
             </div>
             <div class="rc-card-body">
-                {{if .company}}
+                <!-- Success/Error Messages -->
+                {{if .error}}
+                <div class="rc-alert rc-alert-danger rc-mb-lg">{{.error}}</div>
+                {{end}}
+                {{if .success}}
+                <div class="rc-alert rc-alert-success rc-mb-lg">{{.success}}</div>
+                {{end}}
+                
                 <form method="POST" action="/settings/company" enctype="multipart/form-data">
                     <div class="rc-grid rc-grid-2 rc-mb-lg">
                         <div class="rc-form-group">
                             <label class="rc-label" for="company_name">Company Name</label>
-                            <input type="text" class="rc-input" id="company_name" name="company_name" value="{{.company.CompanyName}}" required>
+                            <input type="text" class="rc-input" id="company_name" name="company_name" value="{{if .company}}{{.company.CompanyName}}{{end}}" required>
                         </div>
                         <div class="rc-form-group">
-                            <label class="rc-label" for="tax_id">Tax ID</label>
-                            <input type="text" class="rc-input" id="tax_id" name="tax_id" value="{{.company.TaxID}}">
+                            <label class="rc-label" for="tax_number">Tax Number</label>
+                            <input type="text" class="rc-input" id="tax_number" name="tax_number" value="{{if and .company .company.TaxNumber}}{{.company.TaxNumber}}{{end}}">
                         </div>
                     </div>
                     
                     <div class="rc-grid rc-grid-2 rc-mb-lg">
                         <div class="rc-form-group">
                             <label class="rc-label" for="email">Email</label>
-                            <input type="email" class="rc-input" id="email" name="email" value="{{.company.Email}}">
+                            <input type="email" class="rc-input" id="email" name="email" value="{{if and .company .company.Email}}{{.company.Email}}{{end}}">
                         </div>
                         <div class="rc-form-group">
                             <label class="rc-label" for="phone">Phone</label>
-                            <input type="tel" class="rc-input" id="phone" name="phone" value="{{.company.Phone}}">
+                            <input type="tel" class="rc-input" id="phone" name="phone" value="{{if and .company .company.Phone}}{{.company.Phone}}{{end}}">
                         </div>
                     </div>
                     
                     <div class="rc-form-group rc-mb-lg">
-                        <label class="rc-label" for="address">Address</label>
-                        <textarea class="rc-input" id="address" name="address" rows="3">{{.company.Address}}</textarea>
+                        <label class="rc-label" for="address_line1">Address Line 1</label>
+                        <input type="text" class="rc-input" id="address_line1" name="address_line1" value="{{if and .company .company.AddressLine1}}{{.company.AddressLine1}}{{end}}">
+                    </div>
+                    
+                    <div class="rc-form-group rc-mb-lg">
+                        <label class="rc-label" for="address_line2">Address Line 2</label>
+                        <input type="text" class="rc-input" id="address_line2" name="address_line2" value="{{if and .company .company.AddressLine2}}{{.company.AddressLine2}}{{end}}">
                     </div>
                     
                     <div class="rc-grid rc-grid-3 rc-mb-lg">
                         <div class="rc-form-group">
                             <label class="rc-label" for="city">City</label>
-                            <input type="text" class="rc-input" id="city" name="city" value="{{.company.City}}">
+                            <input type="text" class="rc-input" id="city" name="city" value="{{if and .company .company.City}}{{.company.City}}{{end}}">
                         </div>
                         <div class="rc-form-group">
                             <label class="rc-label" for="postal_code">Postal Code</label>
-                            <input type="text" class="rc-input" id="postal_code" name="postal_code" value="{{.company.PostalCode}}">
+                            <input type="text" class="rc-input" id="postal_code" name="postal_code" value="{{if and .company .company.PostalCode}}{{.company.PostalCode}}{{end}}">
                         </div>
                         <div class="rc-form-group">
                             <label class="rc-label" for="country">Country</label>
-                            <input type="text" class="rc-input" id="country" name="country" value="{{.company.Country}}">
+                            <input type="text" class="rc-input" id="country" name="country" value="{{if and .company .company.Country}}{{.company.Country}}{{end}}">
                         </div>
                     </div>
                     
                     <div class="rc-form-group rc-mb-lg">
                         <label class="rc-label" for="logo">Company Logo</label>
                         <input type="file" class="rc-input" id="logo" name="logo" accept="image/*">
-                        {{if .company.LogoPath}}
+                        {{if and .company .company.LogoPath}}
                         <div class="rc-mt-sm">
                             <img src="{{.company.LogoPath}}" alt="Current Logo" style="max-height: 100px; border-radius: var(--radius-md);">
                         </div>
@@ -220,18 +232,6 @@
                         </button>
                     </div>
                 </form>
-                {{else}}
-                <div class="rc-text-center" style="padding: var(--space-3xl);">
-                    <div style="font-size: 4rem; color: var(--text-muted); margin-bottom: var(--space-lg);">
-                        <i class="bi bi-building-gear"></i>
-                    </div>
-                    <h3 style="color: var(--text-secondary); margin-bottom: var(--space-md);">No company settings found</h3>
-                    <p class="rc-text-sm">Set up your company information to get started.</p>
-                    <a href="/settings/company/new" class="rc-btn rc-btn-primary">
-                        <i class="bi bi-plus-lg"></i> Setup Company
-                    </a>
-                </div>
-                {{end}}
             </div>
         </div>
     </main>

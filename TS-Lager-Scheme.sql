@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Jun 17, 2025 at 07:11 AM
+-- Generation Time: Jul 14, 2025 at 07:49 AM
 -- Server version: 9.2.0
 -- PHP Version: 8.2.27
 
@@ -335,6 +335,27 @@ CREATE TABLE `employeejob` (
   `employeeID` int NOT NULL,
   `jobID` int NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `email_templates`
+--
+
+CREATE TABLE `email_templates` (
+  `template_id` int unsigned NOT NULL,
+  `name` varchar(255) NOT NULL,
+  `description` text,
+  `template_type` enum('invoice','reminder','payment_confirmation','general') NOT NULL DEFAULT 'general',
+  `subject` varchar(500) NOT NULL,
+  `html_content` longtext NOT NULL,
+  `text_content` longtext,
+  `is_default` tinyint(1) NOT NULL DEFAULT '0',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_by` int unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -1214,6 +1235,16 @@ ALTER TABLE `employeejob`
   ADD KEY `idx_employeejob_jobID` (`jobID`);
 
 --
+-- Indexes for table `email_templates`
+--
+ALTER TABLE `email_templates`
+  ADD PRIMARY KEY (`template_id`),
+  ADD KEY `idx_email_templates_type` (`template_type`),
+  ADD KEY `idx_email_templates_default` (`is_default`),
+  ADD KEY `idx_email_templates_active` (`is_active`),
+  ADD KEY `idx_email_templates_created_by` (`created_by`);
+
+--
 -- Indexes for table `equipment_packages`
 --
 ALTER TABLE `equipment_packages`
@@ -1535,6 +1566,12 @@ ALTER TABLE `documents`
 --
 ALTER TABLE `employee`
   MODIFY `employeeID` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `email_templates`
+--
+ALTER TABLE `email_templates`
+  MODIFY `template_id` int unsigned NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `equipment_packages`

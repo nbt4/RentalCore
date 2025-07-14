@@ -205,7 +205,7 @@
                         </thead>
                         <tbody>
                             {{range .cases}}
-                            <tr>
+                            <tr data-case-id="{{.CaseID}}">
                                 <td><code class="rc-code">{{.CaseID}}</code></td>
                                 <td class="rc-text-semibold">{{.Name}}</td>
                                 <td class="rc-text-muted">{{derefString .Description}}</td>
@@ -370,6 +370,14 @@
                     <div class="rc-spinner"></div>
                     <p class="rc-text-muted rc-mt-md">Loading available devices...</p>
                 </div>
+            </div>
+            <div class="rc-modal-footer" style="padding: 1.25rem; gap: 0.75rem; display: flex; justify-content: flex-end;">
+                <button class="rc-btn rc-btn-secondary" onclick="closeAddDeviceToCaseModal()">
+                    <i class="bi bi-x-lg"></i> Close
+                </button>
+                <button class="rc-btn rc-btn-primary" onclick="closeAddDeviceToCaseModal()">
+                    <i class="bi bi-check-lg"></i> Done Adding Devices
+                </button>
             </div>
         </div>
     </div>
@@ -603,6 +611,7 @@
         // Close other modals if open
         closeCaseModal();
         closeEditCaseModal();
+        closeAddDeviceToCaseModal();
         
         const modal = document.getElementById('caseDevicesModal');
         const content = document.getElementById('caseDevicesContent');
@@ -616,8 +625,8 @@
             </div>
         `;
         
-        // Fetch case devices with product information
-        fetch('/api/v1/cases/' + caseID + '/devices')
+        // Fetch case devices with product information (with cache busting)
+        fetch('/api/v1/cases/' + caseID + '/devices?_t=' + Date.now())
             .then(response => {
                 if (!response.ok) {
                     return response.text().then(text => {
@@ -849,7 +858,7 @@
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ deviceID: deviceID })
+                body: JSON.stringify({ device_id: deviceID })
             })
             .then(response => {
                 if (!response.ok) {
@@ -864,13 +873,174 @@
                     throw new Error(result.error);
                 }
                 
-                // Success - close modal and refresh case devices
-                closeAddDeviceToCaseModal();
-                showCaseDevices(caseID);
+                // Success - keep modal open and refresh case devices list
+                
+                // Don't close the modal, just refresh UI
+                setTimeout(() => {
+                    // Check which modal is open and update accordingly
+                    const caseDevicesModal = document.getElementById('caseDevicesModal');
+                    const addDeviceModal = document.getElementById('addDeviceToCaseModal');
+                    
+                    if (caseDevicesModal && caseDevicesModal.style.display === 'flex') {
+                        refreshCaseDevicesModal(caseID);
+                    }
+                    
+                    if (addDeviceModal && addDeviceModal.style.display !== 'none') {
+                        showAddDeviceToCase(caseID);
+                    }
+                    
+                    updateCaseDeviceCount(caseID);
+                }, 200);
             })
             .catch(error => {
                 alert('Error adding device to case: ' + error.message);
             });
+        }
+    }
+
+    function refreshCaseDevicesContent(caseID) {
+        // Check if the case devices modal is currently open
+        const modal = document.getElementById('caseDevicesModal');
+        if (modal && modal.style.display === 'flex') {
+            // Modal is open, just refresh the content
+            showCaseDevices(caseID);
+        }
+        // If modal is not open, don't do anything
+    }
+
+    function refreshCaseDevicesModal(caseID) {
+        // Refresh ONLY the content without closing/opening modal
+        const content = document.getElementById('caseDevicesContent');
+        if (!content) return;
+        
+        // Show loading state
+        content.innerHTML = `
+            <div class="rc-text-center rc-py-xl">
+                <div class="rc-spinner"></div>
+                <p class="rc-text-muted rc-mt-md">Refreshing devices...</p>
+            </div>
+        `;
+        
+        // Fetch updated device list
+        fetch('/api/v1/cases/' + caseID + '/devices?_t=' + Date.now())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                let devices = data.devices || data || [];
+                updateCaseDevicesContent(devices, caseID);
+            })
+            .catch(error => {
+                console.error('Error refreshing case devices:', error);
+                content.innerHTML = '<div class="rc-text-center rc-py-xl"><p class="rc-text-danger">Error loading devices</p></div>';
+            });
+    }
+
+    function showSuccessMessage(message) {
+        // Show a temporary success message
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-success alert-dismissible fade show';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        // Add to the top of the modal content
+        const modalContent = document.getElementById('caseDevicesContent');
+        if (modalContent) {
+            modalContent.insertBefore(alertDiv, modalContent.firstChild);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 3000);
+        }
+    }
+
+    function updateCaseDevicesContent(devices, caseID) {
+        const content = document.getElementById('caseDevicesContent');
+        if (!content) return;
+        
+        if (devices.length === 0) {
+            content.innerHTML = `
+                <div class="rc-text-center rc-py-xl">
+                    <div style="font-size: 3rem; color: var(--text-muted); margin-bottom: var(--space-md);">
+                        <i class="bi bi-inbox"></i>
+                    </div>
+                    <h3 style="color: var(--text-secondary);">No devices in this case</h3>
+                    <p class="rc-text-sm">This case is currently empty.</p>
+                    <button onclick="showAddDeviceToCase(${caseID})" class="rc-btn rc-btn-primary rc-mt-md">
+                        <i class="bi bi-plus-lg"></i> Add Device to Case
+                    </button>
+                </div>
+            `;
+        } else {
+            content.innerHTML = `
+                <div class="rc-table-responsive" style="max-height: 60vh; overflow-y: auto;">
+                    <table class="rc-table">
+                        <thead>
+                            <tr>
+                                <th>Device ID</th>
+                                <th>Product</th>
+                                <th>Serial Number</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${devices.map(device => 
+                                '<tr>' +
+                                    '<td><code class="rc-code">' + device.deviceID + '</code></td>' +
+                                    '<td>' + (device.product && device.product.name ? device.product.name : 'Unknown') + '</td>' +
+                                    '<td>' + (device.serialnumber || '-') + '</td>' +
+                                    '<td>' +
+                                        '<span class="rc-badge ' + (device.status === 'free' ? 'rc-badge-success' : device.status === 'rented' ? 'rc-badge-warning' : 'rc-badge-secondary') + '">' +
+                                            (device.status || 'Unknown') +
+                                        '</span>' +
+                                    '</td>' +
+                                    '<td>' +
+                                        '<button onclick="removeDeviceFromCase(' + caseID + ', \'' + device.deviceID + '\')" class="rc-btn rc-btn-outline rc-btn-sm" title="Remove from Case">' +
+                                            '<i class="bi bi-x-lg"></i>' +
+                                        '</button>' +
+                                    '</td>' +
+                                '</tr>'
+                            ).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="rc-flex rc-flex-between rc-mt-lg">
+                    <button onclick="showAddDeviceToCase(${caseID})" class="rc-btn rc-btn-primary">
+                        <i class="bi bi-plus-lg"></i> Add Device
+                    </button>
+                    <div class="rc-text-sm rc-text-muted">${devices.length} device${devices.length !== 1 ? 's' : ''} in this case</div>
+                </div>
+            `;
+        }
+    }
+
+    async function updateCaseDeviceCount(caseID) {
+        try {
+            const response = await fetch(`/api/v1/cases/${caseID}/devices?_t=${Date.now()}`);
+            if (response.ok) {
+                const data = await response.json();
+                const devices = data.devices || data || [];
+                const deviceCount = devices.length || 0;
+                
+                const caseCard = document.querySelector(`[data-case-id="${caseID}"]`);
+                if (caseCard) {
+                    const badge = caseCard.querySelector('.rc-badge-info');
+                    if (badge) {
+                        badge.textContent = `${deviceCount} devices`;
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error updating case device count:', error);
         }
     }
 
@@ -892,8 +1062,10 @@
                     throw new Error(result.error);
                 }
                 
-                // Success - refresh case devices
-                showCaseDevices(caseID);
+                setTimeout(() => {
+                    refreshCaseDevicesModal(caseID);
+                    updateCaseDeviceCount(caseID);
+                }, 200);
             })
             .catch(error => {
                 alert('Error removing device from case: ' + error.message);

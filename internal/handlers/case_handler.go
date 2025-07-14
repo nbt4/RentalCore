@@ -270,12 +270,22 @@ func (h *CaseHandler) UpdateCase(c *gin.Context) {
 	// Process device associations
 	var deviceIDs []string
 	
-	// Parse device form data
+	// Parse device form data - handle both devices[] and devices[*] formats
 	for key, values := range c.Request.PostForm {
-		if strings.HasPrefix(key, "devices[") && strings.HasSuffix(key, "]") {
+		if key == "devices[]" || (strings.HasPrefix(key, "devices[") && strings.HasSuffix(key, "]")) {
 			for _, deviceID := range values {
 				if deviceID != "" {
-					deviceIDs = append(deviceIDs, deviceID)
+					// Avoid duplicates
+					found := false
+					for _, existing := range deviceIDs {
+						if existing == deviceID {
+							found = true
+							break
+						}
+					}
+					if !found {
+						deviceIDs = append(deviceIDs, deviceID)
+					}
 				}
 			}
 		}
@@ -437,7 +447,6 @@ func (h *CaseHandler) RemoveDeviceFromCase(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
 	c.JSON(http.StatusOK, gin.H{"message": "Device removed from case successfully"})
 }
 

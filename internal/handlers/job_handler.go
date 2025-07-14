@@ -235,6 +235,7 @@ func (h *JobHandler) GetJob(c *gin.Context) {
 		jdCopy.CustomPrice = &effectivePrice
 
 		productGroups[productName].Devices = append(productGroups[productName].Devices, jdCopy)
+		productGroups[productName].Count = len(productGroups[productName].Devices)
 		productGroups[productName].TotalValue += effectivePrice
 		totalValue += effectivePrice
 	}
@@ -490,10 +491,65 @@ func (h *JobHandler) ListJobsAPI(c *gin.Context) {
 }
 
 func (h *JobHandler) CreateJobAPI(c *gin.Context) {
-	var job models.Job
-	if err := c.ShouldBindJSON(&job); err != nil {
+	// Use a map to capture raw JSON data
+	var requestData map[string]interface{}
+	if err := c.ShouldBindJSON(&requestData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	// Create job from request data
+	var job models.Job
+	if customerID, ok := requestData["customerID"]; ok {
+		if cid, ok := customerID.(float64); ok {
+			job.CustomerID = uint(cid)
+		}
+	}
+	if statusID, ok := requestData["statusID"]; ok {
+		if sid, ok := statusID.(float64); ok {
+			job.StatusID = uint(sid)
+		}
+	}
+	if description, ok := requestData["description"]; ok {
+		if desc, ok := description.(string); ok {
+			job.Description = &desc
+		}
+	}
+	if discount, ok := requestData["discount"]; ok {
+		if d, ok := discount.(float64); ok {
+			job.Discount = d
+		}
+	}
+	if discountType, ok := requestData["discount_type"]; ok {
+		if dt, ok := discountType.(string); ok {
+			job.DiscountType = dt
+		}
+	}
+	if revenue, ok := requestData["revenue"]; ok {
+		if r, ok := revenue.(float64); ok {
+			job.Revenue = r
+		}
+	}
+	if finalRevenue, ok := requestData["final_revenue"]; ok {
+		if fr, ok := finalRevenue.(float64); ok {
+			job.FinalRevenue = &fr
+		}
+	}
+
+	// Handle date fields manually
+	if startDateStr, ok := requestData["startDate"]; ok {
+		if dateStr, ok := startDateStr.(string); ok && dateStr != "" {
+			if parsed, err := time.Parse("2006-01-02", dateStr); err == nil {
+				job.StartDate = &parsed
+			}
+		}
+	}
+	if endDateStr, ok := requestData["endDate"]; ok {
+		if dateStr, ok := endDateStr.(string); ok && dateStr != "" {
+			if parsed, err := time.Parse("2006-01-02", dateStr); err == nil {
+				job.EndDate = &parsed
+			}
+		}
 	}
 
 	if err := h.jobRepo.Create(&job); err != nil {
@@ -527,13 +583,74 @@ func (h *JobHandler) UpdateJobAPI(c *gin.Context) {
 		return
 	}
 
-	var job models.Job
-	if err := c.ShouldBindJSON(&job); err != nil {
+	// Use a map to capture raw JSON data
+	var requestData map[string]interface{}
+	if err := c.ShouldBindJSON(&requestData); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	job.JobID = uint(id)
+	// Get existing job
+	existingJob, err := h.jobRepo.GetByID(uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Job not found"})
+		return
+	}
+
+	// Update fields from request
+	job := *existingJob
+	if customerID, ok := requestData["customerID"]; ok {
+		if cid, ok := customerID.(float64); ok {
+			job.CustomerID = uint(cid)
+		}
+	}
+	if statusID, ok := requestData["statusID"]; ok {
+		if sid, ok := statusID.(float64); ok {
+			job.StatusID = uint(sid)
+		}
+	}
+	if description, ok := requestData["description"]; ok {
+		if desc, ok := description.(string); ok {
+			job.Description = &desc
+		}
+	}
+	if discount, ok := requestData["discount"]; ok {
+		if d, ok := discount.(float64); ok {
+			job.Discount = d
+		}
+	}
+	if discountType, ok := requestData["discount_type"]; ok {
+		if dt, ok := discountType.(string); ok {
+			job.DiscountType = dt
+		}
+	}
+	if revenue, ok := requestData["revenue"]; ok {
+		if r, ok := revenue.(float64); ok {
+			job.Revenue = r
+		}
+	}
+	if finalRevenue, ok := requestData["final_revenue"]; ok {
+		if fr, ok := finalRevenue.(float64); ok {
+			job.FinalRevenue = &fr
+		}
+	}
+
+	// Handle date fields manually
+	if startDateStr, ok := requestData["startDate"]; ok {
+		if dateStr, ok := startDateStr.(string); ok && dateStr != "" {
+			if parsed, err := time.Parse("2006-01-02", dateStr); err == nil {
+				job.StartDate = &parsed
+			}
+		}
+	}
+	if endDateStr, ok := requestData["endDate"]; ok {
+		if dateStr, ok := endDateStr.(string); ok && dateStr != "" {
+			if parsed, err := time.Parse("2006-01-02", dateStr); err == nil {
+				job.EndDate = &parsed
+			}
+		}
+	}
+
 	if err := h.jobRepo.Update(&job); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

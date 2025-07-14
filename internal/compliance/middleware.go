@@ -395,24 +395,7 @@ func (cm *ComplianceMiddleware) GetComplianceStatus() gin.HandlerFunc {
 
 // InitializeCompliance sets up all compliance-related database tables
 func (cm *ComplianceMiddleware) InitializeCompliance() error {
-	// Auto-migrate all compliance tables
-	tables := []interface{}{
-		&models.AuditLog{},
-		&GoBDRecord{},
-		&SignedDocument{},
-		&RetentionPolicy{},
-		&ConsentRecord{},
-		&DataProcessingRecord{},
-		&DataSubjectRequest{},
-		&EncryptedPersonalData{},
-	}
-
-	for _, table := range tables {
-		if err := cm.db.AutoMigrate(table); err != nil {
-			return fmt.Errorf("failed to migrate compliance table: %w", err)
-		}
-	}
-
+	// Migration disabled - compliance tables should be created manually
 	return nil
 }
 

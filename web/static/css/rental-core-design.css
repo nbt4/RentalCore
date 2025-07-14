@@ -217,6 +217,7 @@ body {
     padding: var(--space-sm) var(--space-md);
     border-radius: var(--radius-md);
     font-weight: 500;
+    font-family: var(--font-sans);
     transition: all var(--transition-normal) ease;
     position: relative;
     display: flex;
