@@ -16,17 +16,35 @@ func NewJobRepository(db *Database) *JobRepository {
 	return &JobRepository{db: db}
 }
 
+// loadProductsForJobDevices manually loads products for job devices
+// This is a workaround for GORM nested preloading issues
+func (r *JobRepository) loadProductsForJobDevices(jobDevices []models.JobDevice) {
+	for i := range jobDevices {
+		jd := &jobDevices[i]
+		if jd.Device.ProductID != nil {
+			var product models.Product
+			productErr := r.db.Where("productID = ?", *jd.Device.ProductID).First(&product).Error
+			if productErr == nil {
+				jd.Device.Product = &product
+			}
+		}
+	}
+}
+
 func (r *JobRepository) Create(job *models.Job) error {
 	return r.db.Create(job).Error
 }
 
 func (r *JobRepository) GetByID(id uint) (*models.Job, error) {
 	var job models.Job
-	err := r.db.Preload("Customer").Preload("Status").Preload("JobDevices.Device.Product").First(&job, id).Error
+	err := r.db.Preload("Customer").Preload("Status").Preload("JobDevices.Device").First(&job, id).Error
 	if err != nil {
 		fmt.Printf("🔧 DEBUG JobRepo.GetByID: Error loading job %d: %v\n", id, err)
 		return nil, err
 	}
+	
+	// Manually load products for each device
+	r.loadProductsForJobDevices(job.JobDevices)
 	
 	fmt.Printf("🔧 DEBUG JobRepo.GetByID: Loaded job %d with description: '%s'\n", id, func() string {
 		if job.Description == nil {
@@ -163,9 +181,19 @@ func (r *JobRepository) List(params *models.FilterParams) ([]models.JobWithDetai
 
 func (r *JobRepository) GetJobDevices(jobID uint) ([]models.JobDevice, error) {
 	var jobDevices []models.JobDevice
+	
+	// Load JobDevices with Device, then manually preload Products
 	err := r.db.Where("jobID = ?", jobID).
-		Preload("Device.Product").
+		Preload("Device").
 		Find(&jobDevices).Error
+	
+	if err != nil {
+		return nil, err
+	}
+	
+	// Manually load products for each device to ensure they're loaded correctly
+	r.loadProductsForJobDevices(jobDevices)
+	
 	return jobDevices, err
 }
 
@@ -317,11 +345,14 @@ func (r *JobRepository) CalculateAndUpdateRevenue(jobID uint) error {
 	var totalRevenue float64
 	var jobDevices []models.JobDevice
 	err = r.db.Where("jobID = ?", jobID).
-		Preload("Device.Product").
+		Preload("Device").
 		Find(&jobDevices).Error
 	if err != nil {
 		return err
 	}
+	
+	// Manually load products for each device
+	r.loadProductsForJobDevices(jobDevices)
 
 	for _, jd := range jobDevices {
 		if jd.CustomPrice != nil && *jd.CustomPrice > 0 {
