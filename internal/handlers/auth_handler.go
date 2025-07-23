@@ -125,22 +125,22 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 // AuthMiddleware checks if user is authenticated
 func (h *AuthHandler) AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		fmt.Printf("DEBUG: AuthMiddleware called for URL: %s\n", c.Request.URL.Path)
+		log.Printf("DEBUG: AuthMiddleware: Request URL: %s", c.Request.URL.Path)
 		
 		sessionID, err := c.Cookie("session_id")
 		if err != nil || sessionID == "" {
-			fmt.Printf("DEBUG: No session cookie found, redirecting to login\n")
+			log.Printf("DEBUG: AuthMiddleware: No session cookie found for %s, redirecting to /login", c.Request.URL.Path)
 			c.Redirect(http.StatusSeeOther, "/login")
 			c.Abort()
 			return
 		}
 
-		fmt.Printf("DEBUG: Found session cookie: %s\n", sessionID)
+		log.Printf("DEBUG: AuthMiddleware: Found session cookie: %s for %s", sessionID, c.Request.URL.Path)
 
 		// Validate session
 		var session models.Session
 		if err := h.db.Where("session_id = ? AND expires_at > ?", sessionID, time.Now()).First(&session).Error; err != nil {
-			fmt.Printf("DEBUG: Session validation failed: %v\n", err)
+			log.Printf("DEBUG: AuthMiddleware: Session validation failed for %s: %v", sessionID, err)
 			// Clean up invalid session cookie
 			c.SetCookie("session_id", "", -1, "/", "", false, true)
 			c.Redirect(http.StatusSeeOther, "/login")
@@ -151,7 +151,7 @@ func (h *AuthHandler) AuthMiddleware() gin.HandlerFunc {
 		// Load the user and verify they are still active
 		var user models.User
 		if err := h.db.Where("userID = ? AND is_active = ?", session.UserID, true).First(&user).Error; err != nil {
-			fmt.Printf("DEBUG: User not found or inactive for session: %v\n", err)
+			log.Printf("DEBUG: AuthMiddleware: User not found or inactive for session %s (UserID: %d): %v", sessionID, session.UserID, err)
 			// Delete the session since user is inactive/deleted
 			h.db.Where("session_id = ?", sessionID).Delete(&models.Session{})
 			c.SetCookie("session_id", "", -1, "/", "", false, true)
@@ -160,13 +160,13 @@ func (h *AuthHandler) AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		log.Printf("DEBUG: AuthMiddleware: Session valid for user: %s (ID: %d) for URL: %s", user.Username, user.UserID, c.Request.URL.Path)
+
 		// Optional: Extend session on activity (sliding expiration)
 		// Uncomment if you want sessions to extend on each request
 		// sessionTimeout := time.Duration(h.config.Security.SessionTimeout) * time.Second
 		// session.ExpiresAt = time.Now().Add(sessionTimeout)
 		// h.db.Save(&session)
-
-		fmt.Printf("DEBUG: Session valid for user: %s (ID: %d)\n", user.Username, user.UserID)
 
 		// Store user in context
 		c.Set("user", user)
@@ -288,10 +288,12 @@ func (h *AuthHandler) ListUsers(c *gin.Context) {
 	currentUser, exists := GetCurrentUser(c)
 	fmt.Printf("DEBUG: Current user exists: %v, User: %+v\n", exists, currentUser)
 	
+	fmt.Printf("DEBUG: Rendering users_list.html with currentPage = 'users'\n")
 	c.HTML(http.StatusOK, "users_list.html", gin.H{
-		"title": "User Management",
-		"users": users,
-		"user":  currentUser,
+		"title":       "User Management",
+		"users":       users,
+		"user":        currentUser,
+		"currentPage": "users",
 	})
 	fmt.Printf("DEBUG: ListUsers template rendered\n")
 }
@@ -550,8 +552,11 @@ func parseUserID(userIDStr string) uint {
 
 // ProfileSettingsForm displays the profile settings page
 func (h *AuthHandler) ProfileSettingsForm(c *gin.Context) {
+	log.Printf("DEBUG: ProfileSettingsForm: Handler invoked for URL: %s, Method: %s", c.Request.URL.Path, c.Request.Method)
+	
 	currentUser, exists := GetCurrentUser(c)
 	if !exists || currentUser == nil {
+		log.Printf("DEBUG: ProfileSettingsForm: User not authenticated, redirecting to /login")
 		c.Redirect(http.StatusSeeOther, "/login")
 		return
 	}
@@ -560,6 +565,7 @@ func (h *AuthHandler) ProfileSettingsForm(c *gin.Context) {
 	var preferences models.UserPreferences
 	if err := h.db.Where("user_id = ?", currentUser.UserID).First(&preferences).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
+			log.Printf("DEBUG: ProfileSettingsForm: Preferences not found for user %d, creating defaults", currentUser.UserID)
 			// Create default preferences
 			preferences = models.UserPreferences{
 				UserID:                   currentUser.UserID,
@@ -580,6 +586,7 @@ func (h *AuthHandler) ProfileSettingsForm(c *gin.Context) {
 				UpdatedAt:                time.Now(),
 			}
 			if err := h.db.Create(&preferences).Error; err != nil {
+				log.Printf("ERROR: ProfileSettingsForm: Failed to create user preferences: %v", err)
 				c.HTML(http.StatusInternalServerError, "error.html", gin.H{
 					"error": "Failed to create user preferences",
 					"user":  currentUser,
@@ -587,6 +594,7 @@ func (h *AuthHandler) ProfileSettingsForm(c *gin.Context) {
 				return
 			}
 		} else {
+			log.Printf("ERROR: ProfileSettingsForm: Failed to load user preferences: %v", err)
 			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
 				"error": "Failed to load user preferences",
 				"user":  currentUser,
@@ -595,11 +603,12 @@ func (h *AuthHandler) ProfileSettingsForm(c *gin.Context) {
 		}
 	}
 
-	log.Printf("👤 PROFILE SETTINGS ROUTE CALLED - URL: %s, rendering profile_settings.html", c.Request.URL.Path)
+	log.Printf("DEBUG: ProfileSettingsForm: Rendering profile_settings.html for user %s", currentUser.Username)
 	c.HTML(http.StatusOK, "profile_settings.html", gin.H{
 		"title":       "Profile Settings",
 		"user":        currentUser,
 		"preferences": preferences,
+		"currentPage": "profile",
 	})
 }
 

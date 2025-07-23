@@ -141,50 +141,28 @@ type SearchHistory struct {
 // WORKFLOW & TEMPLATES MODELS
 // ================================================================
 
-type JobTemplate struct {
-	TemplateID          uint            `gorm:"primaryKey;autoIncrement;column:templateID" json:"templateID"`
-	Name                string          `gorm:"not null;column:name" json:"name" binding:"required,min=3,max=100"`
-	Description         string          `gorm:"column:description" json:"description" binding:"max=500"`
-	JobCategoryID       *uint           `gorm:"column:jobcategoryID" json:"jobCategoryID"`
-	DefaultDurationDays *int            `gorm:"column:default_duration_days" json:"defaultDurationDays" binding:"omitempty,min=1,max=365"`
-	EquipmentList       json.RawMessage `gorm:"type:json;column:equipment_list" json:"equipmentList"`
-	DefaultNotes        string          `gorm:"column:default_notes" json:"defaultNotes" binding:"max=1000"`
-	PricingTemplate     json.RawMessage `gorm:"type:json;column:pricing_template" json:"pricingTemplate"`
-	RequiredDocuments   json.RawMessage `gorm:"type:json;column:required_documents" json:"requiredDocuments"`
-	CreatedBy           *uint           `gorm:"column:created_by" json:"createdBy"`
-	CreatedAt           time.Time       `gorm:"column:created_at" json:"createdAt"`
-	UpdatedAt           time.Time       `gorm:"column:updated_at" json:"updatedAt"`
-	IsActive            bool            `gorm:"default:true;column:is_active" json:"isActive"`
-	UsageCount          int             `gorm:"default:0;column:usage_count" json:"usageCount"`
-
-	// Relationships
-	JobCategory *JobCategory `gorm:"foreignKey:JobCategoryID;references:JobCategoryID" json:"jobCategory,omitempty"`
-	Creator     *User        `gorm:"foreignKey:CreatedBy;references:UserID" json:"creator,omitempty"`
-	Jobs        []Job        `gorm:"foreignKey:TemplateID;references:TemplateID" json:"jobs,omitempty"`
-}
-
-func (JobTemplate) TableName() string {
-	return "job_templates"
-}
 
 type EquipmentPackage struct {
-	PackageID        uint            `gorm:"primaryKey;autoIncrement" json:"packageID"`
-	Name             string          `gorm:"not null;size:100" json:"name" binding:"required,min=3,max=100"`
-	Description      string          `gorm:"size:1000" json:"description" binding:"max=1000"`
-	PackageItems     json.RawMessage `gorm:"type:json;not null" json:"packageItems"`
-	PackagePrice     *float64        `gorm:"type:decimal(12,2)" json:"packagePrice" binding:"omitempty,min=0"`
-	DiscountPercent  float64         `gorm:"type:decimal(5,2);default:0.00" json:"discountPercent" binding:"min=0,max=100"`
-	MinRentalDays    int             `gorm:"default:1" json:"minRentalDays" binding:"min=1,max=365"`
-	MaxRentalDays    *int            `gorm:"" json:"maxRentalDays" binding:"omitempty,min=1,max=3650"`
-	IsActive         bool            `gorm:"default:true" json:"isActive"`
-	Category         string          `gorm:"size:50" json:"category" binding:"max=50"`
-	Tags             string          `gorm:"size:500" json:"tags" binding:"max=500"`
-	CreatedBy        *uint           `json:"createdBy"`
-	CreatedAt        time.Time       `json:"createdAt"`
-	UpdatedAt        time.Time       `json:"updatedAt"`
-	UsageCount       int             `gorm:"default:0" json:"usageCount"`
-	LastUsedAt       *time.Time      `json:"lastUsedAt"`
-	TotalRevenue     float64         `gorm:"type:decimal(12,2);default:0.00" json:"totalRevenue"`
+	PackageID        uint            `gorm:"primaryKey;autoIncrement;column:packageID" json:"packageID"`
+	Name             string          `gorm:"not null;size:100;column:name" json:"name" binding:"required,min=3,max=100"`
+	Description      string          `gorm:"size:1000;column:description" json:"description" binding:"max=1000"`
+	PackageItems     json.RawMessage `gorm:"type:json;not null;column:package_items" json:"packageItems"`
+	PackagePrice     *float64        `gorm:"type:decimal(12,2);column:package_price" json:"packagePrice" binding:"omitempty,min=0"`
+	DiscountPercent  float64         `gorm:"type:decimal(5,2);default:0.00;column:discount_percent" json:"discountPercent" binding:"min=0,max=100"`
+	MinRentalDays    int             `gorm:"default:1;column:min_rental_days" json:"minRentalDays" binding:"min=1,max=365"`
+	MaxRentalDays    *int            `gorm:"column:max_rental_days" json:"maxRentalDays" binding:"omitempty,min=1,max=3650"`
+	IsActive         bool            `gorm:"default:true;column:is_active" json:"isActive"`
+	Category         string          `gorm:"size:50;column:category" json:"category" binding:"max=50"`
+	Tags             string          `gorm:"size:500;column:tags" json:"tags" binding:"max=500"`
+	CreatedBy        *uint           `gorm:"column:created_by" json:"createdBy"`
+	CreatedAt        time.Time       `gorm:"column:created_at" json:"createdAt"`
+	UpdatedAt        time.Time       `gorm:"column:updated_at" json:"updatedAt"`
+	UsageCount       int             `gorm:"default:0;column:usage_count" json:"usageCount"`
+	LastUsedAt       *time.Time      `gorm:"column:last_used_at" json:"lastUsedAt"`
+	TotalRevenue     float64         `gorm:"type:decimal(12,2);default:0.00;column:total_revenue" json:"totalRevenue"`
+	TotalValue       float64         `gorm:"-:all" json:"total_value"`
+	CalculatedPrice  float64         `gorm:"-:all" json:"calculated_price"`
+	DeviceCount      int             `gorm:"-:all" json:"device_count"`
 
 	// Relationships
 	Creator        *User           `gorm:"foreignKey:CreatedBy" json:"creator,omitempty"`
@@ -206,7 +184,7 @@ type PackageDevice struct {
 	CreatedAt   time.Time `gorm:"column:created_at" json:"createdAt"`
 	UpdatedAt   time.Time `gorm:"column:updated_at" json:"updatedAt"`
 
-	// Relationships
+	// Relationships - DISABLE AUTO-CREATION via manual loading only
 	Package *EquipmentPackage `gorm:"foreignKey:PackageID" json:"package,omitempty"`
 	Device  *Device           `gorm:"foreignKey:DeviceID" json:"device,omitempty"`
 }
@@ -338,7 +316,6 @@ type UserEnhanced struct {
 // JobEnhanced extends the existing Job model with new fields
 type JobEnhanced struct {
 	Job                      // Embed the existing Job struct
-	TemplateID               *uint    `json:"templateID"`
 	Priority                 string   `gorm:"type:enum('low','normal','high','urgent');default:'normal'" json:"priority"`
 	InternalNotes            string   `json:"internalNotes"`
 	CustomerNotes            string   `json:"customerNotes"`
@@ -350,7 +327,6 @@ type JobEnhanced struct {
 	CompletionPercentage     int      `gorm:"default:0" json:"completionPercentage"`
 
 	// New relationships
-	Template         *JobTemplate          `gorm:"foreignKey:TemplateID" json:"template,omitempty"`
 	ContractDocument *Document             `gorm:"foreignKey:ContractDocumentID" json:"contractDocument,omitempty"`
 	UsageLogs        []EquipmentUsageLog   `gorm:"foreignKey:JobID" json:"usageLogs,omitempty"`
 	Transactions     []FinancialTransaction `gorm:"foreignKey:JobID" json:"transactions,omitempty"`

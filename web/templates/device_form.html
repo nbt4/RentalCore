@@ -54,8 +54,6 @@
                             <div class="rc-dropdown-header">
                                 <i class="bi bi-folder"></i> Management
                             </div>
-                            <a href="/workflow/templates" class="rc-dropdown-item">
-                                <i class="bi bi-file-earmark-text"></i> Job Templates
                             </a>
                             <a href="/workflow/packages" class="rc-dropdown-item">
                                 <i class="bi bi-box-seam"></i> Equipment Packages
@@ -96,7 +94,6 @@
                             <a href="/settings/company" class="rc-dropdown-item">
                                 <i class="bi bi-building-gear"></i> Company Settings
                             </a>
-                            <a href="/settings/email-templates" class="rc-dropdown-item">
                                 <i class="bi bi-envelope-gear"></i> E-Mail Templates
                             </a>
                             <hr class="rc-dropdown-divider">
@@ -165,7 +162,7 @@
                     <input type="hidden" name="_method" value="PUT">
                     {{end}}
                     
-                    <div class="rc-grid rc-grid-2 rc-gap-lg">
+                    <div class="rc-grid rc-grid-3 rc-gap-lg">
                         <div class="rc-form-group">
                             <label class="rc-label">Product *</label>
                             <select class="rc-input" name="productID" required>
@@ -181,6 +178,13 @@
                             <label class="rc-label">Serial Number</label>
                             <input type="text" class="rc-input" name="serialnumber" value="{{derefString .device.SerialNumber}}" placeholder="Optional">
                         </div>
+                        {{if not .device.DeviceID}}
+                        <div class="rc-form-group">
+                            <label class="rc-label">Quantity *</label>
+                            <input type="number" class="rc-input" name="quantity" value="1" min="1" max="100" required>
+                            <small class="rc-help-text">Number of identical devices to create</small>
+                        </div>
+                        {{end}}
                     </div>
                     
                     <div class="rc-grid rc-grid-3 rc-gap-lg rc-mt-lg">
@@ -222,7 +226,7 @@
                                 {{if .device.DeviceID}}
                                     Save Changes
                                 {{else}}
-                                    Create Device
+                                    <span id="createButtonText">Create Device(s)</span>
                                 {{end}}
                             </button>
                         </div>
@@ -261,6 +265,26 @@
         document.addEventListener('DOMContentLoaded', function() {
             const saveButton = document.getElementById('saveDeviceBtn');
             const form = document.querySelector('form');
+            const quantityInput = document.querySelector('input[name="quantity"]');
+            const createButtonText = document.getElementById('createButtonText');
+            
+            // Update button text based on quantity
+            if (quantityInput && createButtonText) {
+                function updateButtonText() {
+                    const quantity = parseInt(quantityInput.value) || 1;
+                    if (quantity === 1) {
+                        createButtonText.textContent = 'Create Device';
+                    } else {
+                        createButtonText.textContent = `Create ${quantity} Devices`;
+                    }
+                }
+                
+                // Update on input change
+                quantityInput.addEventListener('input', updateButtonText);
+                
+                // Initial update
+                updateButtonText();
+            }
             
             if (saveButton) {
                 saveButton.addEventListener('click', function(e) {
@@ -273,9 +297,18 @@
                         return;
                     }
                     
+                    // Validate quantity if present
+                    if (quantityInput) {
+                        const quantity = parseInt(quantityInput.value);
+                        if (!quantity || quantity < 1 || quantity > 100) {
+                            alert('Please enter a valid quantity (1-100)');
+                            return;
+                        }
+                    }
+                    
                     // Change button text to show saving
                     const originalText = saveButton.innerHTML;
-                    saveButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
+                    saveButton.innerHTML = '<i class="bi bi-hourglass-split"></i> Creating...';
                     saveButton.disabled = true;
                     
                     // Submit form

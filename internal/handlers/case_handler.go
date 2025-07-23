@@ -31,7 +31,7 @@ func (h *CaseHandler) ListCases(c *gin.Context) {
 	
 	params := &models.FilterParams{}
 	if err := c.ShouldBindQuery(params); err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": err.Error(), "user": user})
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/error?code=400&message=Bad Request&details=%s", err.Error()))
 		return
 	}
 
@@ -51,17 +51,18 @@ func (h *CaseHandler) ListCases(c *gin.Context) {
 
 	cases, err := h.caseRepo.List(params)
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/error?code=500&message=Database Error&details=%s", err.Error()))
 		return
 	}
 
 	fmt.Printf("DEBUG: Found %d cases with search term '%s'\n", len(cases), params.SearchTerm)
 
-	c.HTML(http.StatusOK, "cases_list.html", gin.H{
-		"title": "Cases",
-		"cases": cases,
-		"params": params,
-		"user": user,
+	SafeHTML(c, http.StatusOK, "cases_list.html", gin.H{
+		"title":       "Cases",
+		"cases":       cases,
+		"params":      params,
+		"user":        user,
+		"currentPage": "cases",
 	})
 }
 
@@ -73,7 +74,7 @@ func (h *CaseHandler) NewCaseForm(c *gin.Context) {
 	// Get available devices for new case
 	availableDevices, err := h.caseRepo.GetAvailableDevices()
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/error?code=500&message=Database Error&details=%s", err.Error()))
 		return
 	}
 	
@@ -181,7 +182,7 @@ func (h *CaseHandler) EditCaseForm(c *gin.Context) {
 	// Get available devices for case management
 	availableDevices, err := h.caseRepo.GetAvailableDevicesForCase(uint(caseID))
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/error?code=500&message=Database Error&details=%s", err.Error()))
 		return
 	}
 
@@ -294,7 +295,7 @@ func (h *CaseHandler) UpdateCase(c *gin.Context) {
 	// Get current devices in case
 	currentDevices, err := h.caseRepo.GetDevicesInCase(uint(caseID))
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/error?code=500&message=Database Error&details=%s", err.Error()))
 		return
 	}
 
@@ -367,7 +368,7 @@ func (h *CaseHandler) CaseDeviceMapping(c *gin.Context) {
 
 	deviceCases, err := h.caseRepo.GetDevicesInCase(uint(caseID))
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/error?code=500&message=Database Error&details=%s", err.Error()))
 		return
 	}
 

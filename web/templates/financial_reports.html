@@ -522,8 +522,8 @@
                 })
                 .catch(error => {
                     console.error('Error fetching report data:', error);
-                    // For demo purposes, use mock data
-                    updateReportDisplay(generateMockData(reportType), reportType);
+                    // Show error message to user
+                    updateReportDisplay({ tableData: [], chartData: null, summary: null }, reportType);
                 });
         }
 
@@ -600,36 +600,6 @@
             `;
         }
 
-        function generateMockData(reportType) {
-            // Mock data for demonstration
-            return {
-                tableData: [
-                    { period: '2025-01', revenue: '€12,500', expenses: '€3,200', profit: '€9,300', transactions: 45 },
-                    { period: '2025-02', revenue: '€15,200', expenses: '€4,100', profit: '€11,100', transactions: 52 },
-                    { period: '2025-03', revenue: '€18,750', expenses: '€4,800', profit: '€13,950', transactions: 63 }
-                ],
-                chartData: {
-                    revenue: {
-                        labels: ['Jan', 'Feb', 'Mar'],
-                        revenue: [12500, 15200, 18750],
-                        expenses: [3200, 4100, 4800]
-                    },
-                    transactionTypes: {
-                        labels: ['Rental', 'Payment', 'Fee', 'Expense'],
-                        data: [45, 32, 18, 15]
-                    },
-                    topCustomers: {
-                        labels: ['Customer A', 'Customer B', 'Customer C'],
-                        data: [15000, 12500, 8750]
-                    }
-                },
-                summary: {
-                    totalRevenue: 46450,
-                    totalTransactions: 160,
-                    averageTransaction: 290.31
-                }
-            };
-        }
 
         function generatePredefinedReport(reportType) {
             alert(`Generating ${reportType} report - feature coming soon!`);

@@ -33,9 +33,5 @@ UPDATE equipment_packages
 SET package_items = '[]' 
 WHERE package_items IS NULL OR package_items = '';
 
--- Add sample categories if packages table is empty
-INSERT IGNORE INTO equipment_packages (name, description, category, is_active, min_rental_days, created_at, updated_at, package_items)
-VALUES 
-('Audio Basic Package', 'Basic audio equipment for small events', 'audio', true, 1, NOW(), NOW(), '[]'),
-('Lighting Standard Package', 'Standard lighting setup for medium venues', 'lighting', true, 2, NOW(), NOW(), '[]'),
-('Video Production Package', 'Complete video production equipment', 'video', true, 1, NOW(), NOW(), '[]');
+-- Sample equipment packages removed for production use
+-- Create packages through the application interface as needed

@@ -38,6 +38,15 @@ type CompanySettings struct {
 	FooterText      *string `gorm:"type:text;column:footer_text" json:"footerText"`
 	PaymentTermsText *string `gorm:"type:text;column:payment_terms_text" json:"paymentTermsText"`
 	
+	// Email Settings
+	SMTPHost     *string `gorm:"column:smtp_host" json:"smtpHost"`
+	SMTPPort     *int    `gorm:"column:smtp_port" json:"smtpPort"`
+	SMTPUsername *string `gorm:"column:smtp_username" json:"smtpUsername"`
+	SMTPPassword *string `gorm:"column:smtp_password" json:"smtpPassword"`
+	SMTPFromEmail *string `gorm:"column:smtp_from_email" json:"smtpFromEmail"`
+	SMTPFromName  *string `gorm:"column:smtp_from_name" json:"smtpFromName"`
+	SMTPUseTLS    *bool   `gorm:"column:smtp_use_tls" json:"smtpUseTLS"`
+	
 	CreatedAt    time.Time `gorm:"column:created_at" json:"createdAt"`
 	UpdatedAt    time.Time `gorm:"column:updated_at" json:"updatedAt"`
 }
@@ -369,39 +378,3 @@ type InvoiceFilter struct {
 	PageSize      int        `form:"page_size" json:"pageSize"`
 }
 
-// ================================================================
-// EMAIL TEMPLATE MODELS
-// ================================================================
-
-// EmailTemplate represents customizable email templates
-type EmailTemplate struct {
-	TemplateID   uint      `gorm:"primaryKey;autoIncrement;column:template_id" json:"templateId"`
-	Name         string    `gorm:"not null;column:name" json:"name" binding:"required"`
-	Description  *string   `gorm:"column:description" json:"description"`
-	TemplateType string    `gorm:"type:enum('invoice','reminder','payment_confirmation','general');not null;default:'general';column:template_type" json:"templateType"`
-	Subject      string    `gorm:"not null;column:subject" json:"subject" binding:"required"`
-	HTMLContent  string    `gorm:"type:longtext;not null;column:html_content" json:"htmlContent" binding:"required"`
-	TextContent  *string   `gorm:"type:longtext;column:text_content" json:"textContent"`
-	IsDefault    bool      `gorm:"not null;default:false;column:is_default" json:"isDefault"`
-	IsActive     bool      `gorm:"not null;default:true;column:is_active" json:"isActive"`
-	CreatedBy    *uint     `gorm:"column:created_by" json:"createdBy"`
-	CreatedAt    time.Time `gorm:"column:created_at" json:"createdAt"`
-	UpdatedAt    time.Time `gorm:"column:updated_at" json:"updatedAt"`
-
-	// Relationships
-	Creator *User `gorm:"-" json:"creator,omitempty"`
-}
-
-func (EmailTemplate) TableName() string {
-	return "email_templates"
-}
-
-// EmailTemplateCreateRequest represents the request to create an email template
-type EmailTemplateCreateRequest struct {
-	Name         string  `json:"name" binding:"required"`
-	Description  *string `json:"description"`
-	TemplateType string  `json:"templateType" binding:"required,oneof=invoice reminder payment_confirmation general"`
-	Subject      string  `json:"subject" binding:"required"`
-	HTMLContent  string  `json:"htmlContent" binding:"required"`
-	TextContent  *string `json:"textContent"`
-}

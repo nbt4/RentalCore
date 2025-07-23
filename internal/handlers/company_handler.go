@@ -10,7 +10,9 @@ import (
 	"strings"
 	"time"
 
+	"go-barcode-webapp/internal/config"
 	"go-barcode-webapp/internal/models"
+	"go-barcode-webapp/internal/services"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -57,6 +59,7 @@ func (h *CompanyHandler) CompanySettingsForm(c *gin.Context) {
 		"user":         user,
 		"company":      company,
 		"success":      successMsg,
+		"currentPage":  "settings",
 	})
 }
 
@@ -210,6 +213,15 @@ func (h *CompanyHandler) UpdateCompanySettings(c *gin.Context) {
 	// Update invoice text fields
 	company.FooterText = h.trimStringPointer(request.FooterText)
 	company.PaymentTermsText = h.trimStringPointer(request.PaymentTermsText)
+	
+	// Update email settings
+	company.SMTPHost = h.trimStringPointer(request.SMTPHost)
+	company.SMTPPort = request.SMTPPort
+	company.SMTPUsername = h.trimStringPointer(request.SMTPUsername)
+	company.SMTPPassword = h.trimStringPointer(request.SMTPPassword)
+	company.SMTPFromEmail = h.trimStringPointer(request.SMTPFromEmail)
+	company.SMTPFromName = h.trimStringPointer(request.SMTPFromName)
+	company.SMTPUseTLS = request.SMTPUseTLS
 	
 	company.UpdatedAt = time.Now()
 
@@ -461,12 +473,31 @@ func (h *CompanyHandler) GetSMTPConfig(c *gin.Context) {
 		return
 	}
 
+	// Get company settings with email configuration
+	company, err := h.getCompanySettings()
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"success": true,
+			"config": gin.H{
+				"smtp_host":       "",
+				"smtp_port":       587,
+				"smtp_username":   "",
+				"smtp_from_email": "",
+				"smtp_from_name":  "",
+				"smtp_use_tls":    true,
+			},
+		})
+		return
+	}
+
 	// For security, we don't return the actual password
 	config := gin.H{
-		"smtp_host":     "", // These would come from config file
-		"smtp_port":     587,
-		"smtp_username": "",
-		// smtp_password is intentionally omitted for security
+		"smtp_host":       h.getStringValue(company.SMTPHost),
+		"smtp_port":       h.getIntValue(company.SMTPPort, 587),
+		"smtp_username":   h.getStringValue(company.SMTPUsername),
+		"smtp_from_email": h.getStringValue(company.SMTPFromEmail),
+		"smtp_from_name":  h.getStringValue(company.SMTPFromName),
+		"smtp_use_tls":    h.getBoolValue(company.SMTPUseTLS, true),
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -483,10 +514,13 @@ func (h *CompanyHandler) UpdateSMTPConfig(c *gin.Context) {
 	}
 
 	var request struct {
-		SMTPHost     string `json:"smtp_host" binding:"required"`
-		SMTPPort     int    `json:"smtp_port" binding:"required"`
-		SMTPUsername string `json:"smtp_username" binding:"required"`
-		SMTPPassword string `json:"smtp_password" binding:"required"`
+		SMTPHost      string `json:"smtp_host" binding:"required"`
+		SMTPPort      int    `json:"smtp_port" binding:"required"`
+		SMTPUsername  string `json:"smtp_username" binding:"required"`
+		SMTPPassword  string `json:"smtp_password"`
+		SMTPFromEmail string `json:"smtp_from_email" binding:"required"`
+		SMTPFromName  string `json:"smtp_from_name"`
+		SMTPUseTLS    bool   `json:"smtp_use_tls"`
 	}
 
 	if err := c.ShouldBindJSON(&request); err != nil {
@@ -497,13 +531,55 @@ func (h *CompanyHandler) UpdateSMTPConfig(c *gin.Context) {
 		return
 	}
 
-	// TODO: Save SMTP config to config file or database
-	// For now, we'll just return success
-	log.Printf("SMTP config update requested by user %s: %s:%d", user.Username, request.SMTPHost, request.SMTPPort)
+	// Get existing company settings or create new
+	company, err := h.getCompanySettings()
+	if err != nil {
+		company = &models.CompanySettings{
+			CompanyName: "Ihre Firma GmbH",
+			CreatedAt:   time.Now(),
+		}
+	}
+
+	// Update email settings
+	company.SMTPHost = &request.SMTPHost
+	company.SMTPPort = &request.SMTPPort
+	company.SMTPUsername = &request.SMTPUsername
+	company.SMTPFromEmail = &request.SMTPFromEmail
+	company.SMTPUseTLS = &request.SMTPUseTLS
+	
+	if request.SMTPFromName != "" {
+		company.SMTPFromName = &request.SMTPFromName
+	}
+	
+	// Only update password if provided
+	if request.SMTPPassword != "" {
+		company.SMTPPassword = &request.SMTPPassword
+	}
+	
+	company.UpdatedAt = time.Now()
+
+	// Save to database
+	var result *gorm.DB
+	if company.ID == 0 {
+		result = h.db.Create(company)
+	} else {
+		result = h.db.Save(company)
+	}
+
+	if result.Error != nil {
+		log.Printf("UpdateSMTPConfig: Database error: %v", result.Error)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to save email configuration",
+			"details": result.Error.Error(),
+		})
+		return
+	}
+
+	log.Printf("SMTP config updated successfully by user %s: %s:%d", user.Username, request.SMTPHost, request.SMTPPort)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": "SMTP configuration updated successfully",
+		"message": "Email configuration updated successfully",
 	})
 }
 
@@ -514,12 +590,74 @@ func (h *CompanyHandler) TestSMTPConnection(c *gin.Context) {
 		return
 	}
 
-	// TODO: Implement actual SMTP connection test
-	// For now, we'll simulate a test
-	log.Printf("SMTP connection test requested by user %s", user.Username)
+	// Get company settings with email configuration
+	company, err := h.getCompanySettings()
+	if err != nil || company.SMTPHost == nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Email configuration not found. Please configure email settings first.",
+		})
+		return
+	}
+
+	// Test email configuration by sending a test email
+	testEmail := c.Query("test_email")
+	if testEmail == "" {
+		testEmail = user.Email
+	}
+
+	// Create email configuration from company settings
+	emailConfig := &config.EmailConfig{
+		SMTPHost:     h.getStringValue(company.SMTPHost),
+		SMTPPort:     h.getIntValue(company.SMTPPort, 587),
+		SMTPUsername: h.getStringValue(company.SMTPUsername),
+		SMTPPassword: h.getStringValue(company.SMTPPassword),
+		FromEmail:    h.getStringValue(company.SMTPFromEmail),
+		FromName:     h.getStringValue(company.SMTPFromName),
+		UseTLS:       h.getBoolValue(company.SMTPUseTLS, true),
+	}
+
+	// Create email service and send test email
+	emailService := services.NewEmailService(emailConfig)
+	testData := &services.EmailData{
+		Company: company,
+	}
+
+	err = emailService.SendTestEmail(testEmail, testData)
+	if err != nil {
+		log.Printf("TestSMTPConnection: Failed to send test email: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "Failed to send test email",
+			"details": err.Error(),
+		})
+		return
+	}
+
+	log.Printf("SMTP connection test successful by user %s, test email sent to %s", user.Username, testEmail)
 
 	c.JSON(http.StatusOK, gin.H{
 		"success": true,
-		"message": "SMTP connection test successful",
+		"message": fmt.Sprintf("Test email sent successfully to %s", testEmail),
 	})
+}
+
+// Helper methods for safe pointer access
+func (h *CompanyHandler) getStringValue(ptr *string) string {
+	if ptr == nil {
+		return ""
+	}
+	return *ptr
+}
+
+func (h *CompanyHandler) getIntValue(ptr *int, defaultValue int) int {
+	if ptr == nil {
+		return defaultValue
+	}
+	return *ptr
+}
+
+func (h *CompanyHandler) getBoolValue(ptr *bool, defaultValue bool) bool {
+	if ptr == nil {
+		return defaultValue
+	}
+	return *ptr
 }

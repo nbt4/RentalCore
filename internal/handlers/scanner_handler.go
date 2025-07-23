@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"time"
 
 	"go-barcode-webapp/internal/models"
 	"go-barcode-webapp/internal/repository"
@@ -40,7 +41,7 @@ func (h *ScannerHandler) ScanJobSelection(c *gin.Context) {
 	// Get all jobs first
 	allJobs, err := h.jobRepo.List(&models.FilterParams{})
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/error?code=500&message=Database Error&details=%s", err.Error()))
 		return
 	}
 	
@@ -52,29 +53,30 @@ func (h *ScannerHandler) ScanJobSelection(c *gin.Context) {
 		}
 	}
 
-	// Get device statistics for the dashboard
-	totalDevices, err := h.deviceRepo.List(&models.FilterParams{})
+	// Get available device count for today
+	today := time.Now()
+	availableCount, err := h.deviceRepo.CountAvailableDevicesForDate(today)
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/error?code=500&message=Database Error&details=%s", err.Error()))
 		return
 	}
 
-	// Count available devices (status = 'free')
-	availableCount := 0
-	assignedCount := 0
-	for _, device := range totalDevices {
-		if device.Status == "free" {
-			availableCount++
-		} else {
-			assignedCount++
-		}
+	// Get total device count for calculation
+	totalDeviceCount, err := h.deviceRepo.GetTotalDeviceCount()
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/error?code=500&message=Database Error&details=%s", err.Error()))
+		return
 	}
+	
+	// Use the actual count of devices assigned to jobs, not the calculated difference
+	assignedCount, _ := h.deviceRepo.CountDevicesAssignedToJobs(today)
 
-	c.HTML(http.StatusOK, "scan_select_job.html", gin.H{
+	SafeHTML(c, http.StatusOK, "scan_select_job.html", gin.H{
 		"title":           "Select Job for Scanning",
 		"jobs":            jobs,
 		"totalDevices":    availableCount,
 		"assignedDevices": assignedCount,
+		"totalDeviceCount": totalDeviceCount,
 		"user":            user,
 	})
 }
@@ -84,20 +86,20 @@ func (h *ScannerHandler) ScanJob(c *gin.Context) {
 	
 	jobID, err := strconv.ParseUint(c.Param("jobId"), 10, 32)
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"error": "Invalid job ID", "user": user})
+		c.Redirect(http.StatusSeeOther, "/error?code=400&message=Bad Request&details=Invalid job ID")
 		return
 	}
 
 	job, err := h.jobRepo.GetByID(uint(jobID))
 	if err != nil {
-		c.HTML(http.StatusNotFound, "error.html", gin.H{"error": "Job not found", "user": user})
+		c.Redirect(http.StatusSeeOther, "/error?code=404&message=Job Not Found&details=Job not found")
 		return
 	}
 
 	// Get assigned devices for this job
 	assignedDevices, err := h.jobRepo.GetJobDevices(uint(jobID))
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"error": err.Error(), "user": user})
+		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/error?code=500&message=Database Error&details=%s", err.Error()))
 		return
 	}
 
@@ -120,6 +122,7 @@ func (h *ScannerHandler) ScanJob(c *gin.Context) {
 			}
 		}
 		productGroups[productName].Devices = append(productGroups[productName].Devices, jd)
+		productGroups[productName].Count = len(productGroups[productName].Devices)
 	}
 
 	// Get available cases for case scanning functionality
@@ -172,12 +175,46 @@ func (h *ScannerHandler) ScanDevice(c *gin.Context) {
 		}
 	}
 
-	// Check if device is available (status should be 'free')
-	if device.Status != "free" {
-		c.JSON(http.StatusConflict, gin.H{
-			"error":  "Device is not available",
-			"device": device,
-		})
+	// Get job details to check date range
+	job, err := h.jobRepo.GetByID(req.JobID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Job not found"})
+		return
+	}
+
+	// Check if device is available for this job's date range
+	isAvailable, conflictingAssignment, err := h.deviceRepo.IsDeviceAvailableForJob(device.DeviceID, req.JobID, job.StartDate, job.EndDate)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check device availability"})
+		return
+	}
+
+	if !isAvailable {
+		if conflictingAssignment != nil {
+			// Get conflicting job details for error message
+			conflictingJob, _ := h.jobRepo.GetByID(conflictingAssignment.JobID)
+			if conflictingJob != nil && conflictingAssignment.JobID == req.JobID {
+				c.JSON(http.StatusConflict, gin.H{
+					"error": fmt.Sprintf("Device is already assigned to this job #%d", req.JobID),
+				})
+			} else if conflictingJob != nil {
+				c.JSON(http.StatusConflict, gin.H{
+					"error": fmt.Sprintf("Device is already assigned to job #%d from %s to %s", 
+						conflictingAssignment.JobID,
+						conflictingJob.StartDate.Format("2006-01-02"),
+						conflictingJob.EndDate.Format("2006-01-02")),
+				})
+			} else {
+				c.JSON(http.StatusConflict, gin.H{
+					"error": fmt.Sprintf("Device is already assigned to job #%d", conflictingAssignment.JobID),
+				})
+			}
+		} else {
+			c.JSON(http.StatusConflict, gin.H{
+				"error":  "Device is not available",
+				"device": device,
+			})
+		}
 		return
 	}
 
@@ -217,6 +254,57 @@ func (h *ScannerHandler) RemoveDevice(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Device removed from job successfully"})
+}
+
+type BulkRemoveRequest struct {
+	DeviceIDs []string `json:"device_ids" binding:"required"`
+}
+
+func (h *ScannerHandler) BulkRemoveDevices(c *gin.Context) {
+	jobID, err := strconv.ParseUint(c.Param("id"), 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid job ID"})
+		return
+	}
+
+	var req BulkRemoveRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if len(req.DeviceIDs) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No device IDs provided"})
+		return
+	}
+
+	var successCount, errorCount int
+	var errors []string
+
+	for _, deviceID := range req.DeviceIDs {
+		if err := h.jobRepo.RemoveDevice(uint(jobID), deviceID); err != nil {
+			errorCount++
+			errors = append(errors, fmt.Sprintf("Failed to remove %s: %s", deviceID, err.Error()))
+		} else {
+			successCount++
+		}
+	}
+
+	result := gin.H{
+		"message":       fmt.Sprintf("Bulk removal completed: %d succeeded, %d failed", successCount, errorCount),
+		"success_count": successCount,
+		"error_count":   errorCount,
+	}
+
+	if len(errors) > 0 {
+		result["errors"] = errors
+	}
+
+	if errorCount > 0 && successCount == 0 {
+		c.JSON(http.StatusInternalServerError, result)
+	} else {
+		c.JSON(http.StatusOK, result)
+	}
 }
 
 func (h *ScannerHandler) ScanCase(c *gin.Context) {

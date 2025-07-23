@@ -296,20 +296,20 @@ func (h *InvoiceTemplateHandler) PreviewTemplate(c *gin.Context) {
 		return
 	}
 
-	// Get sample company and invoice data for preview
+	// Get company settings or use placeholder for preview
 	company, err := h.invoiceRepo.GetCompanySettings()
 	if err != nil {
 		log.Printf("PreviewTemplate: Error fetching company settings: %v", err)
-		addressLine1 := "Musterstraße 123"
-		postalCode := "12345"
-		city := "Musterstadt"
-		phone := "+49 123 456789"
-		email := "info@sample-company.de"
-		taxNumber := "123/456/78901"
-		vatNumber := "DE123456789"
+		addressLine1 := "[Company Address]"
+		postalCode := "[ZIP]"
+		city := "[City]"
+		phone := "[Phone Number]"
+		email := "[Email Address]"
+		taxNumber := "[Tax Number]"
+		vatNumber := "[VAT Number]"
 		
 		company = &models.CompanySettings{
-			CompanyName:  "Sample Company GmbH",
+			CompanyName:  "[Your Company Name]",
 			AddressLine1: &addressLine1,
 			PostalCode:   &postalCode,
 			City:         &city,
@@ -320,19 +320,19 @@ func (h *InvoiceTemplateHandler) PreviewTemplate(c *gin.Context) {
 		}
 	}
 
-	// Create sample invoice data
-	customerStreet := "Kundenstraße"
-	customerHouseNumber := "456"
-	customerZIP := "54321"
-	customerCity := "Kundenstadt"
-	customerFirstName := "Max"
-	customerLastName := "Mustermann"
-	customerEmail := "max@mustermann.de"
-	customerPhone := "+49 555 123456"
-	customerCompanyName := "Max Mustermann GmbH"
+	// Create placeholder invoice data for preview
+	customerStreet := "[Customer Street]"
+	customerHouseNumber := "[No.]"
+	customerZIP := "[ZIP]"
+	customerCity := "[Customer City]"
+	customerFirstName := "[First Name]"
+	customerLastName := "[Last Name]"
+	customerEmail := "[customer@email.com]"
+	customerPhone := "[Phone Number]"
+	customerCompanyName := "[Customer Company Name]"
 	
 	sampleInvoice := &models.Invoice{
-		InvoiceNumber: "INV-2024-SAMPLE",
+		InvoiceNumber: "INV-PREVIEW-001",
 		IssueDate:     time.Now(),
 		DueDate:       time.Now().AddDate(0, 0, 30),
 		Subtotal:      100.00,
@@ -351,7 +351,7 @@ func (h *InvoiceTemplateHandler) PreviewTemplate(c *gin.Context) {
 		},
 		LineItems: []models.InvoiceLineItem{
 			{
-				Description: "Sample Product Rental",
+				Description: "[Product/Service Description]",
 				Quantity:    1,
 				UnitPrice:   100.00,
 				TotalPrice:  100.00,

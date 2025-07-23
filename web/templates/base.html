@@ -65,8 +65,6 @@
                             <div class="rc-dropdown-header">
                                 <i class="bi bi-folder"></i> Management
                             </div>
-                            <a href="/workflow/templates" class="rc-dropdown-item">
-                                <i class="bi bi-file-earmark-text"></i> Job Templates
                             </a>
                             <a href="/workflow/packages" class="rc-dropdown-item">
                                 <i class="bi bi-box-seam"></i> Equipment Packages
@@ -107,15 +105,15 @@
                             <a href="/settings/company" class="rc-dropdown-item">
                                 <i class="bi bi-building-gear"></i> Company Settings
                             </a>
-                            <a href="/settings/email-templates" class="rc-dropdown-item">
-                                <i class="bi bi-envelope-gear"></i> E-Mail Templates
-                            </a>
                             <hr class="rc-dropdown-divider">
                             <div class="rc-dropdown-header">System</div>
                             <a href="/users" class="rc-dropdown-item">
                                 <i class="bi bi-people-fill"></i> User Management
                             </a>
-                            <a href="/security" class="rc-dropdown-item">
+                            <a href="/security/roles" class="rc-dropdown-item">
+                                <i class="bi bi-person-badge"></i> Role Management
+                            </a>
+                            <a href="/security/audit" class="rc-dropdown-item">
                                 <i class="bi bi-shield-check"></i> Security & Audit
                             </a>
                             <hr class="rc-dropdown-divider">
@@ -191,11 +189,14 @@
         });
         
         // Service Worker registration
+        // TEMPORARILY DISABLED FOR DEBUGGING - SERVICE WORKER CACHING ISSUE
+        /*
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/static/sw.js')
                 .then(registration => console.log('SW registered:', registration))
                 .catch(error => console.log('SW registration failed:', error));
         }
+        */
         
         // Enhanced form submissions
         document.addEventListener('submit', function(e) {

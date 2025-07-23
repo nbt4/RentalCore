@@ -42,13 +42,13 @@ func main() {
 	if err != nil {
 		log.Printf("Failed to load config, using defaults: %v", err)
 		cfg = &config.Config{}
-		cfg.Database.Host = "localhost"
+		cfg.Database.Host = "tsunami-events.de"
 		cfg.Database.Port = 3306
-		cfg.Database.Database = "jobscanner"
-		cfg.Database.Username = "root"
-		cfg.Database.Password = ""
+		cfg.Database.Database = "TS-Lager"
+		cfg.Database.Username = "tsweb"
+		cfg.Database.Password = "N1KO4cCYnp3Tyf"
 		cfg.Database.PoolSize = 5
-		cfg.Server.Host = "localhost"
+		cfg.Server.Host = "0.0.0.0"
 		cfg.Server.Port = 8080
 	}
 
@@ -128,7 +128,6 @@ func main() {
 	productRepo := repository.NewProductRepository(db)
 	jobCategoryRepo := repository.NewJobCategoryRepository(db)
 	caseRepo := repository.NewCaseRepository(db)
-	jobTemplateRepo := repository.NewJobTemplateRepository(db)
 	equipmentPackageRepo := repository.NewEquipmentPackageRepository(db)
 	invoiceRepo := repository.NewInvoiceRepositoryNew(db) // Using NEW fixed repository
 
@@ -156,14 +155,14 @@ func main() {
 	analyticsHandler := handlers.NewAnalyticsHandler(db.DB)
 	searchHandler := handlers.NewSearchHandler(db.DB)
 	pwaHandler := handlers.NewPWAHandler(db.DB)
-	workflowHandler := handlers.NewWorkflowHandler(jobTemplateRepo, jobRepo, customerRepo, equipmentPackageRepo, deviceRepo, db.DB, barcodeService)
+	workflowHandler := handlers.NewWorkflowHandler(jobRepo, customerRepo, equipmentPackageRepo, deviceRepo, db.DB, barcodeService)
+	equipmentPackageHandler := handlers.NewEquipmentPackageHandler(equipmentPackageRepo, deviceRepo)
 	documentHandler := handlers.NewDocumentHandler(db.DB)
 	financialHandler := handlers.NewFinancialHandler(db.DB)
 	securityHandler := handlers.NewSecurityHandler(db.DB)
 	invoiceHandler := handlers.NewInvoiceHandlerNew(invoiceRepo, customerRepo, jobRepo, deviceRepo, equipmentPackageRepo, productRepo, &cfg.PDF)
 	templateHandler := handlers.NewInvoiceTemplateHandler(invoiceRepo)
 	companyHandler := handlers.NewCompanyHandler(db.DB)
-	emailTemplateHandler := handlers.NewEmailTemplateHandler(db.DB)
 	monitoringHandler := handlers.NewMonitoringHandler(db.DB, monitoring.GlobalErrorTracker, perfMonitor, cacheManager)
 
 	// Create default invoice template if none exists
@@ -295,6 +294,68 @@ func main() {
 				return fmt.Sprintf("%d days ago", days)
 			}
 		},
+		"formatDate": func(t time.Time) string {
+			return t.Format("2006-01-02 15:04")
+		},
+		"substr": func(s string, start, end int) string {
+			if len(s) == 0 {
+				return ""
+			}
+			if start >= len(s) {
+				return ""
+			}
+			if end > len(s) {
+				end = len(s)
+			}
+			if start < 0 {
+				start = 0
+			}
+			return s[start:end]
+		},
+		"mul": func(a, b interface{}) float64 {
+			var aVal, bVal float64
+			switch v := a.(type) {
+			case float64:
+				aVal = v
+			case *float64:
+				if v != nil {
+					aVal = *v
+				}
+			case int:
+				aVal = float64(v)
+			case uint:
+				aVal = float64(v)
+			}
+			switch v := b.(type) {
+			case float64:
+				bVal = v
+			case *float64:
+				if v != nil {
+					bVal = *v
+				}
+			case int:
+				bVal = float64(v)
+			case uint:
+				bVal = float64(v)
+			}
+			return aVal * bVal
+		},
+		"eq": func(a, b interface{}) bool {
+			return a == b
+		},
+		"gt": func(a, b int) bool {
+			return a > b
+		},
+		"len": func(slice interface{}) int {
+			switch v := slice.(type) {
+			case []interface{}:
+				return len(v)
+			case string:
+				return len(v)
+			default:
+				return 0
+			}
+		},
 	}
 	r.SetFuncMap(funcMap)
 	r.LoadHTMLGlob("web/templates/*")
@@ -329,7 +390,26 @@ func main() {
 	}
 
 	// Routes
-	setupRoutes(r, jobHandler, deviceHandler, customerHandler, statusHandler, productHandler, barcodeHandler, scannerHandler, authHandler, homeHandler, caseHandler, analyticsHandler, searchHandler, pwaHandler, workflowHandler, documentHandler, financialHandler, securityHandler, invoiceHandler, templateHandler, companyHandler, emailTemplateHandler, monitoringHandler, complianceMiddleware)
+	setupRoutes(r, jobHandler, deviceHandler, customerHandler, statusHandler, productHandler, barcodeHandler, scannerHandler, authHandler, homeHandler, caseHandler, analyticsHandler, searchHandler, pwaHandler, workflowHandler, equipmentPackageHandler, documentHandler, financialHandler, securityHandler, invoiceHandler, templateHandler, companyHandler, monitoringHandler, complianceMiddleware)
+	
+	// Add dedicated error route
+	r.GET("/error", func(c *gin.Context) {
+		code := c.DefaultQuery("code", "500")
+		message := c.DefaultQuery("message", "Internal Server Error")
+		details := c.DefaultQuery("details", "Something went wrong on the server")
+		
+		// Convert code to integer for template comparison
+		codeInt, _ := strconv.Atoi(code)
+		
+		c.HTML(http.StatusOK, "error_page.html", gin.H{
+			"error_code":    codeInt,
+			"error_message": message,
+			"error_details": details,
+			"request_id":    c.GetHeader("X-Request-Id"),
+			"timestamp":     time.Now().Format("2006-01-02 15:04:05"),
+			"user":          nil,
+		})
+	})
 	
 	// Add 404 handler as the last route
 	r.NoRoute(handlers.NotFoundHandler())
@@ -379,13 +459,13 @@ func setupRoutes(r *gin.Engine,
 	searchHandler *handlers.SearchHandler,
 	pwaHandler *handlers.PWAHandler,
 	workflowHandler *handlers.WorkflowHandler,
+	equipmentPackageHandler *handlers.EquipmentPackageHandler,
 	documentHandler *handlers.DocumentHandler,
 	financialHandler *handlers.FinancialHandler,
 	securityHandler *handlers.SecurityHandler,
 	invoiceHandler *handlers.InvoiceHandlerNew,
 	templateHandler *handlers.InvoiceTemplateHandler,
 	companyHandler *handlers.CompanyHandler,
-	emailTemplateHandler *handlers.EmailTemplateHandler,
 	monitoringHandler *handlers.MonitoringHandler,
 	complianceMiddleware *compliance.ComplianceMiddleware) {
 
@@ -463,6 +543,7 @@ func setupRoutes(r *gin.Engine,
 			devices.GET("/:id/stats", deviceHandler.GetDeviceStatsAPI)
 			devices.GET("/available", deviceHandler.GetAvailableDevices)
 		}
+
 
 		// Customer routes
 		customers := protected.Group("/customers")
@@ -553,27 +634,16 @@ func setupRoutes(r *gin.Engine,
 		// Workflow routes
 		workflow := protected.Group("/workflow")
 		{
-			// Job Templates
-			jobTemplates := workflow.Group("/templates")
-			{
-				jobTemplates.GET("", workflowHandler.ListJobTemplates)
-				jobTemplates.GET("/new", workflowHandler.NewJobTemplateForm)
-				jobTemplates.POST("", workflowHandler.CreateJobTemplate)
-				jobTemplates.GET("/:id", workflowHandler.GetJobTemplate)
-				jobTemplates.GET("/:id/edit", workflowHandler.EditJobTemplateForm)
-				jobTemplates.PUT("/:id", workflowHandler.UpdateJobTemplate)
-				jobTemplates.DELETE("/:id", workflowHandler.DeleteJobTemplate)
-				jobTemplates.POST("/:id/create-job", workflowHandler.CreateJobFromTemplate)
-			}
-
 			// Equipment Packages
 			packages := workflow.Group("/packages")
 			{
-				packages.GET("", workflowHandler.ListEquipmentPackages)
-				packages.GET("/new", workflowHandler.NewEquipmentPackageForm)
-				packages.GET("/debug", workflowHandler.DebugPackageForm)
-				packages.POST("", workflowHandler.CreateEquipmentPackage)
-				packages.GET("/:id", workflowHandler.GetEquipmentPackage)
+				packages.GET("", equipmentPackageHandler.ShowPackagesList)
+				packages.GET("/new", equipmentPackageHandler.ShowPackageForm)
+				packages.GET("/:id", equipmentPackageHandler.ShowPackageDetail)
+				packages.GET("/:id/edit", equipmentPackageHandler.ShowPackageForm)
+				packages.POST("", equipmentPackageHandler.CreatePackage)
+				packages.PUT("/:id", equipmentPackageHandler.UpdatePackage)
+				packages.DELETE("/:id", equipmentPackageHandler.DeletePackage)
 			}
 
 			// Bulk Operations
@@ -672,20 +742,6 @@ func setupRoutes(r *gin.Engine,
 			settings.POST("/company/logo", companyHandler.UploadCompanyLogo)
 			settings.DELETE("/company/logo", companyHandler.DeleteCompanyLogo)
 			
-			// Email Template Management
-			emailTemplates := settings.Group("/email-templates")
-			{
-				emailTemplates.GET("", emailTemplateHandler.ListEmailTemplates)
-				emailTemplates.GET("/new", emailTemplateHandler.NewEmailTemplateForm)
-				emailTemplates.POST("", emailTemplateHandler.CreateEmailTemplate)
-				emailTemplates.GET("/:id", emailTemplateHandler.GetEmailTemplate)
-				emailTemplates.GET("/:id/edit", emailTemplateHandler.EditEmailTemplateForm)
-				emailTemplates.PUT("/:id", emailTemplateHandler.UpdateEmailTemplate)
-				emailTemplates.DELETE("/:id", emailTemplateHandler.DeleteEmailTemplate)
-				emailTemplates.GET("/:id/preview", emailTemplateHandler.PreviewEmailTemplate)
-				emailTemplates.POST("/:id/set-default", emailTemplateHandler.SetDefaultEmailTemplate)
-				emailTemplates.POST("/:id/test", emailTemplateHandler.TestEmailTemplate)
-			}
 		}
 
 		// Security & Admin routes
@@ -694,16 +750,18 @@ func setupRoutes(r *gin.Engine,
 			// Web interface routes
 			security.GET("/roles", func(c *gin.Context) {
 				user, _ := handlers.GetCurrentUser(c)
-				c.HTML(http.StatusOK, "security_roles.html", gin.H{
-					"title": "Role Management",
-					"user":  user,
+				c.HTML(http.StatusOK, "security_roles_standalone.html", gin.H{
+					"title":       "Role Management",
+					"user":        user,
+					"currentPage": "security",
 				})
 			})
 			security.GET("/audit", func(c *gin.Context) {
 				user, _ := handlers.GetCurrentUser(c)
 				c.HTML(http.StatusOK, "security_audit.html", gin.H{
-					"title": "Audit Logs",
-					"user":  user,
+					"title":       "Audit Logs",
+					"user":        user,
+					"currentPage": "security",
 				})
 			})
 
@@ -793,13 +851,14 @@ func setupRoutes(r *gin.Engine,
 			})
 		})
 
-		// Profile Settings routes
+		// Profile Settings routes (moved to end to avoid potential conflicts)
 		profile := protected.Group("/profile")
 		{
 			profile.GET("/settings", authHandler.ProfileSettingsForm)
 			profile.POST("/settings", authHandler.UpdateProfileSettings)
 			profile.GET("/preferences", authHandler.GetUserPreferences)
 		}
+		
 
 		// User Management - Use explicit routing without parameter conflicts
 		
@@ -832,6 +891,7 @@ func setupRoutes(r *gin.Engine,
 				apiJobs.DELETE("/:id", jobHandler.DeleteJobAPI)
 				apiJobs.POST("/:id/devices/:deviceId", jobHandler.AssignDeviceAPI)
 				apiJobs.DELETE("/:id/devices/:deviceId", jobHandler.RemoveDeviceAPI)
+				apiJobs.DELETE("/:id/devices/bulk-remove", scannerHandler.BulkRemoveDevices)
 				apiJobs.POST("/:id/bulk-scan", jobHandler.BulkScanDevicesAPI)
 				
 				// Scanner API endpoints
@@ -849,6 +909,7 @@ func setupRoutes(r *gin.Engine,
 				apiDevices.DELETE("/:id", deviceHandler.DeleteDeviceAPI)
 				apiDevices.GET("/available", deviceHandler.GetAvailableDevicesAPI)
 			}
+
 
 			// Customer API
 			apiCustomers := api.Group("/customers")
@@ -876,17 +937,22 @@ func setupRoutes(r *gin.Engine,
 			// Workflow API
 			apiWorkflow := api.Group("/workflow")
 			{
-				// Job Templates API
-				apiJobTemplates := apiWorkflow.Group("/templates")
+				// Equipment Packages API
+				apiPackages := apiWorkflow.Group("/packages")
 				{
-					apiJobTemplates.GET("", workflowHandler.ListJobTemplatesAPI)
-					apiJobTemplates.POST("", workflowHandler.CreateJobTemplate)
-					apiJobTemplates.GET("/most-used", workflowHandler.GetMostUsedTemplatesAPI)
-					apiJobTemplates.GET("/category/:categoryId", workflowHandler.GetTemplatesByCategoryAPI)
-					apiJobTemplates.GET("/:id", workflowHandler.GetJobTemplate)
-					apiJobTemplates.PUT("/:id", workflowHandler.UpdateJobTemplate)
-					apiJobTemplates.DELETE("/:id", workflowHandler.DeleteJobTemplate)
-					apiJobTemplates.POST("/:id/create-job", workflowHandler.CreateJobFromTemplate)
+					apiPackages.GET("", equipmentPackageHandler.GetPackages)
+					apiPackages.POST("", equipmentPackageHandler.CreatePackage)
+					apiPackages.GET("/:id", equipmentPackageHandler.GetPackage)
+					apiPackages.PUT("/:id", equipmentPackageHandler.UpdatePackage)
+					apiPackages.DELETE("/:id", equipmentPackageHandler.DeletePackage)
+					apiPackages.POST("/:id/clone", equipmentPackageHandler.ClonePackage)
+					apiPackages.GET("/:id/validate", equipmentPackageHandler.ValidatePackage)
+					apiPackages.GET("/:id/stats", equipmentPackageHandler.GetPackageStats)
+					apiPackages.GET("/search", equipmentPackageHandler.SearchPackages)
+					apiPackages.GET("/categories", equipmentPackageHandler.GetPackageCategories)
+					apiPackages.GET("/popular", equipmentPackageHandler.GetPopularPackages)
+					apiPackages.GET("/available-devices", equipmentPackageHandler.GetAvailableDevices)
+					apiPackages.PUT("/bulk", equipmentPackageHandler.BulkUpdatePackages)
 				}
 			}
 
@@ -978,7 +1044,7 @@ func setupRoutes(r *gin.Engine,
 			// Will be re-implemented in new system when needed
 			// legacyAPI.POST("/test-email", invoiceHandler.TestEmailSettings)
 
-			// Security API
+			// Security API - Legacy routes kept for backward compatibility with frontend
 			apiSecurity := legacyAPI.Group("/security")
 			{
 				// Roles API
@@ -1000,7 +1066,8 @@ func setupRoutes(r *gin.Engine,
 
 				// Permissions API
 				apiSecurity.GET("/permissions", securityHandler.GetPermissions)
-				apiSecurity.GET("/check-permission", securityHandler.CheckPermission)
+				apiSecurity.GET("/permissions/definitions", securityHandler.GetPermissionDefinitionsAPI)
+				apiSecurity.GET("/permissions/check", securityHandler.CheckPermission)
 			}
 		}
 	}

@@ -1,9 +1,11 @@
 package repository
 
 import (
-	"sort"
-	"time"
+	"fmt"
 	"log"
+	"runtime/debug"
+	"strings"
+	"time"
 	"go-barcode-webapp/internal/models"
 )
 
@@ -16,12 +18,40 @@ func NewDeviceRepository(db *Database) *DeviceRepository {
 }
 
 func (r *DeviceRepository) Create(device *models.Device) error {
+	log.Printf("🚨 DEVICE CREATION: Creating device %s with productID %v", device.DeviceID, device.ProductID)
+	log.Printf("🚨 DEVICE CREATION: Stack trace: %s", string(debug.Stack()))
+	
+	// Check if this is being called during package operations
+	stackTrace := string(debug.Stack())
+	if strings.Contains(stackTrace, "equipment_package") || strings.Contains(stackTrace, "UpdateDeviceAssociations") || strings.Contains(stackTrace, "package") {
+		log.Printf("❌ DEVICE CREATION: Blocked device creation during package operations")
+		return fmt.Errorf("device creation blocked during package operations - device %s does not exist", device.DeviceID)
+	}
+	
+	// Generate device ID if not provided
+	if device.DeviceID == "" {
+		generatedID, err := r.generateDeviceID(device)
+		if err != nil {
+			log.Printf("❌ DEVICE CREATION: Failed to generate device ID: %v", err)
+			return fmt.Errorf("failed to generate device ID: %v", err)
+		}
+		device.DeviceID = generatedID
+		log.Printf("✅ DEVICE CREATION: Generated device ID: %s", device.DeviceID)
+	}
+	
 	return r.db.Create(device).Error
 }
 
 func (r *DeviceRepository) GetByID(deviceID string) (*models.Device, error) {
 	var device models.Device
-	err := r.db.Where("deviceID = ?", deviceID).Preload("Product").First(&device).Error
+	err := r.db.Where("deviceID = ?", deviceID).
+		Preload("Product").
+		Preload("Product.Category").
+		Preload("Product.Subcategory").
+		Preload("Product.Subbiercategory").
+		Preload("Product.Brand").
+		Preload("Product.Manufacturer").
+		First(&device).Error
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +60,14 @@ func (r *DeviceRepository) GetByID(deviceID string) (*models.Device, error) {
 
 func (r *DeviceRepository) GetBySerialNo(serialNo string) (*models.Device, error) {
 	var device models.Device
-	err := r.db.Where("serialnumber = ?", serialNo).Preload("Product").First(&device).Error
+	err := r.db.Where("serialnumber = ?", serialNo).
+		Preload("Product").
+		Preload("Product.Category").
+		Preload("Product.Subcategory").
+		Preload("Product.Subbiercategory").
+		Preload("Product.Brand").
+		Preload("Product.Manufacturer").
+		First(&device).Error
 	if err != nil {
 		return nil, err
 	}
@@ -42,7 +79,14 @@ func (r *DeviceRepository) Update(device *models.Device) error {
 }
 
 func (r *DeviceRepository) Delete(deviceID string) error {
-	return r.db.Where("deviceID = ?", deviceID).Delete(&models.Device{}).Error
+	log.Printf("🗑️ DEVICE DELETION: Deleting device %s", deviceID)
+	err := r.db.Where("deviceID = ?", deviceID).Delete(&models.Device{}).Error
+	if err != nil {
+		log.Printf("❌ DEVICE DELETION: Failed to delete device %s: %v", deviceID, err)
+	} else {
+		log.Printf("✅ DEVICE DELETION: Successfully deleted device %s", deviceID)
+	}
+	return err
 }
 
 func (r *DeviceRepository) List(params *models.FilterParams) ([]models.DeviceWithJobInfo, error) {
@@ -54,7 +98,7 @@ func (r *DeviceRepository) List(params *models.FilterParams) ([]models.DeviceWit
 	// Set default pagination if not provided
 	limit := params.Limit
 	if limit <= 0 {
-		limit = 20 // Reduce default to 20 items per page for better performance
+		limit = 20 // Default devices per page
 	}
 	
 	offset := params.Offset
@@ -65,15 +109,15 @@ func (r *DeviceRepository) List(params *models.FilterParams) ([]models.DeviceWit
 	// Simple query without complex joins for better performance
 	query := r.db.Model(&models.Device{})
 	
-	// Only preload Product if we actually need it
+	// Always preload Product with Category for proper display
 	if params.SearchTerm != "" {
 		searchPattern := "%" + params.SearchTerm + "%"
-		query = query.Preload("Product").
+		query = query.Preload("Product").Preload("Product.Category").
 			Joins("LEFT JOIN products ON products.productID = devices.productID").
 			Where("devices.deviceID LIKE ? OR devices.serialnumber LIKE ? OR products.name LIKE ?", searchPattern, searchPattern, searchPattern)
 	} else {
-		// For normal list view, we don't need full product details
-		query = query.Preload("Product")
+		// For normal list view, preload Product with Category
+		query = query.Preload("Product").Preload("Product.Category")
 	}
 
 	query = query.Limit(limit).Offset(offset).Order("deviceID DESC")
@@ -87,7 +131,7 @@ func (r *DeviceRepository) List(params *models.FilterParams) ([]models.DeviceWit
 		log.Printf("❌ Device query error: %v", err)
 		return nil, err
 	}
-
+	
 	// Skip job assignment check for better performance - we can add it back later if needed
 	var result []models.DeviceWithJobInfo
 	for _, device := range devices {
@@ -126,6 +170,21 @@ func (r *DeviceRepository) ListWithCategories(params *models.FilterParams) ([]mo
 	if params.Category != "" {
 		query = query.Joins("JOIN categories ON categories.categoryID = products.categoryID").
 			Where("categories.name = ?", params.Category)
+	}
+
+	// Status filter
+	if params.Status != "" {
+		query = query.Where("devices.status = ?", params.Status)
+	}
+
+	// Filter devices not in any case (for case assignment)
+	if params.AssignmentStatus == "not_in_case" {
+		query = query.Where("devices.deviceID NOT IN (SELECT DISTINCT deviceID FROM devicecases WHERE removedAt IS NULL)")
+	}
+
+	// Available filter (devices not in any case and with free status)
+	if params.Available != nil && *params.Available {
+		query = query.Where("devices.status = 'free' AND devices.deviceID NOT IN (SELECT DISTINCT deviceID FROM devicecases WHERE removedAt IS NULL)")
 	}
 
 	if params.Limit > 0 {
@@ -201,168 +260,6 @@ func (r *DeviceRepository) GetAvailableDevicesForCaseManagement() ([]models.Devi
 	return devices, err
 }
 
-func (r *DeviceRepository) GetDevicesGroupedByCategory(params *models.FilterParams) (*models.CategorizedDevicesResponse, error) {
-	var devices []models.Device
-	
-	// Set default pagination if not provided
-	limit := params.Limit
-	if limit <= 0 {
-		limit = 100 // Default to 100 items for categorized view
-	}
-	
-	offset := params.Offset
-	if offset < 0 {
-		offset = 0
-	}
-
-	query := r.db.Model(&models.Device{}).
-		Preload("Product").
-		Preload("Product.Category").
-		Preload("Product.Subcategory").
-		Preload("Product.Brand").
-		Preload("Product.Manufacturer")
-
-	if params.SearchTerm != "" {
-		searchPattern := "%" + params.SearchTerm + "%"
-		query = query.Joins("LEFT JOIN products ON products.productID = devices.productID").
-			Where("devices.deviceID LIKE ? OR devices.serialnumber LIKE ? OR products.name LIKE ?", searchPattern, searchPattern, searchPattern)
-	}
-
-	query = query.Limit(limit).Offset(offset).Order("deviceID DESC")
-
-	err := query.Find(&devices).Error
-	if err != nil {
-		return nil, err
-	}
-
-	// --- Performance Optimization ---
-	// 1. Get all device IDs from the current list
-	deviceIDs := make([]string, len(devices))
-	for i, d := range devices {
-		deviceIDs[i] = d.DeviceID
-	}
-
-	// 2. Fetch all relevant job assignments in a single query
-	var jobDevices []models.JobDevice
-	if len(deviceIDs) > 0 {
-		r.db.Where("deviceID IN ?", deviceIDs).Find(&jobDevices)
-	}
-
-	// 3. Create a map for quick lookup of job assignments
-	jobDeviceMap := make(map[string]*models.JobDevice)
-	for i, jd := range jobDevices {
-		jobDeviceMap[jd.DeviceID] = &jobDevices[i]
-	}
-	// --- End of Performance Optimization ---
-
-	// Convert to DeviceWithJobInfo and group by categories
-	deviceMap := make(map[uint]map[string][]models.DeviceWithJobInfo) // categoryID -> subcategoryID -> devices
-	categoryMap := make(map[uint]*models.Category)
-	subcategoryMap := make(map[string]*models.Subcategory)
-	var uncategorized []models.DeviceWithJobInfo
-
-	for _, device := range devices {
-		// Check if device is assigned using the optimized map
-		jobDevice, isAssigned := jobDeviceMap[device.DeviceID]
-		var jobID *uint
-		if isAssigned {
-			jobID = &jobDevice.JobID
-		}
-
-		deviceWithJob := models.DeviceWithJobInfo{
-			Device:     device,
-			JobID:      jobID,
-			IsAssigned: isAssigned,
-		}
-
-		// Group by category and subcategory
-		if device.Product != nil && device.Product.Category != nil {
-			categoryID := device.Product.Category.CategoryID
-			var subcategoryID string
-			if device.Product.Subcategory != nil {
-				subcategoryID = device.Product.Subcategory.SubcategoryID
-			}
-
-			// Store category and subcategory references
-			categoryMap[categoryID] = device.Product.Category
-			if device.Product.Subcategory != nil {
-				subcategoryMap[subcategoryID] = device.Product.Subcategory
-			}
-
-			// Initialize maps if needed
-			if deviceMap[categoryID] == nil {
-				deviceMap[categoryID] = make(map[string][]models.DeviceWithJobInfo)
-			}
-			if deviceMap[categoryID][subcategoryID] == nil {
-				deviceMap[categoryID][subcategoryID] = []models.DeviceWithJobInfo{}
-			}
-
-			deviceMap[categoryID][subcategoryID] = append(deviceMap[categoryID][subcategoryID], deviceWithJob)
-		} else {
-			// Add to uncategorized if product, category, or subcategory is missing
-			uncategorized = append(uncategorized, deviceWithJob)
-		}
-	}
-
-	// Build response structure
-	var categories []models.DeviceCategoryGroup
-	totalDevices := len(devices)
-
-	for categoryID, subcategoryDevices := range deviceMap {
-		category := categoryMap[categoryID]
-		var subcategories []models.DeviceSubcategoryGroup
-		categoryDeviceCount := 0
-
-		for subcategoryID, devices := range subcategoryDevices {
-			var subcategory *models.Subcategory
-			if subcategoryID != "" {
-				subcategory = subcategoryMap[subcategoryID]
-			} else {
-				subcategory = &models.Subcategory{Name: "General"}
-			}
-			subcategories = append(subcategories, models.DeviceSubcategoryGroup{
-				Subcategory: subcategory,
-				Devices:     devices,
-				DeviceCount: len(devices),
-			})
-			categoryDeviceCount += len(devices)
-		}
-
-		// Sort subcategories by name
-		sort.Slice(subcategories, func(i, j int) bool {
-			if subcategories[i].Subcategory == nil {
-				return false
-			}
-			if subcategories[j].Subcategory == nil {
-				return true
-			}
-			return subcategories[i].Subcategory.Name < subcategories[j].Subcategory.Name
-		})
-
-		categories = append(categories, models.DeviceCategoryGroup{
-			Category:      category,
-			Subcategories: subcategories,
-			DeviceCount:   categoryDeviceCount,
-		})
-	}
-
-	// Sort categories by name
-	sort.Slice(categories, func(i, j int) bool {
-		if categories[i].Category == nil {
-			return false
-		}
-		if categories[j].Category == nil {
-			return true
-		}
-		return categories[i].Category.Name < categories[j].Category.Name
-	})
-
-	return &models.CategorizedDevicesResponse{
-		Categories:    categories,
-		Uncategorized: uncategorized,
-		TotalDevices:  totalDevices,
-	}, nil
-}
 
 func (r *DeviceRepository) GetDeviceStats(deviceID string) (map[string]interface{}, error) {
 	stats := make(map[string]interface{})
@@ -437,4 +334,232 @@ func (r *DeviceRepository) GetDeviceStats(deviceID string) (map[string]interface
 	stats["weight"] = weight
 	
 	return stats, nil
+}
+
+// generateDeviceID generates a unique device ID based on the product category and existing devices
+func (r *DeviceRepository) generateDeviceID(device *models.Device) (string, error) {
+	// Default prefix if we can't determine from product
+	prefix := "DEV"
+	
+	// If we have a product, try to determine a prefix based on product name
+	if device.ProductID != nil {
+		var product models.Product
+		err := r.db.First(&product, *device.ProductID).Error
+		if err == nil && product.Name != "" {
+			prefix = r.generatePrefixFromProductName(product.Name)
+		}
+	}
+	
+	// Find the next available number for this prefix
+	var maxNum int
+	err := r.db.Raw(`
+		SELECT COALESCE(MAX(CAST(SUBSTRING(deviceID, ?) AS UNSIGNED)), 0) as max_num 
+		FROM devices 
+		WHERE deviceID LIKE ?
+	`, len(prefix)+1, prefix+"%").Scan(&maxNum).Error
+	
+	if err != nil {
+		log.Printf("❌ Error finding max device number for prefix %s: %v", prefix, err)
+		return "", fmt.Errorf("failed to find max device number: %v", err)
+	}
+	
+	// Generate new device ID
+	newNum := maxNum + 1
+	deviceID := fmt.Sprintf("%s%04d", prefix, newNum)
+	
+	log.Printf("✅ Generated device ID: %s (prefix: %s, next number: %d)", deviceID, prefix, newNum)
+	return deviceID, nil
+}
+
+// generatePrefixFromProductName creates a prefix based on the product name
+func (r *DeviceRepository) generatePrefixFromProductName(productName string) string {
+	// Simple mapping based on common patterns observed in existing data
+	name := strings.ToLower(productName)
+	
+	// Audio/Lighting equipment
+	if strings.Contains(name, "speaker") || strings.Contains(name, "stand") || strings.Contains(name, "lighting") {
+		return "LFT"
+	}
+	
+	// CO2 equipment
+	if strings.Contains(name, "co2") || strings.Contains(name, "bottle") || strings.Contains(name, "hose") {
+		return "CO2"
+	}
+	
+	// Hazer/Fog equipment
+	if strings.Contains(name, "hazer") || strings.Contains(name, "fog") || strings.Contains(name, "dmx") {
+		return "FOG"
+	}
+	
+	// Microphone/Audio equipment
+	if strings.Contains(name, "microphone") || strings.Contains(name, "mic") || strings.Contains(name, "audio") {
+		return "MHD"
+	}
+	
+	// Accessories
+	if strings.Contains(name, "accessory") || strings.Contains(name, "cable") || strings.Contains(name, "adapter") {
+		return "ACC"
+	}
+	
+	// External/Rental
+	if strings.Contains(name, "external") || strings.Contains(name, "rental") || strings.Contains(name, "cleaning") {
+		return "EXT"
+	}
+	
+	// Default fallback
+	return "DEV"
+}
+
+// GetAvailableDevicesForDate returns devices that are available on a specific date
+// A device is available if it's not assigned to any job that overlaps with the given date
+func (r *DeviceRepository) GetAvailableDevicesForDate(targetDate time.Time) ([]models.Device, error) {
+	var devices []models.Device
+	
+	// Get all devices with 'free' status that are NOT assigned to jobs overlapping the target date
+	// CORRECTED: Use >= for endDate comparison
+	// This ensures devices are unavailable ON the end date and become available the day AFTER
+	err := r.db.Where(`status = 'free' AND deviceID NOT IN (
+		SELECT DISTINCT jd.deviceID 
+		FROM jobdevices jd
+		JOIN jobs j ON jd.jobID = j.jobID 
+		WHERE j.startDate <= ? AND j.endDate >= ? AND j.statusID IN (
+			SELECT statusID FROM status WHERE status IN ('open', 'in_progress')
+		)
+	)`, targetDate, targetDate).Find(&devices).Error
+	
+	return devices, err
+}
+
+// CountAvailableDevicesForDate returns the count of devices available on a specific date
+func (r *DeviceRepository) CountAvailableDevicesForDate(targetDate time.Time) (int64, error) {
+	var count int64
+	
+	// CORRECTED: Use >= for endDate comparison
+	// This ensures devices are unavailable ON the end date and become available the day AFTER
+	// Example: If endDate = 2025-07-19, devices are unavailable on 2025-07-19, available on 2025-07-20
+	err := r.db.Model(&models.Device{}).Where(`status = 'free' AND deviceID NOT IN (
+		SELECT DISTINCT jd.deviceID 
+		FROM jobdevices jd
+		JOIN jobs j ON jd.jobID = j.jobID 
+		WHERE j.startDate <= ? AND j.endDate >= ? AND j.statusID IN (
+			SELECT statusID FROM status WHERE status IN ('open', 'in_progress')
+		)
+	)`, targetDate, targetDate).Count(&count).Error
+	
+	return count, err
+}
+
+// GetTotalDeviceCount returns the total number of devices in the database
+func (r *DeviceRepository) GetTotalDeviceCount() (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Device{}).Count(&count).Error
+	return count, err
+}
+
+// CountAssignedDevicesForDate returns the count of devices assigned to jobs on a specific date
+func (r *DeviceRepository) CountAssignedDevicesForDate(targetDate time.Time) (int64, error) {
+	var count int64
+	
+	err := r.db.Model(&models.Device{}).Where(`deviceID IN (
+		SELECT DISTINCT jd.deviceID 
+		FROM jobdevices jd
+		JOIN jobs j ON jd.jobID = j.jobID 
+		WHERE j.startDate <= ? AND j.endDate >= ? AND j.statusID IN (
+			SELECT statusID FROM status WHERE status IN ('open', 'in_progress')
+		)
+	)`, targetDate, targetDate).Count(&count).Error
+	
+	return count, err
+}
+
+// CountDevicesByStatus returns the count of devices with a specific status
+func (r *DeviceRepository) CountDevicesByStatus(status string) (int64, error) {
+	var count int64
+	err := r.db.Model(&models.Device{}).Where("status = ?", status).Count(&count).Error
+	return count, err
+}
+
+// CountDevicesAssignedToJobs returns the count of devices assigned to any job on a specific date
+// This counts ALL devices in job assignments regardless of device status
+func (r *DeviceRepository) CountDevicesAssignedToJobs(targetDate time.Time) (int64, error) {
+	var count int64
+	
+	fmt.Printf("🔍 DEBUG: CountDevicesAssignedToJobs called with targetDate: %s\n", targetDate.Format("2006-01-02"))
+	
+	// CORRECTED: Use >= for endDate comparison
+	// This ensures devices are unavailable ON the end date and become available the day AFTER
+	err := r.db.Table("jobdevices jd").
+		Joins("JOIN jobs j ON jd.jobID = j.jobID").
+		Where("j.startDate <= ? AND j.endDate >= ? AND j.statusID IN (SELECT statusID FROM status WHERE status IN ('open', 'in_progress'))", targetDate, targetDate).
+		Count(&count).Error
+	
+	fmt.Printf("🔍 DEBUG: Total devices assigned to jobs on %s: %d\n", targetDate.Format("2006-01-02"), count)
+	
+	return count, err
+}
+
+// IsDeviceAvailableForJob checks if a device is available for a specific job's date range
+func (r *DeviceRepository) IsDeviceAvailableForJob(deviceID string, jobID uint, startDate, endDate *time.Time) (bool, *models.JobDevice, error) {
+	// If no dates specified, use basic availability check
+	if startDate == nil || endDate == nil {
+		// Check if device exists and has 'free' status
+		var device models.Device
+		err := r.db.Where("deviceID = ? AND status = 'free'", deviceID).First(&device).Error
+		if err != nil {
+			return false, nil, err
+		}
+		
+		// Check if already assigned to this specific job
+		var existingAssignment models.JobDevice
+		err = r.db.Where("deviceID = ? AND jobID = ?", deviceID, jobID).First(&existingAssignment).Error
+		if err == nil {
+			return false, &existingAssignment, nil // Already assigned to this job
+		}
+		
+		// Check if assigned to any other job
+		err = r.db.Where("deviceID = ?", deviceID).First(&existingAssignment).Error
+		if err == nil {
+			return false, &existingAssignment, nil // Assigned to another job
+		}
+		
+		return true, nil, nil
+	}
+	
+	// Check if device exists and has 'free' status
+	var device models.Device
+	err := r.db.Where("deviceID = ? AND status = 'free'", deviceID).First(&device).Error
+	if err != nil {
+		return false, nil, err
+	}
+	
+	// Check for overlapping job assignments
+	// CORRECTED: Use >= for endDate comparison
+	// This ensures devices are unavailable ON the end date and become available the day AFTER
+	var conflictingJob models.JobDevice
+	err = r.db.Joins("JOIN jobs ON jobdevices.jobID = jobs.jobID").
+		Where(`jobdevices.deviceID = ? 
+			AND jobs.jobID != ? 
+			AND jobs.startDate <= ? 
+			AND jobs.endDate >= ? 
+			AND jobs.statusID IN (
+				SELECT statusID FROM status WHERE status IN ('open', 'in_progress')
+			)`, deviceID, jobID, endDate, startDate).
+		First(&conflictingJob).Error
+	
+	if err == nil {
+		// Found a conflicting assignment, get the job details
+		var job models.Job
+		r.db.Where("jobID = ?", conflictingJob.JobID).First(&job)
+		conflictingJob.Job = job
+		return false, &conflictingJob, nil
+	}
+	
+	return true, nil, nil
+}
+
+// GetTotalCount returns the total number of devices
+func (r *DeviceRepository) GetTotalCount() (int, error) {
+	var count int64
+	err := r.db.Model(&models.Device{}).Count(&count).Error
+	return int(count), err
 }

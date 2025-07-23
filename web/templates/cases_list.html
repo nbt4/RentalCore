@@ -24,121 +24,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
 <body class="rc-animate-fade-in">
-    <!-- Navigation -->
-    <nav class="rc-navbar">
-        <div class="rc-container">
-            <div class="rc-navbar-content">
-                <a href="/" class="rc-navbar-brand">
-                    <i class="bi bi-gear-wide-connected"></i>
-                    RentalCore
-                </a>
-                
-                <!-- Mobile toggle -->
-                <button class="rc-navbar-toggle">
-                    <i class="bi bi-list"></i>
-                </button>
-                
-                <!-- Main navigation -->
-                <ul class="rc-navbar-nav">
-                    <li><a href="/jobs" class="rc-nav-link">
-                        <i class="bi bi-briefcase"></i> Jobs
-                    </a></li>
-                    <li><a href="/devices" class="rc-nav-link">
-                        <i class="bi bi-cpu"></i> Devices
-                    </a></li>
-                    <li><a href="/customers" class="rc-nav-link">
-                        <i class="bi bi-people"></i> Customers
-                    </a></li>
-                    <li><a href="/cases" class="rc-nav-link active">
-                        <i class="bi bi-box"></i> Cases
-                    </a></li>
-                    
-                    <!-- Tools Dropdown -->
-                    <li class="rc-dropdown">
-                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
-                            <i class="bi bi-tools"></i> Tools
-                        </a>
-                        <div class="rc-dropdown-menu">
-                            <div class="rc-dropdown-header">
-                                <i class="bi bi-folder"></i> Management
-                            </div>
-                            <a href="/workflow/templates" class="rc-dropdown-item">
-                                <i class="bi bi-file-earmark-text"></i> Job Templates
-                            </a>
-                            <a href="/workflow/packages" class="rc-dropdown-item">
-                                <i class="bi bi-box-seam"></i> Equipment Packages
-                            </a>
-                            <hr class="rc-dropdown-divider">
-                            <div class="rc-dropdown-header">
-                                <i class="bi bi-building"></i> Business
-                            </div>
-                            <a href="/invoices" class="rc-dropdown-item">
-                                <i class="bi bi-file-text"></i> Invoices
-                            </a>
-                            <a href="/analytics" class="rc-dropdown-item">
-                                <i class="bi bi-graph-up"></i> Analytics
-                            </a>
-                            <a href="/financial" class="rc-dropdown-item">
-                                <i class="bi bi-calculator"></i> Financial
-                            </a>
-                        </div>
-                    </li>
-                    
-                    <!-- User Dropdown -->
-                    {{if .user}}
-                    <li class="rc-dropdown">
-                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
-                            <i class="bi bi-person-circle"></i> {{.user.Username}}
-                        </a>
-                        <div class="rc-dropdown-menu">
-                            <div class="rc-dropdown-header">
-                                <i class="bi bi-person"></i> {{.user.FirstName}} {{.user.LastName}}
-                            </div>
-                            <hr class="rc-dropdown-divider">
-                            <div class="rc-dropdown-header">Personal</div>
-                            <a href="/profile/settings" class="rc-dropdown-item">
-                                <i class="bi bi-person-gear"></i> Profile Settings
-                            </a>
-                            <hr class="rc-dropdown-divider">
-                            <div class="rc-dropdown-header">Company</div>
-                            <a href="/settings/company" class="rc-dropdown-item">
-                                <i class="bi bi-building-gear"></i> Company Settings
-                            </a>
-                            <a href="/settings/email-templates" class="rc-dropdown-item">
-                                <i class="bi bi-envelope-gear"></i> E-Mail Templates
-                            </a>
-                            <hr class="rc-dropdown-divider">
-                            <div class="rc-dropdown-header">System</div>
-                            <a href="/users" class="rc-dropdown-item">
-                                <i class="bi bi-people-fill"></i> User Management
-                            </a>
-                            <a href="/security" class="rc-dropdown-item">
-                                <i class="bi bi-shield-check"></i> Security & Audit
-                            </a>
-                            <hr class="rc-dropdown-divider">
-                            <a href="/logout" class="rc-dropdown-item">
-                                <i class="bi bi-box-arrow-right"></i> Logout
-                            </a>
-                        </div>
-                    </li>
-                    {{else}}
-                    <li>
-                        <a href="/login" class="rc-btn rc-btn-primary rc-btn-sm">
-                            <i class="bi bi-box-arrow-in-right"></i> Login
-                        </a>
-                    </li>
-                    {{end}}
-                    
-                    <!-- Theme Toggle -->
-                    <li>
-                        <button class="rc-btn rc-btn-ghost rc-btn-sm" data-theme-toggle title="Toggle theme">
-                            <i class="bi bi-moon-fill"></i>
-                        </button>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    {{template "navbar.html" .}}
 
     <!-- Main Content -->
     <main class="rc-container rc-mt-lg">
@@ -228,7 +114,7 @@
                                     {{end}}
                                 </td>
                                 <td>
-                                    <span class="rc-badge rc-badge-info">{{len .Devices}} devices</span>
+                                    <span class="rc-badge rc-badge-info">{{.DeviceCount}} devices</span>
                                 </td>
                                 <td>
                                     <div class="rc-flex rc-flex-gap-xs">
@@ -371,13 +257,15 @@
                     <p class="rc-text-muted rc-mt-md">Loading available devices...</p>
                 </div>
             </div>
-            <div class="rc-modal-footer" style="padding: 1.25rem; gap: 0.75rem; display: flex; justify-content: flex-end;">
+            <div class="rc-modal-footer" style="padding: 1.25rem; gap: 0.75rem; display: flex; justify-content: space-between;">
                 <button class="rc-btn rc-btn-secondary" onclick="closeAddDeviceToCaseModal()">
                     <i class="bi bi-x-lg"></i> Close
                 </button>
-                <button class="rc-btn rc-btn-primary" onclick="closeAddDeviceToCaseModal()">
-                    <i class="bi bi-check-lg"></i> Done Adding Devices
-                </button>
+                <div>
+                    <button class="rc-btn rc-btn-primary" id="addSelectedDevicesBtn" style="display: none;" onclick="addSelectedDevicesToCase()">
+                        <i class="bi bi-plus-lg"></i> <span id="addSelectedButtonText">Add Selected</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -752,6 +640,10 @@
             </div>
         `;
         
+        // Store current case ID for multi-select
+        window.currentCaseID = caseID;
+        window.selectedDevicesForCase = [];
+        
         // Fetch available devices (devices not in any case)
         fetch('/api/v1/devices?available=true')
             .then(response => {
@@ -764,9 +656,9 @@
             })
             .then(data => {
                 console.log('Available devices data:', data);
-                const devices = data.devices || data || [];
+                window.availableDevicesForCase = data.devices || data || [];
                 
-                if (devices.length === 0) {
+                if (window.availableDevicesForCase.length === 0) {
                     content.innerHTML = `
                         <div class="rc-text-center rc-py-xl">
                             <div style="font-size: 3rem; color: var(--text-muted); margin-bottom: var(--space-md);">
@@ -782,42 +674,26 @@
                             <label class="rc-label">Search devices:</label>
                             <input type="text" class="rc-input" id="deviceSearchInput" placeholder="Search by device ID or product name..." onkeyup="filterAvailableDevices()">
                         </div>
-                        <div class="rc-table-responsive" style="max-height: 60vh; overflow-y: auto;">
-                            <table class="rc-table" id="availableDevicesTable">
-                                <thead>
-                                    <tr>
-                                        <th>Device ID</th>
-                                        <th>Product</th>
-                                        <th>Serial Number</th>
-                                        <th>Status</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${devices.map(device => 
-                                        '<tr class="device-row" data-device-id="' + device.deviceID + '" data-product="' + (device.product && device.product.name ? device.product.name.toLowerCase() : '') + '">' +
-                                            '<td><code class="rc-code">' + device.deviceID + '</code></td>' +
-                                            '<td>' + (device.product && device.product.name ? device.product.name : 'Unknown') + '</td>' +
-                                            '<td>' + (device.serialnumber || '-') + '</td>' +
-                                            '<td>' +
-                                                '<span class="rc-badge ' + (device.status === 'free' ? 'rc-badge-success' : 'rc-badge-secondary') + '">' +
-                                                    (device.status || 'Unknown') +
-                                                '</span>' +
-                                            '</td>' +
-                                            '<td>' +
-                                                '<button onclick="addDeviceToCase(' + caseID + ', \'' + device.deviceID + '\')" class="rc-btn rc-btn-primary rc-btn-sm">' +
-                                                    '<i class="bi bi-plus-lg"></i> Add' +
-                                                '</button>' +
-                                            '</td>' +
-                                        '</tr>'
-                                    ).join('')}
-                                </tbody>
-                            </table>
+                        <div class="rc-mb-md">
+                            <button class="rc-btn rc-btn-outline rc-btn-sm" onclick="selectAllVisibleDevices()">
+                                <i class="bi bi-check-square"></i> Select All Visible
+                            </button>
+                            <button class="rc-btn rc-btn-outline rc-btn-sm rc-ml-sm" onclick="clearAllSelections()">
+                                <i class="bi bi-square"></i> Clear All
+                            </button>
+                            <span class="rc-ml-md rc-text-sm rc-text-muted" id="selectionCounter">0 devices selected</span>
                         </div>
-                        <div class="rc-flex rc-flex-end rc-mt-lg">
-                            <div class="rc-text-sm rc-text-muted">${devices.length} available device${devices.length !== 1 ? 's' : ''}</div>
+                        <div class="rc-table-responsive" style="max-height: 50vh; overflow-y: auto;">
+                            <div id="devicesList" class="rc-grid rc-grid-cols-1 rc-grid-gap-sm">
+                            </div>
+                        </div>
+                        <div class="rc-flex rc-flex-between rc-mt-lg">
+                            <div class="rc-text-sm rc-text-muted" id="deviceCount">${window.availableDevicesForCase.length} available device${window.availableDevicesForCase.length !== 1 ? 's' : ''}</div>
                         </div>
                     `;
+                    
+                    // Render devices
+                    renderAvailableDevicesForCase();
                 }
             })
             .catch(error => {
@@ -832,24 +708,204 @@
 
     function closeAddDeviceToCaseModal() {
         document.getElementById('addDeviceToCaseModal').style.display = 'none';
+        // Clear selection state
+        window.selectedDevicesForCase = [];
+        window.availableDevicesForCase = [];
+        window.currentCaseID = null;
+    }
+
+    // Multi-select device functions for case assignment
+    function renderAvailableDevicesForCase() {
+        const container = document.getElementById('devicesList');
+        if (!window.availableDevicesForCase || window.availableDevicesForCase.length === 0) {
+            container.innerHTML = '<div class="rc-text-center rc-py-lg rc-text-muted">No devices available</div>';
+            return;
+        }
+
+        let html = '';
+        window.availableDevicesForCase.forEach(device => {
+            const isSelected = window.selectedDevicesForCase.includes(device.deviceID);
+            html += `
+                <div class="rc-card device-card" style="cursor: pointer; border: 1px solid ${isSelected ? 'var(--primary-color)' : 'var(--border-color)'}; background: ${isSelected ? 'var(--primary-color-alpha)' : 'var(--surface-1)'}; padding: 8px 12px;" onclick="toggleDeviceSelectionForCase('${device.deviceID}')" data-device-id="${device.deviceID}" data-product="${(device.product && device.product.name ? device.product.name.toLowerCase() : '')}">
+                    <div class="rc-flex rc-flex-between rc-flex-items-center">
+                        <div class="rc-flex rc-flex-items-center rc-flex-gap-sm">
+                            <input type="checkbox" class="rc-form-check" ${isSelected ? 'checked' : ''} onchange="toggleDeviceSelectionForCase('${device.deviceID}')" onclick="event.stopPropagation()">
+                            <div>
+                                <div class="rc-text-sm rc-font-mono rc-font-weight-600" style="color: var(--primary-color);">${device.deviceID}</div>
+                                <div class="rc-text-xs rc-text-muted">${device.product && device.product.name ? device.product.name : 'Unknown Product'}</div>
+                            </div>
+                        </div>
+                        <div class="rc-flex rc-flex-items-center rc-flex-gap-xs">
+                            <span class="rc-badge rc-badge-success rc-text-xs">Free</span>
+                            ${device.serialnumber ? `<span class="rc-text-xs rc-text-muted">SN: ${device.serialnumber}</span>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `;
+        });
+        
+        container.innerHTML = html;
+        
+        // Re-apply search filter if there is one
+        const searchInput = document.getElementById('deviceSearchInput');
+        if (searchInput && searchInput.value.trim()) {
+            filterAvailableDevices();
+        }
+        
+        updateSelectionCounter();
+        updateAddSelectedButton();
+    }
+
+    function toggleDeviceSelectionForCase(deviceID) {
+        const index = window.selectedDevicesForCase.indexOf(deviceID);
+        if (index > -1) {
+            window.selectedDevicesForCase.splice(index, 1);
+        } else {
+            window.selectedDevicesForCase.push(deviceID);
+        }
+        
+        renderAvailableDevicesForCase();
+    }
+
+    function selectAllVisibleDevices() {
+        const visibleDevices = document.querySelectorAll('.device-card:not([style*="display: none"])');
+        visibleDevices.forEach(card => {
+            const deviceID = card.getAttribute('data-device-id');
+            if (!window.selectedDevicesForCase.includes(deviceID)) {
+                window.selectedDevicesForCase.push(deviceID);
+            }
+        });
+        renderAvailableDevicesForCase();
+    }
+
+    function clearAllSelections() {
+        window.selectedDevicesForCase = [];
+        renderAvailableDevicesForCase();
+    }
+
+    function updateSelectionCounter() {
+        const counter = document.getElementById('selectionCounter');
+        if (counter) {
+            const count = window.selectedDevicesForCase.length;
+            counter.textContent = `${count} device${count !== 1 ? 's' : ''} selected`;
+        }
+    }
+
+    function updateAddSelectedButton() {
+        const addBtn = document.getElementById('addSelectedDevicesBtn');
+        const addBtnText = document.getElementById('addSelectedButtonText');
+        
+        if (!addBtn || !addBtnText) return;
+        
+        if (window.selectedDevicesForCase.length === 0) {
+            addBtn.style.display = 'none';
+            return;
+        }
+        
+        addBtn.style.display = 'block';
+        
+        // Get product names of selected devices
+        const selectedDeviceData = window.availableDevicesForCase.filter(device => 
+            window.selectedDevicesForCase.includes(device.deviceID)
+        );
+        
+        // Group by product name
+        const productGroups = {};
+        selectedDeviceData.forEach(device => {
+            const productName = device.product && device.product.name ? device.product.name : 'Unknown Product';
+            if (!productGroups[productName]) {
+                productGroups[productName] = 0;
+            }
+            productGroups[productName]++;
+        });
+        
+        // Create button text
+        let buttonText = '';
+        const productNames = Object.keys(productGroups);
+        
+        if (productNames.length === 1) {
+            // Single product type
+            const productName = productNames[0];
+            const count = productGroups[productName];
+            buttonText = `${count}x ${productName} hinzufügen`;
+        } else {
+            // Multiple product types
+            buttonText = `${window.selectedDevicesForCase.length} Geräte hinzufügen`;
+        }
+        
+        addBtnText.textContent = buttonText;
     }
 
     function filterAvailableDevices() {
-        const searchInput = document.getElementById('deviceSearchInput');
-        const searchTerm = searchInput.value.toLowerCase();
-        const rows = document.querySelectorAll('.device-row');
+        const searchTerm = document.getElementById('deviceSearchInput').value.toLowerCase();
+        const deviceCards = document.querySelectorAll('.device-card');
         
-        rows.forEach(row => {
-            const deviceID = row.dataset.deviceId.toLowerCase();
-            const product = row.dataset.product;
+        deviceCards.forEach(card => {
+            const deviceID = card.getAttribute('data-device-id').toLowerCase();
+            const productName = card.getAttribute('data-product') || '';
             
-            if (deviceID.includes(searchTerm) || product.includes(searchTerm)) {
-                row.style.display = '';
+            if (deviceID.includes(searchTerm) || productName.includes(searchTerm)) {
+                card.style.display = 'block';
             } else {
-                row.style.display = 'none';
+                card.style.display = 'none';
             }
         });
+        
+        // Update device count
+        const visibleCount = document.querySelectorAll('.device-card:not([style*="display: none"])').length;
+        const deviceCount = document.getElementById('deviceCount');
+        if (deviceCount) {
+            deviceCount.textContent = `${visibleCount} available device${visibleCount !== 1 ? 's' : ''}`;
+        }
     }
+
+    async function addSelectedDevicesToCase() {
+        if (window.selectedDevicesForCase.length === 0 || !window.currentCaseID) {
+            return;
+        }
+        
+        const addBtn = document.getElementById('addSelectedDevicesBtn');
+        const originalText = addBtn.innerHTML;
+        
+        // Show loading state
+        addBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Adding...';
+        addBtn.disabled = true;
+        
+        try {
+            // Add devices one by one
+            const promises = window.selectedDevicesForCase.map(deviceID => 
+                fetch('/api/v1/cases/' + window.currentCaseID + '/devices', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ device_id: deviceID })
+                })
+            );
+            
+            const results = await Promise.all(promises);
+            
+            // Check if all were successful
+            const allSuccessful = results.every(response => response.ok);
+            
+            if (allSuccessful) {
+                // Success - close modal and refresh case list
+                closeAddDeviceToCaseModal();
+                
+                // Refresh the cases list
+                location.reload();
+            } else {
+                throw new Error('Some devices could not be added');
+            }
+            
+        } catch (error) {
+            console.error('Error adding selected devices:', error);
+            alert('Error adding devices to case: ' + error.message);
+            
+            // Restore button
+            addBtn.innerHTML = originalText;
+            addBtn.disabled = false;
+        }
+    }
+
 
     function addDeviceToCase(caseID, deviceID) {
         if (confirm('Add device ' + deviceID + ' to this case?')) {

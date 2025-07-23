@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>{{.title}} - RentalCore</title>
+    <!-- Cache buster for debugging -->
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="/static/manifest.json">
@@ -378,7 +379,7 @@
 
         <div class="row">
             <!-- Scanner Column -->
-            <div class="col-lg-6">
+            <div class="col-lg-4">
                 <div class="card">
                     <div class="card-header">
                         <h6><i class="bi bi-camera"></i> Device Scanner</h6>
@@ -446,8 +447,33 @@
                 </div>
             </div>
 
+            <!-- Available Devices Column -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6><i class="bi bi-cpu"></i> Available Devices</h6>
+                        <button class="btn btn-primary btn-sm" id="addSelectedBtn" style="display: none;" onclick="addSelectedDevices()">
+                            <i class="bi bi-plus-lg"></i> <span id="addButtonText">Add Selected</span>
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <input type="text" class="form-control" id="deviceSearch" placeholder="Search devices..." onkeyup="filterDevices()">
+                        </div>
+                        <div class="device-list" id="available-devices-list" style="max-height: 400px; overflow-y: auto;">
+                            <div class="text-center py-3">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2 text-muted">Loading available devices...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Devices in Case Column -->
-            <div class="col-lg-6">
+            <div class="col-lg-4">
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h6><i class="bi bi-list-check"></i> Devices in Case</h6>
@@ -516,6 +542,7 @@
             console.log('Case device mapping page loaded');
             initializeScanner();
             setupEventListeners();
+            loadAvailableDevices();
         });
 
         function initializeScanner() {
@@ -895,6 +922,203 @@
                 else if (type === 'warning') statusElement.classList.add('text-warning');
                 else if (type === 'info') statusElement.classList.add('text-info');
             }
+        }
+
+        // Multi-select device functionality
+        let selectedDevices = [];
+        let availableDevices = [];
+
+        async function loadAvailableDevices() {
+            console.log('Loading available devices...');
+            try {
+                const response = await fetch('/api/v1/devices?available=true');
+                console.log('API response status:', response.status);
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('API error response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+                
+                const data = await response.json();
+                console.log('API response data:', data);
+                availableDevices = data.devices || data || [];
+                console.log('Available devices loaded:', availableDevices.length);
+                renderAvailableDevices();
+            } catch (error) {
+                console.error('Error loading available devices:', error);
+                document.getElementById('available-devices-list').innerHTML = `
+                    <div class="text-center py-3 text-danger">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <p class="mt-2">Error loading devices: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function renderAvailableDevices() {
+            console.log('Rendering available devices, count:', availableDevices.length);
+            const container = document.getElementById('available-devices-list');
+            
+            if (!availableDevices || availableDevices.length === 0) {
+                console.log('No devices to render');
+                container.innerHTML = `
+                    <div class="text-center py-3 text-muted">
+                        <i class="bi bi-cpu display-6"></i>
+                        <p class="mt-2">No available devices</p>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            availableDevices.forEach(device => {
+                const isSelected = selectedDevices.includes(device.deviceID);
+                html += `
+                    <div class="device-item" style="cursor: pointer; border: 1px solid ${isSelected ? '#6f42c1' : 'var(--bg-tertiary)'}; background: ${isSelected ? 'rgba(111, 66, 193, 0.1)' : 'var(--bg-secondary)'};" onclick="toggleDeviceSelection('${device.deviceID}')">
+                        <div class="d-flex align-items-center">
+                            <input type="checkbox" class="form-check-input me-3" ${isSelected ? 'checked' : ''} onchange="toggleDeviceSelection('${device.deviceID}')" onclick="event.stopPropagation()">
+                            <div class="flex-grow-1">
+                                <div class="device-id">${device.deviceID}</div>
+                                <div class="device-name">
+                                    ${device.product ? device.product.name : 'Unknown Product'}
+                                </div>
+                                <div class="text-muted mt-1">
+                                    <span class="badge bg-success">Free</span>
+                                    ${(device.serialnumber || device.serialNumber) ? `• SN: ${device.serialnumber || device.serialNumber}` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+            updateAddButton();
+        }
+
+        function toggleDeviceSelection(deviceID) {
+            const index = selectedDevices.indexOf(deviceID);
+            if (index > -1) {
+                selectedDevices.splice(index, 1);
+            } else {
+                selectedDevices.push(deviceID);
+            }
+            
+            renderAvailableDevices();
+            updateAddButton();
+        }
+
+        function updateAddButton() {
+            const addBtn = document.getElementById('addSelectedBtn');
+            const addBtnText = document.getElementById('addButtonText');
+            
+            if (selectedDevices.length === 0) {
+                addBtn.style.display = 'none';
+                return;
+            }
+            
+            addBtn.style.display = 'block';
+            
+            // Get product names of selected devices
+            const selectedDeviceData = availableDevices.filter(device => 
+                selectedDevices.includes(device.deviceID)
+            );
+            
+            // Group by product name
+            const productGroups = {};
+            selectedDeviceData.forEach(device => {
+                const productName = device.product ? device.product.name : 'Unknown Product';
+                if (!productGroups[productName]) {
+                    productGroups[productName] = 0;
+                }
+                productGroups[productName]++;
+            });
+            
+            // Create button text
+            let buttonText = '';
+            const productNames = Object.keys(productGroups);
+            
+            if (productNames.length === 1) {
+                // Single product type
+                const productName = productNames[0];
+                const count = productGroups[productName];
+                buttonText = `${count}x ${productName} hinzufügen`;
+            } else {
+                // Multiple product types
+                buttonText = `${selectedDevices.length} Geräte hinzufügen`;
+            }
+            
+            addBtnText.textContent = buttonText;
+        }
+
+        async function addSelectedDevices() {
+            if (selectedDevices.length === 0) {
+                return;
+            }
+            
+            const addBtn = document.getElementById('addSelectedBtn');
+            const originalText = addBtn.innerHTML;
+            
+            // Show loading state
+            addBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Adding...';
+            addBtn.disabled = true;
+            
+            try {
+                // Add devices one by one
+                const promises = selectedDevices.map(deviceID => 
+                    fetch('/cases/{{.case.CaseID}}/devices', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ device_id: deviceID })
+                    })
+                );
+                
+                const results = await Promise.all(promises);
+                
+                // Check if all were successful
+                const allSuccessful = results.every(response => response.ok);
+                
+                if (allSuccessful) {
+                    // Success - reload page to show updated lists
+                    window.location.reload();
+                } else {
+                    throw new Error('Some devices could not be added');
+                }
+                
+            } catch (error) {
+                console.error('Error adding selected devices:', error);
+                alert('Error adding devices to case');
+                
+                // Restore button
+                addBtn.innerHTML = originalText;
+                addBtn.disabled = false;
+            }
+        }
+
+        function filterDevices() {
+            const searchTerm = document.getElementById('deviceSearch').value.toLowerCase();
+            
+            if (!searchTerm) {
+                renderAvailableDevices();
+                return;
+            }
+            
+            const filteredDevices = availableDevices.filter(device => {
+                const deviceID = device.deviceID.toLowerCase();
+                const productName = device.product ? device.product.name.toLowerCase() : '';
+                const serialNumber = (device.serialnumber || device.serialNumber || '').toLowerCase();
+                
+                return deviceID.includes(searchTerm) || 
+                       productName.includes(searchTerm) || 
+                       serialNumber.includes(searchTerm);
+            });
+            
+            // Temporarily update availableDevices for rendering
+            const originalDevices = availableDevices;
+            availableDevices = filteredDevices;
+            renderAvailableDevices();
+            availableDevices = originalDevices;
         }
 
         window.addEventListener('beforeunload', function() {

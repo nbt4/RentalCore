@@ -24,6 +24,23 @@ func NewEmailService(emailConfig *config.EmailConfig) *EmailService {
 	}
 }
 
+func NewEmailServiceFromCompany(company *models.CompanySettings) *EmailService {
+	// Create config from company settings
+	emailConfig := &config.EmailConfig{
+		SMTPHost:     getStringValue(company.SMTPHost),
+		SMTPPort:     getIntValue(company.SMTPPort, 587),
+		SMTPUsername: getStringValue(company.SMTPUsername),
+		SMTPPassword: getStringValue(company.SMTPPassword),
+		FromEmail:    getStringValue(company.SMTPFromEmail),
+		FromName:     getStringValue(company.SMTPFromName),
+		UseTLS:       getBoolValue(company.SMTPUseTLS, true),
+	}
+	
+	return &EmailService{
+		config: emailConfig,
+	}
+}
+
 // EmailData represents data for email templates
 type EmailData struct {
 	Invoice      *models.Invoice
@@ -518,5 +535,27 @@ func (s *EmailService) encodeBase64(data []byte) string {
 	}
 	
 	return encoded
+}
+
+// Helper functions for safe pointer access
+func getStringValue(ptr *string) string {
+	if ptr == nil {
+		return ""
+	}
+	return *ptr
+}
+
+func getIntValue(ptr *int, defaultValue int) int {
+	if ptr == nil {
+		return defaultValue
+	}
+	return *ptr
+}
+
+func getBoolValue(ptr *bool, defaultValue bool) bool {
+	if ptr == nil {
+		return defaultValue
+	}
+	return *ptr
 }
 

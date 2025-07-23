@@ -62,8 +62,6 @@
                             <div class="rc-dropdown-header">
                                 <i class="bi bi-folder"></i> Management
                             </div>
-                            <a href="/workflow/templates" class="rc-dropdown-item">
-                                <i class="bi bi-file-earmark-text"></i> Job Templates
                             </a>
                             <a href="/workflow/packages" class="rc-dropdown-item">
                                 <i class="bi bi-box-seam"></i> Equipment Packages
@@ -104,7 +102,6 @@
                             <a href="/settings/company" class="rc-dropdown-item">
                                 <i class="bi bi-building-gear"></i> Company Settings
                             </a>
-                            <a href="/settings/email-templates" class="rc-dropdown-item">
                                 <i class="bi bi-envelope-gear"></i> E-Mail Templates
                             </a>
                             <hr class="rc-dropdown-divider">
@@ -234,6 +231,72 @@
                 </form>
             </div>
         </div>
+
+        <!-- Email Configuration -->
+        <div class="rc-card rc-mt-xl">
+            <div class="rc-card-header">
+                <h3 class="rc-card-title">
+                    <i class="bi bi-envelope-gear"></i> Email Configuration
+                </h3>
+            </div>
+            <div class="rc-card-body">
+                <div id="email-form-container">
+                    <form id="email-config-form">
+                        <div class="rc-grid rc-grid-2 rc-mb-lg">
+                            <div class="rc-form-group">
+                                <label class="rc-label" for="smtp_host">SMTP Host</label>
+                                <input type="text" class="rc-input" id="smtp_host" name="smtp_host" placeholder="smtp.gmail.com" required>
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label" for="smtp_port">SMTP Port</label>
+                                <input type="number" class="rc-input" id="smtp_port" name="smtp_port" value="587" required>
+                            </div>
+                        </div>
+                        
+                        <div class="rc-grid rc-grid-2 rc-mb-lg">
+                            <div class="rc-form-group">
+                                <label class="rc-label" for="smtp_username">SMTP Username</label>
+                                <input type="text" class="rc-input" id="smtp_username" name="smtp_username" placeholder="your-email@gmail.com" required>
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label" for="smtp_password">SMTP Password</label>
+                                <input type="password" class="rc-input" id="smtp_password" name="smtp_password" placeholder="Leave blank to keep current password">
+                            </div>
+                        </div>
+                        
+                        <div class="rc-grid rc-grid-2 rc-mb-lg">
+                            <div class="rc-form-group">
+                                <label class="rc-label" for="smtp_from_email">From Email</label>
+                                <input type="email" class="rc-input" id="smtp_from_email" name="smtp_from_email" placeholder="noreply@yourcompany.com" required>
+                            </div>
+                            <div class="rc-form-group">
+                                <label class="rc-label" for="smtp_from_name">From Name</label>
+                                <input type="text" class="rc-input" id="smtp_from_name" name="smtp_from_name" placeholder="Your Company Name">
+                            </div>
+                        </div>
+                        
+                        <div class="rc-form-group rc-mb-lg">
+                            <label class="rc-label">
+                                <input type="checkbox" id="smtp_use_tls" name="smtp_use_tls" checked>
+                                Use TLS/SSL encryption
+                            </label>
+                        </div>
+                        
+                        <div class="rc-flex rc-flex-between">
+                            <button type="button" class="rc-btn rc-btn-secondary" id="test-email-btn">
+                                <i class="bi bi-envelope-check"></i> Test Email
+                            </button>
+                            <button type="submit" class="rc-btn rc-btn-primary">
+                                <i class="bi bi-check-lg"></i> Save Email Settings
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Loading/Status Messages -->
+                <div id="email-status" class="rc-mt-lg" style="display: none;"></div>
+            </div>
+        </div>
     </main>
 
     <!-- Footer -->
@@ -261,5 +324,114 @@
 
     <!-- JavaScript -->
     <script src="/static/js/rental-core-design.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Load existing email configuration
+        loadEmailConfig();
+        
+        // Handle email configuration form submission
+        document.getElementById('email-config-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveEmailConfig();
+        });
+        
+        // Handle test email button
+        document.getElementById('test-email-btn').addEventListener('click', function() {
+            testEmailConnection();
+        });
+        
+        function loadEmailConfig() {
+            fetch('/api/settings/smtp')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.config) {
+                        document.getElementById('smtp_host').value = data.config.smtp_host || '';
+                        document.getElementById('smtp_port').value = data.config.smtp_port || 587;
+                        document.getElementById('smtp_username').value = data.config.smtp_username || '';
+                        document.getElementById('smtp_from_email').value = data.config.smtp_from_email || '';
+                        document.getElementById('smtp_from_name').value = data.config.smtp_from_name || '';
+                        document.getElementById('smtp_use_tls').checked = data.config.smtp_use_tls !== false;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading email config:', error);
+                });
+        }
+        
+        function saveEmailConfig() {
+            const formData = new FormData(document.getElementById('email-config-form'));
+            const data = {
+                smtp_host: formData.get('smtp_host'),
+                smtp_port: parseInt(formData.get('smtp_port')),
+                smtp_username: formData.get('smtp_username'),
+                smtp_password: formData.get('smtp_password'),
+                smtp_from_email: formData.get('smtp_from_email'),
+                smtp_from_name: formData.get('smtp_from_name'),
+                smtp_use_tls: formData.get('smtp_use_tls') === 'on'
+            };
+            
+            showStatus('Saving email configuration...', 'info');
+            
+            fetch('/api/settings/smtp', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus(data.message, 'success');
+                    // Clear password field after successful save
+                    document.getElementById('smtp_password').value = '';
+                } else {
+                    showStatus(data.error || 'Failed to save email configuration', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error saving email config:', error);
+                showStatus('Failed to save email configuration', 'error');
+            });
+        }
+        
+        function testEmailConnection() {
+            const testEmail = prompt('Enter email address to send test email to:');
+            if (!testEmail) return;
+            
+            showStatus('Sending test email...', 'info');
+            
+            fetch('/api/settings/smtp/test?test_email=' + encodeURIComponent(testEmail), {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showStatus(data.message, 'success');
+                } else {
+                    showStatus(data.error || 'Test email failed', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error testing email:', error);
+                showStatus('Test email failed', 'error');
+            });
+        }
+        
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('email-status');
+            statusDiv.style.display = 'block';
+            statusDiv.className = `rc-alert rc-alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'}`;
+            statusDiv.textContent = message;
+            
+            // Hide after 5 seconds for success/info messages
+            if (type !== 'error') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
+    });
+    </script>
 </body>
 </html>

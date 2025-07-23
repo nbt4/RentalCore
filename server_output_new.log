@@ -1,0 +1,493 @@
+2025/07/23 20:44:11 Database connection established successfully
+2025/07/23 20:44:11 GoBD compliance table migration disabled
+2025/07/23 20:44:11 Database auto-migration disabled - using manual schema management
+2025/07/23 20:44:11 Templates already exist (1), skipping default template creation
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] Loaded HTML Templates (62): 
+	- error.html
+	- invoice_templates_list.html
+	- job_form.html
+	- analytics_dashboard.html
+	- bulk_operations.html
+	- invoices-content
+	- navbar.html
+	- cases_list.html
+	- invoice_settings_form.html
+	- job_detail.html
+	- user_form.html
+	- base.html
+	- error_page.html
+	- signature_form.html
+	- device_form.html
+	- equipment_package_detail.html
+	- jobs.html
+	- scan_job.html
+	- security_roles_standalone.html
+	- user_detail.html
+	- documents_list.html
+	- financial_dashboard.html
+	- home.html
+	- invoice_template_designer.html
+	- invoices_list.html
+	- security_audit.html
+	- case_detail.html
+	- customer_detail.html
+	- equipment_package_form.html
+	- error_standalone.html
+	- profile_settings.html
+	- financial_reports.html
+	- css
+	- invoice_form.html
+	- login.html
+	- scan_select_job.html
+	- transactions_list.html
+	- base.html.backup
+	- invoice_template_designer_basic.html
+	- company_settings.html
+	- invoice_preview.html
+	- invoice_template_german.html
+	- content
+	- js
+	- case_form.html
+	- monitoring_dashboard.html
+	- users_list.html
+	- customers.html
+	- device_detail.html
+	- devices_standalone.html
+	- equipment_packages_standalone.html
+	- transaction_form.html
+	- 
+	- case_device_mapping.html
+	- invoice_detail.html
+	- devices_tree.html
+	- document_upload_form.html
+	- search_results.html
+	- customer_form.html
+	- invoices_content.html
+	- mobile_scanner.html
+	- transaction_detail.html
+
+[GIN-debug] GET    /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (8 handlers)
+[GIN-debug] HEAD   /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (8 handlers)
+[GIN-debug] GET    /uploads/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (8 handlers)
+[GIN-debug] HEAD   /uploads/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (8 handlers)
+[GIN-debug] GET    /sw.js                    --> main.main.func24 (9 handlers)
+[GIN-debug] GET    /manifest.json            --> main.main.func25 (9 handlers)
+[GIN-debug] GET    /                         --> main.setupRoutes.func1 (9 handlers)
+[GIN-debug] GET    /login                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).LoginForm-fm (9 handlers)
+[GIN-debug] POST   /login                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).Login-fm (9 handlers)
+[GIN-debug] GET    /logout                   --> go-barcode-webapp/internal/handlers.(*AuthHandler).Logout-fm (9 handlers)
+[GIN-debug] GET    /debug/invoice-test       --> main.setupRoutes.func2 (9 handlers)
+[GIN-debug] GET    /debug/customer-selection --> main.setupRoutes.func3 (9 handlers)
+[GIN-debug] GET    /debug/routes             --> main.setupRoutes.func4 (9 handlers)
+[GIN-debug] GET    /dashboard                --> go-barcode-webapp/internal/handlers.(*HomeHandler).Dashboard-fm (10 handlers)
+[GIN-debug] GET    /jobs                     --> go-barcode-webapp/internal/handlers.(*JobHandler).ListJobs-fm (10 handlers)
+[GIN-debug] GET    /jobs/new                 --> go-barcode-webapp/internal/handlers.(*JobHandler).NewJobForm-fm (10 handlers)
+[GIN-debug] POST   /jobs                     --> go-barcode-webapp/internal/handlers.(*JobHandler).CreateJob-fm (10 handlers)
+[GIN-debug] GET    /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).GetJob-fm (10 handlers)
+[GIN-debug] GET    /jobs/:id/edit            --> go-barcode-webapp/internal/handlers.(*JobHandler).EditJobForm-fm (10 handlers)
+[GIN-debug] PUT    /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).UpdateJob-fm (10 handlers)
+[GIN-debug] POST   /jobs/:id/update          --> go-barcode-webapp/internal/handlers.(*JobHandler).UpdateJob-fm (10 handlers)
+[GIN-debug] DELETE /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).DeleteJob-fm (10 handlers)
+[GIN-debug] GET    /jobs/:id/devices         --> go-barcode-webapp/internal/handlers.(*JobHandler).GetJobDevices-fm (10 handlers)
+[GIN-debug] POST   /jobs/:id/devices         --> go-barcode-webapp/internal/handlers.(*JobHandler).AssignDevice-fm (10 handlers)
+[GIN-debug] DELETE /jobs/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*JobHandler).RemoveDevice-fm (10 handlers)
+[GIN-debug] POST   /jobs/:id/bulk-scan       --> go-barcode-webapp/internal/handlers.(*JobHandler).BulkScanDevices-fm (10 handlers)
+[GIN-debug] GET    /devices                  --> go-barcode-webapp/internal/handlers.(*DeviceHandler).ListDevices-fm (10 handlers)
+[GIN-debug] GET    /devices/new              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).NewDeviceForm-fm (10 handlers)
+[GIN-debug] POST   /devices                  --> go-barcode-webapp/internal/handlers.(*DeviceHandler).CreateDevice-fm (10 handlers)
+[GIN-debug] GET    /devices/:id              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDevice-fm (10 handlers)
+[GIN-debug] GET    /devices/:id/edit         --> go-barcode-webapp/internal/handlers.(*DeviceHandler).EditDeviceForm-fm (10 handlers)
+[GIN-debug] PUT    /devices/:id              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).UpdateDevice-fm (10 handlers)
+[GIN-debug] DELETE /devices/:id              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).DeleteDevice-fm (10 handlers)
+[GIN-debug] GET    /devices/:id/qr           --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceQR-fm (10 handlers)
+[GIN-debug] GET    /devices/:id/barcode      --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceBarcode-fm (10 handlers)
+[GIN-debug] GET    /devices/:id/stats        --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceStatsAPI-fm (10 handlers)
+[GIN-debug] GET    /devices/available        --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetAvailableDevices-fm (10 handlers)
+[GIN-debug] GET    /customers                --> go-barcode-webapp/internal/handlers.(*CustomerHandler).ListCustomers-fm (10 handlers)
+[GIN-debug] GET    /customers/new            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).NewCustomerForm-fm (10 handlers)
+[GIN-debug] POST   /customers                --> go-barcode-webapp/internal/handlers.(*CustomerHandler).CreateCustomer-fm (10 handlers)
+[GIN-debug] GET    /customers/:id            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).GetCustomer-fm (10 handlers)
+[GIN-debug] GET    /customers/:id/edit       --> go-barcode-webapp/internal/handlers.(*CustomerHandler).EditCustomerForm-fm (10 handlers)
+[GIN-debug] PUT    /customers/:id            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).UpdateCustomer-fm (10 handlers)
+[GIN-debug] DELETE /customers/:id            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).DeleteCustomer-fm (10 handlers)
+[GIN-debug] GET    /statuses                 --> go-barcode-webapp/internal/handlers.(*StatusHandler).ListStatuses-fm (10 handlers)
+[GIN-debug] GET    /products                 --> go-barcode-webapp/internal/handlers.(*ProductHandler).ListProducts-fm (10 handlers)
+[GIN-debug] GET    /cases                    --> go-barcode-webapp/internal/handlers.(*CaseHandler).ListCases-fm (10 handlers)
+[GIN-debug] GET    /cases/new                --> go-barcode-webapp/internal/handlers.(*CaseHandler).NewCaseForm-fm (10 handlers)
+[GIN-debug] POST   /cases                    --> go-barcode-webapp/internal/handlers.(*CaseHandler).CreateCase-fm (10 handlers)
+[GIN-debug] GET    /cases/:id                --> go-barcode-webapp/internal/handlers.(*CaseHandler).GetCase-fm (10 handlers)
+[GIN-debug] GET    /cases/:id/edit           --> go-barcode-webapp/internal/handlers.(*CaseHandler).EditCaseForm-fm (10 handlers)
+[GIN-debug] PUT    /cases/:id                --> go-barcode-webapp/internal/handlers.(*CaseHandler).UpdateCase-fm (10 handlers)
+[GIN-debug] DELETE /cases/:id                --> go-barcode-webapp/internal/handlers.(*CaseHandler).DeleteCase-fm (10 handlers)
+[GIN-debug] GET    /cases/:id/devices        --> go-barcode-webapp/internal/handlers.(*CaseHandler).CaseDeviceMapping-fm (10 handlers)
+[GIN-debug] POST   /cases/:id/devices        --> go-barcode-webapp/internal/handlers.(*CaseHandler).ScanDeviceToCase-fm (10 handlers)
+[GIN-debug] DELETE /cases/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*CaseHandler).RemoveDeviceFromCase-fm (10 handlers)
+[GIN-debug] GET    /barcodes/device/:serialNo/qr --> go-barcode-webapp/internal/handlers.(*BarcodeHandler).GenerateDeviceQR-fm (10 handlers)
+[GIN-debug] GET    /barcodes/device/:serialNo/barcode --> go-barcode-webapp/internal/handlers.(*BarcodeHandler).GenerateDeviceBarcode-fm (10 handlers)
+[GIN-debug] GET    /scan                     --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanJobSelection-fm (10 handlers)
+[GIN-debug] GET    /scan/select              --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanJobSelection-fm (10 handlers)
+[GIN-debug] GET    /scan/:jobId              --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanJob-fm (10 handlers)
+[GIN-debug] POST   /scan/:jobId/assign       --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanDevice-fm (10 handlers)
+[GIN-debug] DELETE /scan/:jobId/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*ScannerHandler).RemoveDevice-fm (10 handlers)
+[GIN-debug] GET    /analytics                --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).Dashboard-fm (10 handlers)
+[GIN-debug] GET    /analytics/revenue        --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).GetRevenueAPI-fm (10 handlers)
+[GIN-debug] GET    /analytics/equipment      --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).GetEquipmentAPI-fm (10 handlers)
+[GIN-debug] GET    /analytics/export         --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).ExportAnalytics-fm (10 handlers)
+[GIN-debug] GET    /search/global            --> go-barcode-webapp/internal/handlers.(*SearchHandler).GlobalSearch-fm (10 handlers)
+[GIN-debug] POST   /search/advanced          --> go-barcode-webapp/internal/handlers.(*SearchHandler).AdvancedSearch-fm (10 handlers)
+[GIN-debug] GET    /search/suggestions       --> go-barcode-webapp/internal/handlers.(*SearchHandler).SearchSuggestions-fm (10 handlers)
+[GIN-debug] GET    /search/saved             --> go-barcode-webapp/internal/handlers.(*SearchHandler).SavedSearches-fm (10 handlers)
+[GIN-debug] DELETE /search/saved/:id         --> go-barcode-webapp/internal/handlers.(*SearchHandler).DeleteSavedSearch-fm (10 handlers)
+[GIN-debug] POST   /pwa/subscribe            --> go-barcode-webapp/internal/handlers.(*PWAHandler).SubscribePush-fm (10 handlers)
+[GIN-debug] POST   /pwa/unsubscribe          --> go-barcode-webapp/internal/handlers.(*PWAHandler).UnsubscribePush-fm (10 handlers)
+[GIN-debug] POST   /pwa/sync                 --> go-barcode-webapp/internal/handlers.(*PWAHandler).SyncOfflineData-fm (10 handlers)
+[GIN-debug] GET    /pwa/manifest             --> go-barcode-webapp/internal/handlers.(*PWAHandler).GetOfflineManifest-fm (10 handlers)
+[GIN-debug] GET    /pwa/install              --> go-barcode-webapp/internal/handlers.(*PWAHandler).InstallPrompt-fm (10 handlers)
+[GIN-debug] GET    /pwa/status               --> go-barcode-webapp/internal/handlers.(*PWAHandler).GetConnectionStatus-fm (10 handlers)
+[GIN-debug] GET    /workflow/packages        --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).ShowPackagesList-fm (10 handlers)
+[GIN-debug] GET    /workflow/packages/new    --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).ShowPackageForm-fm (10 handlers)
+[GIN-debug] GET    /workflow/packages/:id    --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).ShowPackageDetail-fm (10 handlers)
+[GIN-debug] GET    /workflow/packages/:id/edit --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).ShowPackageForm-fm (10 handlers)
+[GIN-debug] POST   /workflow/packages        --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).CreatePackage-fm (10 handlers)
+[GIN-debug] PUT    /workflow/packages/:id    --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).UpdatePackage-fm (10 handlers)
+[GIN-debug] DELETE /workflow/packages/:id    --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).DeletePackage-fm (10 handlers)
+[GIN-debug] GET    /workflow/bulk            --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkOperationsForm-fm (10 handlers)
+[GIN-debug] POST   /workflow/bulk/update-status --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkUpdateDeviceStatus-fm (10 handlers)
+[GIN-debug] POST   /workflow/bulk/assign-job --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkAssignToJob-fm (10 handlers)
+[GIN-debug] POST   /workflow/bulk/generate-qr --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkGenerateQRCodes-fm (10 handlers)
+[GIN-debug] GET    /workflow/stats           --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetWorkflowStats-fm (10 handlers)
+[GIN-debug] GET    /documents                --> go-barcode-webapp/internal/handlers.(*DocumentHandler).ListDocuments-fm (10 handlers)
+[GIN-debug] GET    /documents/upload         --> go-barcode-webapp/internal/handlers.(*DocumentHandler).UploadDocumentForm-fm (10 handlers)
+[GIN-debug] POST   /documents/upload         --> go-barcode-webapp/internal/handlers.(*DocumentHandler).UploadDocument-fm (10 handlers)
+[GIN-debug] GET    /documents/:id            --> go-barcode-webapp/internal/handlers.(*DocumentHandler).GetDocument-fm (10 handlers)
+[GIN-debug] GET    /documents/:id/view       --> go-barcode-webapp/internal/handlers.(*DocumentHandler).ViewDocument-fm (10 handlers)
+[GIN-debug] GET    /documents/:id/download   --> go-barcode-webapp/internal/handlers.(*DocumentHandler).DownloadDocument-fm (10 handlers)
+[GIN-debug] DELETE /documents/:id            --> go-barcode-webapp/internal/handlers.(*DocumentHandler).DeleteDocument-fm (10 handlers)
+[GIN-debug] GET    /documents/:id/sign       --> go-barcode-webapp/internal/handlers.(*DocumentHandler).SignatureForm-fm (10 handlers)
+[GIN-debug] POST   /documents/:id/sign       --> go-barcode-webapp/internal/handlers.(*DocumentHandler).AddSignature-fm (10 handlers)
+[GIN-debug] GET    /documents/signatures/:id/verify --> go-barcode-webapp/internal/handlers.(*DocumentHandler).VerifySignature-fm (10 handlers)
+[GIN-debug] GET    /financial                --> go-barcode-webapp/internal/handlers.(*FinancialHandler).FinancialDashboard-fm (10 handlers)
+[GIN-debug] GET    /financial/transactions   --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ListTransactions-fm (10 handlers)
+[GIN-debug] GET    /financial/transactions/new --> go-barcode-webapp/internal/handlers.(*FinancialHandler).NewTransactionForm-fm (10 handlers)
+[GIN-debug] POST   /financial/transactions   --> go-barcode-webapp/internal/handlers.(*FinancialHandler).CreateTransaction-fm (10 handlers)
+[GIN-debug] GET    /financial/transactions/:id --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetTransaction-fm (10 handlers)
+[GIN-debug] PUT    /financial/transactions/:id/status --> go-barcode-webapp/internal/handlers.(*FinancialHandler).UpdateTransactionStatus-fm (10 handlers)
+[GIN-debug] POST   /financial/jobs/:jobId/invoice --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GenerateInvoice-fm (10 handlers)
+[GIN-debug] GET    /financial/reports        --> go-barcode-webapp/internal/handlers.(*FinancialHandler).FinancialReports-fm (10 handlers)
+[GIN-debug] GET    /financial/api/revenue-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetRevenueReport-fm (10 handlers)
+[GIN-debug] GET    /financial/api/payment-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetPaymentReport-fm (10 handlers)
+[GIN-debug] GET    /financial/api/export/transactions --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ExportTransactions-fm (10 handlers)
+[GIN-debug] GET    /financial/api/export/revenue --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ExportRevenue-fm (10 handlers)
+[GIN-debug] GET    /financial/api/export/tax-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ExportTaxReportCSV-fm (10 handlers)
+[GIN-debug] GET    /invoices                 --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).ListInvoices-fm (12 handlers)
+[GIN-debug] GET    /invoices/new             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).NewInvoiceForm-fm (12 handlers)
+[GIN-debug] POST   /invoices                 --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).CreateInvoice-fm (12 handlers)
+[GIN-debug] GET    /invoices/:id             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoice-fm (12 handlers)
+[GIN-debug] GET    /invoices/:id/edit        --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).EditInvoiceForm-fm (12 handlers)
+[GIN-debug] GET    /invoices/:id/preview     --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).PreviewInvoice-fm (12 handlers)
+[GIN-debug] PUT    /invoices/:id             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoice-fm (12 handlers)
+[GIN-debug] PUT    /invoices/:id/status      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoiceStatus-fm (12 handlers)
+[GIN-debug] DELETE /invoices/:id             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).DeleteInvoice-fm (12 handlers)
+[GIN-debug] GET    /invoices/:id/pdf         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GenerateInvoicePDF-fm (12 handlers)
+[GIN-debug] GET    /invoice-templates        --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).ListTemplates-fm (10 handlers)
+[GIN-debug] GET    /invoice-templates/new    --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).NewTemplateForm-fm (10 handlers)
+[GIN-debug] POST   /invoice-templates        --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).CreateTemplate-fm (10 handlers)
+[GIN-debug] GET    /invoice-templates/:id/edit --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).EditTemplateForm-fm (10 handlers)
+[GIN-debug] PUT    /invoice-templates/:id    --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).UpdateTemplate-fm (10 handlers)
+[GIN-debug] DELETE /invoice-templates/:id    --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).DeleteTemplate-fm (10 handlers)
+[GIN-debug] GET    /invoice-templates/:id/preview --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).PreviewTemplate-fm (10 handlers)
+[GIN-debug] POST   /invoice-templates/:id/set-default --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).SetDefaultTemplate-fm (10 handlers)
+[GIN-debug] GET    /settings/company         --> main.setupRoutes.func5 (10 handlers)
+[GIN-debug] POST   /settings/company         --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UpdateCompanySettingsForm-fm (10 handlers)
+[GIN-debug] GET    /settings/company/api     --> go-barcode-webapp/internal/handlers.(*CompanyHandler).GetCompanySettings-fm (10 handlers)
+[GIN-debug] PUT    /settings/company/api     --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UpdateCompanySettings-fm (10 handlers)
+[GIN-debug] POST   /settings/company/logo    --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UploadCompanyLogo-fm (10 handlers)
+[GIN-debug] DELETE /settings/company/logo    --> go-barcode-webapp/internal/handlers.(*CompanyHandler).DeleteCompanyLogo-fm (10 handlers)
+[GIN-debug] GET    /security/roles           --> main.setupRoutes.func6 (10 handlers)
+[GIN-debug] GET    /security/audit           --> main.setupRoutes.func7 (10 handlers)
+[GIN-debug] GET    /security/api/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRoles-fm (10 handlers)
+[GIN-debug] GET    /security/api/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRole-fm (10 handlers)
+[GIN-debug] POST   /security/api/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CreateRole-fm (10 handlers)
+[GIN-debug] PUT    /security/api/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).UpdateRole-fm (10 handlers)
+[GIN-debug] DELETE /security/api/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).DeleteRole-fm (10 handlers)
+[GIN-debug] GET    /security/api/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetUserRoles-fm (10 handlers)
+[GIN-debug] POST   /security/api/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).AssignUserRole-fm (10 handlers)
+[GIN-debug] DELETE /security/api/users/:userId/roles/:roleId --> go-barcode-webapp/internal/handlers.(*SecurityHandler).RevokeUserRole-fm (10 handlers)
+[GIN-debug] GET    /security/api/audit       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLogs-fm (10 handlers)
+[GIN-debug] GET    /security/api/audit/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLog-fm (10 handlers)
+[GIN-debug] GET    /security/api/audit/export --> go-barcode-webapp/internal/handlers.(*SecurityHandler).ExportAuditLogs-fm (10 handlers)
+[GIN-debug] GET    /security/api/permissions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissions-fm (10 handlers)
+[GIN-debug] GET    /security/api/permissions/definitions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissionDefinitionsAPI-fm (10 handlers)
+[GIN-debug] GET    /security/api/permissions/check --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CheckPermission-fm (10 handlers)
+[GIN-debug] GET    /monitoring               --> main.setupRoutes.func8 (10 handlers)
+[GIN-debug] GET    /monitoring/health        --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetApplicationHealth-fm (10 handlers)
+[GIN-debug] GET    /monitoring/metrics       --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetSystemMetrics-fm (10 handlers)
+[GIN-debug] GET    /monitoring/metrics/prometheus --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).ExportMetrics-fm (10 handlers)
+[GIN-debug] GET    /monitoring/performance   --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetPerformanceMetrics-fm (10 handlers)
+[GIN-debug] GET    /monitoring/errors        --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetErrorDetails-fm (10 handlers)
+[GIN-debug] POST   /monitoring/errors/:fingerprint/resolve --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).ResolveError-fm (10 handlers)
+[GIN-debug] POST   /monitoring/test-error    --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).TriggerTestError-fm (10 handlers)
+[GIN-debug] GET    /monitoring/logs          --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetLogStream-fm (10 handlers)
+[GIN-debug] GET    /compliance/status        --> main.setupRoutes.(*ComplianceMiddleware).GetComplianceStatus.func15 (10 handlers)
+[GIN-debug] POST   /compliance/retention/cleanup --> main.setupRoutes.(*ComplianceMiddleware).RetentionCleanupMiddleware.func16 (10 handlers)
+[GIN-debug] POST   /compliance/gdpr/request  --> main.setupRoutes.(*ComplianceMiddleware).GDPRRequestMiddleware.func17 (10 handlers)
+[GIN-debug] GET    /mobile/scanner/:jobId    --> main.setupRoutes.func9 (10 handlers)
+[GIN-debug] GET    /mobile/scanner/:jobId/enhanced --> main.setupRoutes.func10 (10 handlers)
+[GIN-debug] GET    /profile/settings         --> go-barcode-webapp/internal/handlers.(*AuthHandler).ProfileSettingsForm-fm (10 handlers)
+[GIN-debug] POST   /profile/settings         --> go-barcode-webapp/internal/handlers.(*AuthHandler).UpdateProfileSettings-fm (10 handlers)
+[GIN-debug] GET    /profile/preferences      --> go-barcode-webapp/internal/handlers.(*AuthHandler).GetUserPreferences-fm (10 handlers)
+[GIN-debug] GET    /users                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).ListUsers-fm (10 handlers)
+[GIN-debug] POST   /users                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).CreateUserWeb-fm (10 handlers)
+[GIN-debug] GET    /user-management/new      --> go-barcode-webapp/internal/handlers.(*AuthHandler).NewUserForm-fm (10 handlers)
+[GIN-debug] GET    /user-management/:id/edit --> go-barcode-webapp/internal/handlers.(*AuthHandler).EditUserForm-fm (10 handlers)
+[GIN-debug] GET    /user-management/:id/view --> go-barcode-webapp/internal/handlers.(*AuthHandler).GetUser-fm (10 handlers)
+[GIN-debug] PUT    /user-management/:id      --> go-barcode-webapp/internal/handlers.(*AuthHandler).UpdateUser-fm (10 handlers)
+[GIN-debug] DELETE /user-management/:id      --> go-barcode-webapp/internal/handlers.(*AuthHandler).DeleteUser-fm (10 handlers)
+[GIN-debug] GET    /users/new                --> main.setupRoutes.func11 (10 handlers)
+[GIN-debug] GET    /api/v1/jobs              --> go-barcode-webapp/internal/handlers.(*JobHandler).ListJobsAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/jobs              --> go-barcode-webapp/internal/handlers.(*JobHandler).CreateJobAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/jobs/:id          --> go-barcode-webapp/internal/handlers.(*JobHandler).GetJobAPI-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/jobs/:id          --> go-barcode-webapp/internal/handlers.(*JobHandler).UpdateJobAPI-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/jobs/:id          --> go-barcode-webapp/internal/handlers.(*JobHandler).DeleteJobAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*JobHandler).AssignDeviceAPI-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/jobs/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*JobHandler).RemoveDeviceAPI-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/jobs/:id/devices/bulk-remove --> go-barcode-webapp/internal/handlers.(*ScannerHandler).BulkRemoveDevices-fm (10 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/bulk-scan --> go-barcode-webapp/internal/handlers.(*JobHandler).BulkScanDevicesAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/assign-device --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanDevice-fm (10 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/assign-case --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanCase-fm (10 handlers)
+[GIN-debug] GET    /api/v1/devices           --> go-barcode-webapp/internal/handlers.(*DeviceHandler).ListDevicesAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/devices           --> go-barcode-webapp/internal/handlers.(*DeviceHandler).CreateDeviceAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/devices/:id       --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceAPI-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/devices/:id       --> go-barcode-webapp/internal/handlers.(*DeviceHandler).UpdateDeviceAPI-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/devices/:id       --> go-barcode-webapp/internal/handlers.(*DeviceHandler).DeleteDeviceAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/devices/available --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetAvailableDevicesAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/devices/category/:id --> go-barcode-webapp/internal/handlers.(*TreeHandler).GetDevicesByCategory-fm (10 handlers)
+[GIN-debug] GET    /api/v1/devices/subcategory/:id --> go-barcode-webapp/internal/handlers.(*TreeHandler).GetDevicesBySubcategory-fm (10 handlers)
+[GIN-debug] GET    /api/v1/devices/subbiercategory/:id --> go-barcode-webapp/internal/handlers.(*TreeHandler).GetDevicesBySubbiercategory-fm (10 handlers)
+[GIN-debug] GET    /api/v1/tree/complete     --> go-barcode-webapp/internal/handlers.(*TreeHandler).GetCompleteTree-fm (10 handlers)
+[GIN-debug] GET    /api/v1/customers         --> go-barcode-webapp/internal/handlers.(*CustomerHandler).ListCustomersAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/customers         --> go-barcode-webapp/internal/handlers.(*CustomerHandler).CreateCustomerAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/customers/:id     --> go-barcode-webapp/internal/handlers.(*CustomerHandler).GetCustomerAPI-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/customers/:id     --> go-barcode-webapp/internal/handlers.(*CustomerHandler).UpdateCustomerAPI-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/customers/:id     --> go-barcode-webapp/internal/handlers.(*CustomerHandler).DeleteCustomerAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/cases             --> go-barcode-webapp/internal/handlers.(*CaseHandler).ListCasesAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/cases             --> go-barcode-webapp/internal/handlers.(*CaseHandler).CreateCaseAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/cases/:id         --> go-barcode-webapp/internal/handlers.(*CaseHandler).GetCaseAPI-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/cases/:id         --> go-barcode-webapp/internal/handlers.(*CaseHandler).UpdateCaseAPI-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/cases/:id         --> go-barcode-webapp/internal/handlers.(*CaseHandler).DeleteCaseAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/cases/:id/devices --> go-barcode-webapp/internal/handlers.(*CaseHandler).GetCaseDevicesAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/cases/:id/devices --> go-barcode-webapp/internal/handlers.(*CaseHandler).ScanDeviceToCase-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/cases/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*CaseHandler).RemoveDeviceFromCase-fm (10 handlers)
+[GIN-debug] GET    /api/v1/workflow/packages --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).GetPackages-fm (10 handlers)
+[GIN-debug] POST   /api/v1/workflow/packages --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).CreatePackage-fm (10 handlers)
+[GIN-debug] GET    /api/v1/workflow/packages/:id --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).GetPackage-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/workflow/packages/:id --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).UpdatePackage-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/workflow/packages/:id --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).DeletePackage-fm (10 handlers)
+[GIN-debug] POST   /api/v1/workflow/packages/:id/clone --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).ClonePackage-fm (10 handlers)
+[GIN-debug] GET    /api/v1/workflow/packages/:id/validate --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).ValidatePackage-fm (10 handlers)
+[GIN-debug] GET    /api/v1/workflow/packages/:id/stats --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).GetPackageStats-fm (10 handlers)
+[GIN-debug] GET    /api/v1/workflow/packages/search --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).SearchPackages-fm (10 handlers)
+[GIN-debug] GET    /api/v1/workflow/packages/categories --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).GetPackageCategories-fm (10 handlers)
+[GIN-debug] GET    /api/v1/workflow/packages/popular --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).GetPopularPackages-fm (10 handlers)
+[GIN-debug] GET    /api/v1/workflow/packages/available-devices --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).GetAvailableDevices-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/workflow/packages/bulk --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).BulkUpdatePackages-fm (10 handlers)
+[GIN-debug] GET    /api/v1/documents         --> go-barcode-webapp/internal/handlers.(*DocumentHandler).ListDocumentsAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/documents/stats   --> go-barcode-webapp/internal/handlers.(*DocumentHandler).GetDocumentStats-fm (10 handlers)
+[GIN-debug] GET    /api/v1/documents/:id     --> go-barcode-webapp/internal/handlers.(*DocumentHandler).GetDocument-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/documents/:id     --> go-barcode-webapp/internal/handlers.(*DocumentHandler).DeleteDocument-fm (10 handlers)
+[GIN-debug] GET    /api/v1/financial/transactions --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ListTransactionsAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/financial/stats   --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetFinancialStatsAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/financial/revenue-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetRevenueReport-fm (10 handlers)
+[GIN-debug] GET    /api/v1/financial/payment-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetPaymentReport-fm (10 handlers)
+[GIN-debug] GET    /api/v1/invoices          --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoicesAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/invoices          --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).CreateInvoice-fm (10 handlers)
+[GIN-debug] GET    /api/v1/invoices/:id      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoice-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/invoices/:id      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoice-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/invoices/:id/status --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoiceStatus-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/invoices/:id      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).DeleteInvoice-fm (10 handlers)
+[GIN-debug] GET    /api/v1/invoices/stats    --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoiceStatsAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/invoices/products/:productId --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetProductDetails-fm (10 handlers)
+[GIN-debug] GET    /api/v1/invoices/products/:productId/devices --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetDevicesByProduct-fm (10 handlers)
+[GIN-debug] GET    /api/v1/security/audit    --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLogs-fm (10 handlers)
+[GIN-debug] GET    /api/v1/security/audit/:id --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLog-fm (10 handlers)
+[GIN-debug] GET    /api/v1/security/audit/export --> go-barcode-webapp/internal/handlers.(*SecurityHandler).ExportAuditLogs-fm (10 handlers)
+[GIN-debug] GET    /api/v1/security/auth/users --> go-barcode-webapp/internal/handlers.(*AuthHandler).ListUsersAPI-fm (10 handlers)
+[GIN-debug] GET    /api/invoices             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoicesAPI-fm (10 handlers)
+[GIN-debug] POST   /api/invoices             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).CreateInvoice-fm (10 handlers)
+[GIN-debug] GET    /api/invoices/:id         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoice-fm (10 handlers)
+[GIN-debug] PUT    /api/invoices/:id         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoice-fm (10 handlers)
+[GIN-debug] PUT    /api/invoices/:id/status  --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoiceStatus-fm (10 handlers)
+[GIN-debug] DELETE /api/invoices/:id         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).DeleteInvoice-fm (10 handlers)
+[GIN-debug] GET    /api/invoices/stats       --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoiceStatsAPI-fm (10 handlers)
+[GIN-debug] GET    /api/company-settings     --> go-barcode-webapp/internal/handlers.(*CompanyHandler).GetCompanySettings-fm (10 handlers)
+[GIN-debug] PUT    /api/company-settings     --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UpdateCompanySettings-fm (10 handlers)
+[GIN-debug] POST   /api/company-settings/logo --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UploadCompanyLogo-fm (10 handlers)
+[GIN-debug] DELETE /api/company-settings/logo --> go-barcode-webapp/internal/handlers.(*CompanyHandler).DeleteCompanyLogo-fm (10 handlers)
+[GIN-debug] GET    /api/settings/smtp        --> go-barcode-webapp/internal/handlers.(*CompanyHandler).GetSMTPConfig-fm (10 handlers)
+[GIN-debug] POST   /api/settings/smtp        --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UpdateSMTPConfig-fm (10 handlers)
+[GIN-debug] POST   /api/settings/smtp/test   --> go-barcode-webapp/internal/handlers.(*CompanyHandler).TestSMTPConnection-fm (10 handlers)
+[GIN-debug] GET    /api/security/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRoles-fm (10 handlers)
+[GIN-debug] GET    /api/security/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRole-fm (10 handlers)
+[GIN-debug] POST   /api/security/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CreateRole-fm (10 handlers)
+[GIN-debug] PUT    /api/security/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).UpdateRole-fm (10 handlers)
+[GIN-debug] DELETE /api/security/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).DeleteRole-fm (10 handlers)
+[GIN-debug] GET    /api/security/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetUserRoles-fm (10 handlers)
+[GIN-debug] POST   /api/security/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).AssignUserRole-fm (10 handlers)
+[GIN-debug] DELETE /api/security/users/:userId/roles/:roleId --> go-barcode-webapp/internal/handlers.(*SecurityHandler).RevokeUserRole-fm (10 handlers)
+[GIN-debug] GET    /api/security/audit       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLogs-fm (10 handlers)
+[GIN-debug] GET    /api/security/audit/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLog-fm (10 handlers)
+[GIN-debug] GET    /api/security/audit/export --> go-barcode-webapp/internal/handlers.(*SecurityHandler).ExportAuditLogs-fm (10 handlers)
+[GIN-debug] GET    /api/security/permissions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissions-fm (10 handlers)
+[GIN-debug] GET    /api/security/permissions/definitions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissionDefinitionsAPI-fm (10 handlers)
+[GIN-debug] GET    /api/security/permissions/check --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CheckPermission-fm (10 handlers)
+[GIN-debug] GET    /error                    --> main.main.func26 (9 handlers)
+2025/07/23 20:44:11 Server starting on 0.0.0.0:8080
+2025/07/23 20:44:14 Route Debug: GET /devices/CO21001
+2025/07/23 20:44:14 DEBUG: AuthMiddleware: Request URL: /devices/CO21001
+2025/07/23 20:44:14 DEBUG: AuthMiddleware: Found session cookie: 49d934f57c798aa826db6ddbf783462620dbaa76ab76bb5816500182128476eb for /devices/CO21001
+2025/07/23 20:44:14 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /devices/CO21001
+{"timestamp":"2025-07-23T18:44:14.696200918Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753296254345113291","method":"GET","path":"/devices/CO21001","status_code":200,"duration":"351.084485ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":-1}}
+2025/07/23 20:44:16 Route Debug: GET /devices
+2025/07/23 20:44:16 DEBUG: AuthMiddleware: Request URL: /devices
+2025/07/23 20:44:16 DEBUG: AuthMiddleware: Found session cookie: 49d934f57c798aa826db6ddbf783462620dbaa76ab76bb5816500182128476eb for /devices
+2025/07/23 20:44:16 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /devices
+2025/07/23 20:44:16 🚀 DeviceHandler.ListDevices() started
+2025/07/23 20:44:16 🐛 DEBUG: Device view requested: viewType='tree'
+2025/07/23 20:44:16 ⏱️  Database query took: 185.733669ms
+2025/07/23 20:44:16 SafeHTML: Rendering template devices_tree.html with status 200
+2025/07/23 20:44:16 ⏱️  Template rendering took: 12.051395ms
+2025/07/23 20:44:16 🏁 DeviceHandler.ListDevices() completed in 197.921865ms
+{"timestamp":"2025-07-23T18:44:16.971764411Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753296256672261160","method":"GET","path":"/devices","status_code":200,"duration":"299.498452ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":53205}}
+2025/07/23 20:44:17 Route Debug: GET /api/v1/tree/complete
+2025/07/23 20:44:17 DEBUG: AuthMiddleware: Request URL: /api/v1/tree/complete
+2025/07/23 20:44:17 DEBUG: AuthMiddleware: Found session cookie: 49d934f57c798aa826db6ddbf783462620dbaa76ab76bb5816500182128476eb for /api/v1/tree/complete
+2025/07/23 20:44:17 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /api/v1/tree/complete
+2025/07/23 20:44:17 🌳 TreeHandler.GetCompleteTree() started
+2025/07/23 20:44:17 🔧 GetAllCategories: Found 5 categories in database
+2025/07/23 20:44:17 🔧 Category from DB: Effect (ID: 1004)
+2025/07/23 20:44:17 🔧 Category from DB: Light (ID: 1002)
+2025/07/23 20:44:17 🔧 Category from DB: Other (ID: 1005)
+2025/07/23 20:44:17 🔧 Category from DB: Sound (ID: 1001)
+2025/07/23 20:44:17 🔧 Category from DB: Stage (ID: 1003)
+2025/07/23 20:44:17 🔍 Found 5 categories
+2025/07/23 20:44:17 🔍 Category Effect has 2 subcategories
+2025/07/23 20:44:17 🔍 Category Light has 5 subcategories
+2025/07/23 20:44:21 🔍 Category Other has 3 subcategories
+2025/07/23 20:44:22 🔍 Category Sound has 4 subcategories
+2025/07/23 20:44:24 🔍 Category Stage has 3 subcategories
+2025/07/23 20:44:26 ✅ Tree loaded successfully with 5 categories
+2025/07/23 20:44:26 SLOW REQUEST: GET /api/v1/tree/complete took 9.275767208s (status: 200)
+{"timestamp":"2025-07-23T18:44:26.403939663Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753296257128038315","method":"GET","path":"/api/v1/tree/complete","status_code":200,"duration":"9.275898838s","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":15564}}
+2025/07/23 20:44:29 Route Debug: GET /api/v1/devices/FOG1001
+2025/07/23 20:44:29 DEBUG: AuthMiddleware: Request URL: /api/v1/devices/FOG1001
+2025/07/23 20:44:29 DEBUG: AuthMiddleware: Found session cookie: 49d934f57c798aa826db6ddbf783462620dbaa76ab76bb5816500182128476eb for /api/v1/devices/FOG1001
+2025/07/23 20:44:29 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /api/v1/devices/FOG1001
+{"timestamp":"2025-07-23T18:44:29.363896513Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753296269024887187","method":"GET","path":"/api/v1/devices/FOG1001","status_code":200,"duration":"339.004968ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":967}}
+2025/07/23 20:47:04 Route Debug: GET /devices
+2025/07/23 20:47:04 DEBUG: AuthMiddleware: Request URL: /devices
+2025/07/23 20:47:04 DEBUG: AuthMiddleware: Found session cookie: 49d934f57c798aa826db6ddbf783462620dbaa76ab76bb5816500182128476eb for /devices
+2025/07/23 20:47:04 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /devices
+2025/07/23 20:47:04 🚀 DeviceHandler.ListDevices() started
+2025/07/23 20:47:04 🐛 DEBUG: Device view requested: viewType='categorized'
+2025/07/23 20:47:04 ⏱️  Database query took: 188.43997ms
+2025/07/23 20:47:04 🔧 GetAllCategories: Found 5 categories in database
+2025/07/23 20:47:04 🔧 Category from DB: Effect (ID: 1004)
+2025/07/23 20:47:04 🔧 Category from DB: Light (ID: 1002)
+2025/07/23 20:47:04 🔧 Category from DB: Other (ID: 1005)
+2025/07/23 20:47:04 🔧 Category from DB: Sound (ID: 1001)
+2025/07/23 20:47:04 🔧 Category from DB: Stage (ID: 1003)
+2025/07/23 20:47:04 🔧 DEBUG: Found 5 categories
+2025/07/23 20:47:04 🔧 DEBUG: Category: Effect (ID: 1004)
+2025/07/23 20:47:04 🔧 DEBUG: Category: Light (ID: 1002)
+2025/07/23 20:47:04 🔧 DEBUG: Category: Other (ID: 1005)
+2025/07/23 20:47:04 🔧 DEBUG: Category: Sound (ID: 1001)
+2025/07/23 20:47:04 🔧 DEBUG: Category: Stage (ID: 1003)
+2025/07/23 20:47:04 SafeHTML: Rendering template devices_standalone.html with status 200
+2025/07/23 20:47:04 ⏱️  Template rendering took: 218.459987ms
+2025/07/23 20:47:04 🏁 DeviceHandler.ListDevices() completed in 406.997491ms
+2025/07/23 20:47:04 SLOW REQUEST: GET /devices took 508.121943ms (status: 200)
+{"timestamp":"2025-07-23T18:47:04.693761773Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753296424185451504","method":"GET","path":"/devices","status_code":200,"duration":"508.305758ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18818}}
+DEBUG: Cleaned up 2 expired sessions
+2025/07/23 22:57:21 Route Debug: GET /devices
+2025/07/23 22:57:21 DEBUG: AuthMiddleware: Request URL: /devices
+2025/07/23 22:57:21 DEBUG: AuthMiddleware: No session cookie found for /devices, redirecting to /login
+{"timestamp":"2025-07-23T20:57:21.962377708Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753304241811956955","method":"GET","path":"/devices","status_code":303,"duration":"150.412895ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":33}}
+2025/07/23 22:57:21 Route Debug: GET /login
+{"timestamp":"2025-07-23T20:57:22.016648436Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753304241971370840","method":"GET","path":"/login","status_code":200,"duration":"45.272705ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":9726}}
+2025/07/23 22:57:22 Route Debug: GET /static/css/rental-core-design.css
+2025/07/23 22:57:22 Route Debug: GET /static/images/icon-180.png
+2025/07/23 22:57:22 NotFoundHandler: 404 for path: /static/images/icon-180.png
+2025/07/23 22:57:22 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+2025/07/23 22:57:22 Route Debug: GET /favicon.ico
+2025/07/23 22:57:22 NotFoundHandler: 404 for path: /favicon.ico
+2025/07/23 22:57:22 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+{"timestamp":"2025-07-23T20:57:22.229455959Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753304242149884058","method":"GET","path":"/favicon.ico","status_code":404,"duration":"79.569305ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":4404}}
+2025/07/23 22:57:24 POST request to /login with Content-Type: 'application/x-www-form-urlencoded'
+2025/07/23 22:57:24 Form _method parameter: ''
+2025/07/23 22:57:24 Route Debug: POST /login
+DEBUG: Creating session for user admin (ID: 5)
+DEBUG: Login successful, session created: 4b83aca782c7d8e6aea3eb22716ab542745096aa9daa1136c1e2bbd412701607
+2025/07/23 22:57:26 SLOW REQUEST: POST /login took 1.169958142s (status: 303)
+{"timestamp":"2025-07-23T20:57:26.107907796Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753304244937855586","method":"POST","path":"/login","status_code":303,"duration":"1.170049273s","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":35,"bytes_out":-1}}
+2025/07/23 22:57:26 Route Debug: GET /
+{"timestamp":"2025-07-23T20:57:26.158959619Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753304246124128534","method":"GET","path":"/","status_code":307,"duration":"34.827277ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":46}}
+2025/07/23 22:57:26 Route Debug: GET /dashboard
+2025/07/23 22:57:26 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/07/23 22:57:26 DEBUG: AuthMiddleware: Found session cookie: 4b83aca782c7d8e6aea3eb22716ab542745096aa9daa1136c1e2bbd412701607 for /dashboard
+2025/07/23 22:57:26 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /dashboard
+{"timestamp":"2025-07-23T20:57:26.386808986Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753304246169291237","method":"GET","path":"/dashboard","status_code":200,"duration":"217.514522ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18345}}
+2025/07/23 22:57:30 Route Debug: GET /devices
+2025/07/23 22:57:30 DEBUG: AuthMiddleware: Request URL: /devices
+2025/07/23 22:57:30 DEBUG: AuthMiddleware: Found session cookie: 4b83aca782c7d8e6aea3eb22716ab542745096aa9daa1136c1e2bbd412701607 for /devices
+2025/07/23 22:57:30 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /devices
+2025/07/23 22:57:30 🚀 DeviceHandler.ListDevices() started
+2025/07/23 22:57:30 🐛 DEBUG: Device view requested: viewType='list'
+2025/07/23 22:57:30 ⏱️  Database query took: 188.889626ms
+2025/07/23 22:57:30 💾 Cached 20 devices
+2025/07/23 22:57:30 SafeHTML: Rendering template devices_standalone.html with status 200
+2025/07/23 22:57:30 ⏱️  Template rendering took: 12.902576ms
+2025/07/23 22:57:30 🏁 DeviceHandler.ListDevices() completed in 218.388084ms
+{"timestamp":"2025-07-23T20:57:30.447619946Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753304250125648476","method":"GET","path":"/devices","status_code":200,"duration":"321.967009ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":50142}}
+2025/07/23 22:57:32 Route Debug: GET /devices
+2025/07/23 22:57:32 DEBUG: AuthMiddleware: Request URL: /devices
+2025/07/23 22:57:32 DEBUG: AuthMiddleware: Found session cookie: 4b83aca782c7d8e6aea3eb22716ab542745096aa9daa1136c1e2bbd412701607 for /devices
+2025/07/23 22:57:32 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /devices
+2025/07/23 22:57:32 🚀 DeviceHandler.ListDevices() started
+2025/07/23 22:57:32 🐛 DEBUG: Device view requested: viewType='tree'
+2025/07/23 22:57:32 ⏱️  Database query took: 186.875412ms
+2025/07/23 22:57:32 SafeHTML: Rendering template devices_tree.html with status 200
+2025/07/23 22:57:32 ⏱️  Template rendering took: 12.588575ms
+2025/07/23 22:57:32 🏁 DeviceHandler.ListDevices() completed in 199.540014ms
+{"timestamp":"2025-07-23T20:57:32.771094124Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753304252470909373","method":"GET","path":"/devices","status_code":200,"duration":"300.181163ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":53205}}
+2025/07/23 22:57:32 Route Debug: GET /api/v1/tree/complete
+2025/07/23 22:57:32 DEBUG: AuthMiddleware: Request URL: /api/v1/tree/complete
+2025/07/23 22:57:32 DEBUG: AuthMiddleware: Found session cookie: 4b83aca782c7d8e6aea3eb22716ab542745096aa9daa1136c1e2bbd412701607 for /api/v1/tree/complete
+2025/07/23 22:57:32 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /api/v1/tree/complete
+2025/07/23 22:57:32 🌳 TreeHandler.GetCompleteTree() started
+2025/07/23 22:57:32 🔧 GetAllCategories: Found 5 categories in database
+2025/07/23 22:57:32 🔧 Category from DB: Effect (ID: 1004)
+2025/07/23 22:57:32 🔧 Category from DB: Light (ID: 1002)
+2025/07/23 22:57:32 🔧 Category from DB: Other (ID: 1005)
+2025/07/23 22:57:32 🔧 Category from DB: Sound (ID: 1001)
+2025/07/23 22:57:32 🔧 Category from DB: Stage (ID: 1003)
+2025/07/23 22:57:32 🔍 Found 5 categories
+2025/07/23 22:57:32 🔍 Category Effect has 2 subcategories
+2025/07/23 22:57:33 🔍 Category Light has 5 subcategories
+2025/07/23 22:57:36 🔍 Category Other has 3 subcategories
+2025/07/23 22:57:37 🔍 Category Sound has 4 subcategories
+2025/07/23 22:57:40 🔍 Category Stage has 3 subcategories
+2025/07/23 22:57:41 ✅ Tree loaded successfully with 5 categories
+2025/07/23 22:57:42 SLOW REQUEST: GET /api/v1/tree/complete took 9.158147588s (status: 200)
+{"timestamp":"2025-07-23T20:57:42.015967748Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753304252857677526","method":"GET","path":"/api/v1/tree/complete","status_code":200,"duration":"9.158286483s","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":15564}}
+2025/07/23 22:58:05 Route Debug: GET /
+{"timestamp":"2025-07-23T20:58:05.676499754Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753304285641873831","method":"GET","path":"/","status_code":307,"duration":"34.622496ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":46}}
+2025/07/23 22:58:05 Route Debug: GET /dashboard
+2025/07/23 22:58:05 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/07/23 22:58:05 DEBUG: AuthMiddleware: Found session cookie: 4b83aca782c7d8e6aea3eb22716ab542745096aa9daa1136c1e2bbd412701607 for /dashboard
+2025/07/23 22:58:05 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /dashboard
+{"timestamp":"2025-07-23T20:58:05.911068258Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753304285693912186","method":"GET","path":"/dashboard","status_code":200,"duration":"217.153346ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18345}}
+signal: killed

@@ -3,6 +3,7 @@ package handlers
 import (
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -71,38 +72,91 @@ func SafeJSON(c *gin.Context, statusCode int, data interface{}) {
 func renderErrorPage(c *gin.Context, statusCode int, message string, user interface{}) {
 	log.Printf("renderErrorPage: Rendering error page - Status: %d, Message: %s", statusCode, message)
 	
-	// Try to use the error template first
+	// Check if response has already been written
+	if c.Writer.Written() {
+		log.Printf("renderErrorPage: Response already written, skipping error page")
+		return
+	}
+	
+	// Get request ID for debugging
+	requestID := ""
+	if id, exists := c.Get("request_id"); exists {
+		requestID = id.(string)
+	}
+	
+	// Try to use the enhanced error template first
 	defer func() {
 		if r := recover(); r != nil {
 			log.Printf("renderErrorPage: Error template also failed: %v", r)
+			// Check if response has already been written after panic
+			if c.Writer.Written() {
+				log.Printf("renderErrorPage: Response already written after panic, cannot render fallback")
+				return
+			}
 			// Last resort: plain HTML response
 			c.Header("Content-Type", "text/html; charset=utf-8")
 			c.String(statusCode, `
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Error - TS Jobscanner</title>
+    <title>Error %d - RentalCore</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container mt-5">
         <div class="alert alert-danger">
-            <h4>Application Error</h4>
+            <h4>Application Error %d</h4>
             <p>%s</p>
             <p><a href="/" class="btn btn-primary">Return Home</a></p>
+            <small class="text-muted">Request ID: %s</small>
         </div>
     </div>
 </body>
-</html>`, message)
+</html>`, statusCode, statusCode, message, requestID)
 		}
 	}()
 	
-	// Try to render error template
-	c.HTML(statusCode, "error.html", gin.H{
-		"title": "Error",
-		"error": message,
-		"user":  user,
-	})
+	// Try to render enhanced error template first
+	errorData := gin.H{
+		"error_code":    statusCode,
+		"error_message": getErrorMessage(statusCode, message),
+		"error_details": message,
+		"request_id":    requestID,
+		"timestamp":     time.Now().Format("2006-01-02 15:04:05"),
+		"user":          user,
+	}
+	
+	// Ensure user is not nil to prevent template errors
+	if user == nil {
+		errorData["user"] = gin.H{"Username": "Guest", "FirstName": "", "LastName": ""}
+	}
+	
+	c.HTML(statusCode, "error_page.html", errorData)
+}
+
+// getErrorMessage returns a user-friendly error message based on status code
+func getErrorMessage(statusCode int, originalMessage string) string {
+	switch statusCode {
+	case 400:
+		return "Bad Request - The request was invalid or cannot be processed"
+	case 401:
+		return "Unauthorized - You need to log in to access this page"
+	case 403:
+		return "Forbidden - You don't have permission to access this resource"
+	case 404:
+		return "Page Not Found - The requested page could not be found"
+	case 500:
+		return "Internal Server Error - Something went wrong on the server"
+	case 502:
+		return "Bad Gateway - The server received an invalid response"
+	case 503:
+		return "Service Unavailable - The server is temporarily unavailable"
+	default:
+		if originalMessage != "" {
+			return originalMessage
+		}
+		return "An unexpected error occurred"
+	}
 }
 
 // GlobalErrorHandler provides global error recovery middleware
@@ -147,6 +201,8 @@ func TemplateExistsCheck(templateName string) bool {
 	commonTemplates := map[string]bool{
 		"base.html":                       true,
 		"error.html":                      true,
+		"error_standalone.html":           true,
+		"error_page.html":                 true,
 		"login.html":                      true,
 		"home.html":                   true,
 		"cases_list.html":                 true,
@@ -162,11 +218,7 @@ func TemplateExistsCheck(templateName string) bool {
 		"jobs_new.html":                   true,
 		"job_form.html":               true,
 		"job_detail.html":                 true,
-		"job_templates_list.html":         true,
-		"job_template_form.html":          true,
-		"job_template_form_simple.html":   true,
-		"job_template_detail.html":        true,
-		"equipment_packages_list.html":    true,
+		"equipment_packages_standalone.html": true,
 		"equipment_package_form.html":     true,
 		"equipment_package_detail.html":   true,
 		"bulk_operations.html":            true,
@@ -189,6 +241,12 @@ func TemplateExistsCheck(templateName string) bool {
 		"mobile_scanner_enhanced.html":    true,
 		"security_roles.html":             true,
 		"security_audit.html":             true,
+		"profile_settings.html":           true,
+		"devices_standalone.html":         true,
+		"invoices_list.html":              true,
+		"invoices_content.html":           true,
+		"company_settings.html":           true,
+		"monitoring_dashboard.html":       true,
 	}
 	
 	return commonTemplates[templateName]

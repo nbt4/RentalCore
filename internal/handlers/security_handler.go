@@ -290,7 +290,7 @@ func (h *SecurityHandler) GetUserRoles(c *gin.Context) {
 	}
 
 	var userRoles []models.UserRole
-	result := h.db.Preload("Role").Where("user_id = ? AND is_active = ?", userID, true).Find(&userRoles)
+	result := h.db.Preload("Role").Where("userID = ? AND is_active = ?", userID, true).Find(&userRoles)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user roles"})
 		return
@@ -338,7 +338,7 @@ func (h *SecurityHandler) AssignUserRole(c *gin.Context) {
 
 	// Check if role exists and is active
 	var role models.Role
-	result = h.db.Where("role_id = ? AND is_active = ?", request.RoleID, true).First(&role)
+	result = h.db.Where("roleID = ? AND is_active = ?", request.RoleID, true).First(&role)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": "Role not found or inactive"})
@@ -348,12 +348,36 @@ func (h *SecurityHandler) AssignUserRole(c *gin.Context) {
 		return
 	}
 
-	// Check if user already has this role
+	// Check if user already has this role (active or inactive)
 	var existing models.UserRole
-	result = h.db.Where("user_id = ? AND role_id = ? AND is_active = ?", userID, request.RoleID, true).First(&existing)
+	result = h.db.Where("userID = ? AND roleID = ?", userID, request.RoleID).First(&existing)
 	if result.Error == nil {
-		c.JSON(http.StatusConflict, gin.H{"error": "User already has this role"})
-		return
+		if existing.IsActive {
+			c.JSON(http.StatusConflict, gin.H{"error": "User already has this role"})
+			return
+		} else {
+			// Reactivate existing role assignment
+			existing.IsActive = true
+			existing.AssignedAt = time.Now()
+			existing.AssignedBy = &currentUser.UserID
+			existing.ExpiresAt = request.ExpiresAt
+			
+			result = h.db.Save(&existing)
+			if result.Error != nil {
+				fmt.Printf("ERROR reactivating user role: %v\n", result.Error)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to assign role", "details": result.Error.Error()})
+				return
+			}
+			
+			// Load role data for response
+			h.db.Preload("Role").First(&existing, "userID = ? AND roleID = ?", userID, request.RoleID)
+			
+			// Log the action
+			h.logAction(c, "assign_role", "user", userID, nil, existing)
+			
+			c.JSON(http.StatusCreated, gin.H{"userRole": existing})
+			return
+		}
 	}
 
 	// Create new user role assignment
@@ -373,7 +397,7 @@ func (h *SecurityHandler) AssignUserRole(c *gin.Context) {
 	}
 
 	// Load role data for response
-	h.db.Preload("Role").First(&userRole, "user_id = ? AND role_id = ?", userID, request.RoleID)
+	h.db.Preload("Role").First(&userRole, "userID = ? AND roleID = ?", userID, request.RoleID)
 
 	// Log the action
 	h.logAction(c, "assign_role", "user", userID, nil, userRole)
@@ -392,7 +416,7 @@ func (h *SecurityHandler) RevokeUserRole(c *gin.Context) {
 	roleID := c.Param("roleId")
 
 	var userRole models.UserRole
-	result := h.db.Where("user_id = ? AND role_id = ? AND is_active = ?", userID, roleID, true).First(&userRole)
+	result := h.db.Where("userID = ? AND roleID = ? AND is_active = ?", userID, roleID, true).First(&userRole)
 	if result.Error != nil {
 		if result.Error == gorm.ErrRecordNotFound {
 			c.JSON(http.StatusNotFound, gin.H{"error": "User role assignment not found"})
@@ -711,7 +735,7 @@ func (h *SecurityHandler) hasPermission(c *gin.Context, permission string) bool 
 
 	// Get user's active roles
 	var userRoles []models.UserRole
-	result := h.db.Preload("Role").Where("user_id = ? AND is_active = ? AND (expires_at IS NULL OR expires_at > ?)", 
+	result := h.db.Preload("Role").Where("userID = ? AND is_active = ? AND (expires_at IS NULL OR expires_at > ?)", 
 		currentUser.UserID, true, time.Now()).Find(&userRoles)
 	
 	if result.Error != nil {

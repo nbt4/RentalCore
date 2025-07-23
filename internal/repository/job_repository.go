@@ -43,6 +43,13 @@ func (r *JobRepository) GetByID(id uint) (*models.Job, error) {
 		return nil, err
 	}
 	
+	// Add device count
+	var deviceCount int64
+	if err := r.db.DB.Table("jobdevices").Where("jobID = ?", job.JobID).Count(&deviceCount).Error; err != nil {
+		deviceCount = 0
+	}
+	job.DeviceCount = int(deviceCount)
+	
 	// Manually load products for each device
 	r.loadProductsForJobDevices(job.JobDevices)
 	
@@ -102,7 +109,18 @@ func (r *JobRepository) Update(job *models.Job) error {
 	return nil
 }
 
+// RemoveAllDevicesFromJob removes all devices assigned to a specific job
+func (r *JobRepository) RemoveAllDevicesFromJob(jobID uint) error {
+	return r.db.Where("jobID = ?", jobID).Delete(&models.JobDevice{}).Error
+}
+
 func (r *JobRepository) Delete(id uint) error {
+	// First, remove all devices from the job to avoid foreign key constraint issues
+	if err := r.RemoveAllDevicesFromJob(id); err != nil {
+		return fmt.Errorf("failed to remove devices from job: %v", err)
+	}
+	
+	// Then delete the job itself
 	return r.db.Delete(&models.Job{}, id).Error
 }
 

@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -28,19 +27,11 @@ func (h *CustomerHandler) ListCustomers(c *gin.Context) {
 		return
 	}
 
-	// DEBUG: Log all query parameters
-	fmt.Printf("DEBUG Customer Handler: All query params: %+v\n", c.Request.URL.Query())
-	
 	// Manual parameter extraction to ensure search works
 	searchParam := c.Query("search")
-	fmt.Printf("DEBUG Customer Handler: Raw search parameter: '%s'\n", searchParam)
 	if searchParam != "" {
 		params.SearchTerm = searchParam
-		fmt.Printf("DEBUG Customer Handler: Search parameter SET to: '%s'\n", searchParam)
 	}
-	
-	// DEBUG: Log params after binding
-	fmt.Printf("DEBUG Customer Handler: Final params: SearchTerm='%s'\n", params.SearchTerm)
 
 	customers, err := h.customerRepo.List(params)
 	if err != nil {
@@ -48,13 +39,12 @@ func (h *CustomerHandler) ListCustomers(c *gin.Context) {
 		return
 	}
 
-	fmt.Printf("DEBUG: Found %d customers with search term '%s'\n", len(customers), params.SearchTerm)
-
 	c.HTML(http.StatusOK, "customers.html", gin.H{
-		"title":     "Customers",
-		"customers": customers,
-		"params":    params,
-		"user":      user,
+		"title":       "Customers",
+		"customers":   customers,
+		"params":      params,
+		"user":        user,
+		"currentPage": "customers",
 	})
 }
 

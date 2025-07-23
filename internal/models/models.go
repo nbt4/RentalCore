@@ -55,9 +55,9 @@ func (Status) TableName() string {
 type Job struct {
 	JobID           uint        `json:"jobID" gorm:"primaryKey;column:jobID"`
 	CustomerID      uint        `json:"customerID" gorm:"not null;column:customerID"`
-	Customer        Customer    `json:"customer,omitempty" gorm:"-"`
+	Customer        Customer    `json:"customer,omitempty" gorm:"foreignKey:CustomerID"`
 	StatusID        uint        `json:"statusID" gorm:"not null;column:statusID"`
-	Status          Status      `json:"status,omitempty" gorm:"-"`
+	Status          Status      `json:"status,omitempty" gorm:"foreignKey:StatusID"`
 	JobCategoryID   *uint       `json:"jobcategoryID" gorm:"column:jobcategoryID"`
 	Description     *string     `json:"description" gorm:"column:description"`
 	Discount        float64     `json:"discount" gorm:"column:discount;default:0"`
@@ -66,8 +66,8 @@ type Job struct {
 	FinalRevenue    *float64    `json:"final_revenue" gorm:"column:final_revenue"`
 	StartDate       *time.Time  `json:"startDate" gorm:"column:startDate;type:date"`
 	EndDate         *time.Time  `json:"endDate" gorm:"column:endDate;type:date"`
-	TemplateID      *uint       `json:"templateID" gorm:"column:templateID"`
-	JobDevices      []JobDevice `json:"job_devices,omitempty" gorm:"-"`
+	JobDevices      []JobDevice `json:"job_devices,omitempty" gorm:"foreignKey:JobID"`
+	DeviceCount     int         `json:"device_count" gorm:"-:all"`
 }
 
 func (Job) TableName() string {
@@ -77,7 +77,7 @@ func (Job) TableName() string {
 type Device struct {
 	DeviceID             string      `json:"deviceID" gorm:"primaryKey;column:deviceID"`
 	ProductID            *uint       `json:"productID" gorm:"column:productID"`
-	Product              *Product    `json:"product,omitempty" gorm:"-"`
+	Product              *Product    `json:"product,omitempty" gorm:"foreignKey:ProductID;references:ProductID"`
 	SerialNumber         *string     `json:"serialnumber" gorm:"column:serialnumber"`
 	PurchaseDate         *time.Time  `json:"purchaseDate" gorm:"column:purchaseDate;type:date"`
 	LastMaintenance      *time.Time  `json:"lastmaintenance" gorm:"column:lastmaintenance;type:date"`
@@ -119,10 +119,11 @@ type Product struct {
 	Depth                 *float64 `json:"depth" gorm:"column:depth"`
 	PowerConsumption      *float64     `json:"powerconsumption" gorm:"column:powerconsumption"`
 	PosInCategory         *uint        `json:"pos_in_category" gorm:"column:pos_in_category"`
-	Category              *Category    `json:"category,omitempty" gorm:"-"`
-	Subcategory           *Subcategory `json:"subcategory,omitempty" gorm:"-"`
-	Brand                 *Brand       `json:"brand,omitempty" gorm:"-"`
-	Manufacturer          *Manufacturer `json:"manufacturer,omitempty" gorm:"-"`
+	Category              *Category       `json:"category,omitempty" gorm:"foreignKey:CategoryID;references:CategoryID"`
+	Subcategory           *Subcategory    `json:"subcategory,omitempty" gorm:"foreignKey:SubcategoryID"`
+	Subbiercategory       *Subbiercategory `json:"subbiercategory,omitempty" gorm:"foreignKey:SubbiercategoryID"`
+	Brand                 *Brand          `json:"brand,omitempty" gorm:"foreignKey:BrandID"`
+	Manufacturer          *Manufacturer   `json:"manufacturer,omitempty" gorm:"foreignKey:ManufacturerID"`
 }
 
 func (Product) TableName() string {
@@ -142,11 +143,23 @@ func (Subcategory) TableName() string {
 	return "subcategories"
 }
 
+type Subbiercategory struct {
+	SubbiercategoryID string `json:"subbiercategoryID" gorm:"primaryKey;column:subbiercategoryID"`
+	Name              string `json:"name" gorm:"not null;column:name"`
+	Abbreviation      string `json:"abbreviation" gorm:"column:abbreviation"`
+	SubcategoryID     string `json:"subcategoryID" gorm:"column:subcategoryID"`
+	Subcategory       Subcategory `json:"subcategory,omitempty" gorm:"-"`
+}
+
+func (Subbiercategory) TableName() string {
+	return "subbiercategories"
+}
+
 type JobDevice struct {
 	JobID       uint     `json:"jobID" gorm:"primaryKey;column:jobID"`
 	DeviceID    string   `json:"deviceID" gorm:"primaryKey;column:deviceID"`
-	Job         Job      `json:"job,omitempty" gorm:"-"`
-	Device      Device   `json:"device,omitempty" gorm:"-"`
+	Job         Job      `json:"job,omitempty" gorm:"foreignKey:JobID"`
+	Device      Device   `json:"device,omitempty" gorm:"foreignKey:DeviceID"`
 	CustomPrice *float64 `json:"custom_price" gorm:"column:custom_price"`
 }
 
@@ -299,7 +312,6 @@ func (User) TableName() string {
 type Session struct {
 	SessionID string    `json:"sessionID" gorm:"primaryKey;column:session_id"`
 	UserID    uint      `json:"userID" gorm:"not null;column:user_id"`
-	User      User      `json:"user,omitempty" gorm:"-"`
 	ExpiresAt time.Time `json:"expiresAt" gorm:"not null;column:expires_at"`
 	CreatedAt time.Time `json:"createdAt" gorm:"column:created_at"`
 }
@@ -350,7 +362,8 @@ type Case struct {
 	Height      *float64        `json:"height" gorm:"column:height"`
 	Depth       *float64        `json:"depth" gorm:"column:depth"`
 	Status      string          `json:"status" gorm:"not null;column:status;default:free"`
-	Devices     []DeviceCase    `json:"devices,omitempty" gorm:"-"`
+	Devices     []DeviceCase    `json:"devices,omitempty" gorm:"foreignKey:CaseID"`
+	DeviceCount int             `json:"device_count" gorm:"-:all"`
 }
 
 func (Case) TableName() string {
@@ -360,30 +373,12 @@ func (Case) TableName() string {
 type DeviceCase struct {
 	CaseID   uint   `json:"caseID" gorm:"primaryKey;column:caseID"`
 	DeviceID string `json:"deviceID" gorm:"primaryKey;column:deviceID"`
-	Case     Case   `json:"case,omitempty" gorm:"-"`
-	Device   Device `json:"device,omitempty" gorm:"-"`
+	Case     Case   `json:"case,omitempty" gorm:"foreignKey:CaseID"`
+	Device   Device `json:"device,omitempty" gorm:"foreignKey:DeviceID"`
 }
 
 func (DeviceCase) TableName() string {
 	return "devicescases"
 }
 
-// DeviceCategoryGroup represents devices grouped by category and subcategory
-type DeviceCategoryGroup struct {
-	Category     *Category                      `json:"category"`
-	Subcategories []DeviceSubcategoryGroup      `json:"subcategories"`
-	DeviceCount  int                           `json:"deviceCount"`
-}
 
-type DeviceSubcategoryGroup struct {
-	Subcategory *Subcategory            `json:"subcategory"`
-	Devices     []DeviceWithJobInfo     `json:"devices"`
-	DeviceCount int                     `json:"deviceCount"`
-}
-
-// CategorizedDevicesResponse represents the response structure for categorized devices
-type CategorizedDevicesResponse struct {
-	Categories  []DeviceCategoryGroup   `json:"categories"`
-	Uncategorized []DeviceWithJobInfo   `json:"uncategorized"`
-	TotalDevices int                    `json:"totalDevices"`
-}

@@ -9,6 +9,7 @@ import (
 	"go-barcode-webapp/internal/models"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jung-kurt/gofpdf"
 	"gorm.io/gorm"
 )
 
@@ -48,18 +49,19 @@ func (h *AnalyticsHandler) Dashboard(c *gin.Context) {
 	analytics := h.getAnalyticsData(startDate, endDate)
 	
 	c.HTML(http.StatusOK, "analytics_dashboard.html", gin.H{
-		"title":     "Analytics Dashboard",
-		"user":      currentUser,
-		"analytics": analytics,
-		"period":    period,
-		"startDate": startDate.Format("2006-01-02"),
-		"endDate":   endDate.Format("2006-01-02"),
+		"title":       "Analytics Dashboard",
+		"currentPage": "analytics",
+		"user":        currentUser,
+		"analytics":   analytics,
+		"period":      period,
+		"startDate":   startDate.Format("2006-01-02"),
+		"endDate":     endDate.Format("2006-01-02"),
 	})
 }
 
 // getAnalyticsData collects all analytics data for the dashboard
 func (h *AnalyticsHandler) getAnalyticsData(startDate, endDate time.Time) map[string]interface{} {
-	return map[string]interface{}{
+	analytics := map[string]interface{}{
 		"revenue":         h.getRevenueAnalytics(startDate, endDate),
 		"equipment":       h.getEquipmentAnalytics(startDate, endDate),
 		"customers":       h.getCustomerAnalytics(startDate, endDate),
@@ -69,6 +71,19 @@ func (h *AnalyticsHandler) getAnalyticsData(startDate, endDate time.Time) map[st
 		"utilization":    h.getUtilizationMetrics(),
 		"trends":         h.getTrendData(startDate, endDate),
 	}
+	
+	// Ensure trends always has a proper structure
+	if trends, ok := analytics["trends"].(map[string]interface{}); ok {
+		if trends["revenue"] == nil {
+			trends["revenue"] = []map[string]interface{}{}
+		}
+	} else {
+		analytics["trends"] = map[string]interface{}{
+			"revenue": []map[string]interface{}{},
+		}
+	}
+	
+	return analytics
 }
 
 // getRevenueAnalytics calculates revenue metrics
@@ -465,6 +480,8 @@ func (h *AnalyticsHandler) ExportAnalytics(c *gin.Context) {
 
 	if format == "csv" {
 		h.exportToCSV(c, startDate, endDate)
+	} else if format == "pdf" {
+		h.exportToPDF(c, startDate, endDate)
 	} else {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Unsupported format"})
 	}
@@ -538,4 +555,355 @@ func (h *AnalyticsHandler) exportToCSV(c *gin.Context, startDate, endDate time.T
 	}
 
 	c.String(http.StatusOK, csvData)
+}
+
+// exportToPDF exports analytics data to PDF format
+func (h *AnalyticsHandler) exportToPDF(c *gin.Context, startDate, endDate time.Time) {
+	c.Header("Content-Type", "application/pdf")
+	c.Header("Content-Disposition", `attachment; filename="analytics_`+time.Now().Format("2006-01-02")+`.pdf"`)
+
+	// Get analytics data
+	analytics := h.getAnalyticsData(startDate, endDate)
+
+	// Create PDF
+	pdf := gofpdf.New("P", "mm", "A4", "")
+	pdf.AddPage()
+
+	// Add title
+	pdf.SetFont("Arial", "B", 20)
+	pdf.SetTextColor(30, 64, 175) // Blue color
+	pdf.Cell(190, 15, "Analytics Report")
+	pdf.Ln(20)
+
+	// Add date range
+	pdf.SetFont("Arial", "", 12)
+	pdf.SetTextColor(75, 85, 99) // Gray color
+	pdf.Cell(190, 8, fmt.Sprintf("Period: %s to %s", startDate.Format("2006-01-02"), endDate.Format("2006-01-02")))
+	pdf.Ln(15)
+
+	// Revenue Section
+	h.addPDFSection(pdf, "Revenue Analytics", analytics["revenue"])
+
+	// Equipment Section
+	h.addPDFSection(pdf, "Equipment Analytics", analytics["equipment"])
+
+	// Customer Section
+	h.addPDFSection(pdf, "Customer Analytics", analytics["customers"])
+
+	// Job Section
+	h.addPDFSection(pdf, "Job Analytics", analytics["jobs"])
+
+	// Top Equipment Table
+	h.addTopEquipmentTable(pdf, analytics["topEquipment"])
+
+	// Top Customers Table
+	h.addTopCustomersTable(pdf, analytics["topCustomers"])
+
+	// Output PDF
+	err := pdf.Output(c.Writer)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate PDF"})
+		return
+	}
+}
+
+// addPDFSection adds a section to the PDF with key metrics
+func (h *AnalyticsHandler) addPDFSection(pdf *gofpdf.Fpdf, title string, data interface{}) {
+	// Section title
+	pdf.SetFont("Arial", "B", 14)
+	pdf.SetTextColor(51, 51, 51)
+	pdf.Cell(190, 10, title)
+	pdf.Ln(12)
+
+	// Create a colored background rectangle
+	pdf.SetFillColor(248, 250, 252) // Light gray background
+	pdf.Rect(10, pdf.GetY()-2, 190, 25, "F")
+
+	pdf.SetFont("Arial", "", 10)
+	pdf.SetTextColor(75, 85, 99)
+
+	if dataMap, ok := data.(map[string]interface{}); ok {
+		switch title {
+		case "Revenue Analytics":
+			h.addRevenueMetrics(pdf, dataMap)
+		case "Equipment Analytics":
+			h.addEquipmentMetrics(pdf, dataMap)
+		case "Customer Analytics":
+			h.addCustomerMetrics(pdf, dataMap)
+		case "Job Analytics":
+			h.addJobMetrics(pdf, dataMap)
+		}
+	}
+
+	pdf.Ln(15)
+}
+
+// addRevenueMetrics adds revenue metrics to PDF
+func (h *AnalyticsHandler) addRevenueMetrics(pdf *gofpdf.Fpdf, data map[string]interface{}) {
+	y := pdf.GetY()
+	
+	// Total Revenue
+	if totalRevenue, ok := data["totalRevenue"].(float64); ok {
+		pdf.Cell(90, 6, fmt.Sprintf("Total Revenue: €%.2f", totalRevenue))
+	}
+	
+	// Total Jobs
+	if totalJobs, ok := data["totalJobs"].(int64); ok {
+		pdf.SetXY(105, y)
+		pdf.Cell(90, 6, fmt.Sprintf("Total Jobs: %d", totalJobs))
+	}
+
+	y += 8
+	pdf.SetXY(15, y)
+	
+	// Average Job Value
+	if avgJobValue, ok := data["avgJobValue"].(float64); ok {
+		pdf.Cell(90, 6, fmt.Sprintf("Average Job Value: €%.2f", avgJobValue))
+	}
+	
+	// Revenue Growth
+	if revenueGrowth, ok := data["revenueGrowth"].(float64); ok {
+		pdf.SetXY(105, y)
+		pdf.Cell(90, 6, fmt.Sprintf("Revenue Growth: %.1f%%", revenueGrowth))
+	}
+}
+
+// addEquipmentMetrics adds equipment metrics to PDF
+func (h *AnalyticsHandler) addEquipmentMetrics(pdf *gofpdf.Fpdf, data map[string]interface{}) {
+	y := pdf.GetY()
+	
+	// Total Devices
+	if totalDevices, ok := data["totalDevices"].(int64); ok {
+		pdf.Cell(90, 6, fmt.Sprintf("Total Devices: %d", totalDevices))
+	}
+	
+	// Active Devices
+	if activeDevices, ok := data["activeDevices"].(int64); ok {
+		pdf.SetXY(105, y)
+		pdf.Cell(90, 6, fmt.Sprintf("Active Devices: %d", activeDevices))
+	}
+
+	y += 8
+	pdf.SetXY(15, y)
+	
+	// Utilization Rate
+	if utilizationRate, ok := data["utilizationRate"].(float64); ok {
+		pdf.Cell(90, 6, fmt.Sprintf("Utilization Rate: %.1f%%", utilizationRate))
+	}
+	
+	// Revenue per Device
+	if revenuePerDevice, ok := data["revenuePerDevice"].(float64); ok {
+		pdf.SetXY(105, y)
+		pdf.Cell(90, 6, fmt.Sprintf("Revenue per Device: €%.2f", revenuePerDevice))
+	}
+}
+
+// addCustomerMetrics adds customer metrics to PDF
+func (h *AnalyticsHandler) addCustomerMetrics(pdf *gofpdf.Fpdf, data map[string]interface{}) {
+	y := pdf.GetY()
+	
+	// Total Customers
+	if totalCustomers, ok := data["totalCustomers"].(int64); ok {
+		pdf.Cell(90, 6, fmt.Sprintf("Total Customers: %d", totalCustomers))
+	}
+	
+	// Active Customers
+	if activeCustomers, ok := data["activeCustomers"].(int64); ok {
+		pdf.SetXY(105, y)
+		pdf.Cell(90, 6, fmt.Sprintf("Active Customers: %d", activeCustomers))
+	}
+
+	y += 8
+	pdf.SetXY(15, y)
+	
+	// New Customers
+	if newCustomers, ok := data["newCustomers"].(int64); ok {
+		pdf.Cell(90, 6, fmt.Sprintf("New Customers: %d", newCustomers))
+	}
+	
+	// Retention Rate
+	if retentionRate, ok := data["retentionRate"].(float64); ok {
+		pdf.SetXY(105, y)
+		pdf.Cell(90, 6, fmt.Sprintf("Retention Rate: %.1f%%", retentionRate))
+	}
+}
+
+// addJobMetrics adds job metrics to PDF
+func (h *AnalyticsHandler) addJobMetrics(pdf *gofpdf.Fpdf, data map[string]interface{}) {
+	y := pdf.GetY()
+	
+	// Completed Jobs
+	if completedJobs, ok := data["completedJobs"].(int64); ok {
+		pdf.Cell(90, 6, fmt.Sprintf("Completed Jobs: %d", completedJobs))
+	}
+	
+	// Active Jobs
+	if activeJobs, ok := data["activeJobs"].(int64); ok {
+		pdf.SetXY(105, y)
+		pdf.Cell(90, 6, fmt.Sprintf("Active Jobs: %d", activeJobs))
+	}
+
+	y += 8
+	pdf.SetXY(15, y)
+	
+	// Overdue Jobs
+	if overdueJobs, ok := data["overdueJobs"].(int64); ok {
+		pdf.Cell(90, 6, fmt.Sprintf("Overdue Jobs: %d", overdueJobs))
+	}
+	
+	// Average Duration
+	if avgJobDuration, ok := data["avgJobDuration"].(float64); ok {
+		pdf.SetXY(105, y)
+		pdf.Cell(90, 6, fmt.Sprintf("Avg Duration: %.1f days", avgJobDuration))
+	}
+}
+
+// addTopEquipmentTable adds top equipment table to PDF
+func (h *AnalyticsHandler) addTopEquipmentTable(pdf *gofpdf.Fpdf, data interface{}) {
+	if pdf.GetY() > 220 {
+		pdf.AddPage()
+	}
+
+	// Table title
+	pdf.SetFont("Arial", "B", 14)
+	pdf.SetTextColor(51, 51, 51)
+	pdf.Cell(190, 10, "Top Equipment by Revenue")
+	pdf.Ln(12)
+
+	// Table headers
+	pdf.SetFont("Arial", "B", 9)
+	pdf.SetFillColor(230, 230, 230)
+	pdf.CellFormat(40, 8, "Device ID", "1", 0, "C", true, 0, "")
+	pdf.CellFormat(60, 8, "Product Name", "1", 0, "C", true, 0, "")
+	pdf.CellFormat(30, 8, "Rentals", "1", 0, "C", true, 0, "")
+	pdf.CellFormat(35, 8, "Revenue", "1", 0, "C", true, 0, "")
+	pdf.Ln(8)
+
+	// Table data
+	pdf.SetFont("Arial", "", 8)
+	pdf.SetFillColor(255, 255, 255)
+	pdf.SetTextColor(51, 51, 51)
+
+	if equipmentList, ok := data.([]map[string]interface{}); ok {
+		for i, equipment := range equipmentList {
+			if i >= 10 { // Limit to top 10
+				break
+			}
+			
+			// Alternate row colors
+			if i%2 == 1 {
+				pdf.SetFillColor(248, 250, 252)
+			} else {
+				pdf.SetFillColor(255, 255, 255)
+			}
+
+			deviceID := ""
+			if id, ok := equipment["deviceID"].(string); ok {
+				deviceID = id
+			}
+
+			productName := ""
+			if name, ok := equipment["productName"].(string); ok {
+				productName = name
+				if len(productName) > 25 {
+					productName = productName[:22] + "..."
+				}
+			}
+
+			rentalCount := "0"
+			if count, ok := equipment["rentalCount"].(int); ok {
+				rentalCount = strconv.Itoa(count)
+			}
+
+			totalRevenue := "€0.00"
+			if revenue, ok := equipment["totalRevenue"].(float64); ok {
+				totalRevenue = fmt.Sprintf("€%.2f", revenue)
+			}
+
+			pdf.CellFormat(40, 6, deviceID, "1", 0, "L", true, 0, "")
+			pdf.CellFormat(60, 6, productName, "1", 0, "L", true, 0, "")
+			pdf.CellFormat(30, 6, rentalCount, "1", 0, "C", true, 0, "")
+			pdf.CellFormat(35, 6, totalRevenue, "1", 0, "R", true, 0, "")
+			pdf.Ln(6)
+		}
+	}
+
+	pdf.Ln(10)
+}
+
+// addTopCustomersTable adds top customers table to PDF
+func (h *AnalyticsHandler) addTopCustomersTable(pdf *gofpdf.Fpdf, data interface{}) {
+	if pdf.GetY() > 220 {
+		pdf.AddPage()
+	}
+
+	// Table title
+	pdf.SetFont("Arial", "B", 14)
+	pdf.SetTextColor(51, 51, 51)
+	pdf.Cell(190, 10, "Top Customers by Revenue")
+	pdf.Ln(12)
+
+	// Table headers
+	pdf.SetFont("Arial", "B", 9)
+	pdf.SetFillColor(230, 230, 230)
+	pdf.CellFormat(70, 8, "Customer Name", "1", 0, "C", true, 0, "")
+	pdf.CellFormat(30, 8, "Jobs", "1", 0, "C", true, 0, "")
+	pdf.CellFormat(40, 8, "Avg Revenue", "1", 0, "C", true, 0, "")
+	pdf.CellFormat(40, 8, "Total Revenue", "1", 0, "C", true, 0, "")
+	pdf.Ln(8)
+
+	// Table data
+	pdf.SetFont("Arial", "", 8)
+	pdf.SetFillColor(255, 255, 255)
+	pdf.SetTextColor(51, 51, 51)
+
+	if customerList, ok := data.([]map[string]interface{}); ok {
+		for i, customer := range customerList {
+			if i >= 10 { // Limit to top 10
+				break
+			}
+			
+			// Alternate row colors
+			if i%2 == 1 {
+				pdf.SetFillColor(248, 250, 252)
+			} else {
+				pdf.SetFillColor(255, 255, 255)
+			}
+
+			customerName := ""
+			if name, ok := customer["customerName"].(string); ok {
+				customerName = name
+				if len(customerName) > 30 {
+					customerName = customerName[:27] + "..."
+				}
+			}
+
+			jobCount := "0"
+			if count, ok := customer["jobCount"].(int); ok {
+				jobCount = strconv.Itoa(count)
+			}
+
+			avgRevenue := "€0.00"
+			if revenue, ok := customer["avgRevenue"].(float64); ok {
+				avgRevenue = fmt.Sprintf("€%.2f", revenue)
+			}
+
+			totalRevenue := "€0.00"
+			if revenue, ok := customer["totalRevenue"].(float64); ok {
+				totalRevenue = fmt.Sprintf("€%.2f", revenue)
+			}
+
+			pdf.CellFormat(70, 6, customerName, "1", 0, "L", true, 0, "")
+			pdf.CellFormat(30, 6, jobCount, "1", 0, "C", true, 0, "")
+			pdf.CellFormat(40, 6, avgRevenue, "1", 0, "R", true, 0, "")
+			pdf.CellFormat(40, 6, totalRevenue, "1", 0, "R", true, 0, "")
+			pdf.Ln(6)
+		}
+	}
+
+	// Add footer
+	pdf.Ln(15)
+	pdf.SetFont("Arial", "I", 8)
+	pdf.SetTextColor(128, 128, 128)
+	pdf.CellFormat(190, 6, fmt.Sprintf("Generated on %s by RentalCore Analytics", time.Now().Format("2006-01-02 15:04:05")), "", 0, "C", false, 0, "")
 }

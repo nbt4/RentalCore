@@ -137,8 +137,9 @@
         .camera-controls {
             display: flex;
             justify-content: center;
-            gap: 12px;
-            margin-top: 16px;
+            gap: 16px;
+            margin-top: 24px;
+            margin-bottom: 24px;
             position: relative;
             padding-bottom: 40px;
         }
@@ -558,52 +559,7 @@
     </style>
 ></head>
 <body class="rc-animate-fade-in">
-    <!-- Navigation -->
-    <nav class="rc-navbar">
-        <div class="rc-container">
-            <div class="rc-navbar-content">
-                <a href="/" class="rc-navbar-brand">
-                    <i class="bi bi-gear-wide-connected"></i>
-                    RentalCore
-                </a>
-                
-                <!-- Mobile toggle -->
-                <button class="rc-navbar-toggle">
-                    <i class="bi bi-list"></i>
-                </button>
-                
-                <!-- Main navigation -->
-                <ul class="rc-navbar-nav">
-                    <li><a href="/jobs" class="rc-nav-link">
-                        <i class="bi bi-briefcase"></i> Jobs
-                    </a></li>
-                    <li><a href="/devices" class="rc-nav-link">
-                        <i class="bi bi-cpu"></i> Devices
-                    </a></li>
-                    <li><a href="/customers" class="rc-nav-link">
-                        <i class="bi bi-people"></i> Customers
-                    </a></li>
-                    <li><a href="/cases" class="rc-nav-link">
-                        <i class="bi bi-box"></i> Cases
-                    </a></li>
-                    
-                    <!-- User Info (minimal for scanner) -->
-                    {{if .user}}
-                    <li><span class="rc-nav-link">
-                        <i class="bi bi-person-circle"></i> {{.user.Username}}
-                    </span></li>
-                    {{end}}
-                    
-                    <!-- Theme Toggle -->
-                    <li>
-                        <button class="rc-btn rc-btn-ghost rc-btn-sm" data-theme-toggle title="Toggle theme">
-                            <i class="bi bi-moon-fill"></i>
-                        </button>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+    {{template "navbar.html" .}}
 
     <main class="rc-container rc-mt-lg">
         <!-- Job Header -->
@@ -618,7 +574,7 @@
                         <i class="bi bi-calendar"></i> {{if .job.StartDate}}{{.job.StartDate.Format "02.01.2006"}}{{end}}
                     </span>
                     <span class="rc-text-secondary">
-                        <i class="bi bi-cpu"></i> {{len .assignedDevices}} devices assigned
+                        <i class="bi bi-cpu"></i> {{.DeviceCount}} devices assigned
                     </span>
                 </div>
             </div>
@@ -671,7 +627,7 @@
                         </div>
                         
                         <!-- Scanner Status -->
-                        <div class="scanner-status-area rc-text-center" id="scanner-status-area">
+                        <div class="scanner-status-area rc-text-center" id="scanner-status-area" style="margin-top: 16px; margin-bottom: 16px;">
                             <div class="scanner-status" id="scanner-status">Ready to scan</div>
                         </div>
                         
@@ -693,7 +649,7 @@
                         
                         <!-- Mobile Scanner Options -->
                         <div class="mobile-scanner-section rc-mb-md">
-                            <h6><i class="bi bi-phone"></i> Mobile Scanner</h6>
+                            <h6 style="margin-bottom: 16px;"><i class="bi bi-phone"></i> Mobile Scanner</h6>
                             <div class="rc-flex rc-flex-gap-sm">
                                 <a href="/mobile/scanner/{{.job.JobID}}" class="rc-btn rc-btn-outline rc-btn-sm rc-flex-1">
                                     <i class="bi bi-camera"></i> Standard
@@ -705,8 +661,8 @@
                         </div>
 
                         <!-- Bulk Scan Toggle -->
-                        <div class="manual-input-section rc-mb-md">
-                            <h6><i class="bi bi-toggles"></i> Scan Mode</h6>
+                        <div class="manual-input-section rc-mb-md" style="margin-top: 20px; margin-bottom: 20px; padding: 16px; border: 1px solid var(--surface-3); border-radius: 8px; background: var(--surface-1);">
+                            <h6 style="margin-bottom: 16px;"><i class="bi bi-toggles"></i> Scan Mode</h6>
                             <div class="rc-flex rc-flex-gap-md rc-flex-between">
                                 <div class="rc-flex rc-flex-gap-sm rc-flex-center">
                                     <input type="checkbox" id="bulk-mode-toggle" class="rc-switch" checked>
@@ -723,12 +679,12 @@
                         </div>
 
                         <!-- Manual Input -->
-                        <div class="manual-input-section">
-                            <h6><i class="bi bi-keyboard"></i> Manual Input</h6>
-                            <div class="rc-input-group">
+                        <div class="manual-input-section" style="margin-top: 20px;">
+                            <h6 style="margin-bottom: 16px;"><i class="bi bi-keyboard"></i> Manual Input</h6>
+                            <div class="rc-input-group" style="margin-bottom: 20px;">
                                 <input type="text" id="manual-input" class="rc-input" 
                                        placeholder="Type device ID (e.g. SUB1001)" autocomplete="off">
-                                <button class="rc-btn rc-btn-primary" onclick="processManualInput()">
+                                <button class="rc-btn rc-btn-primary" onclick="processManualInput()" style="margin-left: 8px;">
                                     <i class="bi bi-plus-lg"></i> Add
                                 </button>
                             </div>
@@ -752,10 +708,10 @@
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                             {{range $index, $case := .cases}}
                             {{if lt $index 6}}
-                            <button class="rc-btn rc-btn-outline case-scan-btn" onclick="scanCase({{$case.CaseID}}, '{{$case.Name}}', {{len $case.Devices}})" style="font-size: 16px; padding: 20px 12px; min-height: 80px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; border-radius: 12px; border: 2px solid var(--surface-3); background: var(--surface-1); transition: all 0.2s ease;">
+                            <button class="rc-btn rc-btn-outline case-scan-btn" onclick="scanCase({{$case.CaseID}}, '{{$case.Name}}', {{$case.DeviceCount}})" style="font-size: 16px; padding: 20px 12px; min-height: 80px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; border-radius: 12px; border: 2px solid var(--surface-3); background: var(--surface-1); transition: all 0.2s ease;">
                                 <i class="bi bi-box" style="font-size: 24px; color: var(--accent-electric);"></i>
                                 <span style="font-weight: 600; color: var(--text-primary);">{{$case.Name}}</span>
-                                <small style="color: var(--text-muted); font-size: 12px;">{{len $case.Devices}} devices</small>
+                                <small style="color: var(--text-muted); font-size: 12px;">{{$case.DeviceCount}} devices</small>
                             </button>
                             {{end}}
                             {{end}}
@@ -770,10 +726,10 @@
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 24px;">
                                 {{range $index, $case := .cases}}
                                 {{if ge $index 6}}
-                                <button class="rc-btn rc-btn-outline case-scan-btn" onclick="scanCase({{$case.CaseID}}, '{{$case.Name}}', {{len $case.Devices}})" style="font-size: 16px; padding: 20px 12px; min-height: 80px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; border-radius: 12px; border: 2px solid var(--surface-3); background: var(--surface-1); transition: all 0.2s ease;">
+                                <button class="rc-btn rc-btn-outline case-scan-btn" onclick="scanCase({{$case.CaseID}}, '{{$case.Name}}', {{$case.DeviceCount}})" style="font-size: 16px; padding: 20px 12px; min-height: 80px; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; text-align: center; border-radius: 12px; border: 2px solid var(--surface-3); background: var(--surface-1); transition: all 0.2s ease;">
                                     <i class="bi bi-box" style="font-size: 24px; color: var(--accent-electric);"></i>
                                     <span style="font-weight: 600; color: var(--text-primary);">{{$case.Name}}</span>
-                                    <small style="color: var(--text-muted); font-size: 12px;">{{len $case.Devices}} devices</small>
+                                    <small style="color: var(--text-muted); font-size: 12px;">{{$case.DeviceCount}} devices</small>
                                 </button>
                                 {{end}}
                                 {{end}}
@@ -788,7 +744,15 @@
                 <div class="rc-card">
                     <div class="rc-card-header rc-flex rc-flex-between" style="align-items: center;">
                         <h6><i class="bi bi-list-check"></i> Scanned Devices</h6>
-                        <span class="rc-badge rc-badge-primary">{{.totalDevices}} devices</span>
+                        <div class="rc-flex rc-flex-gap-sm" style="align-items: center;">
+                            <button id="bulk-delete-btn" class="rc-btn rc-btn-danger rc-btn-sm" onclick="bulkDeleteDevices()" style="display: none;">
+                                <i class="bi bi-trash"></i> Delete <span id="bulk-delete-count">0</span>
+                            </button>
+                            <button id="select-all-btn" class="rc-btn rc-btn-outline rc-btn-sm" onclick="toggleSelectAll()">
+                                <i class="bi bi-check-square"></i> Select All
+                            </button>
+                            <span class="rc-badge rc-badge-primary">{{.totalDevices}} devices</span>
+                        </div>
                     </div>
                     <div class="rc-card-body">
                         <div class="device-list" id="device-list">
@@ -802,16 +766,15 @@
                                         <button class="rc-accordion-button collapsed" type="button" 
                                                 onclick="toggleAccordion('collapse-product-{{$productId}}')" 
                                                 aria-expanded="false" 
-                                                aria-controls="collapse-product-{{$productId}}">
-                                            <div class="rc-flex rc-flex-between rc-w-full rc-mr-sm" style="align-items: center; text-align: left;">
-                                                <div class="product-info" style="text-align: left;">
-                                                    <div class="product-name">{{$productName}}</div>
-                                                    {{if $group.Product.ItemCostPerDay}}
-                                                    <small class="rc-text-muted">€{{printf "%.2f" (derefFloat $group.Product.ItemCostPerDay)}} per day</small>
-                                                    {{end}}
-                                                </div>
-                                                <span class="rc-badge rc-badge-secondary">{{len $group.Devices}} devices</span>
+                                                aria-controls="collapse-product-{{$productId}}"
+                                                style="display: flex !important; justify-content: space-between !important; align-items: center !important; width: 100% !important; text-align: left !important;">
+                                            <div class="product-info" style="text-align: left; flex: 1 1 auto;">
+                                                <div class="product-name">{{$productName}}</div>
+                                                {{if and $group.Product $group.Product.ItemCostPerDay}}
+                                                <small class="rc-text-muted">€{{printf "%.2f" (derefFloat $group.Product.ItemCostPerDay)}} per day</small>
+                                                {{end}}
                                             </div>
+                                            <span class="rc-badge rc-badge-secondary" style="margin-left: 20px; flex: 0 0 auto;">{{$group.Count}} devices</span>
                                         </button>
                                     </h2>
                                     <div id="collapse-product-{{$productId}}" 
@@ -819,18 +782,21 @@
                                          aria-labelledby="heading-product-{{$productId}}">
                                         <div class="rc-accordion-body">
                                             {{range $group.Devices}}
-                                            <div class="device-item-grouped">
+                                            <div class="device-item-grouped" data-device-id="{{.Device.DeviceID}}">
                                                 <div class="rc-flex rc-flex-between rc-flex-start">
-                                                    <div class="flex-grow-1">
-                                                        <div class="device-id">{{.Device.DeviceID}}</div>
-                                                        <div class="device-price">
-                                                            {{if .CustomPrice}}
-                                                                €{{printf "%.2f" (derefFloat .CustomPrice)}} (custom price)
-                                                            {{else if .Device.Product.ItemCostPerDay}}
-                                                                €{{printf "%.2f" (derefFloat .Device.Product.ItemCostPerDay)}} (default price)
-                                                            {{else}}
-                                                                No price set
-                                                            {{end}}
+                                                    <div class="rc-flex rc-flex-start" style="gap: 12px; flex-grow: 1;">
+                                                        <input type="checkbox" class="device-checkbox" data-device-id="{{.Device.DeviceID}}" onchange="updateBulkDeleteButton()">
+                                                        <div class="flex-grow-1">
+                                                            <div class="device-id">{{.Device.DeviceID}}</div>
+                                                            <div class="device-price">
+                                                                {{if .CustomPrice}}
+                                                                    €{{printf "%.2f" (derefFloat .CustomPrice)}} (custom price)
+                                                                {{else if and .Device.Product .Device.Product.ItemCostPerDay}}
+                                                                    €{{printf "%.2f" (derefFloat .Device.Product.ItemCostPerDay)}} (default price)
+                                                                {{else}}
+                                                                    No price set
+                                                                {{end}}
+                                                            </div>
                                                         </div>
                                                     </div>
                                                     <button class="rc-btn rc-btn-outline-danger rc-btn-sm" onclick="removeDevice('{{.Device.DeviceID}}')">
@@ -1637,6 +1603,78 @@
             }
         });
         
+        // Bulk delete functionality
+        function updateBulkDeleteButton() {
+            const checkboxes = document.querySelectorAll('.device-checkbox:checked');
+            const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+            const bulkDeleteCount = document.getElementById('bulk-delete-count');
+            const selectAllBtn = document.getElementById('select-all-btn');
+            
+            if (checkboxes.length > 0) {
+                bulkDeleteBtn.style.display = 'block';
+                bulkDeleteCount.textContent = checkboxes.length;
+            } else {
+                bulkDeleteBtn.style.display = 'none';
+            }
+            
+            // Update select all button text
+            const allCheckboxes = document.querySelectorAll('.device-checkbox');
+            const allChecked = allCheckboxes.length > 0 && checkboxes.length === allCheckboxes.length;
+            selectAllBtn.innerHTML = allChecked ? 
+                '<i class="bi bi-square"></i> Clear All' : 
+                '<i class="bi bi-check-square"></i> Select All';
+        }
+        
+        function toggleSelectAll() {
+            const allCheckboxes = document.querySelectorAll('.device-checkbox');
+            const checkedCheckboxes = document.querySelectorAll('.device-checkbox:checked');
+            const shouldCheck = checkedCheckboxes.length < allCheckboxes.length;
+            
+            allCheckboxes.forEach(checkbox => {
+                checkbox.checked = shouldCheck;
+            });
+            
+            updateBulkDeleteButton();
+        }
+        
+        async function bulkDeleteDevices() {
+            const checkedCheckboxes = document.querySelectorAll('.device-checkbox:checked');
+            if (checkedCheckboxes.length === 0) return;
+            
+            const deviceIds = Array.from(checkedCheckboxes).map(cb => cb.getAttribute('data-device-id'));
+            
+            if (!confirm(`Are you sure you want to remove ${deviceIds.length} devices from this job?`)) {
+                return;
+            }
+            
+            const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+            const originalText = bulkDeleteBtn.innerHTML;
+            bulkDeleteBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Removing...';
+            bulkDeleteBtn.disabled = true;
+            
+            try {
+                const response = await fetch('/api/v1/jobs/{{.job.JobID}}/devices/bulk-remove', {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ device_ids: deviceIds })
+                });
+                
+                if (response.ok) {
+                    // Reload page to show updated device list
+                    window.location.reload();
+                } else {
+                    const result = await response.json();
+                    alert('Error removing devices: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error removing devices:', error);
+                alert('Network error removing devices');
+            } finally {
+                bulkDeleteBtn.innerHTML = originalText;
+                bulkDeleteBtn.disabled = false;
+            }
+        }
+
         // Cleanup on page unload
         window.addEventListener('beforeunload', function() {
             stopScanner();

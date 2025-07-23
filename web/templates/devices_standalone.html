@@ -4,125 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{.title}} - RentalCore</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- iOS Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="RentalCore">
+    <link rel="apple-touch-icon" href="/static/images/icon-180.png">
+    
+    <!-- Theme Colors -->
+    <meta name="theme-color" content="#030712">
+    <meta name="msapplication-TileColor" content="#030712">
+    
+    <!-- CSS -->
     <link rel="stylesheet" href="/static/css/rental-core-design.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 </head>
-<body>
-    <!-- Navigation -->
-    <nav class="rc-navbar">
-        <div class="rc-container">
-            <div class="rc-navbar-content">
-                <a href="/" class="rc-navbar-brand">
-                    <i class="bi bi-gear-wide-connected"></i>
-                    RentalCore
-                </a>
-                
-                <!-- Mobile toggle -->
-                <button class="rc-navbar-toggle">
-                    <i class="bi bi-list"></i>
-                </button>
-                
-                <!-- Main navigation -->
-                <ul class="rc-navbar-nav">
-                    <li><a href="/jobs" class="rc-nav-link">
-                        <i class="bi bi-briefcase"></i> Jobs
-                    </a></li>
-                    <li><a href="/devices" class="rc-nav-link active">
-                        <i class="bi bi-cpu"></i> Devices
-                    </a></li>
-                    <li><a href="/customers" class="rc-nav-link">
-                        <i class="bi bi-people"></i> Customers
-                    </a></li>
-                    <li><a href="/cases" class="rc-nav-link">
-                        <i class="bi bi-box"></i> Cases
-                    </a></li>
-                    
-                    <!-- Tools Dropdown -->
-                    <li class="rc-dropdown">
-                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
-                            <i class="bi bi-tools"></i> Tools
-                        </a>
-                        <div class="rc-dropdown-menu">
-                            <div class="rc-dropdown-header">
-                                <i class="bi bi-folder"></i> Management
-                            </div>
-                            <a href="/workflow/templates" class="rc-dropdown-item">
-                                <i class="bi bi-file-earmark-text"></i> Job Templates
-                            </a>
-                            <a href="/workflow/packages" class="rc-dropdown-item">
-                                <i class="bi bi-box-seam"></i> Equipment Packages
-                            </a>
-                            <hr class="rc-dropdown-divider">
-                            <div class="rc-dropdown-header">
-                                <i class="bi bi-building"></i> Business
-                            </div>
-                            <a href="/invoices" class="rc-dropdown-item">
-                                <i class="bi bi-file-text"></i> Invoices
-                            </a>
-                            <a href="/analytics" class="rc-dropdown-item">
-                                <i class="bi bi-graph-up"></i> Analytics
-                            </a>
-                            <a href="/financial" class="rc-dropdown-item">
-                                <i class="bi bi-calculator"></i> Financial
-                            </a>
-                        </div>
-                    </li>
-                    
-                    <!-- User Dropdown -->
-                    {{if .user}}
-                    <li class="rc-dropdown">
-                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
-                            <i class="bi bi-person-circle"></i> {{.user.Username}}
-                        </a>
-                        <div class="rc-dropdown-menu">
-                            <div class="rc-dropdown-header">
-                                <i class="bi bi-person"></i> {{.user.FirstName}} {{.user.LastName}}
-                            </div>
-                            <hr class="rc-dropdown-divider">
-                            <div class="rc-dropdown-header">Personal</div>
-                            <a href="/profile/settings" class="rc-dropdown-item">
-                                <i class="bi bi-person-gear"></i> Profile Settings
-                            </a>
-                            <hr class="rc-dropdown-divider">
-                            <div class="rc-dropdown-header">Company</div>
-                            <a href="/settings/company" class="rc-dropdown-item">
-                                <i class="bi bi-building-gear"></i> Company Settings
-                            </a>
-                            <a href="/settings/email-templates" class="rc-dropdown-item">
-                                <i class="bi bi-envelope-gear"></i> E-Mail Templates
-                            </a>
-                            <hr class="rc-dropdown-divider">
-                            <div class="rc-dropdown-header">System</div>
-                            <a href="/users" class="rc-dropdown-item">
-                                <i class="bi bi-people-fill"></i> User Management
-                            </a>
-                            <a href="/security" class="rc-dropdown-item">
-                                <i class="bi bi-shield-check"></i> Security & Audit
-                            </a>
-                            <hr class="rc-dropdown-divider">
-                            <a href="/logout" class="rc-dropdown-item">
-                                <i class="bi bi-box-arrow-right"></i> Logout
-                            </a>
-                        </div>
-                    </li>
-                    {{else}}
-                    <li>
-                        <a href="/login" class="rc-btn rc-btn-primary rc-btn-sm">
-                            <i class="bi bi-box-arrow-in-right"></i> Login
-                        </a>
-                    </li>
-                    {{end}}
-                    
-                    <!-- Theme Toggle -->
-                    <li>
-                        <button class="rc-btn rc-btn-ghost rc-btn-sm" data-theme-toggle title="Toggle theme">
-                            <i class="bi bi-moon-fill"></i>
-                        </button>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
+<body class="rc-animate-fade-in">
+    {{template "navbar.html" .}}
 
     <!-- Main Content -->
     <main class="rc-container rc-mt-lg">
@@ -133,9 +35,15 @@
                 <p class="rc-text">Manage your equipment devices</p>
             </div>
             <div class="rc-flex rc-flex-gap-sm">
-                <a href="/devices?view=list" class="rc-btn rc-btn-outline rc-btn-sm">List</a>
-                <a href="/devices?view=categorized" class="rc-btn rc-btn-outline rc-btn-sm">Categories</a>
-                <a href="/devices/new" class="rc-btn rc-btn-primary rc-btn-sm">New Device</a>
+                <a href="/devices?view=list" class="rc-btn rc-btn-outline rc-btn-sm {{if eq .viewType "list"}}rc-btn-active{{end}}">
+                    <i class="bi bi-list-ul"></i> List
+                </a>
+                <a href="/devices?view=tree" class="rc-btn rc-btn-outline rc-btn-sm {{if eq .viewType "tree"}}rc-btn-active{{end}}">
+                    <i class="bi bi-diagram-3"></i> Tree
+                </a>
+                <button class="rc-btn rc-btn-primary rc-btn-sm" onclick="openAddDeviceModal()">
+                    <i class="bi bi-plus-lg"></i> New Device
+                </button>
             </div>
         </div>
 
@@ -146,14 +54,6 @@
                     <input type="hidden" name="view" value="{{.viewType}}">
                     <div class="rc-flex rc-flex-gap-sm rc-flex-wrap" style="align-items: stretch;">
                         <input type="text" class="rc-input" name="search" placeholder="Search devices..." value="{{.params.SearchTerm}}" style="max-width: 300px;">
-                        {{if eq .viewType "categorized"}}
-                        <select class="rc-select" name="category" style="min-width: 150px;">
-                            <option value="">All Categories</option>
-                            {{range .categories}}
-                            <option value="{{.Name}}" {{if eq .Name $.params.Category}}selected{{end}}>{{.Name}}</option>
-                            {{end}}
-                        </select>
-                        {{end}}
                         <button type="submit" class="rc-btn rc-btn-primary" style="padding: 0 var(--space-md); min-width: 50px;">
                             <i class="bi bi-search"></i>
                         </button>
@@ -167,465 +67,746 @@
             </div>
         </div>
 
-        <!-- Devices Table -->
-        <div class="rc-card">
-            <div class="rc-card-body">
-                {{if .devices}}
-                <table class="rc-table">
-                    <thead>
-                        <tr>
-                            <th>Device ID</th>
-                            <th>Product</th>
-                            {{if eq .viewType "categorized"}}<th>Category</th>{{end}}
-                            <th>Serial Number</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{range .devices}}
-                        <tr>
-                            <td><code>{{.Device.DeviceID}}</code></td>
-                            <td>{{if .Device.Product}}{{.Device.Product.Name}}{{else}}-{{end}}</td>
-                            {{if eq $.viewType "categorized"}}
-                            <td>
-                                {{if and .Device.Product .Device.Product.Category}}
-                                    {{.Device.Product.Category.Name}}
-                                {{else}}
-                                    <span class="rc-text-muted">Unkategorisiert</span>
-                                {{end}}
-                            </td>
-                            {{end}}
-                            <td>{{derefString .Device.SerialNumber}}</td>
-                            <td>
-                                {{if eq .Device.Status "free"}}
-                                    <span class="rc-badge rc-badge-success">Free</span>
-                                {{else if eq .Device.Status "rented"}}
-                                    <span class="rc-badge rc-badge-warning">Rented</span>
-                                {{else if eq .Device.Status "maintenance"}}
-                                    <span class="rc-badge rc-badge-danger">Maintenance</span>
-                                {{else}}
-                                    <span class="rc-badge rc-badge-secondary">{{.Device.Status}}</span>
-                                {{end}}
-                            </td>
-                            <td>
-                                <div class="rc-flex rc-flex-gap-xs">
-                                    <button type="button" class="rc-btn rc-btn-outline rc-btn-sm" title="View Details" onclick="showDeviceDetails('{{.Device.DeviceID}}')">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                    <button type="button" class="rc-btn rc-btn-outline rc-btn-sm" title="Edit Device" onclick="showEditDevice('{{.Device.DeviceID}}')">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <a href="/devices/{{.Device.DeviceID}}/qr" class="rc-btn rc-btn-outline rc-btn-sm" title="QR" target="_blank">
-                                        <i class="bi bi-qr-code"></i>
-                                    </a>
-                                    <button type="button" class="rc-btn rc-btn-outline rc-btn-sm" title="Delete" onclick="deleteDevice('{{.Device.DeviceID}}')">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
+        <!-- Device Content -->
+        {{if eq .viewType "tree"}}
+            <!-- Hierarchical Tree View -->
+            <div class="rc-card">
+                <div class="rc-card-body">
+                    <div class="tree-container">
+                        {{range .treeData}}
+                        <!-- CATEGORY LEVEL -->
+                        <div class="tree-category">
+                            <div class="tree-category-header" onclick="toggleTreeNode('category-{{.ID}}')">
+                                <i class="bi bi-chevron-right tree-chevron" id="chevron-category-{{.ID}}"></i>
+                                <i class="bi bi-folder2 tree-icon category-icon"></i>
+                                <span class="tree-title">{{.Name}}</span>
+                                <span class="tree-count">{{.DeviceCount}} devices</span>
+                            </div>
+                            <div class="tree-content" id="category-{{.ID}}" style="display: none;">
+                                
+                                <!-- Direct devices in category -->
+                                {{if .DirectDevices}}
+                                <div class="tree-direct-devices">
+                                    {{range .DirectDevices}}
+                                    <div class="tree-device">
+                                        <div class="device-info">
+                                            <div class="device-name">{{.ProductName}}</div>
+                                            <div class="device-details">
+                                                <span class="device-id">{{.DeviceID}}</span>
+                                                {{if .SerialNumber}}<span class="device-serial">• {{.SerialNumber}}</span>{{end}}
+                                                <span class="device-status device-status-{{.Status}}">{{.Status}}</span>
+                                            </div>
+                                        </div>
+                                        <div class="device-actions">
+                                            <button onclick="viewDevice('{{.DeviceID}}')" class="rc-btn rc-btn-outline rc-btn-xs" title="View">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button onclick="editDevice('{{.DeviceID}}')" class="rc-btn rc-btn-outline rc-btn-xs" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {{end}}
                                 </div>
-                            </td>
-                        </tr>
+                                {{end}}
+                                
+                                <!-- SUBCATEGORY LEVEL -->
+                                {{range .Subcategories}}
+                                <div class="tree-subcategory">
+                                    <div class="tree-subcategory-header" onclick="toggleTreeNode('subcategory-{{.ID}}')">
+                                        <i class="bi bi-chevron-right tree-chevron" id="chevron-subcategory-{{.ID}}"></i>
+                                        <i class="bi bi-folder tree-icon subcategory-icon"></i>
+                                        <span class="tree-title">{{.Name}}</span>
+                                        <span class="tree-count">{{.DeviceCount}} devices</span>
+                                    </div>
+                                    <div class="tree-content" id="subcategory-{{.ID}}" style="display: none;">
+                                        
+                                        <!-- Direct devices in subcategory -->
+                                        {{if .DirectDevices}}
+                                        <div class="tree-direct-devices">
+                                            {{range .DirectDevices}}
+                                            <div class="tree-device">
+                                                <div class="device-info">
+                                                    <div class="device-name">{{.ProductName}}</div>
+                                                    <div class="device-details">
+                                                        <span class="device-id">{{.DeviceID}}</span>
+                                                        {{if .SerialNumber}}<span class="device-serial">• {{.SerialNumber}}</span>{{end}}
+                                                        <span class="device-status device-status-{{.Status}}">{{.Status}}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="device-actions">
+                                                    <button onclick="viewDevice('{{.DeviceID}}')" class="rc-btn rc-btn-outline rc-btn-xs" title="View">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button onclick="editDevice('{{.DeviceID}}')" class="rc-btn rc-btn-outline rc-btn-xs" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            {{end}}
+                                        </div>
+                                        {{end}}
+                                        
+                                        <!-- SUBBIERCATEGORY LEVEL -->
+                                        {{range .Subbiercategories}}
+                                        <div class="tree-subbiercategory">
+                                            <div class="tree-subbiercategory-header" onclick="toggleTreeNode('subbiercategory-{{.ID}}')">
+                                                <i class="bi bi-chevron-right tree-chevron" id="chevron-subbiercategory-{{.ID}}"></i>
+                                                <i class="bi bi-folder-fill tree-icon subbiercategory-icon"></i>
+                                                <span class="tree-title">{{.Name}}</span>
+                                                <span class="tree-count">{{.DeviceCount}} devices</span>
+                                            </div>
+                                            <div class="tree-content" id="subbiercategory-{{.ID}}" style="display: none;">
+                                                <!-- Devices in subbiercategory -->
+                                                {{range .Devices}}
+                                                <div class="tree-device">
+                                                    <div class="device-info">
+                                                        <div class="device-name">{{.ProductName}}</div>
+                                                        <div class="device-details">
+                                                            <span class="device-id">{{.DeviceID}}</span>
+                                                            {{if .SerialNumber}}<span class="device-serial">• {{.SerialNumber}}</span>{{end}}
+                                                            <span class="device-status device-status-{{.Status}}">{{.Status}}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="device-actions">
+                                                        <button onclick="viewDevice('{{.DeviceID}}')" class="rc-btn rc-btn-outline rc-btn-xs" title="View">
+                                                            <i class="bi bi-eye"></i>
+                                                        </button>
+                                                        <button onclick="editDevice('{{.DeviceID}}')" class="rc-btn rc-btn-outline rc-btn-xs" title="Edit">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                {{end}}
+                                            </div>
+                                        </div>
+                                        {{end}}
+                                        
+                                    </div>
+                                </div>
+                                {{end}}
+                                
+                            </div>
+                        </div>
                         {{end}}
-                    </tbody>
-                </table>
-                {{else}}
-                <div class="rc-text-center">
-                    <h3>No devices found</h3>
-                    <a href="/devices/new" class="rc-btn rc-btn-primary">Add Device</a>
+                    </div>
                 </div>
-                {{end}}
             </div>
-        </div>
+        {{else}}
+            <!-- List View -->
+            <div class="rc-card">
+                <div class="rc-card-body">
+                    {{if .devices}}
+                    <div class="rc-table-responsive">
+                        <table class="rc-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Category</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{range .devices}}
+                                <tr>
+                                    <td><span class="rc-text-mono">{{.DeviceID}}</span></td>
+                                    <td>{{if .Product}}{{.Product.Name}}{{else}}No Product{{end}}</td>
+                                    <td>{{if .Product}}{{if .Product.Description}}{{.Product.Description}}{{else}}-{{end}}{{else}}-{{end}}</td>
+                                    <td><span class="rc-badge rc-badge-primary">{{if .Product}}{{if .Product.Category}}{{.Product.Category.Name}}{{else}}Uncategorized{{end}}{{else}}-{{end}}</span></td>
+                                    <td><span class="rc-badge {{if eq .Status "free"}}rc-badge-success{{else if eq .Status "assigned"}}rc-badge-warning{{else if eq .Status "maintenance"}}rc-badge-danger{{else}}rc-badge-secondary{{end}}">{{.Status}}</span></td>
+                                    <td>
+                                        <div class="rc-flex rc-flex-gap-xs">
+                                            <button onclick="viewDevice({{.DeviceID}})" class="rc-btn rc-btn-outline rc-btn-sm" title="View Details">
+                                                <i class="bi bi-eye"></i>
+                                            </button>
+                                            <button onclick="editDevice({{.DeviceID}})" class="rc-btn rc-btn-outline rc-btn-sm" title="Edit">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button onclick="deleteDevice({{.DeviceID}})" class="rc-btn rc-btn-outline rc-btn-sm" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {{end}}
+                            </tbody>
+                        </table>
+                    </div>
+                    {{else}}
+                    <div class="rc-empty-state">
+                        <i class="bi bi-cpu rc-empty-icon"></i>
+                        <h3 class="rc-heading-3">No devices found</h3>
+                        <p class="rc-text">Add your first device to get started.</p>
+                        <button onclick="openAddDeviceModal()" class="rc-btn rc-btn-primary">
+                            <i class="bi bi-plus-lg"></i> Add Device
+                        </button>
+                    </div>
+                    {{end}}
+                </div>
+            </div>
+        {{end}}
 
         <!-- Pagination -->
-        {{if .devices}}
-        <div class="rc-flex rc-flex-between rc-mt-lg">
-            <div class="rc-flex rc-flex-gap-sm">
-                {{if gt .currentPage 1}}
-                <a href="/devices?view={{.viewType}}&page={{add .currentPage -1}}{{if .params.SearchTerm}}&search={{.params.SearchTerm}}{{end}}" class="rc-btn rc-btn-outline rc-btn-sm">Previous</a>
-                {{end}}
-                <span class="rc-btn rc-btn-ghost rc-btn-sm">Page {{.currentPage}}</span>
-                {{if .hasNextPage}}
-                <a href="/devices?view={{.viewType}}&page={{add .currentPage 1}}{{if .params.SearchTerm}}&search={{.params.SearchTerm}}{{end}}" class="rc-btn rc-btn-outline rc-btn-sm">Next</a>
-                {{end}}
-            </div>
-            <div class="rc-text-sm">{{len .devices}} devices</div>
+        <div class="rc-flex rc-flex-center rc-mt-xl" style="gap: var(--space-md);">
+            <a href="javascript:void(0)" onclick="previousPage()" class="rc-btn rc-btn-outline rc-btn-sm">
+                <i class="bi bi-chevron-left"></i> Previous
+            </a>
+            
+            <span class="rc-text" style="padding: 0 var(--space-md);">Page {{if .pageNumber}}{{.pageNumber}}{{else}}1{{end}} of {{if .totalPages}}{{.totalPages}}{{else}}1{{end}}</span>
+            
+            <a href="javascript:void(0)" onclick="nextPage()" class="rc-btn rc-btn-outline rc-btn-sm">
+                Next <i class="bi bi-chevron-right"></i>
+            </a>
         </div>
-        {{end}}
+        
+        <script>
+        let currentPage = {{if .pageNumber}}{{.pageNumber}}{{else}}1{{end}};
+        const totalPages = {{if .totalPages}}{{.totalPages}}{{else}}1{{end}};
+        
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                const url = new URL(window.location);
+                url.searchParams.set('page', currentPage);
+                window.location.href = url.toString();
+            }
+        }
+        
+        function previousPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                const url = new URL(window.location);
+                url.searchParams.set('page', currentPage);
+                window.location.href = url.toString();
+            }
+        }
+        
+        // Update button states based on current page
+        function updateButtonStates() {
+            const prevBtn = document.querySelector('a[onclick="previousPage()"]');
+            const nextBtn = document.querySelector('a[onclick="nextPage()"]');
+            
+            if (currentPage <= 1) {
+                prevBtn.style.opacity = '0.5';
+                prevBtn.style.pointerEvents = 'none';
+            } else {
+                prevBtn.style.opacity = '1';
+                prevBtn.style.pointerEvents = 'auto';
+            }
+            
+            if (currentPage >= totalPages) {
+                nextBtn.style.opacity = '0.5';
+                nextBtn.style.pointerEvents = 'none';
+            } else {
+                nextBtn.style.opacity = '1';
+                nextBtn.style.pointerEvents = 'auto';
+            }
+        }
+        
+        // Update page display and button states on load
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.rc-flex span').textContent = 'Page ' + currentPage + ' of ' + totalPages;
+            updateButtonStates();
+        });
+        </script>
     </main>
 
-    <!-- Device Edit Modal -->
-    <div id="deviceEditModal" class="rc-modal" style="display: none;">
-        <div class="rc-modal-overlay" onclick="closeDeviceEditModal()"></div>
-        <div class="rc-modal-content" style="max-width: 700px;">
-            <div class="rc-modal-header">
-                <h3 class="rc-modal-title">
-                    <i class="bi bi-pencil"></i> Edit Device
-                </h3>
-                <button class="rc-modal-close" onclick="closeDeviceEditModal()">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
-            <div class="rc-modal-body" id="deviceEditContent">
-                <div class="rc-text-center rc-py-xl">
-                    <div class="rc-spinner"></div>
-                    <p class="rc-text-muted rc-mt-md">Loading device form...</p>
+    <!-- Footer -->
+    <footer style="margin-top: var(--space-3xl); padding: var(--space-xl) 0; border-top: 1px solid var(--surface-3);">
+        <div class="rc-container">
+            <div class="rc-flex rc-flex-between" style="align-items: center;">
+                <div class="rc-text-sm" style="color: var(--text-muted);">
+                    <i class="bi bi-gear-wide-connected"></i>
+                    RentalCore - Advanced Equipment Management System
+                </div>
+                <div class="rc-flex" style="gap: var(--space-lg);">
+                    <a href="/help" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-question-circle"></i> Help
+                    </a>
+                    <a href="/about" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-info-circle"></i> About
+                    </a>
+                    <a href="/contact" class="rc-text-sm" style="color: var(--text-muted); text-decoration: none;">
+                        <i class="bi bi-envelope"></i> Contact
+                    </a>
                 </div>
             </div>
         </div>
-    </div>
+    </footer>
 
-    <!-- Device Details Modal -->
-    <div id="deviceDetailsModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalDeviceTitle">Device Details</h2>
-                <button type="button" class="modal-close" onclick="closeDeviceDetailsModal()">
-                    <i class="bi bi-x"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div id="modalLoadingSpinner" class="loading-spinner">
-                    <i class="bi bi-arrow-clockwise spin"></i> Loading...
-                </div>
-                <div id="modalDeviceContent" style="display: none;">
-                    <!-- Device basic info -->
-                    <div class="device-info-section">
-                        <h3>Geräteinformationen</h3>
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <label>Geräte-ID:</label>
-                                <span id="deviceID"></span>
-                            </div>
-                            <div class="info-item">
-                                <label>Produkt:</label>
-                                <span id="productName"></span>
-                            </div>
-                            <div class="info-item">
-                                <label>Seriennummer:</label>
-                                <span id="serialNumber"></span>
-                            </div>
-                            <div class="info-item">
-                                <label>Status:</label>
-                                <span id="deviceStatus"></span>
-                            </div>
-                            <div class="info-item">
-                                <label>Preis/Tag:</label>
-                                <span id="pricePerDay"></span>
-                            </div>
-                            <div class="info-item">
-                                <label>Gewicht:</label>
-                                <span id="weight"></span>
-                            </div>
-                        </div>
-                    </div>
+    <!-- JavaScript -->
+    <script src="/static/js/rental-core-design.js"></script>
+    
+    <style>
+    /* New Simple Tree View Styles */
+    .tree-container {
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .tree-category {
+        margin-bottom: var(--space-md);
+        border: 1px solid var(--surface-3);
+        border-radius: var(--radius-md);
+        background: var(--surface-1);
+    }
+    
+    .tree-category-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        padding: var(--space-md);
+        cursor: pointer;
+        transition: var(--transition-normal);
+        border-radius: var(--radius-md);
+    }
+    
+    .tree-category-header:hover {
+        background: var(--surface-2);
+    }
+    
+    .tree-chevron {
+        color: var(--text-muted);
+        transition: transform 0.2s ease;
+        font-size: 0.9rem;
+    }
+    
+    .tree-chevron.expanded {
+        transform: rotate(90deg);
+    }
+    
+    .tree-icon {
+        color: var(--accent-electric);
+        font-size: 1.1rem;
+    }
+    
+    .tree-title {
+        font-weight: 600;
+        color: var(--text-primary);
+        flex: 1;
+    }
+    
+    .tree-count {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        background: var(--surface-3);
+        padding: 2px 8px;
+        border-radius: var(--radius-sm);
+    }
+    
+    .tree-devices {
+        padding: 0 var(--space-md) var(--space-md);
+        border-top: 1px solid var(--surface-3);
+        background: var(--surface-0);
+    }
+    
+    .tree-device {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-sm);
+        margin: var(--space-xs) 0;
+        background: var(--surface-1);
+        border: 1px solid var(--surface-2);
+        border-radius: var(--radius-sm);
+        transition: var(--transition-normal);
+    }
+    
+    .tree-device:hover {
+        background: var(--surface-2);
+        border-color: var(--accent-electric);
+    }
+    
+    .device-info {
+        flex: 1;
+    }
+    
+    .device-name {
+        font-weight: 500;
+        color: var(--text-primary);
+        margin-bottom: 2px;
+    }
+    
+    .device-details {
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+        font-size: 0.85rem;
+    }
+    
+    .device-id {
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--text-muted);
+        background: var(--surface-2);
+        padding: 1px 4px;
+        border-radius: 2px;
+    }
+    
+    .device-serial {
+        color: var(--text-muted);
+    }
+    
+    .device-status {
+        padding: 2px 6px;
+        border-radius: var(--radius-sm);
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+    
+    .device-status-free {
+        background: var(--success);
+        color: white;
+    }
+    
+    .device-status-assigned {
+        background: var(--warning);
+        color: white;
+    }
+    
+    .device-status-maintenance {
+        background: var(--error);
+        color: white;
+    }
+    
+    .device-actions {
+        display: flex;
+        gap: var(--space-xs);
+    }
+    
+    /* Hierarchical Tree Styles */
+    .tree-content {
+        padding-left: var(--space-lg);
+        border-left: 2px solid var(--surface-3);
+        margin-left: var(--space-lg);
+    }
+    
+    .tree-subcategory, .tree-subbiercategory {
+        margin: var(--space-sm) 0;
+        border: 1px solid var(--surface-2);
+        border-radius: var(--radius-sm);
+        background: var(--surface-0);
+    }
+    
+    .tree-subcategory-header, .tree-subbiercategory-header {
+        display: flex;
+        align-items: center;
+        gap: var(--space-sm);
+        padding: var(--space-sm) var(--space-md);
+        cursor: pointer;
+        transition: var(--transition-normal);
+        border-radius: var(--radius-sm);
+    }
+    
+    .tree-subcategory-header:hover, .tree-subbiercategory-header:hover {
+        background: var(--surface-1);
+    }
+    
+    .tree-subcategory .tree-title {
+        font-weight: 500;
+        font-size: 0.95rem;
+    }
+    
+    .tree-subbiercategory .tree-title {
+        font-weight: 400;
+        font-size: 0.9rem;
+    }
+    
+    .category-icon {
+        color: var(--accent-electric);
+    }
+    
+    .subcategory-icon {
+        color: var(--accent-purple);
+    }
+    
+    .subbiercategory-icon {
+        color: var(--accent-coral);
+    }
+    
+    .tree-direct-devices {
+        padding: var(--space-sm) 0;
+        border-bottom: 1px solid var(--surface-2);
+        margin-bottom: var(--space-sm);
+    }
+    
+    .tree-direct-devices:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+    }
+    </style>
+    /* Tree View Styles */
+    .device-tree {
+        font-family: 'Inter', sans-serif;
+    }
+    
+    .tree-node {
+        display: flex;
+        align-items: center;
+        gap: var(--space-xs);
+        padding: var(--space-sm);
+        cursor: pointer;
+        border-radius: var(--radius-sm);
+        transition: var(--transition-normal);
+        user-select: none;
+    }
+    
+    .tree-node:hover {
+        background: var(--surface-2);
+    }
+    
+    .tree-node-category {
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .tree-node-subcategory {
+        font-weight: 500;
+        font-size: 0.95rem;
+        margin-left: var(--space-lg);
+    }
+    
+    .tree-node-subbiercategory {
+        font-weight: 400;
+        font-size: 0.9rem;
+        margin-left: calc(var(--space-lg) * 2);
+    }
+    
+    .tree-node-devices {
+        font-weight: 400;
+        font-size: 0.85rem;
+        margin-left: calc(var(--space-lg) * 3);
+    }
+    
+    .tree-icon {
+        transition: transform 0.2s ease;
+        color: var(--text-muted);
+        font-size: 0.8rem;
+    }
+    
+    .tree-icon.expanded {
+        transform: rotate(90deg);
+    }
+    
+    .category-icon {
+        color: var(--accent-electric);
+    }
+    
+    .subcategory-icon {
+        color: var(--accent-purple);
+    }
+    
+    .devices-icon {
+        color: var(--accent-coral);
+    }
+    
+    .tree-label {
+        flex: 1;
+        color: var(--text-primary);
+    }
+    
+    .tree-id {
+        color: var(--text-muted);
+        font-weight: 400;
+        font-size: 0.9em;
+    }
+    
+    .tree-count {
+        color: var(--text-muted);
+        font-size: 0.8rem;
+        font-weight: 400;
+    }
+    
+    .tree-children {
+        margin-left: var(--space-md);
+    }
+    
+    .tree-devices .device-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-xs) var(--space-sm);
+        margin: var(--space-xs) 0;
+        background: var(--surface-1);
+        border: 1px solid var(--surface-3);
+        border-radius: var(--radius-sm);
+        transition: var(--transition-normal);
+    }
+    
+    .tree-devices .device-item:hover {
+        background: var(--surface-2);
+        border-color: var(--accent-electric);
+    }
+    
+    .device-info {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .device-name {
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: var(--text-primary);
+    }
+    
+    .device-serial {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        font-family: 'JetBrains Mono', monospace;
+    }
+    
+    .device-actions {
+        display: flex;
+        gap: var(--space-xs);
+    }
+    </style>
 
-                    <!-- Device statistics -->
-                    <div class="device-stats-section">
-                        <h3>Statistiken</h3>
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-icon">
-                                    <i class="bi bi-briefcase"></i>
-                                </div>
-                                <div class="stat-info">
-                                    <div class="stat-value" id="totalJobs">0</div>
-                                    <div class="stat-label">Gesamte Einsätze</div>
-                                </div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon">
-                                    <i class="bi bi-currency-euro"></i>
-                                </div>
-                                <div class="stat-info">
-                                    <div class="stat-value" id="totalEarnings">€0.00</div>
-                                    <div class="stat-label">Gesamteinnahmen</div>
-                                </div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon">
-                                    <i class="bi bi-calendar-day"></i>
-                                </div>
-                                <div class="stat-info">
-                                    <div class="stat-value" id="totalDaysRented">0</div>
-                                    <div class="stat-label">Tage vermietet</div>
-                                </div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-icon">
-                                    <i class="bi bi-graph-up"></i>
-                                </div>
-                                <div class="stat-info">
-                                    <div class="stat-value" id="averageRentalDuration">0</div>
-                                    <div class="stat-label">Ø Mietdauer (Tage)</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Minimal JavaScript -->
     <script>
-    window.deleteDevice = function(deviceID) {
-        if (confirm('Delete device ' + deviceID + '?')) {
-            fetch('/devices/' + deviceID, {
-                method: 'DELETE',
-                headers: {'Content-Type': 'application/json'}
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.message) {
-                    location.reload();
-                } else {
-                    alert('Error: ' + (data.error || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                alert('Error deleting device');
-            });
+    function toggleTreeNode(element) {
+        const icon = element.querySelector('.tree-icon');
+        const children = element.nextElementSibling;
+        
+        if (children && children.classList.contains('tree-children')) {
+            const isVisible = children.style.display !== 'none';
+            
+            if (isVisible) {
+                children.style.display = 'none';
+                icon.classList.remove('expanded');
+            } else {
+                children.style.display = 'block';
+                icon.classList.add('expanded');
+            }
         }
-    };
-
-    window.showDeviceDetails = function(deviceID) {
-        const modal = document.getElementById('deviceDetailsModal');
-        const loadingSpinner = document.getElementById('modalLoadingSpinner');
-        const content = document.getElementById('modalDeviceContent');
+    }
+    
+    function loadDevices(element, type, id) {
+        const icon = element.querySelector('.tree-icon');
+        const devicesContainer = element.nextElementSibling;
         
-        // Show modal and loading spinner
-        modal.style.display = 'flex';
-        loadingSpinner.style.display = 'block';
-        content.style.display = 'none';
+        if (!devicesContainer || !devicesContainer.classList.contains('tree-devices')) {
+            return;
+        }
         
-        // Fetch device details
-        fetch('/devices/' + deviceID + '/stats')
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                
-                // Populate device information
-                document.getElementById('modalDeviceTitle').textContent = 'Device Details - ' + deviceID;
-                document.getElementById('deviceID').textContent = data.device.deviceID;
-                document.getElementById('productName').textContent = data.device.product ? data.device.product.name : 'N/A';
-                document.getElementById('serialNumber').textContent = data.device.serialNumber || 'N/A';
-                document.getElementById('deviceStatus').textContent = data.device.status || 'N/A';
-                document.getElementById('pricePerDay').textContent = data.stats.pricePerDay ? '€' + data.stats.pricePerDay.toFixed(2) : 'N/A';
-                document.getElementById('weight').textContent = data.stats.weight ? data.stats.weight.toFixed(2) + ' kg' : 'N/A';
-                
-                // Populate statistics
-                document.getElementById('totalJobs').textContent = data.stats.totalJobs || '0';
-                document.getElementById('totalEarnings').textContent = '€' + (data.stats.totalEarnings || 0).toFixed(2);
-                document.getElementById('totalDaysRented').textContent = data.stats.totalDaysRented || '0';
-                document.getElementById('averageRentalDuration').textContent = (data.stats.averageRentalDuration || 0).toFixed(1);
-                
-                // Hide loading spinner and show content
-                loadingSpinner.style.display = 'none';
-                content.style.display = 'block';
-            })
-            .catch(error => {
-                console.error('Error fetching device details:', error);
-                loadingSpinner.innerHTML = '<i class="bi bi-exclamation-triangle"></i> Error loading device details';
-            });
-    };
-
-    window.closeDeviceDetailsModal = function() {
-        document.getElementById('deviceDetailsModal').style.display = 'none';
-    };
-
-    // Device Edit Modal Function
-    window.showEditDevice = function(deviceID) {
-        const modal = document.getElementById('deviceEditModal');
-        const content = document.getElementById('deviceEditContent');
+        const isVisible = devicesContainer.style.display !== 'none';
         
-        // Show modal with loading state
-        modal.style.display = 'flex';
-        content.innerHTML = `
-            <div class="rc-text-center rc-py-xl">
-                <div class="rc-spinner"></div>
-                <p class="rc-text-muted rc-mt-md">Loading device form...</p>
-            </div>
-        `;
-        
-        // Fetch device data for editing
-        fetch('/api/v1/devices/' + deviceID)
-            .then(response => {
-                console.log('Device API Response status:', response.status);
-                if (!response.ok) {
-                    return response.text().then(text => {
-                        console.log('Error response body:', text);
-                        throw new Error(`HTTP ${response.status}: ${text}`);
-                    });
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Device data received:', data);
-                const device = data.device || data; // Handle both response formats
-                
-                content.innerHTML = `
-                    <form id="editDeviceForm">
-                        <div class="rc-grid rc-grid-cols-1 rc-grid-cols-md-2 rc-grid-gap-md rc-mb-lg">
-                            <div class="rc-form-group">
-                                <label class="rc-label">Device ID *</label>
-                                <input type="text" class="rc-input" name="deviceID" value="${device.deviceID || ''}" readonly style="background: var(--surface-2);">
-                            </div>
-                            <div class="rc-form-group">
-                                <label class="rc-label">Serial Number</label>
-                                <input type="text" class="rc-input" name="serialnumber" value="${device.serialnumber || ''}">
-                            </div>
-                            <div class="rc-form-group">
-                                <label class="rc-label">Status</label>
-                                <select class="rc-select" name="status">
-                                    <option value="free" ${device.status === 'free' ? 'selected' : ''}>Free</option>
-                                    <option value="rented" ${device.status === 'rented' ? 'selected' : ''}>Rented</option>
-                                    <option value="maintenance" ${device.status === 'maintenance' ? 'selected' : ''}>Maintenance</option>
-                                    <option value="damaged" ${device.status === 'damaged' ? 'selected' : ''}>Damaged</option>
-                                </select>
-                            </div>
-                            <div class="rc-form-group">
-                                <label class="rc-label">Current Location</label>
-                                <input type="text" class="rc-input" name="currentLocation" value="${device.currentLocation || ''}">
-                            </div>
-                            <div class="rc-form-group">
-                                <label class="rc-label">Purchase Date</label>
-                                <input type="date" class="rc-input" name="purchaseDate" value="${device.purchaseDate ? device.purchaseDate.split('T')[0] : ''}">
-                            </div>
-                            <div class="rc-form-group">
-                                <label class="rc-label">Last Maintenance</label>
-                                <input type="date" class="rc-input" name="lastmaintenance" value="${device.lastmaintenance ? device.lastmaintenance.split('T')[0] : ''}">
-                            </div>
-                            <div class="rc-form-group">
-                                <label class="rc-label">Next Maintenance</label>
-                                <input type="date" class="rc-input" name="nextmaintenance" value="${device.nextmaintenance ? device.nextmaintenance.split('T')[0] : ''}">
-                            </div>
-                            <div class="rc-form-group">
-                                <label class="rc-label">Insurance Number</label>
-                                <input type="text" class="rc-input" name="insurancenumber" value="${device.insurancenumber || ''}">
-                            </div>
-                            <div class="rc-form-group">
-                                <label class="rc-label">Condition Rating (1-5)</label>
-                                <input type="number" class="rc-input" name="conditionRating" value="${device.conditionRating || ''}" min="1" max="5" step="0.1">
-                            </div>
-                            <div class="rc-form-group">
-                                <label class="rc-label">Usage Hours</label>
-                                <input type="number" class="rc-input" name="usageHours" value="${device.usageHours || ''}" step="0.1" min="0">
-                            </div>
-                            <div class="rc-form-group">
-                                <label class="rc-label">Last Maintenance Cost (€)</label>
-                                <input type="number" class="rc-input" name="lastMaintenanceCost" value="${device.lastMaintenanceCost || ''}" step="0.01" min="0">
-                            </div>
-                            <div class="rc-form-group">
-                                <label class="rc-label">Barcode</label>
-                                <input type="text" class="rc-input" name="barcode" value="${device.barcode || ''}">
-                            </div>
-                            <div class="rc-form-group rc-grid-span-2">
-                                <label class="rc-label">Notes</label>
-                                <textarea class="rc-textarea" name="notes" rows="3">${device.notes || ''}</textarea>
-                            </div>
-                        </div>
-                        <div class="rc-flex rc-flex-between">
-                            <button type="button" onclick="closeDeviceEditModal()" class="rc-btn rc-btn-secondary">
-                                <i class="bi bi-x-lg"></i> Cancel
-                            </button>
-                            <button type="submit" class="rc-btn rc-btn-primary">
-                                <i class="bi bi-check-lg"></i> Save Changes
-                            </button>
-                        </div>
-                    </form>
-                `;
-                
-                // Handle form submission
-                document.getElementById('editDeviceForm').addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    saveDevice(deviceID, new FormData(this));
-                });
-            })
-            .catch(error => {
-                console.error('Error loading device:', error);
-                content.innerHTML = `
-                    <div class="rc-alert rc-alert-error">
-                        <i class="bi bi-exclamation-triangle"></i>
-                        Error loading device form: ${error.message}
-                    </div>
-                `;
-            });
-    };
-
-    window.closeDeviceEditModal = function() {
-        document.getElementById('deviceEditModal').style.display = 'none';
-    };
-
-    function saveDevice(deviceID, formData) {
-        const submitBtn = document.querySelector('#editDeviceForm button[type="submit"]');
-        const originalText = submitBtn.innerHTML;
+        if (isVisible) {
+            devicesContainer.style.display = 'none';
+            icon.classList.remove('expanded');
+            return;
+        }
         
         // Show loading state
-        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Saving...';
-        submitBtn.disabled = true;
+        icon.classList.add('expanded');
+        devicesContainer.style.display = 'block';
+        devicesContainer.innerHTML = '<div style="padding: var(--space-sm); color: var(--text-muted);"><i class="bi bi-arrow-repeat" style="animation: spin 1s linear infinite;"></i> Loading devices...</div>';
         
-        // Convert FormData to JSON
-        const data = {};
-        for (let [key, value] of formData.entries()) {
-            // Convert date strings and numbers
-            if (key.includes('Date') || key.includes('maintenance')) {
-                data[key] = value ? value : null;
-            } else if (key === 'conditionRating' || key === 'usageHours' || key === 'lastMaintenanceCost') {
-                data[key] = value ? parseFloat(value) : null;
-            } else {
-                data[key] = value || null;
-            }
-        }
-        
-        console.log('Saving device data:', data);
-        
-        fetch('/api/v1/devices/' + deviceID, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => {
-            console.log('Save response status:', response.status);
-            if (!response.ok) {
-                return response.text().then(text => {
-                    console.log('Save error response:', text);
-                    throw new Error(`HTTP ${response.status}: ${text}`);
+        // Fetch devices via AJAX
+        fetch(`/api/v1/devices/${type}/${id}`)
+            .then(response => response.json())
+            .then(devices => {
+                if (devices.length === 0) {
+                    devicesContainer.innerHTML = '<div style="padding: var(--space-sm); color: var(--text-muted);">No devices found</div>';
+                    return;
+                }
+                
+                let html = '';
+                devices.forEach(device => {
+                    html += `
+                        <div class="device-item">
+                            <div class="device-info">
+                                <div class="device-name">${device.product_name || 'Unknown Product'}</div>
+                                <div class="device-serial">Serial: ${device.serialNo}</div>
+                            </div>
+                            <div class="device-actions">
+                                <button onclick="viewDevice('${device.deviceID}')" class="rc-btn rc-btn-outline rc-btn-xs" title="View Details">
+                                    <i class="bi bi-eye"></i>
+                                </button>
+                                <button onclick="editDevice('${device.deviceID}')" class="rc-btn rc-btn-outline rc-btn-xs" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
                 });
-            }
-            return response.json();
-        })
-        .then(result => {
-            console.log('Save result:', result);
-            if (result.error) {
-                throw new Error(result.error);
-            }
-            
-            // Success - close modal and reload page
-            closeDeviceEditModal();
-            window.location.reload();
-        })
-        .catch(error => {
-            console.error('Save error:', error);
-            // Restore button and show error
-            submitBtn.innerHTML = originalText;
-            submitBtn.disabled = false;
-            
-            alert('Error saving device: ' + error.message);
-        });
+                devicesContainer.innerHTML = html;
+            })
+            .catch(error => {
+                console.error('Error loading devices:', error);
+                devicesContainer.innerHTML = '<div style="padding: var(--space-sm); color: var(--error);">Error loading devices</div>';
+            });
+    }
+    
+    function viewDevice(deviceId) {
+        console.log('View device:', deviceId);
+        // Implement device view functionality
     }
 
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-        const modal = document.getElementById('deviceDetailsModal');
-        if (event.target === modal) {
-            modal.style.display = 'none';
+    function editDevice(deviceId) {
+        console.log('Edit device:', deviceId);
+        // Implement device edit functionality
+    }
+
+    function deleteDevice(deviceId) {
+        if (confirm('Are you sure you want to delete this device?')) {
+            console.log('Delete device:', deviceId);
+            // Implement device delete functionality
         }
-    };
+    }
+
+    function openAddDeviceModal() {
+        console.log('Open add device modal');
+        // Implement add device functionality
+    }
+    
+    // Hierarchical Tree View Functions
+    function toggleTreeNode(nodeId) {
+        const contentDiv = document.getElementById(nodeId);
+        const chevron = document.getElementById('chevron-' + nodeId);
+        
+        if (contentDiv && chevron) {
+            if (contentDiv.style.display === 'none') {
+                contentDiv.style.display = 'block';
+                chevron.classList.add('expanded');
+            } else {
+                contentDiv.style.display = 'none';
+                chevron.classList.remove('expanded');
+            }
+        }
+    }
+    
+    // Device Modal Functions
+    async function viewDevice(deviceId) {
+        try {
+            const response = await fetch(`/api/v1/devices/${deviceId}`, {
+                credentials: 'include'
+            });
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to load device');
+            }
+            
+            // Simple alert for now - you can replace with a proper modal
+            const device = data.device;
+            let info = `Device: ${device.deviceID}\n`;
+            info += `Product: ${device.product ? device.product.name : 'Unknown'}\n`;
+            info += `Status: ${device.status}\n`;
+            if (device.serialnumber) info += `Serial: ${device.serialnumber}\n`;
+            if (device.notes) info += `Notes: ${device.notes}\n`;
+            
+            alert(info);
+        } catch (error) {
+            alert('Error loading device: ' + error.message);
+        }
+    }
+    
+    async function editDevice(deviceId) {
+        // For now, just redirect to edit form - you can implement modal later
+        window.location.href = `/devices/${deviceId}/edit`;
+    }
     </script>
 </body>
 </html>

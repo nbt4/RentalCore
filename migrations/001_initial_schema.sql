@@ -107,26 +107,8 @@ INSERT INTO statuses (name, description, color) VALUES
 ('Cancelled', 'Job has been cancelled', '#dc3545'),
 ('On Hold', 'Job is temporarily on hold', '#ffc107');
 
--- Insert sample customers
-INSERT INTO customers (name, email, phone, address) VALUES
-('ABC Construction', 'contact@abc-construction.com', '+49 123 456789', 'Hauptstraße 123, 12345 Berlin'),
-('XYZ Events GmbH', 'info@xyz-events.de', '+49 987 654321', 'Eventstraße 456, 54321 Hamburg'),
-('Tech Solutions AG', 'support@tech-solutions.com', '+49 555 123456', 'Technikweg 789, 98765 München');
-
--- Insert sample devices
-INSERT INTO devices (serial_no, name, description, category, price, available) VALUES
-('DEV001', 'Professional Camera', 'High-end DSLR camera for events', 'Photography', 250.00, TRUE),
-('DEV002', 'Sound System', 'Professional PA system', 'Audio', 150.00, TRUE),
-('DEV003', 'Lighting Kit', 'LED lighting kit for events', 'Lighting', 100.00, TRUE),
-('DEV004', 'Projector', '4K projector for presentations', 'AV Equipment', 200.00, TRUE),
-('DEV005', 'Laptop', 'High-performance laptop', 'Computing', 80.00, TRUE);
-
--- Insert sample products
-INSERT INTO products (name, description, category, price, active) VALUES
-('Camera Rental', 'Professional camera rental service', 'Photography', 250.00, TRUE),
-('Sound Equipment', 'Audio equipment rental', 'Audio', 150.00, TRUE),
-('Lighting Service', 'Event lighting solutions', 'Lighting', 100.00, TRUE),
-('AV Support', 'Audio-visual equipment support', 'AV Equipment', 200.00, TRUE);
+-- Sample data removed for production use
+-- To add initial data, use the application interface or create separate data import scripts
 
 -- Create views for commonly used queries
 CREATE VIEW job_summary AS

@@ -37,14 +37,14 @@ INSERT IGNORE INTO `company_settings` (
 ) VALUES (
     1,
     'TS RentalCore GmbH',
-    'Musterstraße 123',
-    'Musterstadt',
-    '12345',
-    'Deutschland',
-    '+49 123 456789',
-    'info@rentalcore.de',
-    '123/456/78901',
-    'DE123456789'
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
 );
 
 -- Add index for faster lookups (should only be one record anyway)

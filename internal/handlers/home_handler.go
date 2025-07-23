@@ -33,18 +33,25 @@ func (h *HomeHandler) Dashboard(c *gin.Context) {
 	
 	// Get real counts from database using direct queries
 	var totalJobs int64
+	var activeJobs int64
 	var totalDevices int64 
 	var totalCustomers int64
 	var totalCases int64
 	
 	// Use the DB connection to count records
 	h.db.Model(&models.Job{}).Count(&totalJobs)
+	// Count active jobs by joining with status table to get actual status names
+	h.db.Table("jobs j").
+		Joins("LEFT JOIN status s ON j.statusID = s.statusID").
+		Where("s.status NOT IN ('Completed', 'Cancelled', 'completed', 'cancelled', 'paid', 'On Hold')").
+		Count(&activeJobs)
 	h.db.Model(&models.Device{}).Count(&totalDevices)
 	h.db.Model(&models.Customer{}).Count(&totalCustomers)
 	h.db.Model(&models.Case{}).Count(&totalCases)
 	
 	stats := gin.H{
 		"TotalJobs":      totalJobs,
+		"ActiveJobs":     activeJobs,
 		"TotalDevices":   totalDevices,  
 		"TotalCustomers": totalCustomers,
 		"TotalCases":     totalCases,
@@ -56,9 +63,10 @@ func (h *HomeHandler) Dashboard(c *gin.Context) {
 	})
 	
 	c.HTML(http.StatusOK, "home.html", gin.H{
-		"title":      "Home",
-		"user":       user,
-		"stats":      stats,
-		"recentJobs": recentJobs,
+		"title":       "Home",
+		"user":        user,
+		"stats":       stats,
+		"recentJobs":  recentJobs,
+		"currentPage": "home",
 	})
 }

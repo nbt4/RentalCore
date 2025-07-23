@@ -75,10 +75,11 @@ func (h *JobHandler) ListJobs(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "jobs.html", gin.H{
-		"title":  "Jobs",
-		"jobs":   jobs,
-		"params": params,
-		"user":   user,
+		"title":       "Jobs",
+		"jobs":        jobs,
+		"params":      params,
+		"user":        user,
+		"currentPage": "jobs",
 	})
 }
 
@@ -597,8 +598,20 @@ func (h *JobHandler) UpdateJobAPI(c *gin.Context) {
 		return
 	}
 
-	// Update fields from request
-	job := *existingJob
+	// Create a clean job object without associations to prevent GORM from saving them
+	job := models.Job{
+		JobID:         existingJob.JobID,
+		CustomerID:    existingJob.CustomerID,
+		StatusID:      existingJob.StatusID,
+		JobCategoryID: existingJob.JobCategoryID,
+		Description:   existingJob.Description,
+		Discount:      existingJob.Discount,
+		DiscountType:  existingJob.DiscountType,
+		Revenue:       existingJob.Revenue,
+		FinalRevenue:  existingJob.FinalRevenue,
+		StartDate:     existingJob.StartDate,
+		EndDate:       existingJob.EndDate,
+	}
 	if customerID, ok := requestData["customerID"]; ok {
 		if cid, ok := customerID.(float64); ok {
 			job.CustomerID = uint(cid)
