@@ -872,6 +872,7 @@
         let priceModalCallback = null;
         let scanningEnabled = false;
         let lastDetectedCode = null;
+        let lastDetectionTime = 0;
         let triggerCooldown = false;
 
         // Initialize on page load
@@ -1051,7 +1052,7 @@
                 return;
             }
 
-            // STEP 5: Now initialize QuaggaJS with the already-working video
+            // STEP 5: Now initialize QuaggaJS with mobile-optimized config
             const config = {
                 inputStream: {
                     name: "Live",
@@ -1062,8 +1063,8 @@
                     patchSize: "medium",
                     halfSample: true
                 },
-                numOfWorkers: 1,
-                frequency: 10,
+                numOfWorkers: navigator.hardwareConcurrency ? Math.min(navigator.hardwareConcurrency, 2) : 1,
+                frequency: 5, // Reduced frequency to prevent overload on mobile
                 decoder: {
                     readers: [
                         "code_128_reader",
@@ -1071,7 +1072,13 @@
                         "code_39_reader"
                     ]
                 },
-                locate: true
+                locate: true,
+                debug: {
+                    drawBoundingBox: false, // Disable debug overlay for better mobile performance
+                    showFrequency: false,
+                    drawScanline: false,
+                    showPattern: false
+                }
             };
 
             console.log('Initializing QuaggaJS with existing video stream...');
@@ -1079,13 +1086,23 @@
             // Clear any existing event listeners first
             Quagga.offDetected();
             
-            // Set up barcode detection
+            // Set up barcode detection with mobile-friendly settings
             Quagga.onDetected(function(result) {
                 if (result && result.codeResult && result.codeResult.code) {
                     const code = result.codeResult.code.trim();
-                    console.log('Barcode detected:', code);
-                    if (code && code.length > 3) {
+                    const confidence = result.codeResult.confidence || 0;
+                    
+                    console.log('Barcode detected:', code, 'confidence:', confidence);
+                    
+                    // Higher confidence threshold for mobile to prevent false positives
+                    if (code && code.length > 3 && confidence > 60) {
+                        // Prevent rapid-fire detections
+                        if (lastDetectedCode === code && (Date.now() - lastDetectionTime) < 1000) {
+                            return;
+                        }
+                        
                         lastDetectedCode = code;
+                        lastDetectionTime = Date.now();
                         updateStatus(`Code detected: ${code} - Press trigger to scan`, 'info');
                         document.getElementById('scanner-status').classList.add('code-detected');
                     }
@@ -1272,7 +1289,7 @@
                         addScanResult(deviceId, 'success', 'Device assigned successfully');
                         updateStatus('Added successfully', 'success');
                     }
-                    // Don't reload page - keep camera running
+                    // Keep camera running - no reload needed for individual assignments
                 } else {
                     addScanResult(deviceId, 'error', result.error || 'Failed to assign device');
                     updateStatus('Assignment failed', 'error');
@@ -1408,7 +1425,7 @@
             
             updateStatus(`Bulk scan complete: ${successCount} devices assigned`, 'success');
             bulkDevices = [];
-            setTimeout(() => window.location.reload(), 2000);
+            // Keep camera running after bulk scan - user can see results without reload
         }
 
         function processManualInput() {
@@ -1430,7 +1447,12 @@
                 });
                 
                 if (response.ok) {
-                    window.location.reload();
+                    // Remove device from UI without page reload
+                    const deviceElement = document.querySelector(`[data-device-id="${deviceId}"]`);
+                    if (deviceElement) {
+                        deviceElement.remove();
+                    }
+                    updateStatus('Device removed', 'success');
                 } else {
                     alert('Failed to remove device');
                 }
@@ -1549,8 +1571,8 @@
                         });
                     }
                     
-                    // Reload page after 3 seconds to show new devices
-                    setTimeout(() => window.location.reload(), 3000);
+                    // Keep camera running - devices are shown in scan results
+                    setTimeout(() => updateStatus('Ready for next scan', 'success'), 3000);
                 } else {
                     updateStatus('Case scan failed: ' + result.error, 'error');
                     addScanResult('CASE:' + caseId, 'error', result.error || 'Case scan failed');
@@ -1660,8 +1682,15 @@
                 });
                 
                 if (response.ok) {
-                    // Reload page to show updated device list
-                    window.location.reload();
+                    // Remove selected devices from UI without page reload
+                    deviceIds.forEach(deviceId => {
+                        const deviceElement = document.querySelector(`[data-device-id="${deviceId}"]`);
+                        if (deviceElement) {
+                            deviceElement.remove();
+                        }
+                    });
+                    updateStatus(`${deviceIds.length} devices removed`, 'success');
+                    updateBulkDeleteButton(); // Update button state
                 } else {
                     const result = await response.json();
                     alert('Error removing devices: ' + (result.error || 'Unknown error'));
