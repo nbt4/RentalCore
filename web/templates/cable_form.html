@@ -90,6 +90,14 @@
                             <input type="number" name="mm2" id="mm2" class="rc-input" step="0.01" min="0" 
                                    value="{{if .cable.MM2}}{{.cable.MM2}}{{end}}" required placeholder="e.g., 2.5">
                         </div>
+
+                        <!-- Amount -->
+                        <div class="rc-form-group">
+                            <label for="amount" class="rc-label">Amount *</label>
+                            <input type="number" name="amount" id="amount" class="rc-input" min="1" 
+                                   value="1" required placeholder="e.g., 20">
+                            <small class="rc-text-sm rc-text-muted">Number of identical cables to create</small>
+                        </div>
                     </div>
 
                     <!-- Form Actions -->

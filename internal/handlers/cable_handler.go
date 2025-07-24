@@ -133,9 +133,10 @@ func (h *CableHandler) CreateCable(c *gin.Context) {
 	typeStr := c.PostForm("type")
 	lengthStr := c.PostForm("length")
 	mm2Str := c.PostForm("mm2")
+	amountStr := c.PostForm("amount")
 	
-	log.Printf("📝 Form values: connector1='%s', connector2='%s', type='%s', length='%s', mm2='%s'", 
-		connector1Str, connector2Str, typeStr, lengthStr, mm2Str)
+	log.Printf("📝 Form values: connector1='%s', connector2='%s', type='%s', length='%s', mm2='%s', amount='%s'", 
+		connector1Str, connector2Str, typeStr, lengthStr, mm2Str, amountStr)
 	
 	// Parse required fields
 	connector1, err := strconv.Atoi(connector1Str)
@@ -173,23 +174,41 @@ func (h *CableHandler) CreateCable(c *gin.Context) {
 		return
 	}
 	
-	cable := models.Cable{
-		Connector1: connector1,
-		Connector2: connector2,
-		Type:       cableType,
-		Length:     length,
-		MM2:        mm2,
+	// Parse amount (default to 1 if not provided)
+	amount := 1
+	if amountStr != "" {
+		amount, err = strconv.Atoi(amountStr)
+		if err != nil || amount < 1 {
+			log.Printf("❌ Invalid amount: %v", err)
+			h.renderCableFormWithError(c, "Invalid amount value", nil)
+			return
+		}
 	}
 	
-	log.Printf("💾 Creating cable: %+v", cable)
+	// Create cables based on amount
+	var createdCables []models.Cable
+	var createdIDs []int
 	
-	if err := h.cableRepo.Create(&cable); err != nil {
-		log.Printf("❌ Error creating cable: %v", err)
-		h.renderCableFormWithError(c, fmt.Sprintf("Error creating cable: %v", err), &cable)
-		return
+	for i := 0; i < amount; i++ {
+		cable := models.Cable{
+			Connector1: connector1,
+			Connector2: connector2,
+			Type:       cableType,
+			Length:     length,
+			MM2:        mm2,
+		}
+		
+		if err := h.cableRepo.Create(&cable); err != nil {
+			log.Printf("❌ Error creating cable %d of %d: %v", i+1, amount, err)
+			h.renderCableFormWithError(c, fmt.Sprintf("Error creating cable %d of %d: %v", i+1, amount, err), &cable)
+			return
+		}
+		
+		createdCables = append(createdCables, cable)
+		createdIDs = append(createdIDs, cable.CableID)
 	}
 	
-	log.Printf("✅ Cable created successfully with ID: %d", cable.CableID)
+	log.Printf("✅ Successfully created %d cables with IDs: %v", amount, createdIDs)
 	c.Redirect(http.StatusFound, "/cables")
 }
 
