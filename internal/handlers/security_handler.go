@@ -113,7 +113,7 @@ func (h *SecurityHandler) GetRoles(c *gin.Context) {
 	}
 
 	var roles []models.Role
-	result := h.db.Where("is_active = ?", true).Find(&roles)
+	result := h.db.Preload("UserRoles").Where("is_active = ?", true).Find(&roles)
 	if result.Error != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch roles"})
 		return

@@ -19,7 +19,11 @@ func (r *ProductRepository) Create(product *models.Product) error {
 
 func (r *ProductRepository) GetByID(id uint) (*models.Product, error) {
 	var product models.Product
-	err := r.db.First(&product, id).Error
+	err := r.db.Preload("Category").
+		Preload("Subcategory").
+		Preload("Subbiercategory").
+		Preload("Brand").
+		First(&product, id).Error
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +41,11 @@ func (r *ProductRepository) Delete(id uint) error {
 func (r *ProductRepository) List(params *models.FilterParams) ([]models.Product, error) {
 	var products []models.Product
 
-	query := r.db.Model(&models.Product{})
+	query := r.db.Model(&models.Product{}).
+		Preload("Category").
+		Preload("Subcategory").
+		Preload("Subbiercategory").
+		Preload("Brand")
 
 	if params.SearchTerm != "" {
 		searchPattern := "%" + params.SearchTerm + "%"

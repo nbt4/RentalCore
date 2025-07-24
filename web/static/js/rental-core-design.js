@@ -14,6 +14,7 @@ class RentalCoreDesign {
         this.initAnimations();
         this.initTooltips();
         this.handleClickOutside();
+        this.initThemeToggle();
     }
 
     // Dropdown functionality
@@ -347,7 +348,7 @@ class RentalCoreDesign {
                 // Update icon
                 const icon = themeToggle.querySelector('i');
                 if (icon) {
-                    icon.className = newTheme === 'dark' ? 'bi bi-sun' : 'bi bi-moon';
+                    icon.className = newTheme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-fill';
                 }
             });
         }
@@ -355,6 +356,14 @@ class RentalCoreDesign {
         // Load saved theme
         const savedTheme = localStorage.getItem('rc-theme') || 'dark';
         document.documentElement.setAttribute('data-theme', savedTheme);
+        
+        // Update icon to match saved theme
+        if (themeToggle) {
+            const icon = themeToggle.querySelector('i');
+            if (icon) {
+                icon.className = savedTheme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-fill';
+            }
+        }
     }
 }
 

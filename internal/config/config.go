@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"os"
+	"strconv"
 	"time"
 	
 	"gorm.io/gorm/logger"
@@ -107,19 +108,25 @@ type BackupConfig struct {
 }
 
 func LoadConfig(path string) (*Config, error) {
+	// Start with default config
+	config := getDefaultConfig()
+	
+	// Override with environment variables if they exist
+	loadFromEnvironment(config)
+	
+	// Try to load from file if it exists
 	file, err := os.Open(path)
-	if err != nil {
-		return getDefaultConfig(), nil // Return default config if file doesn't exist
+	if err == nil {
+		defer file.Close()
+		decoder := json.NewDecoder(file)
+		if err := decoder.Decode(config); err != nil {
+			return nil, err
+		}
+		// Override again with environment variables to give them priority
+		loadFromEnvironment(config)
 	}
-	defer file.Close()
 
-	var config Config
-	decoder := json.NewDecoder(file)
-	if err := decoder.Decode(&config); err != nil {
-		return nil, err
-	}
-
-	return &config, nil
+	return config, nil
 }
 
 func (c *Config) Save(path string) error {
@@ -228,5 +235,113 @@ func getDefaultConfig() *Config {
 			RetentionDays: 30,
 			Path:          "backups/",
 		},
+	}
+}
+
+// loadFromEnvironment loads configuration from environment variables
+func loadFromEnvironment(config *Config) {
+	// Database configuration
+	if host := os.Getenv("DB_HOST"); host != "" {
+		config.Database.Host = host
+	}
+	if port := os.Getenv("DB_PORT"); port != "" {
+		if p, err := strconv.Atoi(port); err == nil {
+			config.Database.Port = p
+		}
+	}
+	if database := os.Getenv("DB_NAME"); database != "" {
+		config.Database.Database = database
+	}
+	if username := os.Getenv("DB_USERNAME"); username != "" {
+		config.Database.Username = username
+	}
+	if password := os.Getenv("DB_PASSWORD"); password != "" {
+		config.Database.Password = password
+	}
+
+	// Server configuration
+	if host := os.Getenv("SERVER_HOST"); host != "" {
+		config.Server.Host = host
+	}
+	if port := os.Getenv("SERVER_PORT"); port != "" {
+		if p, err := strconv.Atoi(port); err == nil {
+			config.Server.Port = p
+		}
+	}
+
+	// Security configuration
+	if key := os.Getenv("ENCRYPTION_KEY"); key != "" {
+		config.Security.EncryptionKey = key
+	}
+	if timeout := os.Getenv("SESSION_TIMEOUT"); timeout != "" {
+		if t, err := strconv.Atoi(timeout); err == nil {
+			config.Security.SessionTimeout = t
+		}
+	}
+
+	// Email configuration
+	if host := os.Getenv("SMTP_HOST"); host != "" {
+		config.Email.SMTPHost = host
+	}
+	if port := os.Getenv("SMTP_PORT"); port != "" {
+		if p, err := strconv.Atoi(port); err == nil {
+			config.Email.SMTPPort = p
+		}
+	}
+	if username := os.Getenv("SMTP_USERNAME"); username != "" {
+		config.Email.SMTPUsername = username
+	}
+	if password := os.Getenv("SMTP_PASSWORD"); password != "" {
+		config.Email.SMTPPassword = password
+	}
+	if fromEmail := os.Getenv("FROM_EMAIL"); fromEmail != "" {
+		config.Email.FromEmail = fromEmail
+	}
+	if fromName := os.Getenv("FROM_NAME"); fromName != "" {
+		config.Email.FromName = fromName
+	}
+	if useTLS := os.Getenv("USE_TLS"); useTLS != "" {
+		config.Email.UseTLS = useTLS == "true"
+	}
+
+	// Invoice configuration
+	if taxRate := os.Getenv("DEFAULT_TAX_RATE"); taxRate != "" {
+		if rate, err := strconv.ParseFloat(taxRate, 64); err == nil {
+			config.Invoice.DefaultTaxRate = rate
+		}
+	}
+	if paymentTerms := os.Getenv("DEFAULT_PAYMENT_TERMS"); paymentTerms != "" {
+		if terms, err := strconv.Atoi(paymentTerms); err == nil {
+			config.Invoice.DefaultPaymentTerms = terms
+		}
+	}
+	if symbol := os.Getenv("CURRENCY_SYMBOL"); symbol != "" {
+		config.Invoice.CurrencySymbol = symbol
+	}
+	if code := os.Getenv("CURRENCY_CODE"); code != "" {
+		config.Invoice.CurrencyCode = code
+	}
+
+	// Logging configuration
+	if level := os.Getenv("LOG_LEVEL"); level != "" {
+		config.Logging.Level = level
+	}
+	if file := os.Getenv("LOG_FILE"); file != "" {
+		config.Logging.File = file
+	}
+
+	// Backup configuration
+	if enabled := os.Getenv("BACKUP_ENABLED"); enabled != "" {
+		config.Backup.Enabled = enabled == "true"
+	}
+	if interval := os.Getenv("BACKUP_INTERVAL"); interval != "" {
+		if i, err := strconv.Atoi(interval); err == nil {
+			config.Backup.Interval = i
+		}
+	}
+	if retention := os.Getenv("BACKUP_RETENTION_DAYS"); retention != "" {
+		if r, err := strconv.Atoi(retention); err == nil {
+			config.Backup.RetentionDays = r
+		}
 	}
 }

@@ -381,4 +381,42 @@ func (DeviceCase) TableName() string {
 	return "devicescases"
 }
 
+// Cable management models
+type Cable struct {
+	CableID    int             `json:"cableID" gorm:"primaryKey;column:cableID"`
+	Connector1 int             `json:"connector1" gorm:"not null;column:connector1"`
+	Connector2 int             `json:"connector2" gorm:"not null;column:connector2"`
+	Type       int             `json:"typ" gorm:"not null;column:typ"`
+	Length     float64         `json:"length" gorm:"not null;column:length"`
+	MM2        float64         `json:"mm2" gorm:"not null;column:mm2"`
+	Name       *string         `json:"name" gorm:"column:name"`
+	
+	// Relationships
+	Connector1Info *CableConnector `json:"connector1_info,omitempty" gorm:"foreignKey:Connector1;references:CableConnectorsID"`
+	Connector2Info *CableConnector `json:"connector2_info,omitempty" gorm:"foreignKey:Connector2;references:CableConnectorsID"`
+	TypeInfo       *CableType      `json:"type_info,omitempty" gorm:"foreignKey:Type;references:CableTypesID"`
+}
 
+func (Cable) TableName() string {
+	return "cables"
+}
+
+type CableConnector struct {
+	CableConnectorsID int     `json:"cable_connectorsID" gorm:"primaryKey;column:cable_connectorsID"`
+	Name              string  `json:"name" gorm:"not null;column:name"`
+	Abbreviation      *string `json:"abbreviation" gorm:"column:abbreviation"`
+	Gender            *string `json:"gender" gorm:"column:gender"`
+}
+
+func (CableConnector) TableName() string {
+	return "cable_connectors"
+}
+
+type CableType struct {
+	CableTypesID int    `json:"cable_typesID" gorm:"primaryKey;column:cable_typesID"`
+	Name         string `json:"name" gorm:"not null;column:name"`
+}
+
+func (CableType) TableName() string {
+	return "cable_types"
+}

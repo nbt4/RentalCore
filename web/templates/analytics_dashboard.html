@@ -19,628 +19,299 @@
     <meta name="msapplication-TileColor" content="#030712">
     
     <!-- CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/rental-core-design.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-.rc-metric-card {
-    background: linear-gradient(135deg, var(--rc-card-bg) 0%, rgba(255,255,255,0.1) 100%);
-    border: var(--rc-border);
-    border-radius: var(--rc-radius-lg);
-    padding: 1rem;
-    margin-bottom: 1rem;
-    box-shadow: var(--rc-shadow-lg);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-    height: 120px;
-    backdrop-filter: blur(10px);
-}
-
-.rc-metric-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #1e40af 0%, #059669 25%, #7c3aed 50%, #dc2626 75%, #1e40af 100%);
-    background-size: 200% 100%;
-    animation: shimmer 3s linear infinite;
-}
-
-@keyframes shimmer {
-    0% { background-position: -200% 0; }
-    100% { background-position: 200% 0; }
-}
-
-.rc-metric-card::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    right: 1rem;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-    transform: translateY(-50%);
-    pointer-events: none;
-}
-
-.rc-metric-card:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-}
-
-.rc-metric-card.revenue {
-    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
-    color: white;
-}
-
-.rc-metric-card.equipment {
-    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-    color: white;
-}
-
-.rc-metric-card.customers {
-    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
-    color: white;
-}
-
-.rc-metric-card.jobs {
-    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
-    color: white;
-}
-
-.rc-metric-card.revenue .rc-metric-value,
-.rc-metric-card.equipment .rc-metric-value,
-.rc-metric-card.customers .rc-metric-value,
-.rc-metric-card.jobs .rc-metric-value {
-    color: white;
-}
-
-.rc-metric-card.revenue .rc-metric-label,
-.rc-metric-card.equipment .rc-metric-label,
-.rc-metric-card.customers .rc-metric-label,
-.rc-metric-card.jobs .rc-metric-label {
-    color: rgba(255,255,255,0.9);
-}
-
-.rc-metric-value {
-    font-size: 1.8rem;
-    font-weight: 800;
-    margin-bottom: 0.25rem;
-    color: var(--rc-primary-600);
-    line-height: 1;
-}
-
-.rc-metric-label {
-    font-size: 0.875rem;
-    color: var(--rc-text-secondary);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.rc-metric-growth {
-    font-size: 0.75rem;
-    margin-top: 0.75rem;
-    padding: 0.25rem 0.5rem;
-    border-radius: var(--rc-radius);
-    font-weight: 600;
-}
-
-.rc-metric-growth.positive {
-    background: rgba(34, 197, 94, 0.1);
-    color: var(--rc-success-600);
-}
-
-.rc-metric-growth.negative {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--rc-error-600);
-}
-
-.rc-chart-container {
-    background: var(--rc-card-bg);
-    border: var(--rc-border);
-    border-radius: var(--rc-radius-lg);
-    padding: 1rem;
-    margin-bottom: 1rem;
-    box-shadow: var(--rc-shadow-sm);
-    height: 300px;
-    position: relative;
-}
-
-.rc-chart-container canvas {
-    max-height: 250px !important;
-    height: 250px !important;
-}
-
-.rc-chart-title {
-    font-size: 1.125rem;
-    font-weight: 600;
-    color: var(--rc-text-primary);
-    margin-bottom: 1rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.rc-analytics-header {
-    background: var(--rc-card-bg);
-    border: var(--rc-border);
-    border-radius: var(--rc-radius-lg);
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    box-shadow: var(--rc-shadow-sm);
-}
-
-.rc-controls-group {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-    align-items: center;
-}
-
-.rc-table-container {
-    background: var(--rc-card-bg);
-    border: var(--rc-border);
-    border-radius: var(--rc-radius-lg);
-    overflow: hidden;
-    box-shadow: var(--rc-shadow-sm);
-}
-
-.rc-table-header {
-    background: var(--rc-primary-50);
-    color: var(--rc-primary-700);
-    padding: 1rem 1.5rem;
-    font-weight: 600;
-    border-bottom: var(--rc-border);
-}
-
-.rc-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.rc-table th {
-    background: var(--rc-surface-100);
-    color: var(--rc-text-secondary);
-    font-weight: 600;
-    font-size: 0.875rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    padding: 1rem;
-    text-align: left;
-    border-bottom: var(--rc-border);
-}
-
-.rc-table td {
-    padding: 1rem;
-    border-bottom: var(--rc-border);
-    color: var(--rc-text-primary);
-}
-
-.rc-table tbody tr:hover {
-    background: var(--rc-surface-50);
-}
-
-.rc-progress-bar {
-    height: 8px;
-    background: var(--rc-surface-200);
-    border-radius: var(--rc-radius);
-    overflow: hidden;
-    position: relative;
-}
-
-.rc-progress-fill {
-    height: 100%;
-    border-radius: var(--rc-radius);
-    transition: width 0.3s ease;
-}
-
-.rc-progress-fill.high { background: var(--rc-error-500); }
-.rc-progress-fill.medium { background: var(--rc-warning-500); }
-.rc-progress-fill.good { background: var(--rc-success-500); }
-
-.rc-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: var(--rc-radius-full);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.rc-badge.high { background: var(--rc-error-100); color: var(--rc-error-700); }
-.rc-badge.medium { background: var(--rc-warning-100); color: var(--rc-warning-700); }
-.rc-badge.good { background: var(--rc-success-100); color: var(--rc-success-700); }
-.rc-badge.info { background: var(--rc-primary-100); color: var(--rc-primary-700); }
-
-/* Loading and animation styles */
-.bi-spin {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-.rc-metric-card {
-    cursor: pointer;
-}
-
-.rc-metric-card:active {
-    transform: translateY(1px);
-}
-
-.rc-alert {
-    padding: 1rem;
-    border-radius: var(--rc-radius);
-    background: var(--rc-card-bg);
-    border: var(--rc-border);
-    box-shadow: var(--rc-shadow-lg);
-    animation: slideIn 0.3s ease-out;
-}
-
-.rc-alert-info {
-    border-left: 4px solid var(--rc-primary-500);
-    background: var(--rc-primary-50);
-    color: var(--rc-primary-700);
-}
-
-@keyframes slideIn {
-    from {
-        transform: translateX(100%);
-        opacity: 0;
-    }
-    to {
-        transform: translateX(0);
-        opacity: 1;
-    }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
-
-@keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
-}
-
-@keyframes scaleIn {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
-}
-
-.rc-list {
-    list-style: none;
-    padding: 0;
-    margin: 1rem 0;
-}
-
-.rc-list li {
-    padding: 0.5rem 0;
-    border-bottom: 1px solid var(--rc-surface-200);
-    color: var(--rc-text-secondary);
-}
-
-.rc-list li:before {
-    content: "•";
-    color: var(--rc-primary-500);
-    font-weight: bold;
-    margin-right: 0.5rem;
-}
-
-.rc-metric-breakdown h4 {
-    color: var(--rc-primary-600);
-    margin-bottom: 0.75rem;
-    font-size: 1.125rem;
-}
-
-.rc-fixed {
-    position: fixed;
-}
-
-.rc-top-4 {
-    top: 1rem;
-}
-
-.rc-right-4 {
-    right: 1rem;
-}
-
-.rc-z-50 {
-    z-index: 50;
-}
-
-/* Enhanced responsiveness */
-@media (max-width: 768px) {
-    .rc-controls-group {
-        flex-direction: column;
-        align-items: stretch;
-    }
-    
-    .rc-metric-value {
-        font-size: 1.5rem;
-    }
-    
-    .rc-metric-card {
-        height: 100px;
-        padding: 0.75rem;
-    }
-    
-    .rc-chart-container {
-        padding: 0.75rem;
-        height: 250px;
-    }
-    
-    .rc-chart-container canvas {
-        max-height: 180px !important;
-        height: 180px !important;
-    }
-    
-    .rc-grid {
-        gap: 0.75rem !important;
-    }
-    
-    main.rc-container {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .rc-metric-value {
-        font-size: 1.25rem;
-    }
-    
-    .rc-metric-card {
-        height: 90px;
-        padding: 0.5rem;
-    }
-    
-    .rc-analytics-header {
-        padding: 0.75rem;
-        margin-bottom: 1rem;
-    }
-    
-    .rc-chart-container {
-        height: 220px;
-        padding: 0.5rem;
-    }
-    
-    .rc-chart-container canvas {
-        max-height: 150px !important;
-        height: 150px !important;
-    }
-}
+        /* Analytics-specific styles using RentalCore design tokens */
+        .analytics-metric-card {
+            background: var(--surface-1);
+            border: 1px solid var(--surface-3);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            transition: var(--transition-normal);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .analytics-metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--accent-electric);
+        }
+        
+        .analytics-metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-electric), var(--accent-cyan), var(--accent-electric));
+            background-size: 200% 100%;
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--space-xs);
+        }
+        
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .metric-icon {
+            color: var(--accent-electric);
+            font-size: 1.5rem;
+            margin-bottom: var(--space-sm);
+        }
+        
+        .analytics-chart-container {
+            background: var(--surface-1);
+            border: 1px solid var(--surface-3);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+        
+        .chart-title {
+            color: var(--text-primary);
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: var(--space-md);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+        
+        .analytics-header {
+            background: var(--surface-1);
+            border: 1px solid var(--surface-3);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+        
+        .analytics-controls {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .analytics-table {
+            background: var(--surface-1);
+            border: 1px solid var(--surface-3);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+        
+        .analytics-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .analytics-table th {
+            background: var(--surface-2);
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: var(--space-md);
+            text-align: left;
+            border-bottom: 1px solid var(--surface-3);
+        }
+        
+        .analytics-table td {
+            padding: var(--space-md);
+            border-bottom: 1px solid var(--surface-3);
+            color: var(--text-primary);
+        }
+        
+        .analytics-table tbody tr:hover {
+            background: var(--surface-2);
+        }
+        
+        /* Status badges */
+        .status-badge {
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-high { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
+        .status-medium { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+        .status-good { background: rgba(34, 197, 94, 0.1); color: #22c55e; }
+        .status-info { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
+        
+        /* Progress bars */
+        .progress-bar {
+            height: 6px;
+            background: var(--surface-3);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: var(--radius-sm);
+            transition: width 0.3s ease;
+        }
+        
+        .progress-high { background: #ef4444; }
+        .progress-medium { background: #f59e0b; }
+        .progress-good { background: #22c55e; }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .analytics-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .metric-value {
+                font-size: 1.5rem;
+            }
+            
+            .analytics-metric-card {
+                padding: var(--space-md);
+            }
+        }
     </style>
 </head>
-<body class="rc-animate-fade-in">
+<body>
     <!-- Navigation -->
-    <nav class="rc-navbar">
-        <div class="rc-container">
-            <div class="rc-navbar-content">
-                <a href="/" class="rc-navbar-brand">
-                    <i class="bi bi-gear-wide-connected"></i>
-                    RentalCore
-                </a>
-                
-                <!-- Mobile toggle -->
-                <button class="rc-navbar-toggle">
-                    <i class="bi bi-list"></i>
-                </button>
-                
-                <!-- Main navigation -->
-                <ul class="rc-navbar-nav">
-                    <li><a href="/jobs" class="rc-nav-link">
-                        <i class="bi bi-briefcase"></i> Jobs
-                    </a></li>
-                    <li><a href="/devices" class="rc-nav-link">
-                        <i class="bi bi-cpu"></i> Devices
-                    </a></li>
-                    <li><a href="/customers" class="rc-nav-link">
-                        <i class="bi bi-people"></i> Customers
-                    </a></li>
-                    <li><a href="/cases" class="rc-nav-link">
-                        <i class="bi bi-box"></i> Cases
-                    </a></li>
-                    
-                    <!-- Tools Dropdown -->
-                    <li class="rc-dropdown">
-                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
-                            <i class="bi bi-tools"></i> Tools
-                        </a>
-                        <div class="rc-dropdown-menu">
-                            <div class="rc-dropdown-header">
-                                <i class="bi bi-folder"></i> Management
-                            </div>
-                            <a href="/workflow/packages" class="rc-dropdown-item">
-                                <i class="bi bi-box-seam"></i> Equipment Packages
-                            </a>
-                            <hr class="rc-dropdown-divider">
-                            <div class="rc-dropdown-header">
-                                <i class="bi bi-building"></i> Business
-                            </div>
-                            <a href="/invoices" class="rc-dropdown-item">
-                                <i class="bi bi-file-text"></i> Invoices
-                            </a>
-                            <a href="/analytics" class="rc-dropdown-item active">
-                                <i class="bi bi-graph-up"></i> Analytics
-                            </a>
-                            <a href="/financial" class="rc-dropdown-item">
-                                <i class="bi bi-calculator"></i> Financial
-                            </a>
-                        </div>
-                    </li>
-                    
-                    <!-- User Dropdown -->
-                    {{if .user}}
-                    <li class="rc-dropdown">
-                        <a href="#" class="rc-nav-link rc-dropdown-toggle">
-                            <i class="bi bi-person-circle"></i> {{.user.Username}}
-                        </a>
-                        <div class="rc-dropdown-menu">
-                            <div class="rc-dropdown-header">
-                                <i class="bi bi-person"></i> {{.user.FirstName}} {{.user.LastName}}
-                            </div>
-                            <hr class="rc-dropdown-divider">
-                            <div class="rc-dropdown-header">Personal</div>
-                            <a href="/profile/settings" class="rc-dropdown-item">
-                                <i class="bi bi-gear"></i> Settings
-                            </a>
-                            <hr class="rc-dropdown-divider">
-                            <div class="rc-dropdown-header">Administration</div>
-                            <a href="/users" class="rc-dropdown-item">
-                                <i class="bi bi-people-fill"></i> User Management
-                            </a>
-                            <a href="/security/audit" class="rc-dropdown-item">
-                                <i class="bi bi-shield-check"></i> Security Audit
-                            </a>
-                            <a href="/security/roles" class="rc-dropdown-item">
-                                <i class="bi bi-key"></i> Security Roles
-                            </a>
-                            <a href="/company/settings" class="rc-dropdown-item">
-                                <i class="bi bi-building-gear"></i> Company Settings
-                            </a>
-                            <hr class="rc-dropdown-divider">
-                            <a href="/logout" class="rc-dropdown-item">
-                                <i class="bi bi-box-arrow-right"></i> Logout
-                            </a>
-                        </div>
-                    </li>
-                    {{end}}
-                </ul>
-            </div>
-        </div>
-    </nav>
+    {{template "navbar.html" .}}
 
     <!-- Main Content -->
-    <main class="rc-container rc-py-4">
+    <main class="rc-container" style="padding-top: var(--space-xl); padding-bottom: var(--space-xl);">
         <!-- Header with controls -->
-        <div class="rc-analytics-header">
-            <div class="rc-grid rc-grid-cols-1 lg:rc-grid-cols-2 rc-gap-6 rc-items-center">
+        <div class="analytics-header">
+            <div style="display: grid; grid-template-columns: 1fr auto; gap: var(--space-lg); align-items: center;">
                 <div>
-                    <h1 class="rc-heading-xl rc-mb-2">
-                        <i class="bi bi-graph-up"></i> Analytics Dashboard
+                    <h1 style="font-size: 2rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--space-xs); display: flex; align-items: center; gap: var(--space-sm);">
+                        <i class="bi bi-graph-up" style="color: var(--accent-electric);"></i> 
+                        Analytics Dashboard
                     </h1>
-                    <p class="rc-text-secondary">Performance insights and business metrics</p>
+                    <p style="color: var(--text-secondary); margin: 0;">Performance insights and business metrics</p>
                 </div>
-                <div class="rc-flex rc-justify-end">
-                    <div class="rc-controls-group">
-                        <div class="dropdown">
-                            <button class="rc-btn rc-btn-outline dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-calendar"></i>
-                                {{if eq .period "7days"}}Last 7 Days{{else if eq .period "30days"}}Last 30 Days{{else if eq .period "90days"}}Last 90 Days{{else if eq .period "1year"}}Last Year{{else}}Last 30 Days{{end}}
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="?period=7days"><i class="bi bi-calendar-week me-2"></i>Last 7 Days</a></li>
-                                <li><a class="dropdown-item" href="?period=30days"><i class="bi bi-calendar-month me-2"></i>Last 30 Days</a></li>
-                                <li><a class="dropdown-item" href="?period=90days"><i class="bi bi-calendar3 me-2"></i>Last 90 Days</a></li>
-                                <li><a class="dropdown-item" href="?period=1year"><i class="bi bi-calendar-year me-2"></i>Last Year</a></li>
-                            </ul>
-                        </div>
-                        <div class="dropdown">
-                            <button class="rc-btn rc-btn-outline dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                <i class="bi bi-download"></i> Export
-                            </button>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="/analytics/export?format=csv&period={{.period}}" onclick="showExportFeedback('CSV')">
-                                    <i class="bi bi-file-earmark-csv me-2"></i>Export CSV
-                                </a></li>
-                                <li><a class="dropdown-item" href="/analytics/export?format=pdf&period={{.period}}" onclick="showExportFeedback('PDF')">
-                                    <i class="bi bi-file-earmark-pdf me-2"></i>Export PDF
-                                </a></li>
-                            </ul>
-                        </div>
-                        <button class="rc-btn rc-btn-primary" onclick="refreshDashboard()">
-                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                <div class="analytics-controls">
+                    <div class="rc-dropdown">
+                        <button class="rc-btn rc-btn-secondary rc-dropdown-toggle">
+                            <i class="bi bi-calendar"></i>
+                            {{if eq .period "7days"}}Last 7 Days{{else if eq .period "30days"}}Last 30 Days{{else if eq .period "90days"}}Last 90 Days{{else if eq .period "1year"}}Last Year{{else}}Last 30 Days{{end}}
                         </button>
+                        <div class="rc-dropdown-menu">
+                            <a class="rc-dropdown-item" href="?period=7days"><i class="bi bi-calendar-week"></i>Last 7 Days</a>
+                            <a class="rc-dropdown-item" href="?period=30days"><i class="bi bi-calendar-month"></i>Last 30 Days</a>
+                            <a class="rc-dropdown-item" href="?period=90days"><i class="bi bi-calendar3"></i>Last 90 Days</a>
+                            <a class="rc-dropdown-item" href="?period=1year"><i class="bi bi-calendar-year"></i>Last Year</a>
+                        </div>
                     </div>
+                    <div class="rc-dropdown">
+                        <button class="rc-btn rc-btn-secondary rc-dropdown-toggle">
+                            <i class="bi bi-download"></i> Export
+                        </button>
+                        <div class="rc-dropdown-menu">
+                            <a class="rc-dropdown-item" href="/analytics/export?format=csv&period={{.period}}" onclick="showExportFeedback('CSV')">
+                                <i class="bi bi-file-earmark-csv"></i>Export CSV
+                            </a>
+                            <a class="rc-dropdown-item" href="/analytics/export?format=pdf&period={{.period}}" onclick="showExportFeedback('PDF')">
+                                <i class="bi bi-file-earmark-pdf"></i>Export PDF
+                            </a>
+                        </div>
+                    </div>
+                    <button class="rc-btn rc-btn-primary" onclick="refreshDashboard()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
                 </div>
             </div>
         </div>
 
         <!-- Key Metrics Cards -->
-        <div class="rc-grid rc-grid-cols-1 md:rc-grid-cols-2 lg:rc-grid-cols-4 rc-gap-4 rc-mb-6">
-            <div class="rc-metric-card revenue">
-                <div class="rc-metric-value">€{{printf "%.0f" .analytics.revenue.totalRevenue}}</div>
-                <div class="rc-metric-label">
-                    <i class="bi bi-currency-euro"></i> Total Revenue
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: var(--space-lg); margin-bottom: var(--space-xl);">
+            <div class="analytics-metric-card">
+                <div class="metric-icon">
+                    <i class="bi bi-currency-euro"></i>
                 </div>
+                <div class="metric-value">€{{printf "%.0f" .analytics.revenue.totalRevenue}}</div>
+                <div class="metric-label">Total Revenue</div>
                 {{if .analytics.revenue.revenueGrowth}}
-                <div class="rc-metric-growth {{if gt .analytics.revenue.revenueGrowth 0}}positive{{else}}negative{{end}}">
+                <div style="margin-top: var(--space-sm); padding: var(--space-xs) var(--space-sm); border-radius: var(--radius); font-size: 0.75rem; font-weight: 600; {{if gt .analytics.revenue.revenueGrowth 0}}background: rgba(34, 197, 94, 0.1); color: #22c55e;{{else}}background: rgba(239, 68, 68, 0.1); color: #ef4444;{{end}}">
                     <i class="bi bi-{{if gt .analytics.revenue.revenueGrowth 0}}arrow-up{{else}}arrow-down{{end}}"></i>
                     {{printf "%.1f" .analytics.revenue.revenueGrowth}}% vs previous period
                 </div>
                 {{end}}
             </div>
             
-            <div class="rc-metric-card equipment">
-                <div class="rc-metric-value">{{.analytics.equipment.utilizationRate}}%</div>
-                <div class="rc-metric-label">
-                    <i class="bi bi-speedometer2"></i> Equipment Utilization
+            <div class="analytics-metric-card">
+                <div class="metric-icon">
+                    <i class="bi bi-speedometer2"></i>
                 </div>
-                <div class="rc-metric-growth">
+                <div class="metric-value">{{.analytics.equipment.utilizationRate}}%</div>
+                <div class="metric-label">Equipment Utilization</div>
+                <div style="margin-top: var(--space-sm); color: var(--text-secondary); font-size: 0.75rem;">
                     {{.analytics.equipment.activeDevices}} of {{.analytics.equipment.totalDevices}} devices active
                 </div>
             </div>
             
-            <div class="rc-metric-card customers">
-                <div class="rc-metric-value">{{.analytics.customers.activeCustomers}}</div>
-                <div class="rc-metric-label">
-                    <i class="bi bi-people"></i> Active Customers
+            <div class="analytics-metric-card">
+                <div class="metric-icon">
+                    <i class="bi bi-people"></i>
                 </div>
-                <div class="rc-metric-growth">
+                <div class="metric-value">{{.analytics.customers.activeCustomers}}</div>
+                <div class="metric-label">Active Customers</div>
+                <div style="margin-top: var(--space-sm); color: var(--text-secondary); font-size: 0.75rem;">
                     {{.analytics.customers.retentionRate}}% retention rate
                 </div>
             </div>
             
-            <div class="rc-metric-card jobs">
-                <div class="rc-metric-value">{{.analytics.jobs.completedJobs}}</div>
-                <div class="rc-metric-label">
-                    <i class="bi bi-check-circle"></i> Completed Jobs
+            <div class="analytics-metric-card">
+                <div class="metric-icon">
+                    <i class="bi bi-check-circle"></i>
                 </div>
-                <div class="rc-metric-growth">
+                <div class="metric-value">{{.analytics.jobs.completedJobs}}</div>
+                <div class="metric-label">Completed Jobs</div>
+                <div style="margin-top: var(--space-sm); color: var(--text-secondary); font-size: 0.75rem;">
                     {{printf "%.1f" .analytics.jobs.avgJobDuration}} days average duration
                 </div>
             </div>
         </div>
 
         <!-- Charts Row -->
-        <div class="rc-grid rc-grid-cols-1 lg:rc-grid-cols-3 rc-gap-4 rc-mb-6">
-            <div class="lg:rc-col-span-2">
-                <div class="rc-chart-container">
-                    <h5 class="rc-chart-title">
-                        <i class="bi bi-graph-up"></i> Revenue Trend
-                    </h5>
-                    <canvas id="revenueChart" style="height: 200px; max-height: 200px;"></canvas>
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl);">
+            <div class="analytics-chart-container">
+                <div class="chart-title">
+                    <i class="bi bi-graph-up"></i> Revenue Trend
                 </div>
+                <canvas id="revenueChart" style="height: 300px; max-height: 300px;"></canvas>
             </div>
-            <div>
-                <div class="rc-chart-container">
-                    <h5 class="rc-chart-title">
-                        <i class="bi bi-pie-chart"></i> Equipment Status
-                    </h5>
-                    <canvas id="equipmentChart" style="height: 200px; max-height: 200px;"></canvas>
+            <div class="analytics-chart-container">
+                <div class="chart-title">
+                    <i class="bi bi-pie-chart"></i> Equipment Status
                 </div>
+                <canvas id="equipmentChart" style="height: 300px; max-height: 300px;"></canvas>
             </div>
         </div>
 
         <!-- Top Performers -->
-        <div class="rc-grid rc-grid-cols-1 lg:rc-grid-cols-2 rc-gap-4 rc-mb-6">
-            <div class="rc-table-container">
-                <div class="rc-table-header">
-                    <i class="bi bi-trophy"></i> Top Equipment
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl);">
+            <div class="analytics-table">
+                <div style="padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--surface-3); font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: var(--space-sm);">
+                    <i class="bi bi-trophy" style="color: var(--accent-electric);"></i> Top Equipment
                 </div>
-                <table class="rc-table">
+                <table>
                     <thead>
                         <tr>
                             <th>Device</th>
@@ -654,23 +325,23 @@
                         <tr>
                             <td><strong>{{.deviceID}}</strong></td>
                             <td>{{.productName}}</td>
-                            <td><span class="rc-badge info">{{.rentalCount}}</span></td>
+                            <td><span class="status-badge status-info">{{.rentalCount}}</span></td>
                             <td><strong>€{{printf "%.0f" .totalRevenue}}</strong></td>
                         </tr>
                         {{else}}
                         <tr>
-                            <td colspan="4" class="rc-text-center rc-text-secondary">No data available</td>
+                            <td colspan="4" style="text-align: center; color: var(--text-secondary);">No data available</td>
                         </tr>
                         {{end}}
                     </tbody>
                 </table>
             </div>
             
-            <div class="rc-table-container">
-                <div class="rc-table-header">
-                    <i class="bi bi-people"></i> Top Customers
+            <div class="analytics-table">
+                <div style="padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--surface-3); font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: var(--space-sm);">
+                    <i class="bi bi-people" style="color: var(--accent-electric);"></i> Top Customers
                 </div>
-                <table class="rc-table">
+                <table>
                     <thead>
                         <tr>
                             <th>Customer</th>
@@ -683,13 +354,13 @@
                         {{range .analytics.topCustomers}}
                         <tr>
                             <td><strong>{{.customerName}}</strong></td>
-                            <td><span class="rc-badge info">{{.jobCount}}</span></td>
+                            <td><span class="status-badge status-info">{{.jobCount}}</span></td>
                             <td>€{{printf "%.0f" .avgRevenue}}</td>
                             <td><strong>€{{printf "%.0f" .totalRevenue}}</strong></td>
                         </tr>
                         {{else}}
                         <tr>
-                            <td colspan="4" class="rc-text-center rc-text-secondary">No data available</td>
+                            <td colspan="4" style="text-align: center; color: var(--text-secondary);">No data available</td>
                         </tr>
                         {{end}}
                     </tbody>
@@ -698,11 +369,11 @@
         </div>
 
         <!-- Equipment Utilization -->
-        <div class="rc-table-container rc-mb-6">
-            <div class="rc-table-header">
-                <i class="bi bi-speedometer2"></i> Equipment Utilization by Category
+        <div class="analytics-table" style="margin-bottom: var(--space-xl);">
+            <div style="padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--surface-3); font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: var(--space-sm);">
+                <i class="bi bi-speedometer2" style="color: var(--accent-electric);"></i> Equipment Utilization by Category
             </div>
-            <table class="rc-table">
+            <table>
                 <thead>
                     <tr>
                         <th>Product Category</th>
@@ -719,27 +390,27 @@
                         <td>{{.totalDevices}}</td>
                         <td>{{.activeDevices}}</td>
                         <td>
-                            <div class="rc-flex rc-items-center rc-gap-3">
-                                <div class="rc-progress-bar rc-flex-1">
-                                    <div class="rc-progress-fill {{if and .utilizationRate (ge .utilizationRate 80)}}high{{else if and .utilizationRate (ge .utilizationRate 60)}}medium{{else}}good{{end}}" 
+                            <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                                <div class="progress-bar" style="flex: 1;">
+                                    <div class="progress-fill progress-{{if and .utilizationRate (ge .utilizationRate 80)}}high{{else if and .utilizationRate (ge .utilizationRate 60)}}medium{{else}}good{{end}}" 
                                          style="width: {{if .utilizationRate}}{{.utilizationRate}}{{else}}0{{end}}%"></div>
                                 </div>
-                                <span class="rc-text-sm rc-font-medium">{{if .utilizationRate}}{{printf "%.1f" .utilizationRate}}{{else}}0.0{{end}}%</span>
+                                <span style="font-size: 0.875rem; font-weight: 500;">{{if .utilizationRate}}{{printf "%.1f" .utilizationRate}}{{else}}0.0{{end}}%</span>
                             </div>
                         </td>
                         <td>
                             {{if and .utilizationRate (ge .utilizationRate 80)}}
-                                <span class="rc-badge high">High</span>
+                                <span class="status-badge status-high">High</span>
                             {{else if and .utilizationRate (ge .utilizationRate 60)}}
-                                <span class="rc-badge medium">Medium</span>
+                                <span class="status-badge status-medium">Medium</span>
                             {{else}}
-                                <span class="rc-badge good">Good</span>
+                                <span class="status-badge status-good">Good</span>
                             {{end}}
                         </td>
                     </tr>
                     {{else}}
                     <tr>
-                        <td colspan="5" class="rc-text-center rc-text-secondary">No equipment data available</td>
+                        <td colspan="5" style="text-align: center; color: var(--text-secondary);">No equipment data available</td>
                     </tr>
                     {{end}}
                 </tbody>
@@ -757,7 +428,6 @@
     </footer>
 
     <!-- JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="/static/js/rental-core-design.js"></script>
     <script>
 // Wait for DOM to be fully loaded

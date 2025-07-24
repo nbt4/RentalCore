@@ -130,6 +130,7 @@ func main() {
 	caseRepo := repository.NewCaseRepository(db)
 	equipmentPackageRepo := repository.NewEquipmentPackageRepository(db)
 	invoiceRepo := repository.NewInvoiceRepositoryNew(db) // Using NEW fixed repository
+	cableRepo := repository.NewCableRepository(db)
 
 	// Initialize services
 	barcodeService := services.NewBarcodeService()
@@ -143,6 +144,7 @@ func main() {
 	customerHandler := handlers.NewCustomerHandler(customerRepo)
 	statusHandler := handlers.NewStatusHandler(statusRepo)
 	productHandler := handlers.NewProductHandler(productRepo)
+	cableHandler := handlers.NewCableHandler(cableRepo)
 	barcodeHandler := handlers.NewBarcodeHandler(barcodeService, deviceRepo)
 	scannerHandler := handlers.NewScannerHandler(jobRepo, deviceRepo, customerRepo, caseRepo)
 	authHandler := handlers.NewAuthHandler(db.DB, cfg)
@@ -390,7 +392,7 @@ func main() {
 	}
 
 	// Routes
-	setupRoutes(r, jobHandler, deviceHandler, customerHandler, statusHandler, productHandler, barcodeHandler, scannerHandler, authHandler, homeHandler, caseHandler, analyticsHandler, searchHandler, pwaHandler, workflowHandler, equipmentPackageHandler, documentHandler, financialHandler, securityHandler, invoiceHandler, templateHandler, companyHandler, monitoringHandler, complianceMiddleware)
+	setupRoutes(r, jobHandler, deviceHandler, customerHandler, statusHandler, productHandler, cableHandler, barcodeHandler, scannerHandler, authHandler, homeHandler, caseHandler, analyticsHandler, searchHandler, pwaHandler, workflowHandler, equipmentPackageHandler, documentHandler, financialHandler, securityHandler, invoiceHandler, templateHandler, companyHandler, monitoringHandler, complianceMiddleware)
 	
 	// Add dedicated error route
 	r.GET("/error", func(c *gin.Context) {
@@ -450,6 +452,7 @@ func setupRoutes(r *gin.Engine,
 	customerHandler *handlers.CustomerHandler,
 	statusHandler *handlers.StatusHandler,
 	productHandler *handlers.ProductHandler,
+	cableHandler *handlers.CableHandler,
 	barcodeHandler *handlers.BarcodeHandler,
 	scannerHandler *handlers.ScannerHandler,
 	authHandler *handlers.AuthHandler,
@@ -544,6 +547,21 @@ func setupRoutes(r *gin.Engine,
 			devices.GET("/available", deviceHandler.GetAvailableDevices)
 		}
 
+		// Product routes
+		products := protected.Group("/products")
+		{
+			products.GET("", productHandler.ListProductsWeb)
+			products.GET("/new", productHandler.NewProductForm)
+		}
+
+		// Cable routes
+		cables := protected.Group("/cables")
+		{
+			cables.GET("", cableHandler.ListCablesWeb)
+			cables.GET("/new", cableHandler.NewCableForm)
+			cables.POST("", cableHandler.CreateCable)
+		}
+
 
 		// Customer routes
 		customers := protected.Group("/customers")
@@ -561,12 +579,6 @@ func setupRoutes(r *gin.Engine,
 		statuses := protected.Group("/statuses")
 		{
 			statuses.GET("", statusHandler.ListStatuses)
-		}
-
-		// Product routes
-		products := protected.Group("/products")
-		{
-			products.GET("", productHandler.ListProducts)
 		}
 
 		// Case routes
@@ -908,6 +920,29 @@ func setupRoutes(r *gin.Engine,
 				apiDevices.PUT("/:id", deviceHandler.UpdateDeviceAPI)
 				apiDevices.DELETE("/:id", deviceHandler.DeleteDeviceAPI)
 				apiDevices.GET("/available", deviceHandler.GetAvailableDevicesAPI)
+			}
+
+			// Product API
+			apiProducts := api.Group("/products")
+			{
+				apiProducts.GET("", productHandler.ListProducts)
+				apiProducts.POST("", productHandler.CreateProductAPI)
+				apiProducts.GET("/:id", productHandler.GetProductAPI)
+				apiProducts.PUT("/:id", productHandler.UpdateProductAPI)
+				apiProducts.DELETE("/:id", productHandler.DeleteProductAPI)
+				apiProducts.GET("/categories", productHandler.GetCategoriesAPI)
+			}
+
+			// Cable API
+			apiCables := api.Group("/cables")
+			{
+				apiCables.GET("", cableHandler.ListCablesAPI)
+				apiCables.POST("", cableHandler.CreateCableAPI)
+				apiCables.GET("/:id", cableHandler.GetCableAPI)
+				apiCables.PUT("/:id", cableHandler.UpdateCableAPI)
+				apiCables.DELETE("/:id", cableHandler.DeleteCableAPI)
+				apiCables.GET("/types", cableHandler.GetCableTypesAPI)
+				apiCables.GET("/connectors", cableHandler.GetCableConnectorsAPI)
 			}
 
 

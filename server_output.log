@@ -1,73 +1,75 @@
-2025/07/23 23:28:38 Database connection established successfully
-2025/07/23 23:28:38 GoBD compliance table migration disabled
-2025/07/23 23:28:38 Database auto-migration disabled - using manual schema management
-2025/07/23 23:28:38 Templates already exist (1), skipping default template creation
+2025/07/24 13:16:27 Database connection established successfully
+2025/07/24 13:16:27 GoBD compliance table migration disabled
+2025/07/24 13:16:27 Database auto-migration disabled - using manual schema management
+2025/07/24 13:16:27 Templates already exist (1), skipping default template creation
 [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
  - using env:	export GIN_MODE=release
  - using code:	gin.SetMode(gin.ReleaseMode)
 
-[GIN-debug] Loaded HTML Templates (61): 
-	- document_upload_form.html
-	- invoices_list.html
-	- scan_job.html
-	- customers.html
+[GIN-debug] Loaded HTML Templates (63): 
+	- customer_form.html
 	- equipment_packages_standalone.html
 	- financial_dashboard.html
-	- mobile_scanner.html
-	- content
-	- login.html
-	- security_roles_standalone.html
-	- transactions_list.html
-	- customer_detail.html
-	- invoice_form.html
-	- 
-	- documents_list.html
-	- financial_reports.html
-	- home.html
-	- transaction_form.html
-	- js
-	- css
-	- case_form.html
-	- company_settings.html
-	- device_form.html
-	- job_form.html
-	- base.html
-	- invoice_templates_list.html
-	- case_device_mapping.html
-	- cases_list.html
-	- scan_select_job.html
-	- customer_form.html
-	- device_detail.html
-	- bulk_operations.html
-	- devices_standalone.html
-	- equipment_package_detail.html
-	- error_page.html
-	- invoices_content.html
-	- users_list.html
-	- transaction_detail.html
-	- user_detail.html
-	- case_detail.html
-	- error.html
-	- invoice_template_designer.html
-	- profile_settings.html
-	- search_results.html
-	- security_audit.html
-	- error_standalone.html
-	- jobs.html
 	- monitoring_dashboard.html
-	- invoice_preview.html
+	- search_results.html
+	- signature_form.html
+	- users_list.html
+	- cables_standalone.html
+	- login.html
 	- analytics_dashboard.html
 	- equipment_package_form.html
-	- job_detail.html
-	- invoice_detail.html
-	- invoice_template_german.html
-	- invoices-content
-	- signature_form.html
-	- base.html.backup
-	- invoice_settings_form.html
+	- job_form.html
+	- jobs.html
+	- transaction_detail.html
+	- base.html
+	- device_form.html
+	- error_page.html
+	- invoices_list.html
+	- case_device_mapping.html
+	- devices_standalone.html
+	- equipment_package_detail.html
+	- invoice_preview.html
+	- 
+	- css
+	- customers.html
+	- home.html
 	- invoice_template_designer_basic.html
 	- navbar.html
+	- transaction_form.html
+	- document_upload_form.html
+	- documents_list.html
+	- invoice_form.html
+	- invoice_template_german.html
 	- user_form.html
+	- error_standalone.html
+	- invoice_templates_list.html
+	- products_standalone.html
+	- case_form.html
+	- company_settings.html
+	- job_detail.html
+	- profile_settings.html
+	- case_detail.html
+	- customer_detail.html
+	- invoice_template_designer.html
+	- content
+	- cable_form.html
+	- invoice_detail.html
+	- invoices_content.html
+	- invoices-content
+	- scan_select_job.html
+	- security_audit.html
+	- js
+	- bulk_operations.html
+	- device_detail.html
+	- invoice_settings_form.html
+	- mobile_scanner.html
+	- scan_job.html
+	- cases_list.html
+	- error.html
+	- financial_reports.html
+	- security_roles_standalone.html
+	- transactions_list.html
+	- user_detail.html
 
 [GIN-debug] GET    /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (8 handlers)
 [GIN-debug] HEAD   /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (8 handlers)
@@ -106,6 +108,11 @@
 [GIN-debug] GET    /devices/:id/barcode      --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceBarcode-fm (10 handlers)
 [GIN-debug] GET    /devices/:id/stats        --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceStatsAPI-fm (10 handlers)
 [GIN-debug] GET    /devices/available        --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetAvailableDevices-fm (10 handlers)
+[GIN-debug] GET    /products                 --> go-barcode-webapp/internal/handlers.(*ProductHandler).ListProductsWeb-fm (10 handlers)
+[GIN-debug] GET    /products/new             --> go-barcode-webapp/internal/handlers.(*ProductHandler).NewProductForm-fm (10 handlers)
+[GIN-debug] GET    /cables                   --> go-barcode-webapp/internal/handlers.(*CableHandler).ListCablesWeb-fm (10 handlers)
+[GIN-debug] GET    /cables/new               --> go-barcode-webapp/internal/handlers.(*CableHandler).NewCableForm-fm (10 handlers)
+[GIN-debug] POST   /cables                   --> go-barcode-webapp/internal/handlers.(*CableHandler).CreateCable-fm (10 handlers)
 [GIN-debug] GET    /customers                --> go-barcode-webapp/internal/handlers.(*CustomerHandler).ListCustomers-fm (10 handlers)
 [GIN-debug] GET    /customers/new            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).NewCustomerForm-fm (10 handlers)
 [GIN-debug] POST   /customers                --> go-barcode-webapp/internal/handlers.(*CustomerHandler).CreateCustomer-fm (10 handlers)
@@ -114,7 +121,6 @@
 [GIN-debug] PUT    /customers/:id            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).UpdateCustomer-fm (10 handlers)
 [GIN-debug] DELETE /customers/:id            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).DeleteCustomer-fm (10 handlers)
 [GIN-debug] GET    /statuses                 --> go-barcode-webapp/internal/handlers.(*StatusHandler).ListStatuses-fm (10 handlers)
-[GIN-debug] GET    /products                 --> go-barcode-webapp/internal/handlers.(*ProductHandler).ListProducts-fm (10 handlers)
 [GIN-debug] GET    /cases                    --> go-barcode-webapp/internal/handlers.(*CaseHandler).ListCases-fm (10 handlers)
 [GIN-debug] GET    /cases/new                --> go-barcode-webapp/internal/handlers.(*CaseHandler).NewCaseForm-fm (10 handlers)
 [GIN-debug] POST   /cases                    --> go-barcode-webapp/internal/handlers.(*CaseHandler).CreateCase-fm (10 handlers)
@@ -264,6 +270,19 @@
 [GIN-debug] PUT    /api/v1/devices/:id       --> go-barcode-webapp/internal/handlers.(*DeviceHandler).UpdateDeviceAPI-fm (10 handlers)
 [GIN-debug] DELETE /api/v1/devices/:id       --> go-barcode-webapp/internal/handlers.(*DeviceHandler).DeleteDeviceAPI-fm (10 handlers)
 [GIN-debug] GET    /api/v1/devices/available --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetAvailableDevicesAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/products          --> go-barcode-webapp/internal/handlers.(*ProductHandler).ListProducts-fm (10 handlers)
+[GIN-debug] POST   /api/v1/products          --> go-barcode-webapp/internal/handlers.(*ProductHandler).CreateProductAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/products/:id      --> go-barcode-webapp/internal/handlers.(*ProductHandler).GetProductAPI-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/products/:id      --> go-barcode-webapp/internal/handlers.(*ProductHandler).UpdateProductAPI-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/products/:id      --> go-barcode-webapp/internal/handlers.(*ProductHandler).DeleteProductAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/products/categories --> go-barcode-webapp/internal/handlers.(*ProductHandler).GetCategoriesAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/cables            --> go-barcode-webapp/internal/handlers.(*CableHandler).ListCablesAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/cables            --> go-barcode-webapp/internal/handlers.(*CableHandler).CreateCableAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/cables/:id        --> go-barcode-webapp/internal/handlers.(*CableHandler).GetCableAPI-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/cables/:id        --> go-barcode-webapp/internal/handlers.(*CableHandler).UpdateCableAPI-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/cables/:id        --> go-barcode-webapp/internal/handlers.(*CableHandler).DeleteCableAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/cables/types      --> go-barcode-webapp/internal/handlers.(*CableHandler).GetCableTypesAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/cables/connectors --> go-barcode-webapp/internal/handlers.(*CableHandler).GetCableConnectorsAPI-fm (10 handlers)
 [GIN-debug] GET    /api/v1/customers         --> go-barcode-webapp/internal/handlers.(*CustomerHandler).ListCustomersAPI-fm (10 handlers)
 [GIN-debug] POST   /api/v1/customers         --> go-barcode-webapp/internal/handlers.(*CustomerHandler).CreateCustomerAPI-fm (10 handlers)
 [GIN-debug] GET    /api/v1/customers/:id     --> go-barcode-webapp/internal/handlers.(*CustomerHandler).GetCustomerAPI-fm (10 handlers)
@@ -337,116 +356,9 @@
 [GIN-debug] GET    /api/security/audit/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLog-fm (10 handlers)
 [GIN-debug] GET    /api/security/audit/export --> go-barcode-webapp/internal/handlers.(*SecurityHandler).ExportAuditLogs-fm (10 handlers)
 [GIN-debug] GET    /api/security/permissions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissions-fm (10 handlers)
-[GIN-debug] GET    /api/security/check-permission --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CheckPermission-fm (10 handlers)
+[GIN-debug] GET    /api/security/permissions/definitions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissionDefinitionsAPI-fm (10 handlers)
+[GIN-debug] GET    /api/security/permissions/check --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CheckPermission-fm (10 handlers)
 [GIN-debug] GET    /error                    --> main.main.func26 (9 handlers)
-2025/07/23 23:28:38 Server starting on 0.0.0.0:8080
-2025/07/23 23:31:03 Route Debug: GET /devices
-2025/07/23 23:31:03 DEBUG: AuthMiddleware: Request URL: /devices
-2025/07/23 23:31:03 DEBUG: AuthMiddleware: No session cookie found for /devices, redirecting to /login
-{"timestamp":"2025-07-23T21:31:03.863466241Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753306263828774608","method":"GET","path":"/devices","status_code":303,"duration":"34.686926ms","ip":"127.0.0.1","user_agent":"curl/7.88.1","fields":{"bytes_in":0,"bytes_out":33}}
-2025/07/23 23:32:28 Route Debug: GET /devices
-2025/07/23 23:32:28 DEBUG: AuthMiddleware: Request URL: /devices
-2025/07/23 23:32:28 DEBUG: AuthMiddleware: Found session cookie: 4b83aca782c7d8e6aea3eb22716ab542745096aa9daa1136c1e2bbd412701607 for /devices
-2025/07/23 23:32:28 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /devices
-2025/07/23 23:32:28 🚀 DeviceHandler.ListDevices() started
-2025/07/23 23:32:28 ⏱️  DeviceRepository.List() started
-2025/07/23 23:32:28 ⏱️  Device query took: 85.657686ms
-2025/07/23 23:32:28 ⏱️  DeviceRepository.List() completed in 85.749919ms (found 20 devices)
-2025/07/23 23:32:28 ⏱️  Database query took: 85.757203ms
-2025/07/23 23:32:28 💾 Cached 20 devices
-2025/07/23 23:32:28 SafeHTML: Rendering template devices_standalone.html with status 200
-2025/07/23 23:32:28 ⏱️  Template rendering took: 11.746749ms
-2025/07/23 23:32:28 🏁 DeviceHandler.ListDevices() completed in 97.6248ms
-{"timestamp":"2025-07-23T21:32:28.294280785Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753306348094318817","method":"GET","path":"/devices","status_code":200,"duration":"199.95776ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":54672}}
-2025/07/23 23:32:29 Route Debug: GET /devices
-2025/07/23 23:32:29 DEBUG: AuthMiddleware: Request URL: /devices
-2025/07/23 23:32:29 DEBUG: AuthMiddleware: Found session cookie: 4b83aca782c7d8e6aea3eb22716ab542745096aa9daa1136c1e2bbd412701607 for /devices
-2025/07/23 23:32:29 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /devices
-2025/07/23 23:32:29 🚀 DeviceHandler.ListDevices() started
-2025/07/23 23:32:29 ⚡ Using cached devices (20 items)
-2025/07/23 23:32:29 SafeHTML: Rendering template devices_standalone.html with status 200
-2025/07/23 23:32:29 ⏱️  Template rendering took: 10.20925ms
-2025/07/23 23:32:29 🏁 DeviceHandler.ListDevices() completed in 10.261719ms
-{"timestamp":"2025-07-23T21:32:29.630178825Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753306349518112890","method":"GET","path":"/devices","status_code":200,"duration":"112.062208ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":54672}}
-2025/07/23 23:32:30 Route Debug: GET /devices
-2025/07/23 23:32:30 DEBUG: AuthMiddleware: Request URL: /devices
-2025/07/23 23:32:30 DEBUG: AuthMiddleware: Found session cookie: 4b83aca782c7d8e6aea3eb22716ab542745096aa9daa1136c1e2bbd412701607 for /devices
-2025/07/23 23:32:30 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /devices
-2025/07/23 23:32:30 🚀 DeviceHandler.ListDevices() started
-2025/07/23 23:32:30 ⚡ Using cached devices (20 items)
-2025/07/23 23:32:30 SafeHTML: Rendering template devices_standalone.html with status 200
-2025/07/23 23:32:30 ⏱️  Template rendering took: 11.47132ms
-2025/07/23 23:32:30 🏁 DeviceHandler.ListDevices() completed in 11.519541ms
-{"timestamp":"2025-07-23T21:32:30.791921303Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753306350679590239","method":"GET","path":"/devices","status_code":200,"duration":"112.328288ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":54672}}
-2025/07/23 23:32:30 Route Debug: GET /static/css/rental-core-design.css
-2025/07/23 23:32:30 Route Debug: GET /static/js/rental-core-design.js
-2025/07/23 23:32:31 Route Debug: GET /static/images/icon-180.png
-2025/07/23 23:32:31 NotFoundHandler: 404 for path: /static/images/icon-180.png
-2025/07/23 23:32:31 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
-2025/07/23 23:32:31 Route Debug: GET /favicon.ico
-2025/07/23 23:32:31 NotFoundHandler: 404 for path: /favicon.ico
-2025/07/23 23:32:31 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
-{"timestamp":"2025-07-23T21:32:31.114995544Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753306351035338638","method":"GET","path":"/favicon.ico","status_code":404,"duration":"79.653059ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":4404}}
-2025/07/23 23:32:37 Route Debug: GET /devices
-2025/07/23 23:32:37 DEBUG: AuthMiddleware: Request URL: /devices
-2025/07/23 23:32:37 DEBUG: AuthMiddleware: Found session cookie: 4b83aca782c7d8e6aea3eb22716ab542745096aa9daa1136c1e2bbd412701607 for /devices
-2025/07/23 23:32:37 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /devices
-2025/07/23 23:32:37 🚀 DeviceHandler.ListDevices() started
-2025/07/23 23:32:37 ⚡ Using cached devices (20 items)
-2025/07/23 23:32:37 SafeHTML: Rendering template devices_standalone.html with status 200
-2025/07/23 23:32:37 ⏱️  Template rendering took: 17.325663ms
-2025/07/23 23:32:37 🏁 DeviceHandler.ListDevices() completed in 17.394492ms
-{"timestamp":"2025-07-23T21:32:37.770539875Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753306357652253878","method":"GET","path":"/devices","status_code":200,"duration":"118.281168ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":54672}}
-2025/07/23 23:32:37 Route Debug: GET /static/css/rental-core-design.css
-2025/07/23 23:32:37 Route Debug: GET /static/js/rental-core-design.js
-2025/07/23 23:32:37 Route Debug: GET /static/images/icon-180.png
-2025/07/23 23:32:37 NotFoundHandler: 404 for path: /static/images/icon-180.png
-2025/07/23 23:32:37 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
-2025/07/23 23:32:37 Route Debug: GET /favicon.ico
-2025/07/23 23:32:37 NotFoundHandler: 404 for path: /favicon.ico
-2025/07/23 23:32:37 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
-{"timestamp":"2025-07-23T21:32:38.034218056Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753306357954977314","method":"GET","path":"/favicon.ico","status_code":404,"duration":"79.236835ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":4404}}
-2025/07/23 23:33:27 Route Debug: GET /devices
-2025/07/23 23:33:27 DEBUG: AuthMiddleware: Request URL: /devices
-2025/07/23 23:33:27 DEBUG: AuthMiddleware: Found session cookie: 4b83aca782c7d8e6aea3eb22716ab542745096aa9daa1136c1e2bbd412701607 for /devices
-2025/07/23 23:33:27 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /devices
-2025/07/23 23:33:27 🚀 DeviceHandler.ListDevices() started
-2025/07/23 23:33:27 ⏱️  DeviceRepository.List() started
-2025/07/23 23:33:27 ⏱️  Device query took: 85.315079ms
-2025/07/23 23:33:27 ⏱️  DeviceRepository.List() completed in 85.379527ms (found 20 devices)
-2025/07/23 23:33:27 ⏱️  Database query took: 85.385045ms
-2025/07/23 23:33:27 💾 Cached 20 devices
-2025/07/23 23:33:27 SafeHTML: Rendering template devices_standalone.html with status 200
-2025/07/23 23:33:27 ⏱️  Template rendering took: 12.140596ms
-2025/07/23 23:33:27 🏁 DeviceHandler.ListDevices() completed in 97.563529ms
-{"timestamp":"2025-07-23T21:33:27.800926804Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753306407601507604","method":"GET","path":"/devices","status_code":200,"duration":"199.414454ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":54672}}
-2025/07/23 23:33:29 Route Debug: GET /devices
-2025/07/23 23:33:29 DEBUG: AuthMiddleware: Request URL: /devices
-2025/07/23 23:33:29 DEBUG: AuthMiddleware: Found session cookie: 4b83aca782c7d8e6aea3eb22716ab542745096aa9daa1136c1e2bbd412701607 for /devices
-2025/07/23 23:33:29 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /devices
-2025/07/23 23:33:29 🚀 DeviceHandler.ListDevices() started
-2025/07/23 23:33:29 ⚡ Using cached devices (20 items)
-2025/07/23 23:33:29 SafeHTML: Rendering template devices_standalone.html with status 200
-2025/07/23 23:33:29 ⏱️  Template rendering took: 12.450996ms
-2025/07/23 23:33:29 🏁 DeviceHandler.ListDevices() completed in 12.498025ms
-{"timestamp":"2025-07-23T21:33:29.644519559Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753306409530328182","method":"GET","path":"/devices","status_code":200,"duration":"114.187302ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":54672}}
-2025/07/23 23:33:32 Route Debug: GET /devices
-2025/07/23 23:33:32 DEBUG: AuthMiddleware: Request URL: /devices
-2025/07/23 23:33:32 DEBUG: AuthMiddleware: Found session cookie: 4b83aca782c7d8e6aea3eb22716ab542745096aa9daa1136c1e2bbd412701607 for /devices
-2025/07/23 23:33:32 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /devices
-2025/07/23 23:33:32 🚀 DeviceHandler.ListDevices() started
-2025/07/23 23:33:32 ⚡ Using cached devices (20 items)
-2025/07/23 23:33:32 SafeHTML: Rendering template devices_standalone.html with status 200
-2025/07/23 23:33:32 ⏱️  Template rendering took: 9.447453ms
-2025/07/23 23:33:32 🏁 DeviceHandler.ListDevices() completed in 26.296992ms
-{"timestamp":"2025-07-23T21:33:32.598667826Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753306412470904481","method":"GET","path":"/devices","status_code":200,"duration":"127.760254ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":54674}}
-2025/07/23 23:33:33 Route Debug: GET /devices
-2025/07/23 23:33:33 DEBUG: AuthMiddleware: Request URL: /devices
-2025/07/23 23:33:33 DEBUG: AuthMiddleware: Found session cookie: 4b83aca782c7d8e6aea3eb22716ab542745096aa9daa1136c1e2bbd412701607 for /devices
-2025/07/23 23:33:33 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /devices
-2025/07/23 23:33:33 🚀 DeviceHandler.ListDevices() started
-2025/07/23 23:33:33 ⚡ Using cached devices (20 items)
-2025/07/23 23:33:33 SafeHTML: Rendering template devices_standalone.html with status 200
-2025/07/23 23:33:33 ⏱️  Template rendering took: 13.597896ms
-2025/07/23 23:33:33 🏁 DeviceHandler.ListDevices() completed in 13.632192ms
-{"timestamp":"2025-07-23T21:33:33.524246129Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753306413390018302","method":"GET","path":"/devices","status_code":200,"duration":"134.224285ms","ip":"10.0.0.11","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":54672}}
+2025/07/24 13:16:27 Server starting on 0.0.0.0:8080
+2025/07/24 13:16:27 listen tcp 0.0.0.0:8080: bind: address already in use
+exit status 1
