@@ -542,3 +542,10 @@ DEBUG: Cleaned up 1 expired sessions
 2025/07/24 13:16:13 DEBUG: AuthMiddleware: Request URL: /api/security/roles
 2025/07/24 13:16:13 DEBUG: AuthMiddleware: No session cookie found for /api/security/roles, redirecting to /login
 {"timestamp":"2025-07-24T11:16:13.793260707Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753355773630341479","method":"GET","path":"/api/security/roles","status_code":303,"duration":"162.916607ms","ip":"127.0.0.1","user_agent":"curl/7.88.1","fields":{"bytes_in":0,"bytes_out":33}}
+2025/07/24 16:26:47 Running in production mode
+2025/07/24 16:26:47 Database connection established successfully
+2025/07/24 16:26:47 GoBD compliance table migration disabled
+2025/07/24 16:26:47 Database auto-migration disabled - using manual schema management
+2025/07/24 16:26:47 Templates already exist (1), skipping default template creation
+2025/07/24 16:26:47 Server starting on 0.0.0.0:8080
+2025/07/24 16:26:47 listen tcp 0.0.0.0:8080: bind: address already in use

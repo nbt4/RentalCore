@@ -466,3 +466,19 @@ DEBUG: Login successful, session created: 17f0772ea96372aee9cce2ca0a57e793c77ab3
 2025/07/24 16:18:05 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /dashboard
 2025/07/24 16:18:05 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /dashboard
 {"timestamp":"2025-07-24T14:18:05.930872Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366685712138998","method":"GET","path":"/dashboard","status_code":200,"duration":"218.72931ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18644}}
+2025/07/24 16:26:35 Route Debug: GET /dashboard
+2025/07/24 16:26:35 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/07/24 16:26:35 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /dashboard
+2025/07/24 16:26:36 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /dashboard
+{"timestamp":"2025-07-24T14:26:36.296324505Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753367195975778615","method":"GET","path":"/dashboard","status_code":200,"duration":"320.541078ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18644}}
+2025/07/24 16:26:37 Route Debug: GET /dashboard
+2025/07/24 16:26:37 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/07/24 16:26:37 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /dashboard
+2025/07/24 16:26:37 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /dashboard
+{"timestamp":"2025-07-24T14:26:37.457305572Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753367197237103738","method":"GET","path":"/dashboard","status_code":200,"duration":"220.199573ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18644}}
+2025/07/24 16:26:51 Route Debug: GET /dashboard
+2025/07/24 16:26:51 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/07/24 16:26:51 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /dashboard
+2025/07/24 16:26:51 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /dashboard
+{"timestamp":"2025-07-24T14:26:51.559445151Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753367211343149198","method":"GET","path":"/dashboard","status_code":200,"duration":"216.292082ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18644}}
+signal: terminated
