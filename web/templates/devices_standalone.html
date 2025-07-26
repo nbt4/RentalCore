@@ -757,8 +757,46 @@
     }
 
     function openAddDeviceModal() {
-        console.log('Open add device modal');
-        // Implement add device functionality
+        const modal = document.getElementById('newDeviceModal');
+        modal.style.display = 'flex';
+        
+        // Reset form
+        document.getElementById('newDeviceForm').reset();
+        
+        // Load products
+        loadProductsForModal();
+        
+        // Focus on first input
+        setTimeout(() => {
+            const firstInput = modal.querySelector('select');
+            if (firstInput) firstInput.focus();
+        }, 100);
+    }
+    
+    function loadProductsForModal() {
+        const productSelect = document.querySelector('#newDeviceForm select[name="productID"]');
+        if (!productSelect) return;
+        
+        // Show loading
+        productSelect.innerHTML = '<option value="">Loading products...</option>';
+        
+        fetch('/api/v1/products')
+            .then(response => response.json())
+            .then(data => {
+                const products = data.products || data || [];
+                productSelect.innerHTML = '<option value="">Select Product</option>';
+                
+                products.forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = product.productID || product.ProductID;
+                    option.textContent = product.name || product.Name;
+                    productSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading products:', error);
+                productSelect.innerHTML = '<option value="">Error loading products</option>';
+            });
     }
     
     // Hierarchical Tree View Functions
@@ -807,6 +845,216 @@
         // For now, just redirect to edit form - you can implement modal later
         window.location.href = `/devices/${deviceId}/edit`;
     }
+    
+    // New Device Modal Functions
+    function closeNewDeviceModal() {
+        document.getElementById('newDeviceModal').style.display = 'none';
+    }
+
+    function createNewDevice(formData) {
+        const submitBtn = document.querySelector('#newDeviceForm button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        // Show loading state
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Creating...';
+        submitBtn.disabled = true;
+        
+        // Convert FormData to JSON
+        const data = {};
+        for (let [key, value] of formData.entries()) {
+            if (key === 'quantity') {
+                data[key] = parseInt(value) || 1;
+            } else if (key === 'productID') {
+                data[key] = parseInt(value);
+            } else {
+                data[key] = value || null;
+            }
+        }
+        
+        fetch('/api/v1/devices', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`HTTP ${response.status}: ${text}`);
+                });
+            }
+            return response.json();
+        })
+        .then(result => {
+            if (result.error) {
+                throw new Error(result.error);
+            }
+            
+            // Success - close modal and reload page
+            closeNewDeviceModal();
+            
+            // Show success message
+            showSuccessMessage('Device(s) created successfully!');
+            
+            // Reload page to show new device(s)
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        })
+        .catch(error => {
+            // Restore button and show error
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            
+            showErrorMessage('Error creating device: ' + error.message);
+        });
+    }
+
+    // Helper functions for notifications
+    function showSuccessMessage(message) {
+        const notification = document.createElement('div');
+        notification.className = 'rc-alert rc-alert-success';
+        notification.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 10000; max-width: 400px;';
+        notification.innerHTML = `
+            <i class="bi bi-check-circle"></i> ${message}
+            <button onclick="this.parentElement.remove()" style="float: right; background: none; border: none; color: inherit;">&times;</button>
+        `;
+        document.body.appendChild(notification);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+
+    function showErrorMessage(message) {
+        const notification = document.createElement('div');
+        notification.className = 'rc-alert rc-alert-error';
+        notification.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 10000; max-width: 400px;';
+        notification.innerHTML = `
+            <i class="bi bi-exclamation-triangle"></i> ${message}
+            <button onclick="this.parentElement.remove()" style="float: right; background: none; border: none; color: inherit;">&times;</button>
+        `;
+        document.body.appendChild(notification);
+        
+        // Auto remove after 8 seconds
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 8000);
+    }
+
+    // Handle new device form submission and quantity changes
+    document.addEventListener('DOMContentLoaded', function() {
+        const newDeviceForm = document.getElementById('newDeviceForm');
+        if (newDeviceForm) {
+            newDeviceForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                createNewDevice(new FormData(this));
+            });
+            
+            // Update button text based on quantity
+            const quantityInput = newDeviceForm.querySelector('input[name="quantity"]');
+            const buttonText = document.getElementById('createDeviceButtonText');
+            
+            if (quantityInput && buttonText) {
+                function updateButtonText() {
+                    const quantity = parseInt(quantityInput.value) || 1;
+                    if (quantity === 1) {
+                        buttonText.textContent = 'Create Device';
+                    } else {
+                        buttonText.textContent = `Create ${quantity} Devices`;
+                    }
+                }
+                
+                quantityInput.addEventListener('input', updateButtonText);
+                updateButtonText(); // Initial update
+            }
+        }
+    });
+
+    // Close modals on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeNewDeviceModal();
+        }
+    });
     </script>
+
+    <!-- New Device Modal -->
+    <div id="newDeviceModal" class="rc-modal" style="display: none;">
+        <div class="rc-modal-overlay" onclick="closeNewDeviceModal()"></div>
+        <div class="rc-modal-content" style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
+            <div class="rc-modal-header">
+                <h3 class="rc-modal-title">
+                    <i class="bi bi-cpu"></i> Add New Device
+                </h3>
+                <button class="rc-modal-close" onclick="closeNewDeviceModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="rc-modal-body">
+                <form id="newDeviceForm">
+                    <div class="rc-grid rc-grid-cols-1 rc-grid-cols-md-3 rc-grid-gap-md rc-mb-lg">
+                        <div class="rc-form-group">
+                            <label class="rc-label">Product *</label>
+                            <select class="rc-select" name="productID" required>
+                                <option value="">Select Product</option>
+                                <!-- Products will be loaded dynamically -->
+                            </select>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Serial Number</label>
+                            <input type="text" class="rc-input" name="serialnumber" placeholder="Optional">
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Quantity *</label>
+                            <input type="number" class="rc-input" name="quantity" value="1" min="1" max="100" required>
+                            <small class="rc-text-muted">Number of identical devices to create</small>
+                        </div>
+                    </div>
+                    
+                    <div class="rc-grid rc-grid-cols-1 rc-grid-cols-md-3 rc-grid-gap-md rc-mb-lg">
+                        <div class="rc-form-group">
+                            <label class="rc-label">Purchase Date</label>
+                            <input type="date" class="rc-input" name="purchase_date">
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Last Maintenance</label>
+                            <input type="date" class="rc-input" name="last_maintenance">
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Status</label>
+                            <select class="rc-select" name="status">
+                                <option value="free">Free</option>
+                                <option value="rented">Rented</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="rc-form-group rc-mb-lg">
+                        <label class="rc-label">Notes</label>
+                        <textarea class="rc-textarea" name="notes" rows="4" placeholder="Add any relevant notes about the device..."></textarea>
+                    </div>
+                    
+                    <div class="rc-flex rc-flex-between">
+                        <button type="button" onclick="closeNewDeviceModal()" class="rc-btn rc-btn-secondary">
+                            <i class="bi bi-x-lg"></i> Cancel
+                        </button>
+                        <button type="submit" class="rc-btn rc-btn-primary">
+                            <i class="bi bi-check-lg"></i> <span id="createDeviceButtonText">Create Device(s)</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>

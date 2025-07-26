@@ -86,9 +86,9 @@
 
                         <!-- Cross Section -->
                         <div class="rc-form-group">
-                            <label for="mm2" class="rc-label">Cross Section (mm²) *</label>
+                            <label for="mm2" class="rc-label">Cross Section (mm²)</label>
                             <input type="number" name="mm2" id="mm2" class="rc-input" step="0.01" min="0" 
-                                   value="{{if .cable.MM2}}{{.cable.MM2}}{{end}}" required placeholder="e.g., 2.5">
+                                   value="{{.cable.GetMM2Value}}" placeholder="e.g., 2.5">
                         </div>
 
                         <!-- Amount -->

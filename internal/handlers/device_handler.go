@@ -99,13 +99,21 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 			dbTime := time.Since(dbStart)
 			log.Printf("⏱️  Database query took: %v", dbTime)
 			
-			// Convert to DeviceWithJobInfo format
+			// Convert to DeviceWithJobInfo format with proper assignment checking
 			devices = make([]models.DeviceWithJobInfo, len(deviceList))
 			for i, device := range deviceList {
+				// Check if device is currently assigned to an active job
+				isAssigned, jobID, err := h.deviceRepo.IsDeviceCurrentlyAssigned(device.DeviceID)
+				if err != nil {
+					log.Printf("❌ Error checking device assignment for %s: %v", device.DeviceID, err)
+					isAssigned = false
+					jobID = nil
+				}
+				
 				devices[i] = models.DeviceWithJobInfo{
 					Device:     device,
-					JobID:      nil,      // Job assignment will be checked separately if needed
-					IsAssigned: false,   // Job assignment will be checked separately if needed
+					JobID:      jobID,
+					IsAssigned: isAssigned,
 				}
 			}
 			
@@ -129,13 +137,21 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 		dbTime := time.Since(dbStart)
 		log.Printf("⏱️  Database query took: %v", dbTime)
 		
-		// Convert to DeviceWithJobInfo format
+		// Convert to DeviceWithJobInfo format with proper assignment checking
 		devices = make([]models.DeviceWithJobInfo, len(deviceList))
 		for i, device := range deviceList {
+			// Check if device is currently assigned to an active job
+			isAssigned, jobID, err := h.deviceRepo.IsDeviceCurrentlyAssigned(device.DeviceID)
+			if err != nil {
+				log.Printf("❌ Error checking device assignment for %s: %v", device.DeviceID, err)
+				isAssigned = false
+				jobID = nil
+			}
+			
 			devices[i] = models.DeviceWithJobInfo{
 				Device:     device,
-				JobID:      nil,      // Job assignment will be checked separately if needed
-				IsAssigned: false,   // Job assignment will be checked separately if needed
+				JobID:      jobID,
+				IsAssigned: isAssigned,
 			}
 		}
 		
@@ -667,6 +683,36 @@ func (h *DeviceHandler) GetDeviceStatsAPI(c *gin.Context) {
 
 func (h *DeviceHandler) GetAvailableDevicesAPI(c *gin.Context) {
 	devices, err := h.deviceRepo.GetAvailableDevices()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"devices": devices})
+}
+
+// GetAvailableDevicesForJobAPI returns devices available for a specific job's date range
+func (h *DeviceHandler) GetAvailableDevicesForJobAPI(c *gin.Context) {
+	jobIDStr := c.Param("jobId")
+	jobID, err := strconv.ParseUint(jobIDStr, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid job ID"})
+		return
+	}
+
+	// Get job details to extract dates
+	// We need access to job repository for this - let me create a simple query
+	var job models.Job
+	// This is a bit hacky, but we need the job dates. In a better design, 
+	// this would be passed as query parameters or we'd inject job repository
+	db := h.deviceRepo.GetDB() // We need to add this method to device repo
+	err = db.First(&job, uint(jobID)).Error
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Job not found"})
+		return
+	}
+
+	devices, err := h.deviceRepo.GetAvailableDevicesForJob(uint(jobID), job.StartDate, job.EndDate)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

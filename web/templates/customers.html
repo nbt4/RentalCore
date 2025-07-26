@@ -37,9 +37,9 @@
                 </h1>
                 <p class="rc-text">Manage your customer database</p>
             </div>
-            <a href="/customers/new" class="rc-btn rc-btn-primary">
+            <button onclick="showNewCustomerModal()" class="rc-btn rc-btn-primary">
                 <i class="bi bi-plus-lg"></i> New Customer
-            </a>
+            </button>
         </div>
 
         <!-- Search Card -->
@@ -168,9 +168,9 @@
                         Add your first customer to get started with rental management.
                         {{end}}
                     </p>
-                    <a href="/customers/new" class="rc-btn rc-btn-primary">
+                    <button onclick="showNewCustomerModal()" class="rc-btn rc-btn-primary">
                         <i class="bi bi-plus-lg"></i> Add First Customer
-                    </a>
+                    </button>
                 </div>
                 {{end}}
             </div>
@@ -215,6 +215,112 @@
                     <div class="rc-spinner"></div>
                     <p class="rc-text-muted rc-mt-md">Loading customer form...</p>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Customer Modal -->
+    <div id="newCustomerModal" class="rc-modal" style="display: none;">
+        <div class="rc-modal-overlay" onclick="closeNewCustomerModal()"></div>
+        <div class="rc-modal-content" style="max-width: 700px; max-height: 90vh; overflow-y: auto;">
+            <div class="rc-modal-header">
+                <h3 class="rc-modal-title">
+                    <i class="bi bi-person-plus"></i> Add New Customer
+                </h3>
+                <button class="rc-modal-close" onclick="closeNewCustomerModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="rc-modal-body">
+                <form id="newCustomerForm">
+                    <!-- Company or Personal -->
+                    <div class="rc-grid rc-grid-cols-1 rc-grid-cols-md-2 rc-grid-gap-md rc-mb-lg">
+                        <div class="rc-form-group">
+                            <label class="rc-label">Company Name</label>
+                            <input type="text" class="rc-input" name="companyname" placeholder="Leave empty for personal customers">
+                            <small class="rc-text-muted">Optional - leave blank for individual customers</small>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Customer Type *</label>
+                            <select class="rc-select" name="customertype" required>
+                                <option value="Kunde">Kunde</option>
+                                <option value="Lieferant">Lieferant</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Personal Details -->
+                    <div class="rc-grid rc-grid-cols-1 rc-grid-cols-md-2 rc-grid-gap-md rc-mb-lg">
+                        <div class="rc-form-group">
+                            <label class="rc-label">First Name *</label>
+                            <input type="text" class="rc-input" name="firstname" required>
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Last Name *</label>
+                            <input type="text" class="rc-input" name="lastname" required>
+                        </div>
+                    </div>
+
+                    <!-- Contact Details -->
+                    <div class="rc-grid rc-grid-cols-1 rc-grid-cols-md-2 rc-grid-gap-md rc-mb-lg">
+                        <div class="rc-form-group">
+                            <label class="rc-label">Email</label>
+                            <input type="email" class="rc-input" name="email">
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Phone Number</label>
+                            <input type="tel" class="rc-input" name="phonenumber">
+                        </div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="rc-grid rc-grid-cols-1 rc-grid-cols-md-3 rc-grid-gap-md rc-mb-lg">
+                        <div class="rc-form-group rc-grid-span-2">
+                            <label class="rc-label">Street</label>
+                            <input type="text" class="rc-input" name="street">
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">House Number</label>
+                            <input type="text" class="rc-input" name="housenumber">
+                        </div>
+                    </div>
+
+                    <div class="rc-grid rc-grid-cols-1 rc-grid-cols-md-3 rc-grid-gap-md rc-mb-lg">
+                        <div class="rc-form-group">
+                            <label class="rc-label">ZIP Code</label>
+                            <input type="text" class="rc-input" name="ZIP">
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">City</label>
+                            <input type="text" class="rc-input" name="city">
+                        </div>
+                        <div class="rc-form-group">
+                            <label class="rc-label">Federal State</label>
+                            <input type="text" class="rc-input" name="federalstate">
+                        </div>
+                    </div>
+
+                    <div class="rc-grid rc-grid-cols-1 rc-grid-cols-md-2 rc-grid-gap-md rc-mb-lg">
+                        <div class="rc-form-group">
+                            <label class="rc-label">Country</label>
+                            <input type="text" class="rc-input" name="country" placeholder="DE">
+                        </div>
+                    </div>
+                    
+                    <div class="rc-form-group rc-mb-lg">
+                        <label class="rc-label">Notes</label>
+                        <textarea class="rc-textarea" name="notes" rows="3" placeholder="Additional notes about this customer..."></textarea>
+                    </div>
+                    
+                    <div class="rc-flex rc-flex-between">
+                        <button type="button" onclick="closeNewCustomerModal()" class="rc-btn rc-btn-secondary">
+                            <i class="bi bi-x-lg"></i> Cancel
+                        </button>
+                        <button type="submit" class="rc-btn rc-btn-primary">
+                            <i class="bi bi-check-lg"></i> Create Customer
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -480,11 +586,130 @@
         }
     }
 
+    // New Customer Modal
+    function showNewCustomerModal() {
+        const modal = document.getElementById('newCustomerModal');
+        modal.style.display = 'flex';
+        
+        // Reset form
+        document.getElementById('newCustomerForm').reset();
+        
+        // Focus on first input
+        setTimeout(() => {
+            const firstInput = modal.querySelector('input');
+            if (firstInput) firstInput.focus();
+        }, 100);
+    }
+
+    function closeNewCustomerModal() {
+        document.getElementById('newCustomerModal').style.display = 'none';
+    }
+
+    function createNewCustomer(formData) {
+        const submitBtn = document.querySelector('#newCustomerForm button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        
+        // Show loading state
+        submitBtn.innerHTML = '<i class="bi bi-hourglass-split"></i> Creating...';
+        submitBtn.disabled = true;
+        
+        // Convert FormData to JSON
+        const data = {};
+        for (let [key, value] of formData.entries()) {
+            data[key] = value || null; // Convert empty strings to null
+        }
+        
+        fetch('/api/v1/customers', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => {
+                    throw new Error(`HTTP ${response.status}: ${text}`);
+                });
+            }
+            return response.json();
+        })
+        .then(result => {
+            if (result.error) {
+                throw new Error(result.error);
+            }
+            
+            // Success - close modal and reload page
+            closeNewCustomerModal();
+            
+            // Show success message
+            showSuccessMessage('Customer created successfully!');
+            
+            // Reload page to show new customer
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        })
+        .catch(error => {
+            // Restore button and show error
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+            
+            showErrorMessage('Error creating customer: ' + error.message);
+        });
+    }
+
+    // Helper functions for notifications
+    function showSuccessMessage(message) {
+        const notification = document.createElement('div');
+        notification.className = 'rc-alert rc-alert-success';
+        notification.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 10000; max-width: 400px;';
+        notification.innerHTML = `
+            <i class="bi bi-check-circle"></i> ${message}
+            <button onclick="this.parentElement.remove()" style="float: right; background: none; border: none; color: inherit;">&times;</button>
+        `;
+        document.body.appendChild(notification);
+        
+        // Auto remove after 5 seconds
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+
+    function showErrorMessage(message) {
+        const notification = document.createElement('div');
+        notification.className = 'rc-alert rc-alert-error';
+        notification.style.cssText = 'position: fixed; top: 20px; right: 20px; z-index: 10000; max-width: 400px;';
+        notification.innerHTML = `
+            <i class="bi bi-exclamation-triangle"></i> ${message}
+            <button onclick="this.parentElement.remove()" style="float: right; background: none; border: none; color: inherit;">&times;</button>
+        `;
+        document.body.appendChild(notification);
+        
+        // Auto remove after 8 seconds
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 8000);
+    }
+
+    // Handle new customer form submission
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('newCustomerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            createNewCustomer(new FormData(this));
+        });
+    });
+
     // Close modals on Escape key
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
             closeCustomerModal();
             closeEditModal();
+            closeNewCustomerModal();
         }
     });
     </script>

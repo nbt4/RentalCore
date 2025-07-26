@@ -154,9 +154,9 @@ func (r *CaseRepository) GetDeviceCount(caseID uint) (int64, error) {
 
 // List returns cases with optional filtering
 func (r *CaseRepository) List(filter *models.FilterParams) ([]models.Case, error) {
-	log.Printf("🔥🔥🔥 CASE LIST CALLED!")
+	log.Printf("CaseRepository.List called")
 	
-	// Direct SQL with COUNT - no bullshit
+	// Use direct SQL with COUNT for better performance
 	sqlQuery := `
 		SELECT 
 			c.caseID, 
@@ -180,32 +180,32 @@ func (r *CaseRepository) List(filter *models.FilterParams) ([]models.Case, error
 	
 	sqlQuery += " GROUP BY c.caseID ORDER BY c.caseID"
 	
-	log.Printf("🔥🔥🔥 SQL: %s", sqlQuery)
+	log.Printf("Executing SQL: %s", sqlQuery)
 	
 	type CaseResult struct {
-		CaseID      uint     `json:"caseID"`
-		Name        string   `json:"name"`
-		Description *string  `json:"description"`
-		Width       *float64 `json:"width"`
-		Height      *float64 `json:"height"`
-		Depth       *float64 `json:"depth"`
-		Weight      *float64 `json:"weight"`
-		Status      string   `json:"status"`
-		DeviceCount int      `json:"device_count"`
+		CaseID      uint     `json:"caseID" gorm:"column:caseID"`
+		Name        string   `json:"name" gorm:"column:name"`
+		Description *string  `json:"description" gorm:"column:description"`
+		Width       *float64 `json:"width" gorm:"column:width"`
+		Height      *float64 `json:"height" gorm:"column:height"`
+		Depth       *float64 `json:"depth" gorm:"column:depth"`
+		Weight      *float64 `json:"weight" gorm:"column:weight"`
+		Status      string   `json:"status" gorm:"column:status"`
+		DeviceCount int      `json:"device_count" gorm:"column:device_count"`
 	}
 	
 	var results []CaseResult
 	err := r.db.DB.Raw(sqlQuery, args...).Scan(&results).Error
 	if err != nil {
-		log.Printf("🔥🔥🔥 SQL ERROR: %v", err)
+		log.Printf("SQL ERROR: %v", err)
 		return nil, err
 	}
 	
-	log.Printf("🔥🔥🔥 FOUND %d CASES", len(results))
+	log.Printf("Found %d cases", len(results))
 	
 	var cases []models.Case
 	for _, result := range results {
-		log.Printf("🔥🔥🔥 CASE %d ('%s') = %d DEVICES", result.CaseID, result.Name, result.DeviceCount)
+		log.Printf("Case %d ('%s') = %d devices", result.CaseID, result.Name, result.DeviceCount)
 		
 		case_ := models.Case{
 			CaseID:      result.CaseID,
@@ -223,7 +223,7 @@ func (r *CaseRepository) List(filter *models.FilterParams) ([]models.Case, error
 		cases = append(cases, case_)
 	}
 	
-	log.Printf("🔥🔥🔥 RETURNING %d CASES", len(cases))
+	log.Printf("Returning %d cases", len(cases))
 	return cases, nil
 }
 

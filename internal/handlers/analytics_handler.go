@@ -25,8 +25,8 @@ func NewAnalyticsHandler(db *gorm.DB) *AnalyticsHandler {
 func (h *AnalyticsHandler) Dashboard(c *gin.Context) {
 	currentUser, _ := GetCurrentUser(c)
 	
-	// Get period from query params (default: last 30 days)
-	period := c.DefaultQuery("period", "30days")
+	// Get period from query params (default: last 1 year for better data visibility)
+	period := c.DefaultQuery("period", "1year")
 	
 	// Calculate date range
 	endDate := time.Now()
@@ -42,7 +42,7 @@ func (h *AnalyticsHandler) Dashboard(c *gin.Context) {
 	case "1year":
 		startDate = endDate.AddDate(-1, 0, 0)
 	default:
-		startDate = endDate.AddDate(0, 0, -30)
+		startDate = endDate.AddDate(-1, 0, 0) // Default to 1 year
 	}
 
 	// Get analytics data
@@ -91,9 +91,9 @@ func (h *AnalyticsHandler) getRevenueAnalytics(startDate, endDate time.Time) map
 	var totalRevenue, avgJobValue float64
 	var totalJobs int64
 
-	// Total revenue and job count
+	// Total revenue and job count - include paid jobs (statusID 1002)
 	h.db.Model(&models.Job{}).
-		Where("endDate BETWEEN ? AND ? AND final_revenue IS NOT NULL", startDate, endDate).
+		Where("endDate BETWEEN ? AND ? AND final_revenue IS NOT NULL AND statusID = ?", startDate, endDate, 1002).
 		Select("COALESCE(SUM(final_revenue), 0) as total, COUNT(*) as count, COALESCE(AVG(final_revenue), 0) as avg").
 		Row().Scan(&totalRevenue, &totalJobs, &avgJobValue)
 
@@ -104,7 +104,7 @@ func (h *AnalyticsHandler) getRevenueAnalytics(startDate, endDate time.Time) map
 	var prevRevenue float64
 	var prevJobs int64
 	h.db.Model(&models.Job{}).
-		Where("endDate BETWEEN ? AND ? AND final_revenue IS NOT NULL", prevStartDate, prevEndDate).
+		Where("endDate BETWEEN ? AND ? AND final_revenue IS NOT NULL AND statusID = ?", prevStartDate, prevEndDate, 1002).
 		Select("COALESCE(SUM(final_revenue), 0) as total, COUNT(*) as count").
 		Row().Scan(&prevRevenue, &prevJobs)
 
@@ -147,13 +147,32 @@ func (h *AnalyticsHandler) getEquipmentAnalytics(startDate, endDate time.Time) m
 		utilizationRate = (float64(activeDevices) / float64(totalDevices)) * 100
 	}
 
-	// Revenue per device
+	// Revenue per device - calculate individual device revenue with discount applied
 	var totalDeviceRevenue float64
 	h.db.Raw(`
-		SELECT COALESCE(SUM(j.final_revenue), 0)
+		SELECT COALESCE(SUM(
+			CASE 
+				WHEN jd.custom_price IS NOT NULL THEN 
+					CASE 
+						WHEN j.discount_type = 'percent' THEN 
+							jd.custom_price * (1 - j.discount/100)
+						ELSE 
+							jd.custom_price * (1 - (j.discount / NULLIF(j.revenue, 0)))
+					END
+				ELSE 
+					CASE 
+						WHEN j.discount_type = 'percent' THEN 
+							p.itemcostperday * (1 - j.discount/100)
+						ELSE 
+							p.itemcostperday * (1 - (j.discount / NULLIF(j.revenue, 0)))
+					END
+			END
+		), 0)
 		FROM jobs j
 		INNER JOIN jobdevices jd ON j.jobID = jd.jobID
-		WHERE j.endDate BETWEEN ? AND ?
+		INNER JOIN devices d ON jd.deviceID = d.deviceID
+		INNER JOIN products p ON d.productID = p.productID
+		WHERE j.endDate BETWEEN ? AND ? AND j.statusID = 1002
 	`, startDate, endDate).Scan(&totalDeviceRevenue)
 
 	revenuePerDevice := float64(0)
@@ -249,12 +268,46 @@ func (h *AnalyticsHandler) getTopEquipment(startDate, endDate time.Time, limit i
 			d.deviceID,
 			p.name as product_name,
 			COUNT(jd.jobID) as rental_count,
-			COALESCE(SUM(j.final_revenue), 0) as total_revenue,
-			COALESCE(AVG(j.final_revenue), 0) as avg_revenue
+			COALESCE(SUM(
+				CASE 
+					WHEN jd.custom_price IS NOT NULL THEN 
+						CASE 
+							WHEN j.discount_type = 'percent' THEN 
+								jd.custom_price * (1 - j.discount/100)
+							ELSE 
+								jd.custom_price * (1 - (j.discount / NULLIF(j.revenue, 0)))
+						END
+					ELSE 
+						CASE 
+							WHEN j.discount_type = 'percent' THEN 
+								p.itemcostperday * (1 - j.discount/100)
+							ELSE 
+								p.itemcostperday * (1 - (j.discount / NULLIF(j.revenue, 0)))
+						END
+				END
+			), 0) as total_revenue,
+			COALESCE(AVG(
+				CASE 
+					WHEN jd.custom_price IS NOT NULL THEN 
+						CASE 
+							WHEN j.discount_type = 'percent' THEN 
+								jd.custom_price * (1 - j.discount/100)
+							ELSE 
+								jd.custom_price * (1 - (j.discount / NULLIF(j.revenue, 0)))
+						END
+					ELSE 
+						CASE 
+							WHEN j.discount_type = 'percent' THEN 
+								p.itemcostperday * (1 - j.discount/100)
+							ELSE 
+								p.itemcostperday * (1 - (j.discount / NULLIF(j.revenue, 0)))
+						END
+				END
+			), 0) as avg_revenue
 		FROM devices d
 		LEFT JOIN products p ON d.productID = p.productID
 		LEFT JOIN jobdevices jd ON d.deviceID = jd.deviceID
-		LEFT JOIN jobs j ON jd.jobID = j.jobID AND j.endDate BETWEEN ? AND ?
+		LEFT JOIN jobs j ON jd.jobID = j.jobID AND j.endDate BETWEEN ? AND ? AND j.statusID = 1002
 		GROUP BY d.deviceID, p.name
 		ORDER BY total_revenue DESC
 		LIMIT ?
@@ -284,6 +337,88 @@ func (h *AnalyticsHandler) getTopEquipment(startDate, endDate time.Time, limit i
 	return results
 }
 
+// getAllDeviceRevenues returns revenue data for ALL devices (not limited)
+func (h *AnalyticsHandler) getAllDeviceRevenues(startDate, endDate time.Time, sortColumn, order string) []map[string]interface{} {
+	var results []map[string]interface{}
+
+	// Build the query with dynamic sorting
+	query := `
+		SELECT 
+			d.deviceID,
+			p.name as product_name,
+			COUNT(jd.jobID) as rental_count,
+			COALESCE(SUM(
+				CASE 
+					WHEN jd.custom_price IS NOT NULL THEN 
+						CASE 
+							WHEN j.discount_type = 'percent' THEN 
+								jd.custom_price * (1 - j.discount/100)
+							ELSE 
+								jd.custom_price * (1 - (j.discount / NULLIF(j.revenue, 0)))
+						END
+					ELSE 
+						CASE 
+							WHEN j.discount_type = 'percent' THEN 
+								p.itemcostperday * (1 - j.discount/100)
+							ELSE 
+								p.itemcostperday * (1 - (j.discount / NULLIF(j.revenue, 0)))
+						END
+				END
+			), 0) as total_revenue,
+			COALESCE(AVG(
+				CASE 
+					WHEN jd.custom_price IS NOT NULL THEN 
+						CASE 
+							WHEN j.discount_type = 'percent' THEN 
+								jd.custom_price * (1 - j.discount/100)
+							ELSE 
+								jd.custom_price * (1 - (j.discount / NULLIF(j.revenue, 0)))
+						END
+					ELSE 
+						CASE 
+							WHEN j.discount_type = 'percent' THEN 
+								p.itemcostperday * (1 - j.discount/100)
+							ELSE 
+								p.itemcostperday * (1 - (j.discount / NULLIF(j.revenue, 0)))
+						END
+				END
+			), 0) as avg_revenue,
+			p.itemcostperday as product_price,
+			d.status as device_status
+		FROM devices d
+		LEFT JOIN products p ON d.productID = p.productID
+		LEFT JOIN jobdevices jd ON d.deviceID = jd.deviceID
+		LEFT JOIN jobs j ON jd.jobID = j.jobID AND j.endDate BETWEEN ? AND ? AND j.statusID = 1002
+		GROUP BY d.deviceID, p.name, p.itemcostperday, d.status
+		ORDER BY ` + sortColumn + ` ` + order
+
+	rows, err := h.db.Raw(query, startDate, endDate).Rows()
+	if err != nil {
+		return results
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var deviceID, productName, deviceStatus string
+		var rentalCount int
+		var totalRevenue, avgRevenue, productPrice float64
+
+		rows.Scan(&deviceID, &productName, &rentalCount, &totalRevenue, &avgRevenue, &productPrice, &deviceStatus)
+		
+		results = append(results, map[string]interface{}{
+			"deviceID":     deviceID,
+			"productName":  productName,
+			"rentalCount":  rentalCount,
+			"totalRevenue": totalRevenue,
+			"avgRevenue":   avgRevenue,
+			"productPrice": productPrice,
+			"deviceStatus": deviceStatus,
+		})
+	}
+
+	return results
+}
+
 // getTopCustomers returns top customers by revenue
 func (h *AnalyticsHandler) getTopCustomers(startDate, endDate time.Time, limit int) []map[string]interface{} {
 	var results []map[string]interface{}
@@ -299,6 +434,7 @@ func (h *AnalyticsHandler) getTopCustomers(startDate, endDate time.Time, limit i
 		LEFT JOIN jobs j ON c.customerID = j.customerID 
 			AND j.endDate BETWEEN ? AND ?
 			AND j.final_revenue IS NOT NULL
+			AND j.statusID = 1002
 		WHERE c.customerID IS NOT NULL
 		GROUP BY c.customerID, c.companyname, c.firstname, c.lastname
 		HAVING total_revenue > 0
@@ -382,7 +518,7 @@ func (h *AnalyticsHandler) getTrendData(startDate, endDate time.Time) map[string
 			COALESCE(SUM(j.final_revenue), 0) as revenue,
 			COUNT(j.jobID) as jobs
 		FROM jobs j
-		WHERE j.endDate BETWEEN ? AND ?
+		WHERE j.endDate BETWEEN ? AND ? AND j.statusID = 1002
 		GROUP BY DATE(j.endDate)
 		ORDER BY date
 	`, startDate, endDate).Rows()
@@ -411,7 +547,7 @@ func (h *AnalyticsHandler) getTrendData(startDate, endDate time.Time) map[string
 
 // GetRevenueAPI returns revenue data as JSON API
 func (h *AnalyticsHandler) GetRevenueAPI(c *gin.Context) {
-	period := c.DefaultQuery("period", "30days")
+	period := c.DefaultQuery("period", "1year")
 	
 	endDate := time.Now()
 	var startDate time.Time
@@ -426,7 +562,7 @@ func (h *AnalyticsHandler) GetRevenueAPI(c *gin.Context) {
 	case "1year":
 		startDate = endDate.AddDate(-1, 0, 0)
 	default:
-		startDate = endDate.AddDate(0, 0, -30)
+		startDate = endDate.AddDate(-1, 0, 0)
 	}
 
 	analytics := h.getRevenueAnalytics(startDate, endDate)
@@ -435,7 +571,7 @@ func (h *AnalyticsHandler) GetRevenueAPI(c *gin.Context) {
 
 // GetEquipmentAPI returns equipment analytics as JSON API
 func (h *AnalyticsHandler) GetEquipmentAPI(c *gin.Context) {
-	period := c.DefaultQuery("period", "30days")
+	period := c.DefaultQuery("period", "1year")
 	
 	endDate := time.Now()
 	var startDate time.Time
@@ -450,17 +586,18 @@ func (h *AnalyticsHandler) GetEquipmentAPI(c *gin.Context) {
 	case "1year":
 		startDate = endDate.AddDate(-1, 0, 0)
 	default:
-		startDate = endDate.AddDate(0, 0, -30)
+		startDate = endDate.AddDate(-1, 0, 0)
 	}
 
 	analytics := h.getEquipmentAnalytics(startDate, endDate)
 	c.JSON(http.StatusOK, analytics)
 }
 
-// ExportAnalytics exports analytics data to CSV/Excel
-func (h *AnalyticsHandler) ExportAnalytics(c *gin.Context) {
-	format := c.DefaultQuery("format", "csv")
-	period := c.DefaultQuery("period", "30days")
+// GetAllDeviceRevenuesAPI returns revenue data for ALL devices as JSON API
+func (h *AnalyticsHandler) GetAllDeviceRevenuesAPI(c *gin.Context) {
+	period := c.DefaultQuery("period", "1year")
+	sortBy := c.DefaultQuery("sort", "revenue") // revenue, device_id, product_name, rental_count
+	order := c.DefaultQuery("order", "desc")    // asc, desc
 	
 	endDate := time.Now()
 	var startDate time.Time
@@ -475,7 +612,53 @@ func (h *AnalyticsHandler) ExportAnalytics(c *gin.Context) {
 	case "1year":
 		startDate = endDate.AddDate(-1, 0, 0)
 	default:
+		startDate = endDate.AddDate(-1, 0, 0)
+	}
+
+	// Validate sort and order parameters
+	validSorts := map[string]string{
+		"revenue":      "total_revenue",
+		"device_id":    "d.deviceID",
+		"product_name": "p.name",
+		"rental_count": "rental_count",
+	}
+	
+	sortColumn, exists := validSorts[sortBy]
+	if !exists {
+		sortColumn = "total_revenue"
+	}
+	
+	if order != "asc" && order != "desc" {
+		order = "desc"
+	}
+
+	allDevices := h.getAllDeviceRevenues(startDate, endDate, sortColumn, order)
+	c.JSON(http.StatusOK, gin.H{
+		"devices": allDevices,
+		"period":  period,
+		"count":   len(allDevices),
+	})
+}
+
+// ExportAnalytics exports analytics data to CSV/Excel
+func (h *AnalyticsHandler) ExportAnalytics(c *gin.Context) {
+	format := c.DefaultQuery("format", "csv")
+	period := c.DefaultQuery("period", "1year")
+	
+	endDate := time.Now()
+	var startDate time.Time
+	
+	switch period {
+	case "7days":
+		startDate = endDate.AddDate(0, 0, -7)
+	case "30days":
 		startDate = endDate.AddDate(0, 0, -30)
+	case "90days":
+		startDate = endDate.AddDate(0, 0, -90)
+	case "1year":
+		startDate = endDate.AddDate(-1, 0, 0)
+	default:
+		startDate = endDate.AddDate(-1, 0, 0)
 	}
 
 	if format == "csv" {

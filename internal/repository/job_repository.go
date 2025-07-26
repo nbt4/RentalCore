@@ -115,13 +115,32 @@ func (r *JobRepository) RemoveAllDevicesFromJob(jobID uint) error {
 }
 
 func (r *JobRepository) Delete(id uint) error {
+	// Start a transaction to ensure all deletions succeed or fail together
+	tx := r.db.Begin()
+	if tx.Error != nil {
+		return tx.Error
+	}
+	
 	// First, remove all devices from the job to avoid foreign key constraint issues
-	if err := r.RemoveAllDevicesFromJob(id); err != nil {
+	if err := tx.Where("jobID = ?", id).Delete(&models.JobDevice{}).Error; err != nil {
+		tx.Rollback()
 		return fmt.Errorf("failed to remove devices from job: %v", err)
 	}
 	
+	// Second, remove all employee-job assignments
+	if err := tx.Exec("DELETE FROM employeejob WHERE jobID = ?", id).Error; err != nil {
+		tx.Rollback()
+		return fmt.Errorf("failed to remove employee assignments from job: %v", err)
+	}
+	
 	// Then delete the job itself
-	return r.db.Delete(&models.Job{}, id).Error
+	if err := tx.Delete(&models.Job{}, id).Error; err != nil {
+		tx.Rollback()
+		return err
+	}
+	
+	// Commit the transaction
+	return tx.Commit().Error
 }
 
 func (r *JobRepository) List(params *models.FilterParams) ([]models.JobWithDetails, error) {
@@ -216,14 +235,61 @@ func (r *JobRepository) GetJobDevices(jobID uint) ([]models.JobDevice, error) {
 }
 
 func (r *JobRepository) AssignDevice(jobID uint, deviceID string, price float64) error {
-	// Check if device is already assigned to another job
-	var existingAssignment models.JobDevice
-	err := r.db.Where("deviceID = ?", deviceID).First(&existingAssignment).Error
-	if err == nil {
-		return fmt.Errorf("device is already assigned to job %d", existingAssignment.JobID)
+	fmt.Printf("🚨 DEBUG: NEW AssignDevice called! jobID=%d, deviceID=%s\n", jobID, deviceID)
+	
+	// Get the job to check its date range
+	var job models.Job
+	err := r.db.First(&job, jobID).Error
+	if err != nil {
+		return fmt.Errorf("job not found: %v", err)
 	}
-	if err != gorm.ErrRecordNotFound {
-		return err
+
+	fmt.Printf("🚨 DEBUG: Job %d dates: %v to %v\n", jobID, job.StartDate, job.EndDate)
+
+	// Check if device is available for this job's date range
+	// Implement the date-based availability check directly
+	
+	// Check if device is already assigned to this specific job
+	var existingAssignment models.JobDevice
+	err = r.db.Where("deviceID = ? AND jobID = ?", deviceID, jobID).First(&existingAssignment).Error
+	if err == nil {
+		return fmt.Errorf("device is already assigned to this job")
+	}
+
+	// Check for conflicting assignments based on date overlap
+	if job.StartDate != nil && job.EndDate != nil {
+		var conflictingJob models.JobDevice
+		err = r.db.Joins("JOIN jobs ON jobdevices.jobID = jobs.jobID").
+			Where(`jobdevices.deviceID = ? 
+				AND jobs.jobID != ? 
+				AND jobs.startDate <= ? 
+				AND jobs.endDate >= ? 
+				AND jobs.statusID IN (
+					SELECT statusID FROM status WHERE status IN ('open', 'in_progress')
+				)`, deviceID, jobID, job.EndDate, job.StartDate).
+			First(&conflictingJob).Error
+		
+		if err == nil {
+			// Get conflicting job details for error message
+			var conflictJob models.Job
+			r.db.Where("jobID = ?", conflictingJob.JobID).First(&conflictJob)
+			return fmt.Errorf("device is already assigned to job %d (dates: %s to %s)", 
+				conflictJob.JobID, 
+				conflictJob.StartDate.Format("2006-01-02"), 
+				conflictJob.EndDate.Format("2006-01-02"))
+		}
+		if err != gorm.ErrRecordNotFound {
+			return fmt.Errorf("error checking device availability: %v", err)
+		}
+	} else {
+		// If no dates specified, fall back to simple assignment check
+		err = r.db.Where("deviceID = ?", deviceID).First(&existingAssignment).Error
+		if err == nil {
+			return fmt.Errorf("device is already assigned to job %d", existingAssignment.JobID)
+		}
+		if err != gorm.ErrRecordNotFound {
+			return err
+		}
 	}
 
 	// Create new assignment
@@ -301,14 +367,53 @@ func (r *JobRepository) BulkAssignDevices(jobID uint, deviceIDs []string, price 
 
 // Helper method to assign device without triggering revenue calculation
 func (r *JobRepository) assignDeviceWithoutRevenue(jobID uint, deviceID string, price float64) error {
-	// Check if device is already assigned to another job
-	var existingAssignment models.JobDevice
-	err := r.db.Where("deviceID = ?", deviceID).First(&existingAssignment).Error
-	if err == nil {
-		return fmt.Errorf("device is already assigned to job %d", existingAssignment.JobID)
+	// Get the job to check its date range
+	var job models.Job
+	err := r.db.First(&job, jobID).Error
+	if err != nil {
+		return fmt.Errorf("job not found: %v", err)
 	}
-	if err != gorm.ErrRecordNotFound {
-		return err
+
+	// Check if device is already assigned to this specific job
+	var existingAssignment models.JobDevice
+	err = r.db.Where("deviceID = ? AND jobID = ?", deviceID, jobID).First(&existingAssignment).Error
+	if err == nil {
+		return fmt.Errorf("device is already assigned to this job")
+	}
+
+	// Check for conflicting assignments based on date overlap
+	if job.StartDate != nil && job.EndDate != nil {
+		var conflictingJob models.JobDevice
+		err = r.db.Joins("JOIN jobs ON jobdevices.jobID = jobs.jobID").
+			Where(`jobdevices.deviceID = ? 
+				AND jobs.jobID != ? 
+				AND jobs.startDate <= ? 
+				AND jobs.endDate >= ? 
+				AND jobs.statusID IN (
+					SELECT statusID FROM status WHERE status IN ('open', 'in_progress')
+				)`, deviceID, jobID, job.EndDate, job.StartDate).
+			First(&conflictingJob).Error
+		
+		if err == nil {
+			var conflictJob models.Job
+			r.db.Where("jobID = ?", conflictingJob.JobID).First(&conflictJob)
+			return fmt.Errorf("device is already assigned to job %d (dates: %s to %s)", 
+				conflictJob.JobID, 
+				conflictJob.StartDate.Format("2006-01-02"), 
+				conflictJob.EndDate.Format("2006-01-02"))
+		}
+		if err != gorm.ErrRecordNotFound {
+			return fmt.Errorf("error checking device availability: %v", err)
+		}
+	} else {
+		// If no dates specified, fall back to simple assignment check
+		err = r.db.Where("deviceID = ?", deviceID).First(&existingAssignment).Error
+		if err == nil {
+			return fmt.Errorf("device is already assigned to job %d", existingAssignment.JobID)
+		}
+		if err != gorm.ErrRecordNotFound {
+			return err
+		}
 	}
 
 	// Create new assignment
@@ -349,15 +454,7 @@ func (r *JobRepository) CalculateAndUpdateRevenue(jobID uint) error {
 		return err
 	}
 
-	// Calculate job duration in days
-	var jobDays int = 1 // Default to 1 day if no dates set
-	if job.StartDate != nil && job.EndDate != nil {
-		duration := job.EndDate.Sub(*job.StartDate)
-		jobDays = int(duration.Hours()/24) + 1 // +1 to include both start and end day
-		if jobDays < 1 {
-			jobDays = 1 // Minimum 1 day
-		}
-	}
+	// Revenue is calculated as flat rates, not per day
 
 	// Calculate total revenue from job devices
 	var totalRevenue float64
@@ -377,8 +474,8 @@ func (r *JobRepository) CalculateAndUpdateRevenue(jobID uint) error {
 			// Use custom price as-is (flat rate, not per day)
 			totalRevenue += *jd.CustomPrice
 		} else if jd.Device.Product != nil && jd.Device.Product.ItemCostPerDay != nil {
-			// Use daily rate × job duration
-			totalRevenue += *jd.Device.Product.ItemCostPerDay * float64(jobDays)
+			// Use product price as flat rate (not per day)
+			totalRevenue += *jd.Device.Product.ItemCostPerDay
 		}
 	}
 

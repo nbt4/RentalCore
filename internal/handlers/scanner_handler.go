@@ -155,11 +155,16 @@ type ScanCaseRequest struct {
 }
 
 func (h *ScannerHandler) ScanDevice(c *gin.Context) {
+	fmt.Printf("🚨 DEBUG SCANNER: ScanDevice called!\n")
+	
 	var req ScanDeviceRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Printf("❌ DEBUG SCANNER: JSON binding error: %v\n", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	fmt.Printf("🚨 DEBUG SCANNER: Request - JobID: %d, DeviceID: %s\n", req.JobID, req.DeviceID)
 
 	// Try to get device by ID first, then by serial number
 	var device *models.Device
@@ -170,24 +175,33 @@ func (h *ScannerHandler) ScanDevice(c *gin.Context) {
 		// Try by serial number
 		device, err = h.deviceRepo.GetBySerialNo(req.DeviceID)
 		if err != nil {
+			fmt.Printf("❌ DEBUG SCANNER: Device not found: %v\n", err)
 			c.JSON(http.StatusNotFound, gin.H{"error": "Device not found"})
 			return
 		}
 	}
 
+	fmt.Printf("✅ DEBUG SCANNER: Device found: %s\n", device.DeviceID)
+
 	// Get job details to check date range
 	job, err := h.jobRepo.GetByID(req.JobID)
 	if err != nil {
+		fmt.Printf("❌ DEBUG SCANNER: Job not found: %v\n", err)
 		c.JSON(http.StatusNotFound, gin.H{"error": "Job not found"})
 		return
 	}
 
+	fmt.Printf("🚨 DEBUG SCANNER: Job %d dates: %v to %v\n", req.JobID, job.StartDate, job.EndDate)
+
 	// Check if device is available for this job's date range
 	isAvailable, conflictingAssignment, err := h.deviceRepo.IsDeviceAvailableForJob(device.DeviceID, req.JobID, job.StartDate, job.EndDate)
 	if err != nil {
+		fmt.Printf("❌ DEBUG SCANNER: Availability check error: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check device availability"})
 		return
 	}
+
+	fmt.Printf("🚨 DEBUG SCANNER: Device available: %t\n", isAvailable)
 
 	if !isAvailable {
 		if conflictingAssignment != nil {

@@ -224,30 +224,106 @@
             </div>
             <div class="rc-modal-body">
                 <form id="addProductForm">
-                    <div class="rc-form-grid rc-form-grid-2">
-                        <div class="rc-form-group">
-                            <label for="productName" class="rc-label">Product Name *</label>
-                            <input type="text" id="productName" name="name" class="rc-input" required placeholder="Enter product name">
+                    <!-- Basic Information -->
+                    <div class="rc-form-section">
+                        <h3 class="rc-heading-4 rc-mb-md">Basic Information</h3>
+                        <div class="rc-form-grid rc-form-grid-2">
+                            <div class="rc-form-group">
+                                <label for="productName" class="rc-label">Product Name *</label>
+                                <input type="text" id="productName" name="name" class="rc-input" required placeholder="Enter product name">
+                            </div>
+                            <div class="rc-form-group">
+                                <label for="productCost" class="rc-label">Cost per Day (€)</label>
+                                <input type="number" id="productCost" name="itemcostperday" class="rc-input" step="0.01" min="0" placeholder="0.00">
+                            </div>
                         </div>
                         <div class="rc-form-group">
-                            <label for="productCategory" class="rc-label">Category</label>
-                            <select id="productCategory" name="categoryID" class="rc-select">
-                                <option value="">Select category</option>
-                                <!-- Categories will be loaded via AJAX -->
-                            </select>
-                        </div>
-                        <div class="rc-form-group">
-                            <label for="productCost" class="rc-label">Cost per Day (€)</label>
-                            <input type="number" id="productCost" name="itemcostperday" class="rc-input" step="0.01" min="0" placeholder="0.00">
-                        </div>
-                        <div class="rc-form-group">
-                            <label for="productWeight" class="rc-label">Weight (kg)</label>
-                            <input type="number" id="productWeight" name="weight" class="rc-input" step="0.01" min="0" placeholder="0.00">
+                            <label for="productDescription" class="rc-label">Description</label>
+                            <textarea id="productDescription" name="description" class="rc-textarea" rows="3" placeholder="Product description..."></textarea>
                         </div>
                     </div>
-                    <div class="rc-form-group rc-mt-md">
-                        <label for="productDescription" class="rc-label">Description</label>
-                        <textarea id="productDescription" name="description" class="rc-textarea" rows="3" placeholder="Product description..."></textarea>
+
+                    <!-- Category Information -->
+                    <div class="rc-form-section rc-mt-lg">
+                        <h3 class="rc-heading-4 rc-mb-md">Category & Classification</h3>
+                        <div class="rc-form-grid rc-form-grid-3">
+                            <div class="rc-form-group">
+                                <label for="productCategory" class="rc-label">Category</label>
+                                <select id="productCategory" name="categoryID" class="rc-select">
+                                    <option value="">Select category</option>
+                                    <!-- Categories will be loaded via AJAX -->
+                                </select>
+                            </div>
+                            <div class="rc-form-group">
+                                <label for="productSubcategory" class="rc-label">Subcategory</label>
+                                <select id="productSubcategory" name="subcategoryID" class="rc-select">
+                                    <option value="">Select subcategory</option>
+                                </select>
+                            </div>
+                            <div class="rc-form-group">
+                                <label for="productSubbiercategory" class="rc-label">Sub-subcategory</label>
+                                <select id="productSubbiercategory" name="subbiercategoryID" class="rc-select">
+                                    <option value="">Select sub-subcategory</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Brand & Manufacturer -->
+                    <div class="rc-form-section rc-mt-lg">
+                        <h3 class="rc-heading-4 rc-mb-md">Brand & Manufacturer</h3>
+                        <div class="rc-form-grid rc-form-grid-2">
+                            <div class="rc-form-group">
+                                <label for="productBrand" class="rc-label">Brand</label>
+                                <select id="productBrand" name="brandID" class="rc-select">
+                                    <option value="">Select brand</option>
+                                </select>
+                            </div>
+                            <div class="rc-form-group">
+                                <label for="productManufacturer" class="rc-label">Manufacturer</label>
+                                <select id="productManufacturer" name="manufacturerID" class="rc-select">
+                                    <option value="">Select manufacturer</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Physical Properties -->
+                    <div class="rc-form-section rc-mt-lg">
+                        <h3 class="rc-heading-4 rc-mb-md">Physical Properties</h3>
+                        <div class="rc-form-grid rc-form-grid-4">
+                            <div class="rc-form-group">
+                                <label for="productWeight" class="rc-label">Weight (kg)</label>
+                                <input type="number" id="productWeight" name="weight" class="rc-input" step="0.01" min="0" placeholder="0.00">
+                            </div>
+                            <div class="rc-form-group">
+                                <label for="productHeight" class="rc-label">Height (cm)</label>
+                                <input type="number" id="productHeight" name="height" class="rc-input" step="0.01" min="0" placeholder="0.00">
+                            </div>
+                            <div class="rc-form-group">
+                                <label for="productWidth" class="rc-label">Width (cm)</label>
+                                <input type="number" id="productWidth" name="width" class="rc-input" step="0.01" min="0" placeholder="0.00">
+                            </div>
+                            <div class="rc-form-group">
+                                <label for="productDepth" class="rc-label">Depth (cm)</label>
+                                <input type="number" id="productDepth" name="depth" class="rc-input" step="0.01" min="0" placeholder="0.00">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Technical Specifications -->
+                    <div class="rc-form-section rc-mt-lg">
+                        <h3 class="rc-heading-4 rc-mb-md">Technical Specifications</h3>
+                        <div class="rc-form-grid rc-form-grid-2">
+                            <div class="rc-form-group">
+                                <label for="productPowerConsumption" class="rc-label">Power Consumption (W)</label>
+                                <input type="number" id="productPowerConsumption" name="powerconsumption" class="rc-input" step="0.01" min="0" placeholder="0.00">
+                            </div>
+                            <div class="rc-form-group">
+                                <label for="productMaintenanceInterval" class="rc-label">Maintenance Interval (days)</label>
+                                <input type="number" id="productMaintenanceInterval" name="maintenanceInterval" class="rc-input" min="0" placeholder="0">
+                            </div>
+                        </div>
                     </div>
                     <div class="rc-form-actions rc-mt-xl">
                         <button type="submit" class="rc-btn rc-btn-primary">
@@ -297,30 +373,107 @@
             <div class="rc-modal-body">
                 <form id="editProductForm">
                     <input type="hidden" id="editProductId" name="productID">
-                    <div class="rc-form-grid rc-form-grid-2">
-                        <div class="rc-form-group">
-                            <label for="editProductName" class="rc-label">Product Name *</label>
-                            <input type="text" id="editProductName" name="name" class="rc-input" required>
+                    
+                    <!-- Basic Information -->
+                    <div class="rc-form-section">
+                        <h3 class="rc-heading-4 rc-mb-md">Basic Information</h3>
+                        <div class="rc-form-grid rc-form-grid-2">
+                            <div class="rc-form-group">
+                                <label for="editProductName" class="rc-label">Product Name *</label>
+                                <input type="text" id="editProductName" name="name" class="rc-input" required>
+                            </div>
+                            <div class="rc-form-group">
+                                <label for="editProductCost" class="rc-label">Cost per Day (€)</label>
+                                <input type="number" id="editProductCost" name="itemcostperday" class="rc-input" step="0.01" min="0">
+                            </div>
                         </div>
                         <div class="rc-form-group">
-                            <label for="editProductCategory" class="rc-label">Category</label>
-                            <select id="editProductCategory" name="categoryID" class="rc-select">
-                                <option value="">Select category</option>
-                                <!-- Categories will be loaded via AJAX -->
-                            </select>
-                        </div>
-                        <div class="rc-form-group">
-                            <label for="editProductCost" class="rc-label">Cost per Day (€)</label>
-                            <input type="number" id="editProductCost" name="itemcostperday" class="rc-input" step="0.01" min="0">
-                        </div>
-                        <div class="rc-form-group">
-                            <label for="editProductWeight" class="rc-label">Weight (kg)</label>
-                            <input type="number" id="editProductWeight" name="weight" class="rc-input" step="0.01" min="0">
+                            <label for="editProductDescription" class="rc-label">Description</label>
+                            <textarea id="editProductDescription" name="description" class="rc-textarea" rows="3"></textarea>
                         </div>
                     </div>
-                    <div class="rc-form-group rc-mt-md">
-                        <label for="editProductDescription" class="rc-label">Description</label>
-                        <textarea id="editProductDescription" name="description" class="rc-textarea" rows="3"></textarea>
+
+                    <!-- Category Information -->
+                    <div class="rc-form-section rc-mt-lg">
+                        <h3 class="rc-heading-4 rc-mb-md">Category & Classification</h3>
+                        <div class="rc-form-grid rc-form-grid-3">
+                            <div class="rc-form-group">
+                                <label for="editProductCategory" class="rc-label">Category</label>
+                                <select id="editProductCategory" name="categoryID" class="rc-select">
+                                    <option value="">Select category</option>
+                                    <!-- Categories will be loaded via AJAX -->
+                                </select>
+                            </div>
+                            <div class="rc-form-group">
+                                <label for="editProductSubcategory" class="rc-label">Subcategory</label>
+                                <select id="editProductSubcategory" name="subcategoryID" class="rc-select">
+                                    <option value="">Select subcategory</option>
+                                </select>
+                            </div>
+                            <div class="rc-form-group">
+                                <label for="editProductSubbiercategory" class="rc-label">Sub-subcategory</label>
+                                <select id="editProductSubbiercategory" name="subbiercategoryID" class="rc-select">
+                                    <option value="">Select sub-subcategory</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Brand & Manufacturer -->
+                    <div class="rc-form-section rc-mt-lg">
+                        <h3 class="rc-heading-4 rc-mb-md">Brand & Manufacturer</h3>
+                        <div class="rc-form-grid rc-form-grid-2">
+                            <div class="rc-form-group">
+                                <label for="editProductBrand" class="rc-label">Brand</label>
+                                <select id="editProductBrand" name="brandID" class="rc-select">
+                                    <option value="">Select brand</option>
+                                </select>
+                            </div>
+                            <div class="rc-form-group">
+                                <label for="editProductManufacturer" class="rc-label">Manufacturer</label>
+                                <select id="editProductManufacturer" name="manufacturerID" class="rc-select">
+                                    <option value="">Select manufacturer</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Physical Properties -->
+                    <div class="rc-form-section rc-mt-lg">
+                        <h3 class="rc-heading-4 rc-mb-md">Physical Properties</h3>
+                        <div class="rc-form-grid rc-form-grid-4">
+                            <div class="rc-form-group">
+                                <label for="editProductWeight" class="rc-label">Weight (kg)</label>
+                                <input type="number" id="editProductWeight" name="weight" class="rc-input" step="0.01" min="0">
+                            </div>
+                            <div class="rc-form-group">
+                                <label for="editProductHeight" class="rc-label">Height (cm)</label>
+                                <input type="number" id="editProductHeight" name="height" class="rc-input" step="0.01" min="0">
+                            </div>
+                            <div class="rc-form-group">
+                                <label for="editProductWidth" class="rc-label">Width (cm)</label>
+                                <input type="number" id="editProductWidth" name="width" class="rc-input" step="0.01" min="0">
+                            </div>
+                            <div class="rc-form-group">
+                                <label for="editProductDepth" class="rc-label">Depth (cm)</label>
+                                <input type="number" id="editProductDepth" name="depth" class="rc-input" step="0.01" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Technical Specifications -->
+                    <div class="rc-form-section rc-mt-lg">
+                        <h3 class="rc-heading-4 rc-mb-md">Technical Specifications</h3>
+                        <div class="rc-form-grid rc-form-grid-2">
+                            <div class="rc-form-group">
+                                <label for="editProductPowerConsumption" class="rc-label">Power Consumption (W)</label>
+                                <input type="number" id="editProductPowerConsumption" name="powerconsumption" class="rc-input" step="0.01" min="0">
+                            </div>
+                            <div class="rc-form-group">
+                                <label for="editProductMaintenanceInterval" class="rc-label">Maintenance Interval (days)</label>
+                                <input type="number" id="editProductMaintenanceInterval" name="maintenanceInterval" class="rc-input" min="0">
+                            </div>
+                        </div>
                     </div>
                     <div class="rc-form-actions rc-mt-xl">
                         <button type="submit" class="rc-btn rc-btn-primary">
@@ -339,11 +492,19 @@
     // Modal Management Functions
     function openAddProductModal() {
         console.log('Opening add product modal');
-        loadCategories('productCategory').then(() => {
+        
+        // Load all dropdown data
+        Promise.all([
+            loadCategories('productCategory'),
+            loadSubcategories('productSubcategory'),
+            loadSubbiercategories('productSubbiercategory'),
+            loadBrands('productBrand'),
+            loadManufacturers('productManufacturer')
+        ]).then(() => {
             document.getElementById('addProductModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }).catch(error => {
-            console.error('Error loading categories:', error);
+            console.error('Error loading dropdown data:', error);
             // Show modal anyway
             document.getElementById('addProductModal').style.display = 'flex';
             document.body.style.overflow = 'hidden';
@@ -366,6 +527,7 @@
                     document.getElementById('viewProductTitle').textContent = product.name;
                     document.getElementById('viewProductContent').innerHTML = `
                         <div class="rc-details-grid">
+                            <!-- Basic Information -->
                             <div class="rc-detail-item">
                                 <label class="rc-label">Product ID</label>
                                 <span class="rc-text-mono">${product.productID}</span>
@@ -375,22 +537,58 @@
                                 <span>${product.name}</span>
                             </div>
                             <div class="rc-detail-item">
+                                <label class="rc-label">Cost per Day</label>
+                                <span>${product.itemcostperday ? '€' + product.itemcostperday.toFixed(2) : '-'}</span>
+                            </div>
+                            <div class="rc-detail-item rc-detail-full">
+                                <label class="rc-label">Description</label>
+                                <span>${product.description || 'No description available'}</span>
+                            </div>
+                            
+                            <!-- Category Information -->
+                            <div class="rc-detail-item">
                                 <label class="rc-label">Category</label>
                                 <span class="rc-badge rc-badge-primary">
                                     ${product.category ? product.category.name : 'Uncategorized'}
                                 </span>
                             </div>
                             <div class="rc-detail-item">
-                                <label class="rc-label">Cost per Day</label>
-                                <span>${product.itemcostperday ? '€' + product.itemcostperday.toFixed(2) : '-'}</span>
+                                <label class="rc-label">Subcategory</label>
+                                <span>${product.subcategory ? product.subcategory.name : '-'}</span>
                             </div>
+                            <div class="rc-detail-item">
+                                <label class="rc-label">Sub-subcategory</label>
+                                <span>${product.subbiercategory ? product.subbiercategory.name : '-'}</span>
+                            </div>
+                            
+                            <!-- Brand & Manufacturer -->
+                            <div class="rc-detail-item">
+                                <label class="rc-label">Brand</label>
+                                <span>${product.brand ? product.brand.name : '-'}</span>
+                            </div>
+                            <div class="rc-detail-item">
+                                <label class="rc-label">Manufacturer</label>
+                                <span>${product.manufacturer ? product.manufacturer.name : '-'}</span>
+                            </div>
+                            
+                            <!-- Physical Properties -->
                             <div class="rc-detail-item">
                                 <label class="rc-label">Weight</label>
                                 <span>${product.weight ? product.weight + ' kg' : '-'}</span>
                             </div>
-                            <div class="rc-detail-item rc-detail-full">
-                                <label class="rc-label">Description</label>
-                                <span>${product.description || 'No description available'}</span>
+                            <div class="rc-detail-item">
+                                <label class="rc-label">Dimensions (H×W×D)</label>
+                                <span>
+                                    ${product.height || '-'} × ${product.width || '-'} × ${product.depth || '-'} cm
+                                </span>
+                            </div>
+                            <div class="rc-detail-item">
+                                <label class="rc-label">Power Consumption</label>
+                                <span>${product.powerconsumption ? product.powerconsumption + ' W' : '-'}</span>
+                            </div>
+                            <div class="rc-detail-item">
+                                <label class="rc-label">Maintenance Interval</label>
+                                <span>${product.maintenanceInterval ? product.maintenanceInterval + ' days' : '-'}</span>
                             </div>
                         </div>
                     `;
@@ -416,19 +614,42 @@
             .then(data => {
                 if (data.product) {
                     const product = data.product;
+                    // Basic Information
                     document.getElementById('editProductId').value = product.productID;
                     document.getElementById('editProductName').value = product.name;
                     document.getElementById('editProductDescription').value = product.description || '';
                     document.getElementById('editProductCost').value = product.itemcostperday || '';
-                    document.getElementById('editProductWeight').value = product.weight || '';
                     
-                    // Load categories and wait for completion
-                    loadCategories('editProductCategory', product.categoryID).then(() => {
+                    // Physical Properties
+                    document.getElementById('editProductWeight').value = product.weight || '';
+                    document.getElementById('editProductHeight').value = product.height || '';
+                    document.getElementById('editProductWidth').value = product.width || '';
+                    document.getElementById('editProductDepth').value = product.depth || '';
+                    
+                    // Technical Specifications
+                    document.getElementById('editProductPowerConsumption').value = product.powerconsumption || '';
+                    document.getElementById('editProductMaintenanceInterval').value = product.maintenanceInterval || '';
+                    
+                    // Category fields - set default empty values
+                    document.getElementById('editProductCategory').value = product.categoryID || '';
+                    document.getElementById('editProductSubcategory').value = product.subcategoryID || '';
+                    document.getElementById('editProductSubbiercategory').value = product.subbiercategoryID || '';
+                    document.getElementById('editProductBrand').value = product.brandID || '';
+                    document.getElementById('editProductManufacturer').value = product.manufacturerID || '';
+                    
+                    // Load all dropdown data
+                    Promise.all([
+                        loadCategories('editProductCategory', product.categoryID),
+                        loadSubcategories('editProductSubcategory', product.subcategoryID),
+                        loadSubbiercategories('editProductSubbiercategory', product.subbiercategoryID),
+                        loadBrands('editProductBrand', product.brandID),
+                        loadManufacturers('editProductManufacturer', product.manufacturerID)
+                    ]).then(() => {
                         document.getElementById('editProductModal').style.display = 'flex';
                         document.body.style.overflow = 'hidden';
                     }).catch(error => {
-                        console.error('Error loading categories:', error);
-                        // Show modal anyway, just without pre-selected category
+                        console.error('Error loading dropdown data:', error);
+                        // Show modal anyway
                         document.getElementById('editProductModal').style.display = 'flex';
                         document.body.style.overflow = 'hidden';
                     });
@@ -502,12 +723,153 @@
                 return false;
             });
     }
+    
+    // Additional dropdown loaders
+    function loadSubcategories(selectId, selectedId = null) {
+        const select = document.getElementById(selectId);
+        select.innerHTML = '<option value="">Loading subcategories...</option>';
+        
+        return fetch('/api/v1/products/subcategories')
+            .then(response => response.json())
+            .then(data => {
+                if (data.subcategories) {
+                    select.innerHTML = '<option value="">Select subcategory</option>';
+                    data.subcategories.forEach(subcategory => {
+                        const option = document.createElement('option');
+                        option.value = subcategory.subcategoryID;
+                        option.textContent = subcategory.name;
+                        if (selectedId && selectedId == subcategory.subcategoryID) {
+                            option.selected = true;
+                        }
+                        select.appendChild(option);
+                    });
+                    return true;
+                } else {
+                    select.innerHTML = '<option value="">Error loading subcategories</option>';
+                    return false;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading subcategories:', error);
+                select.innerHTML = '<option value="">Error loading subcategories</option>';
+                return false;
+            });
+    }
+    
+    function loadSubbiercategories(selectId, selectedId = null) {
+        const select = document.getElementById(selectId);
+        select.innerHTML = '<option value="">Loading sub-subcategories...</option>';
+        
+        return fetch('/api/v1/products/subbiercategories')
+            .then(response => response.json())
+            .then(data => {
+                if (data.subbiercategories) {
+                    select.innerHTML = '<option value="">Select sub-subcategory</option>';
+                    data.subbiercategories.forEach(subbiercategory => {
+                        const option = document.createElement('option');
+                        option.value = subbiercategory.subbiercategoryID;
+                        option.textContent = subbiercategory.name;
+                        if (selectedId && selectedId == subbiercategory.subbiercategoryID) {
+                            option.selected = true;
+                        }
+                        select.appendChild(option);
+                    });
+                    return true;
+                } else {
+                    select.innerHTML = '<option value="">Error loading sub-subcategories</option>';
+                    return false;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading sub-subcategories:', error);
+                select.innerHTML = '<option value="">Error loading sub-subcategories</option>';
+                return false;
+            });
+    }
+    
+    function loadBrands(selectId, selectedId = null) {
+        const select = document.getElementById(selectId);
+        select.innerHTML = '<option value="">Loading brands...</option>';
+        
+        return fetch('/api/v1/products/brands')
+            .then(response => response.json())
+            .then(data => {
+                if (data.brands) {
+                    select.innerHTML = '<option value="">Select brand</option>';
+                    data.brands.forEach(brand => {
+                        const option = document.createElement('option');
+                        option.value = brand.brandID;
+                        option.textContent = brand.name;
+                        if (selectedId && selectedId == brand.brandID) {
+                            option.selected = true;
+                        }
+                        select.appendChild(option);
+                    });
+                    return true;
+                } else {
+                    select.innerHTML = '<option value="">Error loading brands</option>';
+                    return false;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading brands:', error);
+                select.innerHTML = '<option value="">Error loading brands</option>';
+                return false;
+            });
+    }
+    
+    function loadManufacturers(selectId, selectedId = null) {
+        const select = document.getElementById(selectId);
+        select.innerHTML = '<option value="">Loading manufacturers...</option>';
+        
+        return fetch('/api/v1/products/manufacturers')
+            .then(response => response.json())
+            .then(data => {
+                if (data.manufacturers) {
+                    select.innerHTML = '<option value="">Select manufacturer</option>';
+                    data.manufacturers.forEach(manufacturer => {
+                        const option = document.createElement('option');
+                        option.value = manufacturer.manufacturerID;
+                        option.textContent = manufacturer.name;
+                        if (selectedId && selectedId == manufacturer.manufacturerID) {
+                            option.selected = true;
+                        }
+                        select.appendChild(option);
+                    });
+                    return true;
+                } else {
+                    select.innerHTML = '<option value="">Error loading manufacturers</option>';
+                    return false;
+                }
+            })
+            .catch(error => {
+                console.error('Error loading manufacturers:', error);
+                select.innerHTML = '<option value="">Error loading manufacturers</option>';
+                return false;
+            });
+    }
 
     // Form Submission Handlers
     document.getElementById('addProductForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const formData = new FormData(this);
         const data = Object.fromEntries(formData.entries());
+        
+        // Convert empty strings to null and handle numeric fields
+        Object.keys(data).forEach(key => {
+            if (data[key] === '' || data[key] === undefined) {
+                data[key] = null;
+            } else if (['productID', 'categoryID', 'brandID', 'manufacturerID', 'maintenanceInterval'].includes(key)) {
+                // Convert to integer
+                data[key] = data[key] ? parseInt(data[key]) : null;
+            } else if (['itemcostperday', 'weight', 'height', 'width', 'depth', 'powerconsumption'].includes(key)) {
+                // Convert to float
+                data[key] = data[key] ? parseFloat(data[key]) : null;
+            }
+            // subcategoryID and subbiercategoryID should remain as strings or null
+        });
+        
+        console.log('Sending product data:', data);
         
         fetch('/api/v1/products', {
             method: 'POST',
@@ -518,16 +880,23 @@
         })
         .then(response => {
             if (response.ok) {
-                alert('Product created successfully');
-                closeAddProductModal();
-                window.location.reload();
+                return response.json();
             } else {
-                throw new Error('Failed to create product');
+                return response.text().then(text => {
+                    console.error('Server response:', text);
+                    throw new Error(`HTTP ${response.status}: ${text}`);
+                });
             }
+        })
+        .then(result => {
+            console.log('Product created:', result);
+            alert('Product created successfully');
+            closeAddProductModal();
+            window.location.reload();
         })
         .catch(error => {
             console.error('Error creating product:', error);
-            alert('Error creating product');
+            alert('Error creating product: ' + error.message);
         });
     });
 
@@ -536,6 +905,22 @@
         const formData = new FormData(this);
         const data = Object.fromEntries(formData.entries());
         const productId = data.productID;
+        
+        // Convert empty strings to null and handle numeric fields
+        Object.keys(data).forEach(key => {
+            if (data[key] === '' || data[key] === undefined) {
+                data[key] = null;
+            } else if (['productID', 'categoryID', 'brandID', 'manufacturerID', 'maintenanceInterval'].includes(key)) {
+                // Convert to integer
+                data[key] = data[key] ? parseInt(data[key]) : null;
+            } else if (['itemcostperday', 'weight', 'height', 'width', 'depth', 'powerconsumption'].includes(key)) {
+                // Convert to float
+                data[key] = data[key] ? parseFloat(data[key]) : null;
+            }
+            // subcategoryID and subbiercategoryID should remain as strings or null
+        });
+        
+        console.log('Updating product data:', data);
         
         fetch(`/api/v1/products/${productId}`, {
             method: 'PUT',
@@ -546,16 +931,23 @@
         })
         .then(response => {
             if (response.ok) {
-                alert('Product updated successfully');
-                closeEditProductModal();
-                window.location.reload();
+                return response.json();
             } else {
-                throw new Error('Failed to update product');
+                return response.text().then(text => {
+                    console.error('Server response:', text);
+                    throw new Error(`HTTP ${response.status}: ${text}`);
+                });
             }
+        })
+        .then(result => {
+            console.log('Product updated:', result);
+            alert('Product updated successfully');
+            closeEditProductModal();
+            window.location.reload();
         })
         .catch(error => {
             console.error('Error updating product:', error);
-            alert('Error updating product');
+            alert('Error updating product: ' + error.message);
         });
     });
 

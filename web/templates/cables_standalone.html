@@ -67,25 +67,24 @@
         <!-- Cable Content -->
         <div class="rc-card">
             <div class="rc-card-body">
-                {{if .cables}}
+                {{if .cableGroups}}
                 <div class="rc-table-responsive">
                     <table class="rc-table">
                         <thead>
                             <tr>
-                                <th>ID</th>
                                 <th>Name</th>
                                 <th>Type</th>
                                 <th>Connectors</th>
                                 <th>Length</th>
                                 <th>Cross Section</th>
+                                <th>Anzahl</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {{range .cables}}
+                            {{range .cableGroups}}
                             <tr>
-                                <td><span class="rc-text-mono">{{.CableID}}</span></td>
-                                <td><strong>{{if .Name}}{{.Name}}{{else}}Cable {{.CableID}}{{end}}</strong></td>
+                                <td><strong>{{if .Name}}{{.Name}}{{else}}Cable Group{{end}}</strong></td>
                                 <td><span class="rc-badge rc-badge-secondary">{{if .TypeInfo}}{{.TypeInfo.Name}}{{else}}Unknown{{end}}</span></td>
                                 <td>
                                     <div class="cable-connectors">
@@ -95,16 +94,17 @@
                                     </div>
                                 </td>
                                 <td><span class="cable-length">{{printf "%.2f" .Length}} m</span></td>
-                                <td><span class="cable-cross-section">{{printf "%.2f" .MM2}} mm²</span></td>
+                                <td><span class="cable-cross-section">{{.GetMM2Display}}</span></td>
+                                <td><span class="rc-badge rc-badge-primary">{{.Count}}</span></td>
                                 <td>
                                     <div class="rc-flex rc-flex-gap-xs">
-                                        <button onclick="viewCable({{.CableID}})" class="rc-btn rc-btn-outline rc-btn-sm" title="View Details">
+                                        <button onclick="viewCableGroup({{.CableIDs}})" class="rc-btn rc-btn-outline rc-btn-sm" title="View Details">
                                             <i class="bi bi-eye"></i>
                                         </button>
-                                        <button onclick="editCable({{.CableID}})" class="rc-btn rc-btn-outline rc-btn-sm" title="Edit">
+                                        <button onclick="editCableGroup({{.Type}}, {{.Connector1}}, {{.Connector2}}, {{.Length}}, {{.MM2}}, '{{.Name}}')" class="rc-btn rc-btn-outline rc-btn-sm" title="Edit All">
                                             <i class="bi bi-pencil"></i>
                                         </button>
-                                        <button onclick="deleteCable({{.CableID}})" class="rc-btn rc-btn-outline rc-btn-sm" title="Delete">
+                                        <button onclick="deleteCableGroup({{.CableIDs}})" class="rc-btn rc-btn-outline rc-btn-sm" title="Delete All">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     </div>
@@ -445,12 +445,17 @@
                             </select>
                         </div>
                         <div class="rc-form-group">
-                            <label for="cableMM2" class="rc-label">Cross Section (mm²) *</label>
-                            <input type="number" id="cableMM2" name="mm2" class="rc-input" step="0.01" min="0" required placeholder="e.g., 2.5">
+                            <label for="cableMM2" class="rc-label">Cross Section (mm²)</label>
+                            <input type="number" id="cableMM2" name="mm2" class="rc-input" step="0.01" min="0" placeholder="e.g., 2.5">
                         </div>
                         <div class="rc-form-group">
                             <label for="cableName" class="rc-label">Custom Name</label>
                             <input type="text" id="cableName" name="name" class="rc-input" placeholder="Optional custom name">
+                        </div>
+                        <div class="rc-form-group">
+                            <label for="cableAmount" class="rc-label">Amount *</label>
+                            <input type="number" id="cableAmount" name="amount" class="rc-input" min="1" value="1" required placeholder="e.g., 20">
+                            <small class="rc-text-sm rc-text-muted">Number of identical cables to create</small>
                         </div>
                     </div>
                     <div class="rc-form-actions rc-mt-xl">
@@ -528,8 +533,8 @@
                             </select>
                         </div>
                         <div class="rc-form-group">
-                            <label for="editCableMM2" class="rc-label">Cross Section (mm²) *</label>
-                            <input type="number" id="editCableMM2" name="mm2" class="rc-input" step="0.01" min="0" required>
+                            <label for="editCableMM2" class="rc-label">Cross Section (mm²)</label>
+                            <input type="number" id="editCableMM2" name="mm2" class="rc-input" step="0.01" min="0">
                         </div>
                         <div class="rc-form-group">
                             <label for="editCableName" class="rc-label">Custom Name</label>
@@ -548,6 +553,143 @@
             </div>
         </div>
     </div>
+
+    <!-- Selective Delete Modal -->
+    <div id="selectiveDeleteModal" class="rc-modal" style="display: none;">
+        <div class="rc-modal-overlay" onclick="closeSelectiveDeleteModal()"></div>
+        <div class="rc-modal-content">
+            <div class="rc-modal-header">
+                <h2 class="rc-modal-title">
+                    <i class="bi bi-trash"></i> Select Cables to Delete
+                </h2>
+                <button class="rc-modal-close" onclick="closeSelectiveDeleteModal()">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+            <div class="rc-modal-body">
+                <div class="rc-mb-lg">
+                    <p class="rc-text">Select which cables you want to delete from this group:</p>
+                    <div class="cable-group-info rc-mb-md" id="deleteGroupInfo">
+                        <!-- Group info will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="cable-selection-list" id="cableSelectionList">
+                    <!-- Cable checkboxes will be populated here -->
+                </div>
+                
+                <div class="rc-flex rc-flex-between rc-flex-center rc-mt-lg">
+                    <div class="selection-summary">
+                        <span id="selectionCount">0</span> of <span id="totalCount">0</span> cables selected
+                    </div>
+                    <div class="rc-flex rc-flex-gap-sm">
+                        <button type="button" onclick="selectAllCables()" class="rc-btn rc-btn-outline rc-btn-sm">
+                            Select All
+                        </button>
+                        <button type="button" onclick="deselectAllCables()" class="rc-btn rc-btn-outline rc-btn-sm">
+                            Deselect All
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="rc-form-actions rc-mt-xl">
+                    <button type="button" onclick="confirmSelectiveDeletion()" class="rc-btn rc-btn-danger" id="deleteSelectedBtn" disabled>
+                        <i class="bi bi-trash"></i> Delete Selected Cables
+                    </button>
+                    <button type="button" onclick="closeSelectiveDeleteModal()" class="rc-btn rc-btn-outline">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+    .cable-group-info {
+        background: var(--surface-2);
+        padding: var(--space-md);
+        border-radius: var(--radius-md);
+        border: 1px solid var(--surface-3);
+    }
+    
+    .cable-selection-list {
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid var(--surface-3);
+        border-radius: var(--radius-md);
+        background: var(--surface-1);
+    }
+    
+    .cable-selection-item {
+        display: flex;
+        align-items: center;
+        padding: var(--space-sm) var(--space-md);
+        border-bottom: 1px solid var(--surface-3);
+        transition: background-color 0.2s ease;
+    }
+    
+    .cable-selection-item:last-child {
+        border-bottom: none;
+    }
+    
+    .cable-selection-item:hover {
+        background: var(--surface-2);
+    }
+    
+    .cable-selection-item input[type="checkbox"] {
+        margin-right: var(--space-sm);
+        transform: scale(1.2);
+    }
+    
+    .cable-info {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: var(--space-md);
+    }
+    
+    .cable-id {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 600;
+        color: var(--text-primary);
+        min-width: 60px;
+    }
+    
+    .cable-specs {
+        display: flex;
+        gap: var(--space-sm);
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+    
+    .cable-spec {
+        background: var(--surface-3);
+        padding: 2px 6px;
+        border-radius: var(--radius-sm);
+        font-family: 'JetBrains Mono', monospace;
+    }
+    
+    .selection-summary {
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+    
+    .rc-btn-danger {
+        background: var(--danger);
+        color: white;
+        border-color: var(--danger);
+    }
+    
+    .rc-btn-danger:hover:not(:disabled) {
+        background: var(--danger-hover);
+        border-color: var(--danger-hover);
+    }
+    
+    .rc-btn-danger:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    </style>
 
     <script>
     // Modal Management Functions
@@ -604,7 +746,7 @@
                                 <div class="cable-line">
                                     <div class="cable-specs">
                                         <span class="cable-length">${cable.length}m</span>
-                                        <span class="cable-cross-section">${cable.mm2}mm²</span>
+                                        <span class="cable-cross-section">${cable.mm2 ? cable.mm2 + 'mm²' : '-'}</span>
                                     </div>
                                     <div class="cable-wire"></div>
                                 </div>
@@ -632,7 +774,7 @@
                                 </div>
                                 <div class="rc-detail-item">
                                     <label class="rc-label">Cross Section</label>
-                                    <span class="cable-cross-section">${cable.mm2} mm²</span>
+                                    <span class="cable-cross-section">${cable.mm2 ? cable.mm2 + ' mm²' : '-'}</span>
                                 </div>
                                 <div class="rc-detail-item">
                                     <label class="rc-label">Usage</label>
@@ -701,6 +843,162 @@
         document.getElementById('editCableModal').style.display = 'none';
         document.body.style.overflow = 'auto';
         document.getElementById('editCableForm').reset();
+    }
+
+    function viewCableGroup(cableIds) {
+        console.log('View cable group:', cableIds);
+        if (cableIds.length > 0) {
+            // Just view the first cable as representative
+            viewCable(cableIds[0]);
+        }
+    }
+
+    function editCableGroup(type, connector1, connector2, length, mm2, name) {
+        console.log('Edit cable group:', {type, connector1, connector2, length, mm2, name});
+        alert('Bulk editing not implemented yet. Please edit individual cables.');
+    }
+
+    function deleteCableGroup(cableIds) {
+        console.log('Opening selective delete modal for cables:', cableIds);
+        openSelectiveDeleteModal(cableIds);
+    }
+
+    let currentCableIds = [];
+    let groupInfo = {};
+
+    function openSelectiveDeleteModal(cableIds) {
+        currentCableIds = cableIds;
+        
+        // Load detailed cable information
+        Promise.all(cableIds.map(id => 
+            fetch(`/api/v1/cables/${id}`).then(r => r.json())
+        )).then(responses => {
+            const cables = responses.map(r => r.cable).filter(c => c);
+            
+            if (cables.length === 0) {
+                alert('Error loading cable information');
+                return;
+            }
+            
+            // Store group info from first cable
+            const firstCable = cables[0];
+            groupInfo = {
+                type: firstCable.type_info?.name || 'Unknown',
+                connector1: firstCable.connector1_info?.name || 'Unknown',
+                connector2: firstCable.connector2_info?.name || 'Unknown',
+                length: firstCable.length,
+                mm2: firstCable.mm2,
+                name: firstCable.name
+            };
+            
+            // Populate group info
+            document.getElementById('deleteGroupInfo').innerHTML = `
+                <div class="rc-flex rc-flex-between rc-flex-center">
+                    <div>
+                        <strong>${groupInfo.name || 'Cable Group'}</strong>
+                        <div class="rc-text-sm rc-text-muted">
+                            ${groupInfo.type} • ${groupInfo.connector1} → ${groupInfo.connector2} • ${groupInfo.length}m • ${groupInfo.mm2 ? groupInfo.mm2 + 'mm²' : '-'}
+                        </div>
+                    </div>
+                    <span class="rc-badge rc-badge-secondary">${cables.length} cables</span>
+                </div>
+            `;
+            
+            // Populate cable list
+            const listHtml = cables.map(cable => `
+                <div class="cable-selection-item">
+                    <input type="checkbox" id="cable_${cable.cableID}" value="${cable.cableID}" onchange="updateSelectionCount()">
+                    <div class="cable-info">
+                        <div class="cable-id">ID: ${cable.cableID}</div>
+                        <div class="cable-specs">
+                            <span class="cable-spec">${cable.length}m</span>
+                            <span class="cable-spec">${cable.mm2 ? cable.mm2 + 'mm²' : '-'}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('cableSelectionList').innerHTML = listHtml;
+            document.getElementById('totalCount').textContent = cables.length;
+            document.getElementById('selectionCount').textContent = '0';
+            document.getElementById('deleteSelectedBtn').disabled = true;
+            
+            // Show modal
+            document.getElementById('selectiveDeleteModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }).catch(error => {
+            console.error('Error loading cable details:', error);
+            alert('Error loading cable information');
+        });
+    }
+
+    function closeSelectiveDeleteModal() {
+        document.getElementById('selectiveDeleteModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+        currentCableIds = [];
+        groupInfo = {};
+    }
+
+    function selectAllCables() {
+        const checkboxes = document.querySelectorAll('#cableSelectionList input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = true);
+        updateSelectionCount();
+    }
+
+    function deselectAllCables() {
+        const checkboxes = document.querySelectorAll('#cableSelectionList input[type="checkbox"]');
+        checkboxes.forEach(cb => cb.checked = false);
+        updateSelectionCount();
+    }
+
+    function updateSelectionCount() {
+        const checkboxes = document.querySelectorAll('#cableSelectionList input[type="checkbox"]');
+        const selectedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+        
+        document.getElementById('selectionCount').textContent = selectedCount;
+        document.getElementById('deleteSelectedBtn').disabled = selectedCount === 0;
+    }
+
+    function confirmSelectiveDeletion() {
+        const checkboxes = document.querySelectorAll('#cableSelectionList input[type="checkbox"]:checked');
+        const selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+        
+        if (selectedIds.length === 0) {
+            alert('Please select at least one cable to delete');
+            return;
+        }
+        
+        if (!confirm(`Are you sure you want to delete ${selectedIds.length} selected cable(s)? This action cannot be undone.`)) {
+            return;
+        }
+        
+        // Delete selected cables
+        let deletePromises = selectedIds.map(cableId => 
+            fetch(`/api/v1/cables/${cableId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+        );
+        
+        Promise.all(deletePromises)
+            .then(responses => {
+                let failedDeletes = responses.filter(r => !r.ok);
+                if (failedDeletes.length === 0) {
+                    alert(`Successfully deleted ${selectedIds.length} cable(s)`);
+                    closeSelectiveDeleteModal();
+                    window.location.reload();
+                } else {
+                    alert(`Deleted ${responses.length - failedDeletes.length} of ${responses.length} cables. Some deletions failed.`);
+                    closeSelectiveDeleteModal();
+                    window.location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting selected cables:', error);
+                alert('Error deleting cables');
+            });
     }
 
     function deleteCable(cableId) {
@@ -782,7 +1080,9 @@
                     data.connectors.forEach(connector => {
                         const option = document.createElement('option');
                         option.value = connector.cable_connectorsID;
-                        option.textContent = connector.name + (connector.abbreviation ? ' (' + connector.abbreviation + ')' : '');
+                        option.textContent = connector.name + 
+                            (connector.abbreviation ? ' (' + connector.abbreviation + ')' : '') +
+                            (connector.gender ? ' - ' + connector.gender : '');
                         console.log(`Comparing selectedId=${selectedId} (${typeof selectedId}) with connector.cable_connectorsID=${connector.cable_connectorsID} (${typeof connector.cable_connectorsID})`);
                         if (selectedId !== null && selectedId !== undefined && selectedId == connector.cable_connectorsID) {
                             console.log(`✓ MATCH! Selected connector: ${connector.name} (ID: ${connector.cable_connectorsID})`);
@@ -809,27 +1109,25 @@
     document.getElementById('addCableForm').addEventListener('submit', function(e) {
         e.preventDefault();
         const formData = new FormData(this);
-        const data = Object.fromEntries(formData.entries());
         
-        fetch('/api/v1/cables', {
+        // Use the web endpoint that supports bulk creation
+        fetch('/cables', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
+            body: formData
         })
         .then(response => {
-            if (response.ok) {
-                alert('Cable created successfully');
+            if (response.ok || response.redirected) {
+                const amount = formData.get('amount') || 1;
+                alert(`${amount} cable(s) created successfully`);
                 closeAddCableModal();
                 window.location.reload();
             } else {
-                throw new Error('Failed to create cable');
+                throw new Error('Failed to create cable(s)');
             }
         })
         .catch(error => {
-            console.error('Error creating cable:', error);
-            alert('Error creating cable');
+            console.error('Error creating cable(s):', error);
+            alert('Error creating cable(s)');
         });
     });
 
@@ -867,6 +1165,7 @@
             closeAddCableModal();
             closeViewCableModal();
             closeEditCableModal();
+            closeSelectiveDeleteModal();
         }
     });
     </script>

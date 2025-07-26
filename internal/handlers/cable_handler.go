@@ -55,9 +55,9 @@ func (h *CableHandler) ListCablesWeb(c *gin.Context) {
 	viewType := c.DefaultQuery("view", "list") // Default to list view
 	log.Printf("🐛 DEBUG: Cable view requested: viewType='%s'", viewType)
 
-	// Get cables from database
+	// Get cables from database (grouped by specifications)
 	dbStart := time.Now()
-	cables, err := h.cableRepo.List(params)
+	cableGroups, err := h.cableRepo.ListGrouped(params)
 	dbTime := time.Since(dbStart)
 	log.Printf("⏱️  Database query took: %v", dbTime)
 	
@@ -82,7 +82,7 @@ func (h *CableHandler) ListCablesWeb(c *gin.Context) {
 	templateStart := time.Now()
 	SafeHTML(c, http.StatusOK, "cables_standalone.html", gin.H{
 		"title":        "Cables",
-		"cables":       cables,
+		"cableGroups":  cableGroups,
 		"params":       params,
 		"user":         user,
 		"viewType":     viewType,
@@ -167,11 +167,15 @@ func (h *CableHandler) CreateCable(c *gin.Context) {
 		return
 	}
 	
-	mm2, err := strconv.ParseFloat(mm2Str, 64)
-	if err != nil {
-		log.Printf("❌ Invalid mm2: %v", err)
-		h.renderCableFormWithError(c, "Invalid mm² value", nil)
-		return
+	var mm2 *float64
+	if mm2Str != "" {
+		parsedMM2, err := strconv.ParseFloat(mm2Str, 64)
+		if err != nil {
+			log.Printf("❌ Invalid mm2: %v", err)
+			h.renderCableFormWithError(c, "Invalid mm² value", nil)
+			return
+		}
+		mm2 = &parsedMM2
 	}
 	
 	// Parse amount (default to 1 if not provided)

@@ -308,8 +308,13 @@
         <!-- Top Performers -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-lg); margin-bottom: var(--space-xl);">
             <div class="analytics-table">
-                <div style="padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--surface-3); font-weight: 600; color: var(--text-primary); display: flex; align-items: center; gap: var(--space-sm);">
-                    <i class="bi bi-trophy" style="color: var(--accent-electric);"></i> Top Equipment
+                <div style="padding: var(--space-md) var(--space-lg); border-bottom: 1px solid var(--surface-3); font-weight: 600; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; gap: var(--space-sm);">
+                        <i class="bi bi-trophy" style="color: var(--accent-electric);"></i> Top Equipment
+                    </div>
+                    <button class="rc-btn rc-btn-sm rc-btn-secondary" onclick="toggleAllDevicesView()">
+                        <i class="bi bi-list"></i> View All
+                    </button>
                 </div>
                 <table>
                     <thead>
@@ -415,6 +420,75 @@
                     {{end}}
                 </tbody>
             </table>
+        </div>
+
+        <!-- All Devices Modal -->
+        <div id="allDevicesModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 1000; backdrop-filter: blur(5px);">
+            <div style="position: relative; width: 90%; max-width: 1200px; margin: 2rem auto; max-height: 90vh; overflow: hidden; background: var(--surface-1); border-radius: var(--radius-lg); border: 1px solid var(--surface-3);">
+                <!-- Modal Header -->
+                <div style="padding: var(--space-lg); border-bottom: 1px solid var(--surface-3); display: flex; align-items: center; justify-content: space-between; background: var(--surface-2);">
+                    <div>
+                        <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: var(--space-sm);">
+                            <i class="bi bi-list" style="color: var(--accent-electric);"></i> All Device Revenues
+                        </h2>
+                        <p style="color: var(--text-secondary); margin: var(--space-xs) 0 0 0; font-size: 0.875rem;">Complete device revenue breakdown for the selected period</p>
+                    </div>
+                    <div style="display: flex; gap: var(--space-sm); align-items: center;">
+                        <div class="rc-dropdown">
+                            <button class="rc-btn rc-btn-sm rc-btn-secondary rc-dropdown-toggle" id="sortDropdown">
+                                <i class="bi bi-sort-down"></i> Sort: Revenue
+                            </button>
+                            <div class="rc-dropdown-menu">
+                                <a class="rc-dropdown-item" href="#" onclick="sortAllDevices('total_revenue', 'desc')">Revenue (High to Low)</a>
+                                <a class="rc-dropdown-item" href="#" onclick="sortAllDevices('total_revenue', 'asc')">Revenue (Low to High)</a>
+                                <a class="rc-dropdown-item" href="#" onclick="sortAllDevices('deviceID', 'asc')">Device ID (A-Z)</a>
+                                <a class="rc-dropdown-item" href="#" onclick="sortAllDevices('product_name', 'asc')">Product Name (A-Z)</a>
+                                <a class="rc-dropdown-item" href="#" onclick="sortAllDevices('rental_count', 'desc')">Rental Count</a>
+                            </div>
+                        </div>
+                        <button class="rc-btn rc-btn-sm rc-btn-ghost" onclick="closeAllDevicesModal()">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modal Content -->
+                <div style="max-height: calc(90vh - 120px); overflow-y: auto; padding: var(--space-lg);">
+                    <div id="allDevicesLoading" style="text-align: center; padding: var(--space-xl); color: var(--text-secondary);">
+                        <i class="bi bi-arrow-clockwise bi-spin" style="font-size: 2rem; margin-bottom: var(--space-md);"></i>
+                        <p>Loading device revenues...</p>
+                    </div>
+                    
+                    <div id="allDevicesContent" style="display: none;">
+                        <div class="analytics-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th style="cursor: pointer;" onclick="sortAllDevices('deviceID', 'asc')">Device ID <i class="bi bi-arrow-up-down"></i></th>
+                                        <th style="cursor: pointer;" onclick="sortAllDevices('product_name', 'asc')">Product <i class="bi bi-arrow-up-down"></i></th>
+                                        <th style="cursor: pointer;" onclick="sortAllDevices('rental_count', 'desc')">Rentals <i class="bi bi-arrow-up-down"></i></th>
+                                        <th style="cursor: pointer;" onclick="sortAllDevices('total_revenue', 'desc')">Revenue <i class="bi bi-arrow-up-down"></i></th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="allDevicesTableBody">
+                                    <!-- Data will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div id="allDevicesPagination" style="margin-top: var(--space-lg); display: flex; justify-content: center; align-items: center; gap: var(--space-sm);">
+                            <!-- Pagination will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div id="allDevicesError" style="display: none; text-align: center; padding: var(--space-xl); color: var(--text-secondary);">
+                        <i class="bi bi-exclamation-triangle" style="font-size: 2rem; margin-bottom: var(--space-md); color: #f59e0b;"></i>
+                        <p>Failed to load device revenues. Please try again.</p>
+                        <button class="rc-btn rc-btn-primary rc-btn-sm" onclick="loadAllDevices()">Retry</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </main>
 
@@ -853,6 +927,205 @@ function makeChartsResponsive() {
         });
     }
 }
+
+// All Devices Modal functionality
+let allDevicesData = [];
+let currentSort = { field: 'total_revenue', order: 'desc' };
+let currentPage = 1;
+const itemsPerPage = 50;
+
+function toggleAllDevicesView() {
+    const modal = document.getElementById('allDevicesModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        loadAllDevices();
+    }
+}
+
+function closeAllDevicesModal() {
+    const modal = document.getElementById('allDevicesModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+function loadAllDevices() {
+    // Show loading state
+    document.getElementById('allDevicesLoading').style.display = 'block';
+    document.getElementById('allDevicesContent').style.display = 'none';
+    document.getElementById('allDevicesError').style.display = 'none';
+    
+    // Get current period from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const period = urlParams.get('period') || '1year';
+    
+    // Fetch all device revenues
+    fetch(`/analytics/devices/all?period=${period}&sort=${currentSort.field}&order=${currentSort.order}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            allDevicesData = data.devices || [];
+            renderAllDevicesTable();
+            
+            // Hide loading, show content
+            document.getElementById('allDevicesLoading').style.display = 'none';
+            document.getElementById('allDevicesContent').style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error loading device revenues:', error);
+            
+            // Hide loading, show error
+            document.getElementById('allDevicesLoading').style.display = 'none';
+            document.getElementById('allDevicesError').style.display = 'block';
+        });
+}
+
+function sortAllDevices(field, order) {
+    currentSort = { field, order };
+    currentPage = 1;
+    
+    // Update sort dropdown text
+    const sortLabels = {
+        'total_revenue': order === 'desc' ? 'Revenue (High to Low)' : 'Revenue (Low to High)',
+        'deviceID': 'Device ID (A-Z)',
+        'product_name': 'Product Name (A-Z)', 
+        'rental_count': 'Rental Count'
+    };
+    
+    const dropdown = document.getElementById('sortDropdown');
+    if (dropdown) {
+        dropdown.innerHTML = `<i class="bi bi-sort-down"></i> Sort: ${sortLabels[field] || 'Revenue'}`;
+    }
+    
+    // Re-fetch data with new sort
+    loadAllDevices();
+}
+
+function renderAllDevicesTable() {
+    const tbody = document.getElementById('allDevicesTableBody');
+    if (!tbody) return;
+    
+    // Calculate pagination
+    const totalItems = allDevicesData.length;
+    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+    const pageData = allDevicesData.slice(startIndex, endIndex);
+    
+    // Clear table
+    tbody.innerHTML = '';
+    
+    if (pageData.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: var(--space-xl);">
+                    <i class="bi bi-inbox" style="font-size: 2rem; margin-bottom: var(--space-sm); display: block;"></i>
+                    No device revenue data available for the selected period.
+                </td>
+            </tr>
+        `;
+        document.getElementById('allDevicesPagination').innerHTML = '';
+        return;
+    }
+    
+    // Populate table rows
+    pageData.forEach(device => {
+        const row = document.createElement('tr');
+        
+        // Determine status based on revenue
+        let statusClass = 'status-good';
+        let statusText = 'Active';
+        
+        if (device.totalRevenue === 0) {
+            statusClass = 'status-medium';
+            statusText = 'Inactive';
+        } else if (device.totalRevenue < 50) {
+            statusClass = 'status-info';
+            statusText = 'Low Use';
+        } else if (device.totalRevenue > 500) {
+            statusClass = 'status-high';
+            statusText = 'High Performer';
+        }
+        
+        row.innerHTML = `
+            <td><strong>${device.deviceID || 'N/A'}</strong></td>
+            <td>${device.productName || 'Unknown Product'}</td>
+            <td><span class="status-badge status-info">${device.rentalCount || 0}</span></td>
+            <td><strong>€${Number(device.totalRevenue || 0).toFixed(0)}</strong></td>
+            <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+        `;
+        
+        tbody.appendChild(row);
+    });
+    
+    // Render pagination
+    renderPagination(totalPages);
+}
+
+function renderPagination(totalPages) {
+    const paginationContainer = document.getElementById('allDevicesPagination');
+    if (!paginationContainer) return;
+    
+    paginationContainer.innerHTML = '';
+    
+    if (totalPages <= 1) return;
+    
+    // Previous button
+    if (currentPage > 1) {
+        const prevBtn = document.createElement('button');
+        prevBtn.className = 'rc-btn rc-btn-sm rc-btn-secondary';
+        prevBtn.innerHTML = '<i class="bi bi-chevron-left"></i> Previous';
+        prevBtn.onclick = () => changePage(currentPage - 1);
+        paginationContainer.appendChild(prevBtn);
+    }
+    
+    // Page info
+    const pageInfo = document.createElement('span');
+    pageInfo.style.cssText = 'color: var(--text-secondary); padding: 0 var(--space-md);';
+    pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+    paginationContainer.appendChild(pageInfo);
+    
+    // Next button
+    if (currentPage < totalPages) {
+        const nextBtn = document.createElement('button');
+        nextBtn.className = 'rc-btn rc-btn-sm rc-btn-secondary';
+        nextBtn.innerHTML = 'Next <i class="bi bi-chevron-right"></i>';
+        nextBtn.onclick = () => changePage(currentPage + 1);
+        paginationContainer.appendChild(nextBtn);
+    }
+    
+    // Total count info
+    const totalInfo = document.createElement('div');
+    totalInfo.style.cssText = 'color: var(--text-secondary); font-size: 0.875rem; margin-top: var(--space-sm);';
+    const startIndex = (currentPage - 1) * itemsPerPage + 1;
+    const endIndex = Math.min(currentPage * itemsPerPage, allDevicesData.length);
+    totalInfo.textContent = `Showing ${startIndex}-${endIndex} of ${allDevicesData.length} devices`;
+    paginationContainer.appendChild(totalInfo);
+}
+
+function changePage(page) {
+    currentPage = page;
+    renderAllDevicesTable();
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('allDevicesModal');
+    if (e.target === modal) {
+        closeAllDevicesModal();
+    }
+});
+
+// Close modal with escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeAllDevicesModal();
+    }
+});
 
 // Initialize additional functionality
 document.addEventListener('DOMContentLoaded', function() {

@@ -217,3 +217,23 @@ func (r *ProductRepository) GetSubcategoriesByCategory(categoryID uint, subcateg
 func (r *ProductRepository) GetSubbiercategoriesBySubcategory(subcategoryID string, subbiercategories *[]models.Subbiercategory) error {
 	return r.db.Where("subcategoryID = ?", subcategoryID).Order("name ASC").Find(subbiercategories).Error
 }
+
+// GetAllSubcategories gets all subcategories
+func (r *ProductRepository) GetAllSubcategories(subcategories *[]models.Subcategory) error {
+	return r.db.Order("name ASC").Find(subcategories).Error
+}
+
+// GetAllSubbiercategories gets all subbiercategories
+func (r *ProductRepository) GetAllSubbiercategories(subbiercategories *[]models.Subbiercategory) error {
+	return r.db.Order("name ASC").Find(subbiercategories).Error
+}
+
+// GetAllBrands gets all brands
+func (r *ProductRepository) GetAllBrands(brands *[]models.Brand) error {
+	return r.db.Order("name ASC").Find(brands).Error
+}
+
+// GetAllManufacturers gets all manufacturers
+func (r *ProductRepository) GetAllManufacturers(manufacturers *[]models.Manufacturer) error {
+	return r.db.Order("name ASC").Find(manufacturers).Error
+}

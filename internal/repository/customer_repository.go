@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"go-barcode-webapp/internal/models"
 )
 
@@ -13,7 +14,11 @@ func NewCustomerRepository(db *Database) *CustomerRepository {
 }
 
 func (r *CustomerRepository) Create(customer *models.Customer) error {
-	return r.db.Create(customer).Error
+	fmt.Printf("🔧 DEBUG CustomerRepo.Create: Before DB operation, customer ID: %d\n", customer.CustomerID)
+	result := r.db.Create(customer)
+	fmt.Printf("🔧 DEBUG CustomerRepo.Create: After DB operation, customer ID: %d, Error: %v\n", customer.CustomerID, result.Error)
+	fmt.Printf("🔧 DEBUG CustomerRepo.Create: Rows affected: %d\n", result.RowsAffected)
+	return result.Error
 }
 
 func (r *CustomerRepository) GetByID(id uint) (*models.Customer, error) {

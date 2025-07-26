@@ -149,11 +149,15 @@ func (h *ProductHandler) GetProductAPI(c *gin.Context) {
 func (h *ProductHandler) CreateProductAPI(c *gin.Context) {
 	var product models.Product
 	if err := c.ShouldBindJSON(&product); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product data"})
+		log.Printf("❌ Error binding product JSON: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid product data: %v", err)})
 		return
 	}
 
+	log.Printf("📦 Creating product: %+v", product)
+
 	if err := h.productRepo.Create(&product); err != nil {
+		log.Printf("❌ Error creating product: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create product"})
 		return
 	}
@@ -171,17 +175,69 @@ func (h *ProductHandler) UpdateProductAPI(c *gin.Context) {
 
 	var product models.Product
 	if err := c.ShouldBindJSON(&product); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid product data"})
+		log.Printf("❌ Error binding product JSON for update: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("Invalid product data: %v", err)})
 		return
 	}
 
+	log.Printf("📦 Updating product %d: %+v", id, product)
+
 	product.ProductID = uint(id)
 	if err := h.productRepo.Update(&product); err != nil {
+		log.Printf("❌ Error updating product: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update product"})
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"product": product})
+}
+
+// GetSubcategoriesAPI returns all subcategories
+func (h *ProductHandler) GetSubcategoriesAPI(c *gin.Context) {
+	var subcategories []models.Subcategory
+	if err := h.productRepo.GetAllSubcategories(&subcategories); err != nil {
+		log.Printf("❌ Error fetching subcategories: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch subcategories"})
+		return
+	}
+	
+	c.JSON(http.StatusOK, gin.H{"subcategories": subcategories})
+}
+
+// GetSubbiercategoriesAPI returns all subbiercategories
+func (h *ProductHandler) GetSubbiercategoriesAPI(c *gin.Context) {
+	var subbiercategories []models.Subbiercategory
+	if err := h.productRepo.GetAllSubbiercategories(&subbiercategories); err != nil {
+		log.Printf("❌ Error fetching subbiercategories: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch subbiercategories"})
+		return
+	}
+	
+	c.JSON(http.StatusOK, gin.H{"subbiercategories": subbiercategories})
+}
+
+// GetBrandsAPI returns all brands
+func (h *ProductHandler) GetBrandsAPI(c *gin.Context) {
+	var brands []models.Brand
+	if err := h.productRepo.GetAllBrands(&brands); err != nil {
+		log.Printf("❌ Error fetching brands: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch brands"})
+		return
+	}
+	
+	c.JSON(http.StatusOK, gin.H{"brands": brands})
+}
+
+// GetManufacturersAPI returns all manufacturers
+func (h *ProductHandler) GetManufacturersAPI(c *gin.Context) {
+	var manufacturers []models.Manufacturer
+	if err := h.productRepo.GetAllManufacturers(&manufacturers); err != nil {
+		log.Printf("❌ Error fetching manufacturers: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch manufacturers"})
+		return
+	}
+	
+	c.JSON(http.StatusOK, gin.H{"manufacturers": manufacturers})
 }
 
 func (h *ProductHandler) DeleteProductAPI(c *gin.Context) {

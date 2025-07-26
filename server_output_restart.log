@@ -1,75 +1,75 @@
-2025/07/24 13:16:48 Database connection established successfully
-2025/07/24 13:16:48 GoBD compliance table migration disabled
-2025/07/24 13:16:48 Database auto-migration disabled - using manual schema management
-2025/07/24 13:16:48 Templates already exist (1), skipping default template creation
+2025/07/25 14:27:02 Database connection established successfully
+2025/07/25 14:27:02 GoBD compliance table migration disabled
+2025/07/25 14:27:02 Database auto-migration disabled - using manual schema management
+2025/07/25 14:27:02 Templates already exist (1), skipping default template creation
 [GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
  - using env:	export GIN_MODE=release
  - using code:	gin.SetMode(gin.ReleaseMode)
 
 [GIN-debug] Loaded HTML Templates (63): 
-	- job_detail.html
-	- login.html
-	- monitoring_dashboard.html
-	- user_form.html
-	- css
-	- device_form.html
-	- invoice_template_designer_basic.html
+	- js
 	- device_detail.html
-	- equipment_package_detail.html
-	- security_audit.html
-	- devices_standalone.html
-	- transactions_list.html
-	- jobs.html
-	- security_roles_standalone.html
-	- customer_detail.html
-	- customers.html
-	- error.html
-	- cases_list.html
-	- invoice_preview.html
-	- invoice_settings_form.html
 	- financial_dashboard.html
-	- invoices_list.html
+	- invoice_template_designer_basic.html
+	- search_results.html
+	- base.html
+	- case_device_mapping.html
 	- products_standalone.html
+	- transactions_list.html
+	- company_settings.html
+	- document_upload_form.html
+	- home.html
+	- invoice_form.html
+	- invoice_template_german.html
+	- user_form.html
+	- users_list.html
 	- content
+	- customers.html
+	- device_form.html
+	- documents_list.html
+	- invoice_detail.html
 	- cable_form.html
-	- error_page.html
+	- cases_list.html
+	- invoice_settings_form.html
+	- invoices-content
+	- cables_standalone.html
+	- invoice_template_designer.html
+	- job_form.html
+	- security_roles_standalone.html
+	- 
+	- login.html
+	- mobile_scanner.html
+	- case_form.html
+	- equipment_package_detail.html
+	- financial_reports.html
+	- invoice_preview.html
+	- analytics_dashboard.html
+	- devices_standalone.html
+	- equipment_packages_standalone.html
+	- invoices_content.html
+	- jobs.html
+	- navbar.html
+	- scan_select_job.html
+	- transaction_form.html
+	- job_detail.html
+	- security_audit.html
+	- css
+	- customer_detail.html
+	- error.html
+	- invoice_templates_list.html
+	- customer_form.html
+	- monitoring_dashboard.html
+	- transaction_detail.html
+	- error_standalone.html
+	- invoices_list.html
+	- bulk_operations.html
+	- case_detail.html
+	- equipment_package_form.html
 	- profile_settings.html
 	- scan_job.html
-	- base.html
-	- bulk_operations.html
-	- mobile_scanner.html
-	- users_list.html
-	- job_form.html
-	- transaction_form.html
-	- cables_standalone.html
-	- invoice_form.html
-	- invoice_templates_list.html
-	- invoice_template_german.html
 	- signature_form.html
 	- user_detail.html
-	- case_detail.html
-	- case_form.html
-	- customer_form.html
-	- invoice_template_designer.html
-	- invoices-content
-	- js
-	- case_device_mapping.html
-	- equipment_packages_standalone.html
-	- 
-	- error_standalone.html
-	- invoice_detail.html
-	- home.html
-	- transaction_detail.html
-	- analytics_dashboard.html
-	- document_upload_form.html
-	- equipment_package_form.html
-	- search_results.html
-	- documents_list.html
-	- financial_reports.html
-	- navbar.html
-	- company_settings.html
-	- invoices_content.html
-	- scan_select_job.html
+	- error_page.html
 
 [GIN-debug] GET    /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (8 handlers)
 [GIN-debug] HEAD   /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (8 handlers)
@@ -359,126 +359,11 @@
 [GIN-debug] GET    /api/security/permissions/definitions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissionDefinitionsAPI-fm (10 handlers)
 [GIN-debug] GET    /api/security/permissions/check --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CheckPermission-fm (10 handlers)
 [GIN-debug] GET    /error                    --> main.main.func26 (9 handlers)
-2025/07/24 13:16:48 Server starting on 0.0.0.0:8080
-2025/07/24 13:26:37 Route Debug: GET /api/security/roles
-2025/07/24 13:26:37 DEBUG: AuthMiddleware: Request URL: /api/security/roles
-2025/07/24 13:26:37 DEBUG: AuthMiddleware: No session cookie found for /api/security/roles, redirecting to /login
-{"timestamp":"2025-07-24T11:26:37.874387253Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753356397839931479","method":"GET","path":"/api/security/roles","status_code":303,"duration":"34.453174ms","ip":"127.0.0.1","user_agent":"curl/7.88.1","fields":{"bytes_in":0,"bytes_out":33}}
-2025/07/24 16:08:52 Route Debug: GET /
-{"timestamp":"2025-07-24T14:08:52.587705964Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366132422972125","method":"GET","path":"/","status_code":307,"duration":"164.730778ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":42}}
-2025/07/24 16:08:52 Route Debug: GET /login
-{"timestamp":"2025-07-24T14:08:52.637834645Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366132594071384","method":"GET","path":"/login","status_code":200,"duration":"43.75917ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":9726}}
-2025/07/24 16:08:52 Route Debug: GET /static/css/rental-core-design.css
-2025/07/24 16:09:06 POST request to /login with Content-Type: 'application/x-www-form-urlencoded'
-2025/07/24 16:09:06 Form _method parameter: ''
-2025/07/24 16:09:06 Route Debug: POST /login
-DEBUG: Creating session for user admin (ID: 5)
-DEBUG: Login successful, session created: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c
-2025/07/24 16:09:08 SLOW REQUEST: POST /login took 1.168529135s (status: 303)
-{"timestamp":"2025-07-24T14:09:08.13212183Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366146963465203","method":"POST","path":"/login","status_code":303,"duration":"1.168653996s","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":35,"bytes_out":-1}}
-2025/07/24 16:09:08 Route Debug: GET /
-{"timestamp":"2025-07-24T14:09:08.178397898Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366148144852660","method":"GET","path":"/","status_code":307,"duration":"33.542857ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":46}}
-2025/07/24 16:09:08 Route Debug: GET /dashboard
-2025/07/24 16:09:08 DEBUG: AuthMiddleware: Request URL: /dashboard
-2025/07/24 16:09:08 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /dashboard
-2025/07/24 16:09:08 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /dashboard
-{"timestamp":"2025-07-24T14:09:08.404020889Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366148185852660","method":"GET","path":"/dashboard","status_code":200,"duration":"218.164887ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18644}}
-2025/07/24 16:09:15 Route Debug: GET /security/roles
-2025/07/24 16:09:15 DEBUG: AuthMiddleware: Request URL: /security/roles
-2025/07/24 16:09:15 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /security/roles
-2025/07/24 16:09:15 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /security/roles
-{"timestamp":"2025-07-24T14:09:15.583781491Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366155466653782","method":"GET","path":"/security/roles","status_code":200,"duration":"117.125198ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":27631}}
-2025/07/24 16:09:15 Route Debug: GET /static/js/security-roles.js
-2025/07/24 16:09:15 Route Debug: GET /security/api/permissions/definitions
-2025/07/24 16:09:15 DEBUG: AuthMiddleware: Request URL: /security/api/permissions/definitions
-2025/07/24 16:09:15 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /security/api/permissions/definitions
-2025/07/24 16:09:15 Route Debug: GET /api/security/roles
-2025/07/24 16:09:15 DEBUG: AuthMiddleware: Request URL: /api/security/roles
-2025/07/24 16:09:15 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /api/security/roles
-2025/07/24 16:09:15 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /security/api/permissions/definitions
-{"timestamp":"2025-07-24T14:09:15.827804311Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366155726515271","method":"GET","path":"/security/api/permissions/definitions","status_code":200,"duration":"101.286488ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":4565}}
-2025/07/24 16:09:15 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /api/security/roles
-{"timestamp":"2025-07-24T14:09:15.995916638Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366155727574460","method":"GET","path":"/api/security/roles","status_code":200,"duration":"268.330093ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":1936}}
-2025/07/24 16:09:30 Route Debug: GET /invoices
-2025/07/24 16:09:30 DEBUG: AuthMiddleware: Request URL: /invoices
-2025/07/24 16:09:30 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /invoices
-2025/07/24 16:09:31 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /invoices
-2025/07/24 16:09:31 ListInvoices: Error fetching invoices: failed to get invoices: Customer: unsupported relations for schema Invoice; Job: unsupported relations for schema Invoice; Template: unsupported relations for schema Invoice
-2025/07/24 16:09:31 ERROR REQUEST: GET /invoices returned 500 in 152.390384ms
-{"timestamp":"2025-07-24T14:09:31.150729099Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366170998219357","method":"GET","path":"/invoices","status_code":500,"duration":"152.506922ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":47550}}
-2025/07/24 16:09:31 Route Debug: GET /api/security/audit
-2025/07/24 16:09:31 Route Debug: GET /api/v1/security/auth/users
-2025/07/24 16:09:31 DEBUG: AuthMiddleware: Request URL: /api/v1/security/auth/users
-2025/07/24 16:09:31 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /api/v1/security/auth/users
-2025/07/24 16:09:31 DEBUG: AuthMiddleware: Request URL: /api/security/audit
-2025/07/24 16:09:31 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /api/security/audit
-2025/07/24 16:09:31 Route Debug: GET /api/security/audit
-2025/07/24 16:09:31 DEBUG: AuthMiddleware: Request URL: /api/security/audit
-2025/07/24 16:09:31 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /api/security/audit
-2025/07/24 16:09:31 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /api/v1/security/auth/users
-2025/07/24 16:09:31 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /api/security/audit
-{"timestamp":"2025-07-24T14:09:31.457501225Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366171339236065","method":"GET","path":"/api/v1/security/auth/users","status_code":200,"duration":"118.261809ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":520}}
-{"timestamp":"2025-07-24T14:09:31.491415713Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366171339194487","method":"GET","path":"/api/security/audit","status_code":200,"duration":"152.217195ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":78}}
-2025/07/24 16:09:31 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /api/security/audit
-{"timestamp":"2025-07-24T14:09:31.575705171Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366171339191377","method":"GET","path":"/api/security/audit","status_code":200,"duration":"236.510003ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":79}}
-2025/07/24 16:09:33 Route Debug: GET /invoices
-2025/07/24 16:09:33 DEBUG: AuthMiddleware: Request URL: /invoices
-2025/07/24 16:09:33 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /invoices
-2025/07/24 16:09:34 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /invoices
-2025/07/24 16:09:34 ListInvoices: Error fetching invoices: failed to get invoices: Customer: unsupported relations for schema Invoice; Job: unsupported relations for schema Invoice; Template: unsupported relations for schema Invoice
-2025/07/24 16:09:34 ERROR REQUEST: GET /invoices returned 500 in 146.518173ms
-{"timestamp":"2025-07-24T14:09:34.108196705Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366173961589325","method":"GET","path":"/invoices","status_code":500,"duration":"146.605129ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":47550}}
-2025/07/24 16:09:34 Route Debug: GET /api/security/audit
-2025/07/24 16:09:34 DEBUG: AuthMiddleware: Request URL: /api/security/audit
-2025/07/24 16:09:34 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /api/security/audit
-2025/07/24 16:09:34 Route Debug: GET /api/security/audit
-2025/07/24 16:09:34 DEBUG: AuthMiddleware: Request URL: /api/security/audit
-2025/07/24 16:09:34 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /api/security/audit
-2025/07/24 16:09:34 Route Debug: GET /api/v1/security/auth/users
-2025/07/24 16:09:34 DEBUG: AuthMiddleware: Request URL: /api/v1/security/auth/users
-2025/07/24 16:09:34 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /api/v1/security/auth/users
-2025/07/24 16:09:34 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /api/security/audit
-2025/07/24 16:09:34 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /api/v1/security/auth/users
-2025/07/24 16:09:34 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /api/security/audit
-{"timestamp":"2025-07-24T14:09:34.388649093Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366174270541355","method":"GET","path":"/api/v1/security/auth/users","status_code":200,"duration":"118.103716ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":520}}
-{"timestamp":"2025-07-24T14:09:34.422627487Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366174270505221","method":"GET","path":"/api/security/audit","status_code":200,"duration":"152.119074ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":78}}
-{"timestamp":"2025-07-24T14:09:34.456253758Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366174270507842","method":"GET","path":"/api/security/audit","status_code":200,"duration":"185.743244ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":79}}
-2025/07/24 16:09:35 Route Debug: GET /analytics
-2025/07/24 16:09:35 DEBUG: AuthMiddleware: Request URL: /analytics
-2025/07/24 16:09:35 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /analytics
-2025/07/24 16:09:35 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /analytics
-2025/07/24 16:09:36 SLOW REQUEST: GET /analytics took 628.713141ms (status: 200)
-{"timestamp":"2025-07-24T14:09:36.083686657Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366175454886701","method":"GET","path":"/analytics","status_code":200,"duration":"628.796705ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":78109}}
-2025/07/24 16:09:39 Route Debug: GET /
-{"timestamp":"2025-07-24T14:09:39.267062198Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366179232171465","method":"GET","path":"/","status_code":307,"duration":"34.888532ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":46}}
-2025/07/24 16:09:39 Route Debug: GET /dashboard
-2025/07/24 16:09:39 DEBUG: AuthMiddleware: Request URL: /dashboard
-2025/07/24 16:09:39 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /dashboard
-2025/07/24 16:09:39 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /dashboard
-{"timestamp":"2025-07-24T14:09:39.501182133Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366179275644527","method":"GET","path":"/dashboard","status_code":200,"duration":"225.534806ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18644}}
-2025/07/24 16:18:04 Route Debug: GET /dashboard
-2025/07/24 16:18:04 DEBUG: AuthMiddleware: Request URL: /dashboard
-2025/07/24 16:18:04 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /dashboard
-2025/07/24 16:18:04 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /dashboard
-{"timestamp":"2025-07-24T14:18:04.713217992Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366684499853016","method":"GET","path":"/dashboard","status_code":200,"duration":"213.362295ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18644}}
-2025/07/24 16:18:05 Route Debug: GET /dashboard
-2025/07/24 16:18:05 DEBUG: AuthMiddleware: Request URL: /dashboard
-2025/07/24 16:18:05 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /dashboard
-2025/07/24 16:18:05 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /dashboard
-{"timestamp":"2025-07-24T14:18:05.930872Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753366685712138998","method":"GET","path":"/dashboard","status_code":200,"duration":"218.72931ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18644}}
-2025/07/24 16:26:35 Route Debug: GET /dashboard
-2025/07/24 16:26:35 DEBUG: AuthMiddleware: Request URL: /dashboard
-2025/07/24 16:26:35 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /dashboard
-2025/07/24 16:26:36 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /dashboard
-{"timestamp":"2025-07-24T14:26:36.296324505Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753367195975778615","method":"GET","path":"/dashboard","status_code":200,"duration":"320.541078ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18644}}
-2025/07/24 16:26:37 Route Debug: GET /dashboard
-2025/07/24 16:26:37 DEBUG: AuthMiddleware: Request URL: /dashboard
-2025/07/24 16:26:37 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /dashboard
-2025/07/24 16:26:37 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /dashboard
-{"timestamp":"2025-07-24T14:26:37.457305572Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753367197237103738","method":"GET","path":"/dashboard","status_code":200,"duration":"220.199573ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18644}}
-2025/07/24 16:26:51 Route Debug: GET /dashboard
-2025/07/24 16:26:51 DEBUG: AuthMiddleware: Request URL: /dashboard
-2025/07/24 16:26:51 DEBUG: AuthMiddleware: Found session cookie: 17f0772ea96372aee9cce2ca0a57e793c77ab3855ae9c6a88c5d865d4765e75c for /dashboard
-2025/07/24 16:26:51 DEBUG: AuthMiddleware: Session valid for user: admin (ID: 5) for URL: /dashboard
-{"timestamp":"2025-07-24T14:26:51.559445151Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753367211343149198","method":"GET","path":"/dashboard","status_code":200,"duration":"216.292082ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18644}}
-signal: terminated
+2025/07/25 14:27:02 Server starting on 0.0.0.0:8080
+2025/07/25 14:27:08 Route Debug: GET /
+{"timestamp":"2025-07-25T12:27:08.351696741Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753446428317933408","method":"GET","path":"/","status_code":307,"duration":"33.758593ms","ip":"127.0.0.1","user_agent":"curl/7.88.1","fields":{"bytes_in":0,"bytes_out":42}}
+2025/07/25 14:27:13 POST request to /api/v1/jobs/1002/assign-case with Content-Type: 'application/json'
+2025/07/25 14:27:13 Route Debug: POST /api/v1/jobs/1002/assign-case
+2025/07/25 14:27:13 DEBUG: AuthMiddleware: Request URL: /api/v1/jobs/1002/assign-case
+2025/07/25 14:27:13 DEBUG: AuthMiddleware: No session cookie found for /api/v1/jobs/1002/assign-case, redirecting to /login
+{"timestamp":"2025-07-25T12:27:13.304062644Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"development","request_id":"1753446433269430936","method":"POST","path":"/api/v1/jobs/1002/assign-case","status_code":303,"duration":"34.628868ms","ip":"127.0.0.1","user_agent":"curl/7.88.1","fields":{"bytes_in":30,"bytes_out":-1}}

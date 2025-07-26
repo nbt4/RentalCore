@@ -244,7 +244,7 @@
                         </div>
                         ${jobData.startDate ? '<div class="rc-form-group"><label class="rc-label">Start Date</label><div><i class="bi bi-calendar"></i> ' + new Date(jobData.startDate).toLocaleDateString() + '</div></div>' : ''}
                         ${jobData.endDate ? '<div class="rc-form-group"><label class="rc-label">End Date</label><div><i class="bi bi-calendar"></i> ' + new Date(jobData.endDate).toLocaleDateString() + '</div></div>' : ''}
-                        ${jobData.discount > 0 ? '<div class="rc-form-group"><label class="rc-label">Discount</label><div>' + jobData.discount + ' ' + (jobData.discount_type === 'percentage' ? '%' : '€') + '</div></div>' : ''}
+                        ${jobData.discount > 0 ? '<div class="rc-form-group"><label class="rc-label">Discount</label><div>' + jobData.discount + ' ' + (jobData.discount_type === 'percent' ? '%' : '€') + '</div></div>' : ''}
                         ${jobData.finalRevenue ? '<div class="rc-form-group"><label class="rc-label">Final Revenue</label><div class="rc-text-lg">€' + jobData.finalRevenue.toFixed(2) + '</div></div>' : ''}
                     </div>
                     <div class="rc-flex rc-flex-end rc-mt-lg">
@@ -346,7 +346,7 @@
                             <label class="rc-label">Discount Type</label>
                             <select class="rc-select" name="discount_type">
                                 <option value="amount" ${job.discount_type === 'amount' ? 'selected' : ''}>Amount (€)</option>
-                                <option value="percentage" ${job.discount_type === 'percentage' ? 'selected' : ''}>Percentage (%)</option>
+                                <option value="percent" ${job.discount_type === 'percent' ? 'selected' : ''}>Percentage (%)</option>
                             </select>
                         </div>
                         <div class="rc-form-group rc-grid-span-2">

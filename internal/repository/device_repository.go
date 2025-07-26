@@ -17,6 +17,11 @@ func NewDeviceRepository(db *Database) *DeviceRepository {
 	return &DeviceRepository{db: db}
 }
 
+// GetDB returns the underlying database connection for advanced queries
+func (r *DeviceRepository) GetDB() *Database {
+	return r.db
+}
+
 func (r *DeviceRepository) Create(device *models.Device) error {
 	log.Printf("🚨 DEVICE CREATION: Creating device %s with productID %v", device.DeviceID, device.ProductID)
 	log.Printf("🚨 DEVICE CREATION: Stack trace: %s", string(debug.Stack()))
@@ -212,10 +217,16 @@ func (r *DeviceRepository) GetByProductID(productID uint) ([]models.Device, erro
 func (r *DeviceRepository) GetAvailableDevices() ([]models.Device, error) {
 	var devices []models.Device
 	
-	// Get devices that are available and not currently assigned to any job
+	// Get devices that are available and not currently assigned to any active job (considering dates)
+	currentDate := time.Now().Format("2006-01-02")
 	err := r.db.Where(`status = 'free' AND deviceID NOT IN (
-		SELECT DISTINCT deviceID FROM jobdevices
-	)`).Find(&devices).Error
+		SELECT DISTINCT jd.deviceID 
+		FROM jobdevices jd
+		JOIN jobs j ON jd.jobID = j.jobID 
+		WHERE j.startDate <= ? AND j.endDate >= ? AND j.statusID IN (
+			SELECT statusID FROM status WHERE status IN ('open', 'in_progress')
+		)
+	)`, currentDate, currentDate).Find(&devices).Error
 	
 	return devices, err
 }
@@ -562,4 +573,54 @@ func (r *DeviceRepository) GetTotalCount() (int, error) {
 	var count int64
 	err := r.db.Model(&models.Device{}).Count(&count).Error
 	return int(count), err
+}
+
+// GetAvailableDevicesForJob returns devices available for a specific job's date range
+func (r *DeviceRepository) GetAvailableDevicesForJob(jobID uint, startDate, endDate *time.Time) ([]models.Device, error) {
+	var devices []models.Device
+	
+	// If no dates provided, use the basic availability check
+	if startDate == nil || endDate == nil {
+		return r.GetAvailableDevices()
+	}
+	
+	// Get devices that are not assigned to overlapping jobs
+	err := r.db.Where(`status = 'free' AND deviceID NOT IN (
+		SELECT DISTINCT jd.deviceID 
+		FROM jobdevices jd
+		JOIN jobs j ON jd.jobID = j.jobID 
+		WHERE j.jobID != ? 
+			AND j.startDate <= ? 
+			AND j.endDate >= ? 
+			AND j.statusID IN (
+				SELECT statusID FROM status WHERE status IN ('open', 'in_progress')
+			)
+	)`, jobID, endDate, startDate).Find(&devices).Error
+	
+	return devices, err
+}
+
+// IsDeviceCurrentlyAssigned checks if a device is currently assigned to an active job
+// considering job dates and status. Returns true if the device should show as "assigned"
+func (r *DeviceRepository) IsDeviceCurrentlyAssigned(deviceID string) (bool, *uint, error) {
+	currentDate := time.Now().Format("2006-01-02")
+	
+	var assignment models.JobDevice
+	err := r.db.Joins("JOIN jobs ON jobdevices.jobID = jobs.jobID").
+		Where(`jobdevices.deviceID = ? 
+			AND jobs.startDate <= ? 
+			AND jobs.endDate >= ? 
+			AND jobs.statusID IN (
+				SELECT statusID FROM status WHERE status IN ('open', 'in_progress')
+			)`, deviceID, currentDate, currentDate).
+		First(&assignment).Error
+	
+	if err != nil {
+		if err.Error() == "record not found" {
+			return false, nil, nil // Not assigned
+		}
+		return false, nil, err // Database error
+	}
+	
+	return true, &assignment.JobID, nil
 }

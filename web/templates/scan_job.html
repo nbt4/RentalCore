@@ -1544,13 +1544,20 @@
         async function scanCase(caseId, caseName, deviceCount) {
             updateStatus('Scanning case: ' + caseName + '...', 'info');
             
+            // Check if bulk mode is disabled - if so, show individual pricing for each device
+            if (!isBulkMode) {
+                await scanCaseWithCustomPricing(caseId, caseName, deviceCount);
+                return;
+            }
+            
+            // Bulk mode enabled - assign all devices directly with default pricing
             try {
                 const response = await fetch('/api/v1/jobs/{{.job.JobID}}/assign-case', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        job_id: {{.job.JobID}},
-                        case_id: caseId
+                        job_id: parseInt({{.job.JobID}}),
+                        case_id: parseInt(caseId)
                     })
                 });
                 
@@ -1582,6 +1589,172 @@
                 updateStatus('Network error during case scan', 'error');
                 addScanResult('CASE:' + caseId, 'error', 'Network error');
             }
+        }
+
+        async function scanCaseWithCustomPricing(caseId, caseName, deviceCount) {
+            updateStatus('Getting devices in case for custom pricing...', 'info');
+            
+            try {
+                // First, get the list of devices in this case
+                const response = await fetch(`/api/v1/cases/${caseId}/devices`);
+                if (!response.ok) {
+                    updateStatus('Failed to get case devices', 'error');
+                    addScanResult('CASE:' + caseId, 'error', 'Failed to get case devices');
+                    return;
+                }
+                
+                const deviceData = await response.json();
+                const devices = deviceData.devices || [];
+                
+                if (devices.length === 0) {
+                    updateStatus('Case is empty', 'warning');
+                    addScanResult('CASE:' + caseId, 'error', 'Case is empty');
+                    return;
+                }
+                
+                updateStatus(`Assigning ${devices.length} devices with custom pricing...`, 'info');
+                
+                // Process each device individually with custom pricing
+                let successCount = 0;
+                let errorCount = 0;
+                
+                for (let i = 0; i < devices.length; i++) {
+                    const deviceCase = devices[i];
+                    const device = deviceCase.device;
+                    
+                    if (!device) {
+                        errorCount++;
+                        addScanResult(deviceCase.deviceID, 'error', 'Device information not found');
+                        continue;
+                    }
+                    
+                    try {
+                        // Show pricing modal for this device
+                        const customPrice = await showDevicePricingModal(device, i + 1, devices.length, caseName);
+                        
+                        // Skip device if user cancelled
+                        if (customPrice === 'CANCEL') {
+                            addScanResult(device.deviceID, 'warning', 'Skipped by user');
+                            continue;
+                        }
+                        
+                        // Assign device with custom price
+                        const assignResponse = await fetch('/api/v1/jobs/{{.job.JobID}}/assign-device', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                job_id: parseInt({{.job.JobID}}),
+                                device_id: device.deviceID,
+                                price: customPrice !== null ? customPrice : null
+                            })
+                        });
+                        
+                        if (assignResponse.ok) {
+                            successCount++;
+                            addScanResult(device.deviceID, 'success', 
+                                customPrice !== null ? `Assigned with custom price €${customPrice.toFixed(2)}` : 'Assigned with default price');
+                        } else {
+                            const error = await assignResponse.json();
+                            errorCount++;
+                            addScanResult(device.deviceID, 'error', error.error || 'Assignment failed');
+                        }
+                    } catch (error) {
+                        errorCount++;
+                        addScanResult(device.deviceID, 'error', 'Failed to assign device');
+                    }
+                    
+                    // Update progress
+                    updateStatus(`Processing device ${i + 1}/${devices.length} from case ${caseName}...`, 'info');
+                }
+                
+                // Final status
+                updateStatus(`Case scan complete: ${successCount} devices assigned` + 
+                    (errorCount > 0 ? `, ${errorCount} errors` : ''), 'success');
+                addScanResult('CASE:' + caseId, 'success', 
+                    `${caseName}: ${successCount} devices assigned with custom pricing` + 
+                    (errorCount > 0 ? `, ${errorCount} errors` : ''));
+                
+            } catch (error) {
+                console.error('Error in case custom pricing:', error);
+                updateStatus('Error processing case with custom pricing', 'error');
+                addScanResult('CASE:' + caseId, 'error', 'Error processing case');
+            }
+        }
+
+        function showDevicePricingModal(device, deviceIndex, totalDevices, caseName) {
+            return new Promise((resolve) => {
+                // Update modal content for case device
+                document.getElementById('modal-device-id').textContent = device.deviceID;
+                document.getElementById('modal-device-name').textContent = 
+                    device.product ? device.product.name : 'Unknown Product';
+                document.getElementById('customPrice').value = '';
+                
+                // Update modal title to show progress
+                const modalTitle = document.querySelector('#priceModal .rc-modal-title');
+                modalTitle.textContent = `Set Price for Device ${deviceIndex}/${totalDevices} from ${caseName}`;
+                
+                if (device.product && device.product.itemcostperday) {
+                    document.getElementById('default-price-info').textContent = 
+                        `Default price: €${device.product.itemcostperday.toFixed(2)} per day`;
+                } else {
+                    document.getElementById('default-price-info').textContent = 'No default price set';
+                }
+                
+                const modal = document.getElementById('priceModal');
+                modal.style.display = 'flex';
+                
+                // Focus the price input
+                setTimeout(() => {
+                    document.getElementById('customPrice').focus();
+                }, 100);
+                
+                // Set up one-time event listeners for this modal instance
+                const confirmBtn = document.getElementById('confirm-assign');
+                const closeButtons = modal.querySelectorAll('.rc-modal-close');
+                
+                function handleConfirm() {
+                    const customPriceValue = document.getElementById('customPrice').value;
+                    const price = customPriceValue && customPriceValue.trim() !== '' ? parseFloat(customPriceValue) : null;
+                    
+                    modal.style.display = 'none';
+                    cleanup();
+                    resolve(price);
+                }
+                
+                function handleCancel() {
+                    modal.style.display = 'none';
+                    cleanup();
+                    resolve('CANCEL'); // Return special cancel token
+                }
+                
+                function cleanup() {
+                    confirmBtn.removeEventListener('click', handleConfirm);
+                    closeButtons.forEach(btn => btn.removeEventListener('click', handleCancel));
+                    document.removeEventListener('keydown', handleKeydown);
+                }
+                
+                function handleKeydown(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        handleConfirm();
+                    } else if (e.key === 'Escape') {
+                        e.preventDefault();
+                        handleCancel();
+                    }
+                }
+                
+                // Add event listeners
+                confirmBtn.addEventListener('click', handleConfirm);
+                closeButtons.forEach(btn => btn.addEventListener('click', handleCancel));
+                document.addEventListener('keydown', handleKeydown);
+                
+                // Modal click outside to close
+                modal.onclick = function(e) {
+                    if (e.target === modal) {
+                        handleCancel();
+                    }
+                };
+            });
         }
 
         function toggleAllCases() {

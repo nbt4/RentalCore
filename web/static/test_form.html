@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Customer Form Test</title>
+</head>
+<body>
+    <h1>Customer Creation Test</h1>
+    <form method="POST" action="/customers" id="testForm">
+        <label>Company Name:</label>
+        <input type="text" name="company_name" value="Test Company"><br><br>
+        
+        <label>First Name:</label>
+        <input type="text" name="first_name" value="John"><br><br>
+        
+        <label>Last Name:</label>
+        <input type="text" name="last_name" value="Doe"><br><br>
+        
+        <label>Email:</label>
+        <input type="email" name="email" value="john.doe@test.com"><br><br>
+        
+        <button type="submit">Create Customer</button>
+    </form>
+    
+    <script>
+        document.getElementById('testForm').addEventListener('submit', function(e) {
+            console.log('Form submission intercepted!');
+            console.log('Form data:', new FormData(this));
+            // Don't prevent default - let it submit normally
+        });
+    </script>
+</body>
+</html>

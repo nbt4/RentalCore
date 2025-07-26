@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -388,7 +389,7 @@ type Cable struct {
 	Connector2 int             `json:"connector2" gorm:"not null;column:connector2"`
 	Type       int             `json:"typ" gorm:"not null;column:typ"`
 	Length     float64         `json:"length" gorm:"not null;column:length"`
-	MM2        float64         `json:"mm2" gorm:"not null;column:mm2"`
+	MM2        *float64        `json:"mm2" gorm:"column:mm2"`
 	Name       *string         `json:"name" gorm:"column:name"`
 	
 	// Relationships
@@ -399,6 +400,22 @@ type Cable struct {
 
 func (Cable) TableName() string {
 	return "cables"
+}
+
+// GetMM2Display returns the formatted MM2 value or "-" if nil
+func (c Cable) GetMM2Display() string {
+	if c.MM2 == nil {
+		return "-"
+	}
+	return fmt.Sprintf("%.2f mm²", *c.MM2)
+}
+
+// GetMM2Value returns the MM2 value or empty string if nil
+func (c Cable) GetMM2Value() string {
+	if c.MM2 == nil {
+		return ""
+	}
+	return fmt.Sprintf("%.2f", *c.MM2)
 }
 
 type CableConnector struct {
@@ -419,4 +436,31 @@ type CableType struct {
 
 func (CableType) TableName() string {
 	return "cable_types"
+}
+
+// CableGroup represents grouped cables with same specifications
+type CableGroup struct {
+	Type       int             `json:"typ"`
+	Connector1 int             `json:"connector1"`
+	Connector2 int             `json:"connector2"`
+	Length     float64         `json:"length"`
+	MM2        *float64        `json:"mm2"`
+	Name       *string         `json:"name"`
+	Count      int             `json:"count"`
+	
+	// Relationships
+	Connector1Info *CableConnector `json:"connector1_info,omitempty"`
+	Connector2Info *CableConnector `json:"connector2_info,omitempty"`
+	TypeInfo       *CableType      `json:"type_info,omitempty"`
+	
+	// Sample cable IDs from this group
+	CableIDs       []int           `json:"cable_ids,omitempty"`
+}
+
+// GetMM2Display returns the formatted MM2 value or "-" if nil
+func (cg CableGroup) GetMM2Display() string {
+	if cg.MM2 == nil {
+		return "-"
+	}
+	return fmt.Sprintf("%.2f mm²", *cg.MM2)
 }

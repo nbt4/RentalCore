@@ -619,6 +619,7 @@ func setupRoutes(r *gin.Engine,
 			analytics.GET("", analyticsHandler.Dashboard)
 			analytics.GET("/revenue", analyticsHandler.GetRevenueAPI)
 			analytics.GET("/equipment", analyticsHandler.GetEquipmentAPI)
+			analytics.GET("/devices/all", analyticsHandler.GetAllDeviceRevenuesAPI)
 			analytics.GET("/export", analyticsHandler.ExportAnalytics)
 		}
 
@@ -920,6 +921,7 @@ func setupRoutes(r *gin.Engine,
 				apiDevices.PUT("/:id", deviceHandler.UpdateDeviceAPI)
 				apiDevices.DELETE("/:id", deviceHandler.DeleteDeviceAPI)
 				apiDevices.GET("/available", deviceHandler.GetAvailableDevicesAPI)
+				apiDevices.GET("/available/job/:jobId", deviceHandler.GetAvailableDevicesForJobAPI)
 			}
 
 			// Product API
@@ -931,6 +933,10 @@ func setupRoutes(r *gin.Engine,
 				apiProducts.PUT("/:id", productHandler.UpdateProductAPI)
 				apiProducts.DELETE("/:id", productHandler.DeleteProductAPI)
 				apiProducts.GET("/categories", productHandler.GetCategoriesAPI)
+				apiProducts.GET("/subcategories", productHandler.GetSubcategoriesAPI)
+				apiProducts.GET("/subbiercategories", productHandler.GetSubbiercategoriesAPI)
+				apiProducts.GET("/brands", productHandler.GetBrandsAPI)
+				apiProducts.GET("/manufacturers", productHandler.GetManufacturersAPI)
 			}
 
 			// Cable API

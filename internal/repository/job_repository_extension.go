@@ -5,25 +5,25 @@ import (
 	"go-barcode-webapp/internal/models"
 )
 
-// FreeDevicesFromCompletedJobs removes device assignments from jobs with "paid" status
-// and sets the device status back to "free"
+// FreeDevicesFromCompletedJobs removes device assignments from jobs with "cancelled" status
+// and sets the device status back to "free". Paid jobs should retain their device assignments for records.
 func (r *JobRepository) FreeDevicesFromCompletedJobs() error {
-	// Find all jobs with "paid" status
-	var paidJobs []models.Job
+	// Find all jobs with "cancelled" status (NOT "paid" - paid jobs should keep device assignments)
+	var cancelledJobs []models.Job
 	err := r.db.Joins("JOIN status ON jobs.statusID = status.statusID").
-		Where("status.status = ?", "paid").
-		Find(&paidJobs).Error
+		Where("status.status = ?", "cancelled").
+		Find(&cancelledJobs).Error
 	if err != nil {
-		return fmt.Errorf("failed to find paid jobs: %v", err)
+		return fmt.Errorf("failed to find cancelled jobs: %v", err)
 	}
 
-	if len(paidJobs) == 0 {
-		return nil // No paid jobs found
+	if len(cancelledJobs) == 0 {
+		return nil // No cancelled jobs found
 	}
 
 	// Extract job IDs
 	var jobIDs []uint
-	for _, job := range paidJobs {
+	for _, job := range cancelledJobs {
 		jobIDs = append(jobIDs, job.JobID)
 	}
 
@@ -31,7 +31,7 @@ func (r *JobRepository) FreeDevicesFromCompletedJobs() error {
 	var jobDevices []models.JobDevice
 	err = r.db.Where("jobID IN ?", jobIDs).Find(&jobDevices).Error
 	if err != nil {
-		return fmt.Errorf("failed to find devices in paid jobs: %v", err)
+		return fmt.Errorf("failed to find devices in cancelled jobs: %v", err)
 	}
 
 	// Start transaction
