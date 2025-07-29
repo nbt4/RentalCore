@@ -195,6 +195,20 @@
     border-top: 1px solid var(--surface-3);
 }
 
+.user-actions .rc-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 32px !important;
+    height: 32px !important;
+    padding: 6px !important;
+}
+
+.user-actions .rc-btn i {
+    margin: 0 !important;
+    line-height: 1 !important;
+}
+
 /* Status Badges */
 .status-badge {
     display: inline-flex;
@@ -759,6 +773,15 @@
                         <button class="rc-btn rc-btn-sm rc-btn-ghost" onclick="resetPassword({{.UserID}}, '{{.Username}}')" title="Reset Password">
                             <i class="bi bi-key"></i>
                         </button>
+                        {{if .IsActive}}
+                        <button class="rc-btn rc-btn-sm rc-btn-ghost" onclick="toggleUserStatus({{.UserID}}, '{{.Username}}', true)" title="Block User">
+                            <i class="bi bi-person-x"></i>
+                        </button>
+                        {{else}}
+                        <button class="rc-btn rc-btn-sm rc-btn-ghost" onclick="toggleUserStatus({{.UserID}}, '{{.Username}}', false)" title="Activate User">
+                            <i class="bi bi-person-check"></i>
+                        </button>
+                        {{end}}
                         <button class="rc-btn rc-btn-sm rc-btn-ghost" onclick="deleteUser({{.UserID}}, '{{.Username}}')" title="Delete User">
                             <i class="bi bi-trash"></i>
                         </button>
@@ -1089,27 +1112,69 @@ function deleteUser(userId, username) {
 }
 
 function resetPassword(userId, username) {
+    // Prompt for new password
+    const password = prompt(`Enter new password for "${username}" (minimum 6 characters):`);
+    if (!password) return;
+    
+    if (password.length < 6) {
+        alert('Password must be at least 6 characters long');
+        return;
+    }
+    
     showModal(
         'Reset Password',
-        `Reset password for user "${username}"? They will receive an email with a new temporary password.`,
+        `Set new password for user "${username}"?`,
         () => {
-            fetch(`/user-management/${userId}/reset-password`, {
-                method: 'POST',
+            fetch(`/security/api/admin/users/${userId}/password`, {
+                method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                }
+                },
+                body: JSON.stringify({ password: password })
             })
             .then(response => response.json())
             .then(data => {
                 if (data.error) {
                     alert('Error: ' + data.error);
                 } else {
-                    showSuccessNotification('Password reset email sent successfully');
+                    showSuccessNotification('Password updated successfully');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('An error occurred while resetting the password');
+                alert('An error occurred while updating the password');
+            });
+        }
+    );
+}
+
+function toggleUserStatus(userId, username, currentStatus) {
+    const newStatus = !currentStatus;
+    const action = newStatus ? 'activate' : 'block';
+    
+    showModal(
+        `${action.charAt(0).toUpperCase() + action.slice(1)} User`,
+        `Are you sure you want to ${action} user "${username}"?`,
+        () => {
+            fetch(`/security/api/admin/users/${userId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ isActive: newStatus })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                } else {
+                    showSuccessNotification(`User ${action}d successfully`);
+                    setTimeout(() => location.reload(), 1000);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert(`An error occurred while ${action}ing the user`);
             });
         }
     );

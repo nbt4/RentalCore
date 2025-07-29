@@ -1,16 +1,17 @@
 module go-barcode-webapp
 
-go 1.21
+go 1.23.0
 
-toolchain go1.21.5
+toolchain go1.23.11
 
 require (
 	github.com/boombuler/barcode v1.0.1
 	github.com/gin-gonic/gin v1.9.1
 	github.com/jung-kurt/gofpdf v1.16.2
+	github.com/pquerna/otp v1.5.0
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/spf13/cobra v1.9.1
-	golang.org/x/crypto v0.9.0
+	golang.org/x/crypto v0.40.0
 	golang.org/x/image v0.0.0-20190910094157-69e4b8554b2a
 	gorm.io/driver/mysql v1.5.1
 	gorm.io/gorm v1.25.4
@@ -39,12 +40,13 @@ require (
 	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/rogpeppe/go-internal v1.8.0 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
+	github.com/stretchr/testify v1.10.0 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
 	golang.org/x/arch v0.3.0 // indirect
-	golang.org/x/net v0.10.0 // indirect
-	golang.org/x/sys v0.8.0 // indirect
-	golang.org/x/text v0.9.0 // indirect
+	golang.org/x/net v0.41.0 // indirect
+	golang.org/x/sys v0.34.0 // indirect
+	golang.org/x/text v0.27.0 // indirect
 	google.golang.org/protobuf v1.30.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

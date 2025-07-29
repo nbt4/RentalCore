@@ -1,0 +1,1002 @@
+2025/07/28 14:31:49 Database connection established successfully
+2025/07/28 14:31:49 GoBD compliance table migration disabled
+2025/07/28 14:31:49 Database auto-migration disabled - using manual schema management
+2025/07/28 14:31:49 Templates already exist (1), skipping default template creation
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] Loaded HTML Templates (63): 
+	- scan_select_job.html
+	- signature_form.html
+	- transaction_form.html
+	- 
+	- case_form.html
+	- login.html
+	- security_audit.html
+	- customer_detail.html
+	- devices_standalone.html
+	- css
+	- equipment_packages_standalone.html
+	- transaction_detail.html
+	- bulk_operations.html
+	- customers.html
+	- invoice_form.html
+	- invoice_settings_form.html
+	- security_roles_standalone.html
+	- financial_dashboard.html
+	- home.html
+	- invoices_list.html
+	- user_form.html
+	- users_list.html
+	- products_standalone.html
+	- js
+	- case_detail.html
+	- document_upload_form.html
+	- invoice_detail.html
+	- invoice_template_designer_basic.html
+	- navbar.html
+	- cables_standalone.html
+	- cases_list.html
+	- financial_reports.html
+	- transactions_list.html
+	- job_detail.html
+	- monitoring_dashboard.html
+	- scan_job.html
+	- analytics_dashboard.html
+	- equipment_package_detail.html
+	- invoice_preview.html
+	- invoice_template_german.html
+	- invoices-content
+	- mobile_scanner.html
+	- user_detail.html
+	- customer_form.html
+	- device_detail.html
+	- invoice_templates_list.html
+	- invoices_content.html
+	- job_form.html
+	- jobs.html
+	- error_standalone.html
+	- profile_settings_standalone.html
+	- base.html
+	- content
+	- case_device_mapping.html
+	- documents_list.html
+	- error.html
+	- cable_form.html
+	- device_form.html
+	- search_results.html
+	- company_settings.html
+	- equipment_package_form.html
+	- error_page.html
+	- invoice_template_designer.html
+
+[GIN-debug] GET    /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (8 handlers)
+[GIN-debug] HEAD   /static/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (8 handlers)
+[GIN-debug] GET    /uploads/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (8 handlers)
+[GIN-debug] HEAD   /uploads/*filepath        --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (8 handlers)
+[GIN-debug] GET    /sw.js                    --> main.main.func27 (9 handlers)
+[GIN-debug] GET    /manifest.json            --> main.main.func28 (9 handlers)
+[GIN-debug] GET    /favicon.ico              --> main.main.func29 (9 handlers)
+[GIN-debug] GET    /                         --> main.setupRoutes.func1 (9 handlers)
+[GIN-debug] GET    /login                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).LoginForm-fm (9 handlers)
+[GIN-debug] POST   /login                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).Login-fm (9 handlers)
+[GIN-debug] GET    /logout                   --> go-barcode-webapp/internal/handlers.(*AuthHandler).Logout-fm (9 handlers)
+[GIN-debug] POST   /auth/passkey/start-authentication --> go-barcode-webapp/internal/handlers.(*WebAuthnHandler).StartPasskeyAuthentication-fm (9 handlers)
+[GIN-debug] POST   /auth/passkey/complete-authentication --> go-barcode-webapp/internal/handlers.(*WebAuthnHandler).CompletePasskeyAuthentication-fm (9 handlers)
+[GIN-debug] GET    /debug/invoice-test       --> main.setupRoutes.func2 (9 handlers)
+[GIN-debug] GET    /debug/customer-selection --> main.setupRoutes.func3 (9 handlers)
+[GIN-debug] GET    /debug/routes             --> main.setupRoutes.func4 (9 handlers)
+[GIN-debug] GET    /dashboard                --> go-barcode-webapp/internal/handlers.(*HomeHandler).Dashboard-fm (10 handlers)
+[GIN-debug] GET    /jobs                     --> go-barcode-webapp/internal/handlers.(*JobHandler).ListJobs-fm (10 handlers)
+[GIN-debug] GET    /jobs/new                 --> go-barcode-webapp/internal/handlers.(*JobHandler).NewJobForm-fm (10 handlers)
+[GIN-debug] POST   /jobs                     --> go-barcode-webapp/internal/handlers.(*JobHandler).CreateJob-fm (10 handlers)
+[GIN-debug] GET    /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).GetJob-fm (10 handlers)
+[GIN-debug] GET    /jobs/:id/edit            --> go-barcode-webapp/internal/handlers.(*JobHandler).EditJobForm-fm (10 handlers)
+[GIN-debug] PUT    /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).UpdateJob-fm (10 handlers)
+[GIN-debug] POST   /jobs/:id/update          --> go-barcode-webapp/internal/handlers.(*JobHandler).UpdateJob-fm (10 handlers)
+[GIN-debug] DELETE /jobs/:id                 --> go-barcode-webapp/internal/handlers.(*JobHandler).DeleteJob-fm (10 handlers)
+[GIN-debug] GET    /jobs/:id/devices         --> go-barcode-webapp/internal/handlers.(*JobHandler).GetJobDevices-fm (10 handlers)
+[GIN-debug] POST   /jobs/:id/devices         --> go-barcode-webapp/internal/handlers.(*JobHandler).AssignDevice-fm (10 handlers)
+[GIN-debug] DELETE /jobs/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*JobHandler).RemoveDevice-fm (10 handlers)
+[GIN-debug] POST   /jobs/:id/bulk-scan       --> go-barcode-webapp/internal/handlers.(*JobHandler).BulkScanDevices-fm (10 handlers)
+[GIN-debug] GET    /devices                  --> go-barcode-webapp/internal/handlers.(*DeviceHandler).ListDevices-fm (10 handlers)
+[GIN-debug] GET    /devices/new              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).NewDeviceForm-fm (10 handlers)
+[GIN-debug] POST   /devices                  --> go-barcode-webapp/internal/handlers.(*DeviceHandler).CreateDevice-fm (10 handlers)
+[GIN-debug] GET    /devices/:id              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDevice-fm (10 handlers)
+[GIN-debug] GET    /devices/:id/edit         --> go-barcode-webapp/internal/handlers.(*DeviceHandler).EditDeviceForm-fm (10 handlers)
+[GIN-debug] PUT    /devices/:id              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).UpdateDevice-fm (10 handlers)
+[GIN-debug] DELETE /devices/:id              --> go-barcode-webapp/internal/handlers.(*DeviceHandler).DeleteDevice-fm (10 handlers)
+[GIN-debug] GET    /devices/:id/qr           --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceQR-fm (10 handlers)
+[GIN-debug] GET    /devices/:id/barcode      --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceBarcode-fm (10 handlers)
+[GIN-debug] GET    /devices/:id/stats        --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceStatsAPI-fm (10 handlers)
+[GIN-debug] GET    /devices/available        --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetAvailableDevices-fm (10 handlers)
+[GIN-debug] GET    /products                 --> go-barcode-webapp/internal/handlers.(*ProductHandler).ListProductsWeb-fm (10 handlers)
+[GIN-debug] GET    /products/new             --> go-barcode-webapp/internal/handlers.(*ProductHandler).NewProductForm-fm (10 handlers)
+[GIN-debug] GET    /cables                   --> go-barcode-webapp/internal/handlers.(*CableHandler).ListCablesWeb-fm (10 handlers)
+[GIN-debug] GET    /cables/new               --> go-barcode-webapp/internal/handlers.(*CableHandler).NewCableForm-fm (10 handlers)
+[GIN-debug] POST   /cables                   --> go-barcode-webapp/internal/handlers.(*CableHandler).CreateCable-fm (10 handlers)
+[GIN-debug] GET    /customers                --> go-barcode-webapp/internal/handlers.(*CustomerHandler).ListCustomers-fm (10 handlers)
+[GIN-debug] GET    /customers/new            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).NewCustomerForm-fm (10 handlers)
+[GIN-debug] POST   /customers                --> go-barcode-webapp/internal/handlers.(*CustomerHandler).CreateCustomer-fm (10 handlers)
+[GIN-debug] GET    /customers/:id            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).GetCustomer-fm (10 handlers)
+[GIN-debug] GET    /customers/:id/edit       --> go-barcode-webapp/internal/handlers.(*CustomerHandler).EditCustomerForm-fm (10 handlers)
+[GIN-debug] PUT    /customers/:id            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).UpdateCustomer-fm (10 handlers)
+[GIN-debug] DELETE /customers/:id            --> go-barcode-webapp/internal/handlers.(*CustomerHandler).DeleteCustomer-fm (10 handlers)
+[GIN-debug] GET    /statuses                 --> go-barcode-webapp/internal/handlers.(*StatusHandler).ListStatuses-fm (10 handlers)
+[GIN-debug] GET    /cases                    --> go-barcode-webapp/internal/handlers.(*CaseHandler).ListCases-fm (10 handlers)
+[GIN-debug] GET    /cases/new                --> go-barcode-webapp/internal/handlers.(*CaseHandler).NewCaseForm-fm (10 handlers)
+[GIN-debug] POST   /cases                    --> go-barcode-webapp/internal/handlers.(*CaseHandler).CreateCase-fm (10 handlers)
+[GIN-debug] GET    /cases/:id                --> go-barcode-webapp/internal/handlers.(*CaseHandler).GetCase-fm (10 handlers)
+[GIN-debug] GET    /cases/:id/edit           --> go-barcode-webapp/internal/handlers.(*CaseHandler).EditCaseForm-fm (10 handlers)
+[GIN-debug] PUT    /cases/:id                --> go-barcode-webapp/internal/handlers.(*CaseHandler).UpdateCase-fm (10 handlers)
+[GIN-debug] DELETE /cases/:id                --> go-barcode-webapp/internal/handlers.(*CaseHandler).DeleteCase-fm (10 handlers)
+[GIN-debug] GET    /cases/:id/devices        --> go-barcode-webapp/internal/handlers.(*CaseHandler).CaseDeviceMapping-fm (10 handlers)
+[GIN-debug] POST   /cases/:id/devices        --> go-barcode-webapp/internal/handlers.(*CaseHandler).ScanDeviceToCase-fm (10 handlers)
+[GIN-debug] DELETE /cases/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*CaseHandler).RemoveDeviceFromCase-fm (10 handlers)
+[GIN-debug] GET    /barcodes/device/:serialNo/qr --> go-barcode-webapp/internal/handlers.(*BarcodeHandler).GenerateDeviceQR-fm (10 handlers)
+[GIN-debug] GET    /barcodes/device/:serialNo/barcode --> go-barcode-webapp/internal/handlers.(*BarcodeHandler).GenerateDeviceBarcode-fm (10 handlers)
+[GIN-debug] GET    /scan                     --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanJobSelection-fm (10 handlers)
+[GIN-debug] GET    /scan/select              --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanJobSelection-fm (10 handlers)
+[GIN-debug] GET    /scan/:jobId              --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanJob-fm (10 handlers)
+[GIN-debug] POST   /scan/:jobId/assign       --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanDevice-fm (10 handlers)
+[GIN-debug] DELETE /scan/:jobId/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*ScannerHandler).RemoveDevice-fm (10 handlers)
+[GIN-debug] GET    /analytics                --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).Dashboard-fm (10 handlers)
+[GIN-debug] GET    /analytics/revenue        --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).GetRevenueAPI-fm (10 handlers)
+[GIN-debug] GET    /analytics/equipment      --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).GetEquipmentAPI-fm (10 handlers)
+[GIN-debug] GET    /analytics/devices/all    --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).GetAllDeviceRevenuesAPI-fm (10 handlers)
+[GIN-debug] GET    /analytics/export         --> go-barcode-webapp/internal/handlers.(*AnalyticsHandler).ExportAnalytics-fm (10 handlers)
+[GIN-debug] GET    /search/global            --> go-barcode-webapp/internal/handlers.(*SearchHandler).GlobalSearch-fm (10 handlers)
+[GIN-debug] POST   /search/advanced          --> go-barcode-webapp/internal/handlers.(*SearchHandler).AdvancedSearch-fm (10 handlers)
+[GIN-debug] GET    /search/suggestions       --> go-barcode-webapp/internal/handlers.(*SearchHandler).SearchSuggestions-fm (10 handlers)
+[GIN-debug] GET    /search/saved             --> go-barcode-webapp/internal/handlers.(*SearchHandler).SavedSearches-fm (10 handlers)
+[GIN-debug] DELETE /search/saved/:id         --> go-barcode-webapp/internal/handlers.(*SearchHandler).DeleteSavedSearch-fm (10 handlers)
+[GIN-debug] POST   /pwa/subscribe            --> go-barcode-webapp/internal/handlers.(*PWAHandler).SubscribePush-fm (10 handlers)
+[GIN-debug] POST   /pwa/unsubscribe          --> go-barcode-webapp/internal/handlers.(*PWAHandler).UnsubscribePush-fm (10 handlers)
+[GIN-debug] POST   /pwa/sync                 --> go-barcode-webapp/internal/handlers.(*PWAHandler).SyncOfflineData-fm (10 handlers)
+[GIN-debug] GET    /pwa/manifest             --> go-barcode-webapp/internal/handlers.(*PWAHandler).GetOfflineManifest-fm (10 handlers)
+[GIN-debug] GET    /pwa/install              --> go-barcode-webapp/internal/handlers.(*PWAHandler).InstallPrompt-fm (10 handlers)
+[GIN-debug] GET    /pwa/status               --> go-barcode-webapp/internal/handlers.(*PWAHandler).GetConnectionStatus-fm (10 handlers)
+[GIN-debug] GET    /workflow/packages        --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).ShowPackagesList-fm (10 handlers)
+[GIN-debug] GET    /workflow/packages/new    --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).ShowPackageForm-fm (10 handlers)
+[GIN-debug] GET    /workflow/packages/:id    --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).ShowPackageDetail-fm (10 handlers)
+[GIN-debug] GET    /workflow/packages/:id/edit --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).ShowPackageForm-fm (10 handlers)
+[GIN-debug] POST   /workflow/packages        --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).CreatePackage-fm (10 handlers)
+[GIN-debug] PUT    /workflow/packages/:id    --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).UpdatePackage-fm (10 handlers)
+[GIN-debug] DELETE /workflow/packages/:id    --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).DeletePackage-fm (10 handlers)
+[GIN-debug] GET    /workflow/bulk            --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkOperationsForm-fm (10 handlers)
+[GIN-debug] POST   /workflow/bulk/update-status --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkUpdateDeviceStatus-fm (10 handlers)
+[GIN-debug] POST   /workflow/bulk/assign-job --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkAssignToJob-fm (10 handlers)
+[GIN-debug] POST   /workflow/bulk/generate-qr --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).BulkGenerateQRCodes-fm (10 handlers)
+[GIN-debug] GET    /workflow/stats           --> go-barcode-webapp/internal/handlers.(*WorkflowHandler).GetWorkflowStats-fm (10 handlers)
+[GIN-debug] GET    /documents                --> go-barcode-webapp/internal/handlers.(*DocumentHandler).ListDocuments-fm (10 handlers)
+[GIN-debug] GET    /documents/upload         --> go-barcode-webapp/internal/handlers.(*DocumentHandler).UploadDocumentForm-fm (10 handlers)
+[GIN-debug] POST   /documents/upload         --> go-barcode-webapp/internal/handlers.(*DocumentHandler).UploadDocument-fm (10 handlers)
+[GIN-debug] GET    /documents/:id            --> go-barcode-webapp/internal/handlers.(*DocumentHandler).GetDocument-fm (10 handlers)
+[GIN-debug] GET    /documents/:id/view       --> go-barcode-webapp/internal/handlers.(*DocumentHandler).ViewDocument-fm (10 handlers)
+[GIN-debug] GET    /documents/:id/download   --> go-barcode-webapp/internal/handlers.(*DocumentHandler).DownloadDocument-fm (10 handlers)
+[GIN-debug] DELETE /documents/:id            --> go-barcode-webapp/internal/handlers.(*DocumentHandler).DeleteDocument-fm (10 handlers)
+[GIN-debug] GET    /documents/:id/sign       --> go-barcode-webapp/internal/handlers.(*DocumentHandler).SignatureForm-fm (10 handlers)
+[GIN-debug] POST   /documents/:id/sign       --> go-barcode-webapp/internal/handlers.(*DocumentHandler).AddSignature-fm (10 handlers)
+[GIN-debug] GET    /documents/signatures/:id/verify --> go-barcode-webapp/internal/handlers.(*DocumentHandler).VerifySignature-fm (10 handlers)
+[GIN-debug] GET    /financial                --> go-barcode-webapp/internal/handlers.(*FinancialHandler).FinancialDashboard-fm (10 handlers)
+[GIN-debug] GET    /financial/transactions   --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ListTransactions-fm (10 handlers)
+[GIN-debug] GET    /financial/transactions/new --> go-barcode-webapp/internal/handlers.(*FinancialHandler).NewTransactionForm-fm (10 handlers)
+[GIN-debug] POST   /financial/transactions   --> go-barcode-webapp/internal/handlers.(*FinancialHandler).CreateTransaction-fm (10 handlers)
+[GIN-debug] GET    /financial/transactions/:id --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetTransaction-fm (10 handlers)
+[GIN-debug] PUT    /financial/transactions/:id/status --> go-barcode-webapp/internal/handlers.(*FinancialHandler).UpdateTransactionStatus-fm (10 handlers)
+[GIN-debug] POST   /financial/jobs/:jobId/invoice --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GenerateInvoice-fm (10 handlers)
+[GIN-debug] GET    /financial/reports        --> go-barcode-webapp/internal/handlers.(*FinancialHandler).FinancialReports-fm (10 handlers)
+[GIN-debug] GET    /financial/api/revenue-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetRevenueReport-fm (10 handlers)
+[GIN-debug] GET    /financial/api/payment-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetPaymentReport-fm (10 handlers)
+[GIN-debug] GET    /financial/api/export/transactions --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ExportTransactions-fm (10 handlers)
+[GIN-debug] GET    /financial/api/export/revenue --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ExportRevenue-fm (10 handlers)
+[GIN-debug] GET    /financial/api/export/tax-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ExportTaxReportCSV-fm (10 handlers)
+[GIN-debug] GET    /invoices                 --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).ListInvoices-fm (12 handlers)
+[GIN-debug] GET    /invoices/new             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).NewInvoiceForm-fm (12 handlers)
+[GIN-debug] POST   /invoices                 --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).CreateInvoice-fm (12 handlers)
+[GIN-debug] GET    /invoices/:id             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoice-fm (12 handlers)
+[GIN-debug] GET    /invoices/:id/edit        --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).EditInvoiceForm-fm (12 handlers)
+[GIN-debug] GET    /invoices/:id/preview     --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).PreviewInvoice-fm (12 handlers)
+[GIN-debug] PUT    /invoices/:id             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoice-fm (12 handlers)
+[GIN-debug] PUT    /invoices/:id/status      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoiceStatus-fm (12 handlers)
+[GIN-debug] DELETE /invoices/:id             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).DeleteInvoice-fm (12 handlers)
+[GIN-debug] GET    /invoices/:id/pdf         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GenerateInvoicePDF-fm (12 handlers)
+[GIN-debug] GET    /invoice-templates        --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).ListTemplates-fm (10 handlers)
+[GIN-debug] GET    /invoice-templates/new    --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).NewTemplateForm-fm (10 handlers)
+[GIN-debug] POST   /invoice-templates        --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).CreateTemplate-fm (10 handlers)
+[GIN-debug] GET    /invoice-templates/:id/edit --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).EditTemplateForm-fm (10 handlers)
+[GIN-debug] PUT    /invoice-templates/:id    --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).UpdateTemplate-fm (10 handlers)
+[GIN-debug] DELETE /invoice-templates/:id    --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).DeleteTemplate-fm (10 handlers)
+[GIN-debug] GET    /invoice-templates/:id/preview --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).PreviewTemplate-fm (10 handlers)
+[GIN-debug] POST   /invoice-templates/:id/set-default --> go-barcode-webapp/internal/handlers.(*InvoiceTemplateHandler).SetDefaultTemplate-fm (10 handlers)
+[GIN-debug] GET    /settings/company         --> main.setupRoutes.func5 (10 handlers)
+[GIN-debug] POST   /settings/company         --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UpdateCompanySettingsForm-fm (10 handlers)
+[GIN-debug] GET    /settings/company/api     --> go-barcode-webapp/internal/handlers.(*CompanyHandler).GetCompanySettings-fm (10 handlers)
+[GIN-debug] PUT    /settings/company/api     --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UpdateCompanySettings-fm (10 handlers)
+[GIN-debug] POST   /settings/company/logo    --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UploadCompanyLogo-fm (10 handlers)
+[GIN-debug] DELETE /settings/company/logo    --> go-barcode-webapp/internal/handlers.(*CompanyHandler).DeleteCompanyLogo-fm (10 handlers)
+[GIN-debug] GET    /security/roles           --> main.setupRoutes.func6 (10 handlers)
+[GIN-debug] GET    /security/audit           --> go-barcode-webapp/internal/handlers.(*SecurityHandler).SecurityAuditPage-fm (10 handlers)
+[GIN-debug] GET    /security/api/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRoles-fm (10 handlers)
+[GIN-debug] GET    /security/api/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRole-fm (10 handlers)
+[GIN-debug] POST   /security/api/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CreateRole-fm (10 handlers)
+[GIN-debug] PUT    /security/api/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).UpdateRole-fm (10 handlers)
+[GIN-debug] DELETE /security/api/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).DeleteRole-fm (10 handlers)
+[GIN-debug] GET    /security/api/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetUserRoles-fm (10 handlers)
+[GIN-debug] POST   /security/api/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).AssignUserRole-fm (10 handlers)
+[GIN-debug] DELETE /security/api/users/:userId/roles/:roleId --> go-barcode-webapp/internal/handlers.(*SecurityHandler).RevokeUserRole-fm (10 handlers)
+[GIN-debug] PUT    /security/api/admin/users/:id/password --> go-barcode-webapp/internal/handlers.(*AuthHandler).AdminSetUserPassword-fm (10 handlers)
+[GIN-debug] PUT    /security/api/admin/users/:id/status --> go-barcode-webapp/internal/handlers.(*AuthHandler).AdminBlockUser-fm (10 handlers)
+[GIN-debug] GET    /security/api/audit       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLogs-fm (10 handlers)
+[GIN-debug] GET    /security/api/audit/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLog-fm (10 handlers)
+[GIN-debug] GET    /security/api/audit/export --> go-barcode-webapp/internal/handlers.(*SecurityHandler).ExportAuditLogs-fm (10 handlers)
+[GIN-debug] GET    /security/api/permissions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissions-fm (10 handlers)
+[GIN-debug] GET    /security/api/permissions/definitions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissionDefinitionsAPI-fm (10 handlers)
+[GIN-debug] GET    /security/api/permissions/check --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CheckPermission-fm (10 handlers)
+[GIN-debug] GET    /monitoring               --> main.setupRoutes.func7 (10 handlers)
+[GIN-debug] GET    /monitoring/health        --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetApplicationHealth-fm (10 handlers)
+[GIN-debug] GET    /monitoring/metrics       --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetSystemMetrics-fm (10 handlers)
+[GIN-debug] GET    /monitoring/metrics/prometheus --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).ExportMetrics-fm (10 handlers)
+[GIN-debug] GET    /monitoring/performance   --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetPerformanceMetrics-fm (10 handlers)
+[GIN-debug] GET    /monitoring/errors        --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetErrorDetails-fm (10 handlers)
+[GIN-debug] POST   /monitoring/errors/:fingerprint/resolve --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).ResolveError-fm (10 handlers)
+[GIN-debug] POST   /monitoring/test-error    --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).TriggerTestError-fm (10 handlers)
+[GIN-debug] GET    /monitoring/logs          --> go-barcode-webapp/internal/handlers.(*MonitoringHandler).GetLogStream-fm (10 handlers)
+[GIN-debug] GET    /compliance/status        --> main.setupRoutes.(*ComplianceMiddleware).GetComplianceStatus.func15 (10 handlers)
+[GIN-debug] POST   /compliance/retention/cleanup --> main.setupRoutes.(*ComplianceMiddleware).RetentionCleanupMiddleware.func16 (10 handlers)
+[GIN-debug] POST   /compliance/gdpr/request  --> main.setupRoutes.(*ComplianceMiddleware).GDPRRequestMiddleware.func17 (10 handlers)
+[GIN-debug] GET    /mobile/scanner/:jobId    --> main.setupRoutes.func8 (10 handlers)
+[GIN-debug] GET    /mobile/scanner/:jobId/enhanced --> main.setupRoutes.func9 (10 handlers)
+[GIN-debug] GET    /profile/settings         --> main.setupRoutes.func10 (10 handlers)
+[GIN-debug] POST   /profile/passkeys/start-registration --> go-barcode-webapp/internal/handlers.(*WebAuthnHandler).StartPasskeyRegistration-fm (10 handlers)
+[GIN-debug] POST   /profile/passkeys/complete-registration --> go-barcode-webapp/internal/handlers.(*WebAuthnHandler).CompletePasskeyRegistration-fm (10 handlers)
+[GIN-debug] GET    /profile/passkeys         --> go-barcode-webapp/internal/handlers.(*WebAuthnHandler).ListUserPasskeys-fm (10 handlers)
+[GIN-debug] DELETE /profile/passkeys/:id     --> go-barcode-webapp/internal/handlers.(*WebAuthnHandler).DeletePasskey-fm (10 handlers)
+[GIN-debug] POST   /profile/2fa/setup        --> go-barcode-webapp/internal/handlers.(*WebAuthnHandler).Setup2FA-fm (10 handlers)
+[GIN-debug] POST   /profile/2fa/verify       --> go-barcode-webapp/internal/handlers.(*WebAuthnHandler).Verify2FA-fm (10 handlers)
+[GIN-debug] POST   /profile/2fa/disable      --> go-barcode-webapp/internal/handlers.(*WebAuthnHandler).Disable2FA-fm (10 handlers)
+[GIN-debug] GET    /profile/2fa/status       --> go-barcode-webapp/internal/handlers.(*WebAuthnHandler).Get2FAStatus-fm (10 handlers)
+[GIN-debug] GET    /users                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).ListUsers-fm (10 handlers)
+[GIN-debug] POST   /users                    --> go-barcode-webapp/internal/handlers.(*AuthHandler).CreateUserWeb-fm (10 handlers)
+[GIN-debug] GET    /user-management/new      --> go-barcode-webapp/internal/handlers.(*AuthHandler).NewUserForm-fm (10 handlers)
+[GIN-debug] GET    /user-management/:id/edit --> go-barcode-webapp/internal/handlers.(*AuthHandler).EditUserForm-fm (10 handlers)
+[GIN-debug] GET    /user-management/:id/view --> go-barcode-webapp/internal/handlers.(*AuthHandler).GetUser-fm (10 handlers)
+[GIN-debug] PUT    /user-management/:id      --> go-barcode-webapp/internal/handlers.(*AuthHandler).UpdateUser-fm (10 handlers)
+[GIN-debug] DELETE /user-management/:id      --> go-barcode-webapp/internal/handlers.(*AuthHandler).DeleteUser-fm (10 handlers)
+[GIN-debug] GET    /users/new                --> main.setupRoutes.func11 (10 handlers)
+[GIN-debug] GET    /api/v1/jobs              --> go-barcode-webapp/internal/handlers.(*JobHandler).ListJobsAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/jobs              --> go-barcode-webapp/internal/handlers.(*JobHandler).CreateJobAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/jobs/:id          --> go-barcode-webapp/internal/handlers.(*JobHandler).GetJobAPI-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/jobs/:id          --> go-barcode-webapp/internal/handlers.(*JobHandler).UpdateJobAPI-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/jobs/:id          --> go-barcode-webapp/internal/handlers.(*JobHandler).DeleteJobAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*JobHandler).AssignDeviceAPI-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/jobs/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*JobHandler).RemoveDeviceAPI-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/jobs/:id/devices/bulk-remove --> go-barcode-webapp/internal/handlers.(*ScannerHandler).BulkRemoveDevices-fm (10 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/bulk-scan --> go-barcode-webapp/internal/handlers.(*JobHandler).BulkScanDevicesAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/assign-device --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanDevice-fm (10 handlers)
+[GIN-debug] POST   /api/v1/jobs/:id/assign-case --> go-barcode-webapp/internal/handlers.(*ScannerHandler).ScanCase-fm (10 handlers)
+[GIN-debug] GET    /api/v1/devices           --> go-barcode-webapp/internal/handlers.(*DeviceHandler).ListDevicesAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/devices           --> go-barcode-webapp/internal/handlers.(*DeviceHandler).CreateDeviceAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/devices/:id       --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetDeviceAPI-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/devices/:id       --> go-barcode-webapp/internal/handlers.(*DeviceHandler).UpdateDeviceAPI-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/devices/:id       --> go-barcode-webapp/internal/handlers.(*DeviceHandler).DeleteDeviceAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/devices/available --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetAvailableDevicesAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/devices/available/job/:jobId --> go-barcode-webapp/internal/handlers.(*DeviceHandler).GetAvailableDevicesForJobAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/products          --> go-barcode-webapp/internal/handlers.(*ProductHandler).ListProducts-fm (10 handlers)
+[GIN-debug] POST   /api/v1/products          --> go-barcode-webapp/internal/handlers.(*ProductHandler).CreateProductAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/products/:id      --> go-barcode-webapp/internal/handlers.(*ProductHandler).GetProductAPI-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/products/:id      --> go-barcode-webapp/internal/handlers.(*ProductHandler).UpdateProductAPI-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/products/:id      --> go-barcode-webapp/internal/handlers.(*ProductHandler).DeleteProductAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/products/categories --> go-barcode-webapp/internal/handlers.(*ProductHandler).GetCategoriesAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/products/subcategories --> go-barcode-webapp/internal/handlers.(*ProductHandler).GetSubcategoriesAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/products/subbiercategories --> go-barcode-webapp/internal/handlers.(*ProductHandler).GetSubbiercategoriesAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/products/brands   --> go-barcode-webapp/internal/handlers.(*ProductHandler).GetBrandsAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/products/manufacturers --> go-barcode-webapp/internal/handlers.(*ProductHandler).GetManufacturersAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/cables            --> go-barcode-webapp/internal/handlers.(*CableHandler).ListCablesAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/cables            --> go-barcode-webapp/internal/handlers.(*CableHandler).CreateCableAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/cables/:id        --> go-barcode-webapp/internal/handlers.(*CableHandler).GetCableAPI-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/cables/:id        --> go-barcode-webapp/internal/handlers.(*CableHandler).UpdateCableAPI-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/cables/:id        --> go-barcode-webapp/internal/handlers.(*CableHandler).DeleteCableAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/cables/types      --> go-barcode-webapp/internal/handlers.(*CableHandler).GetCableTypesAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/cables/connectors --> go-barcode-webapp/internal/handlers.(*CableHandler).GetCableConnectorsAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/customers         --> go-barcode-webapp/internal/handlers.(*CustomerHandler).ListCustomersAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/customers         --> go-barcode-webapp/internal/handlers.(*CustomerHandler).CreateCustomerAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/customers/:id     --> go-barcode-webapp/internal/handlers.(*CustomerHandler).GetCustomerAPI-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/customers/:id     --> go-barcode-webapp/internal/handlers.(*CustomerHandler).UpdateCustomerAPI-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/customers/:id     --> go-barcode-webapp/internal/handlers.(*CustomerHandler).DeleteCustomerAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/cases             --> go-barcode-webapp/internal/handlers.(*CaseHandler).ListCasesAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/cases             --> go-barcode-webapp/internal/handlers.(*CaseHandler).CreateCaseAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/cases/:id         --> go-barcode-webapp/internal/handlers.(*CaseHandler).GetCaseAPI-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/cases/:id         --> go-barcode-webapp/internal/handlers.(*CaseHandler).UpdateCaseAPI-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/cases/:id         --> go-barcode-webapp/internal/handlers.(*CaseHandler).DeleteCaseAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/cases/:id/devices --> go-barcode-webapp/internal/handlers.(*CaseHandler).GetCaseDevicesAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/cases/:id/devices --> go-barcode-webapp/internal/handlers.(*CaseHandler).ScanDeviceToCase-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/cases/:id/devices/:deviceId --> go-barcode-webapp/internal/handlers.(*CaseHandler).RemoveDeviceFromCase-fm (10 handlers)
+[GIN-debug] GET    /api/v1/workflow/packages --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).GetPackages-fm (10 handlers)
+[GIN-debug] POST   /api/v1/workflow/packages --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).CreatePackage-fm (10 handlers)
+[GIN-debug] GET    /api/v1/workflow/packages/:id --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).GetPackage-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/workflow/packages/:id --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).UpdatePackage-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/workflow/packages/:id --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).DeletePackage-fm (10 handlers)
+[GIN-debug] POST   /api/v1/workflow/packages/:id/clone --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).ClonePackage-fm (10 handlers)
+[GIN-debug] GET    /api/v1/workflow/packages/:id/validate --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).ValidatePackage-fm (10 handlers)
+[GIN-debug] GET    /api/v1/workflow/packages/:id/stats --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).GetPackageStats-fm (10 handlers)
+[GIN-debug] GET    /api/v1/workflow/packages/search --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).SearchPackages-fm (10 handlers)
+[GIN-debug] GET    /api/v1/workflow/packages/categories --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).GetPackageCategories-fm (10 handlers)
+[GIN-debug] GET    /api/v1/workflow/packages/popular --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).GetPopularPackages-fm (10 handlers)
+[GIN-debug] GET    /api/v1/workflow/packages/available-devices --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).GetAvailableDevices-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/workflow/packages/bulk --> go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).BulkUpdatePackages-fm (10 handlers)
+[GIN-debug] GET    /api/v1/documents         --> go-barcode-webapp/internal/handlers.(*DocumentHandler).ListDocumentsAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/documents/stats   --> go-barcode-webapp/internal/handlers.(*DocumentHandler).GetDocumentStats-fm (10 handlers)
+[GIN-debug] GET    /api/v1/documents/:id     --> go-barcode-webapp/internal/handlers.(*DocumentHandler).GetDocument-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/documents/:id     --> go-barcode-webapp/internal/handlers.(*DocumentHandler).DeleteDocument-fm (10 handlers)
+[GIN-debug] GET    /api/v1/financial/transactions --> go-barcode-webapp/internal/handlers.(*FinancialHandler).ListTransactionsAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/financial/stats   --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetFinancialStatsAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/financial/revenue-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetRevenueReport-fm (10 handlers)
+[GIN-debug] GET    /api/v1/financial/payment-report --> go-barcode-webapp/internal/handlers.(*FinancialHandler).GetPaymentReport-fm (10 handlers)
+[GIN-debug] GET    /api/v1/invoices          --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoicesAPI-fm (10 handlers)
+[GIN-debug] POST   /api/v1/invoices          --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).CreateInvoice-fm (10 handlers)
+[GIN-debug] GET    /api/v1/invoices/:id      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoice-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/invoices/:id      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoice-fm (10 handlers)
+[GIN-debug] PUT    /api/v1/invoices/:id/status --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoiceStatus-fm (10 handlers)
+[GIN-debug] DELETE /api/v1/invoices/:id      --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).DeleteInvoice-fm (10 handlers)
+[GIN-debug] GET    /api/v1/invoices/stats    --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoiceStatsAPI-fm (10 handlers)
+[GIN-debug] GET    /api/v1/invoices/products/:productId --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetProductDetails-fm (10 handlers)
+[GIN-debug] GET    /api/v1/invoices/products/:productId/devices --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetDevicesByProduct-fm (10 handlers)
+[GIN-debug] GET    /api/v1/security/audit    --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLogs-fm (10 handlers)
+[GIN-debug] GET    /api/v1/security/audit/:id --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLog-fm (10 handlers)
+[GIN-debug] GET    /api/v1/security/audit/export --> go-barcode-webapp/internal/handlers.(*SecurityHandler).ExportAuditLogs-fm (10 handlers)
+[GIN-debug] GET    /api/v1/security/auth/users --> go-barcode-webapp/internal/handlers.(*AuthHandler).ListUsersAPI-fm (10 handlers)
+[GIN-debug] GET    /api/invoices             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoicesAPI-fm (10 handlers)
+[GIN-debug] POST   /api/invoices             --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).CreateInvoice-fm (10 handlers)
+[GIN-debug] GET    /api/invoices/:id         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoice-fm (10 handlers)
+[GIN-debug] PUT    /api/invoices/:id         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoice-fm (10 handlers)
+[GIN-debug] PUT    /api/invoices/:id/status  --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).UpdateInvoiceStatus-fm (10 handlers)
+[GIN-debug] DELETE /api/invoices/:id         --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).DeleteInvoice-fm (10 handlers)
+[GIN-debug] GET    /api/invoices/stats       --> go-barcode-webapp/internal/handlers.(*InvoiceHandlerNew).GetInvoiceStatsAPI-fm (10 handlers)
+[GIN-debug] GET    /api/company-settings     --> go-barcode-webapp/internal/handlers.(*CompanyHandler).GetCompanySettings-fm (10 handlers)
+[GIN-debug] PUT    /api/company-settings     --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UpdateCompanySettings-fm (10 handlers)
+[GIN-debug] POST   /api/company-settings/logo --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UploadCompanyLogo-fm (10 handlers)
+[GIN-debug] DELETE /api/company-settings/logo --> go-barcode-webapp/internal/handlers.(*CompanyHandler).DeleteCompanyLogo-fm (10 handlers)
+[GIN-debug] GET    /api/settings/smtp        --> go-barcode-webapp/internal/handlers.(*CompanyHandler).GetSMTPConfig-fm (10 handlers)
+[GIN-debug] POST   /api/settings/smtp        --> go-barcode-webapp/internal/handlers.(*CompanyHandler).UpdateSMTPConfig-fm (10 handlers)
+[GIN-debug] POST   /api/settings/smtp/test   --> go-barcode-webapp/internal/handlers.(*CompanyHandler).TestSMTPConnection-fm (10 handlers)
+[GIN-debug] GET    /api/security/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRoles-fm (10 handlers)
+[GIN-debug] GET    /api/security/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetRole-fm (10 handlers)
+[GIN-debug] POST   /api/security/roles       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CreateRole-fm (10 handlers)
+[GIN-debug] PUT    /api/security/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).UpdateRole-fm (10 handlers)
+[GIN-debug] DELETE /api/security/roles/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).DeleteRole-fm (10 handlers)
+[GIN-debug] GET    /api/security/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetUserRoles-fm (10 handlers)
+[GIN-debug] POST   /api/security/users/:userId/roles --> go-barcode-webapp/internal/handlers.(*SecurityHandler).AssignUserRole-fm (10 handlers)
+[GIN-debug] DELETE /api/security/users/:userId/roles/:roleId --> go-barcode-webapp/internal/handlers.(*SecurityHandler).RevokeUserRole-fm (10 handlers)
+[GIN-debug] GET    /api/security/audit       --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLogs-fm (10 handlers)
+[GIN-debug] GET    /api/security/audit/:id   --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetAuditLog-fm (10 handlers)
+[GIN-debug] GET    /api/security/audit/export --> go-barcode-webapp/internal/handlers.(*SecurityHandler).ExportAuditLogs-fm (10 handlers)
+[GIN-debug] GET    /api/security/permissions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissions-fm (10 handlers)
+[GIN-debug] GET    /api/security/permissions/definitions --> go-barcode-webapp/internal/handlers.(*SecurityHandler).GetPermissionDefinitionsAPI-fm (10 handlers)
+[GIN-debug] GET    /api/security/permissions/check --> go-barcode-webapp/internal/handlers.(*SecurityHandler).CheckPermission-fm (10 handlers)
+[GIN-debug] GET    /error                    --> main.main.func30 (9 handlers)
+2025/07/28 14:31:49 Server starting on 0.0.0.0:8080
+2025/07/28 14:34:07 Running in production mode
+2025/07/28 14:34:07 Database connection established successfully
+2025/07/28 14:34:07 GoBD compliance table migration disabled
+2025/07/28 14:34:07 Database auto-migration disabled - using manual schema management
+2025/07/28 14:34:07 Templates already exist (1), skipping default template creation
+2025/07/28 14:34:07 Server starting on 0.0.0.0:8080
+2025/07/28 14:34:55 Route Debug: GET /profile/settings
+2025/07/28 14:34:55 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/07/28 14:34:55 DEBUG: AuthMiddleware: Found session cookie: 0211bf713ec0a10a942b429e3c81e4b6fb9c4ed4eb5dbd7d3c99eccce0fb5211 for /profile/settings
+2025/07/28 14:34:55 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/settings
+{"timestamp":"2025-07-28T12:34:55.483755753Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706095342374717","method":"GET","path":"/profile/settings","status_code":200,"duration":"141.379331ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":46659}}
+2025/07/28 14:34:55 Route Debug: GET /static/manifest.json
+2025/07/28 14:34:58 POST request to /profile/2fa/setup with Content-Type: ''
+2025/07/28 14:34:58 Route Debug: POST /profile/2fa/setup
+2025/07/28 14:34:58 DEBUG: AuthMiddleware: Request URL: /profile/2fa/setup
+2025/07/28 14:34:58 DEBUG: AuthMiddleware: Found session cookie: 0211bf713ec0a10a942b429e3c81e4b6fb9c4ed4eb5dbd7d3c99eccce0fb5211 for /profile/2fa/setup
+2025/07/28 14:34:58 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/2fa/setup
+2025/07/28 14:34:58 DEBUG: Setup2FA called
+2025/07/28 14:34:58 DEBUG: Setup2FA - user authenticated: ntielmann (ID: 5)
+2025/07/28 14:34:58 DEBUG: Setup2FA - deleting any existing incomplete setup records
+2025/07/28 14:34:58 DEBUG: Setup2FA - generating TOTP secret
+2025/07/28 14:34:58 DEBUG: Setup2FA - TOTP secret generated successfully
+2025/07/28 14:34:58 DEBUG: Setup2FA - generating backup codes
+2025/07/28 14:34:58 DEBUG: Setup2FA - generated 10 backup codes
+2025/07/28 14:34:58 DEBUG: Setup2FA - creating 2FA database record with manual JSON serialization
+2025/07/28 14:34:58 DEBUG: Setup2FA - backup codes JSON: ["15d85e00","47699be9","a98d0130","9a4ca036","1d94e844","7278e746","61c98651","a3bbc01c","4f6530b3","f0de7312"]
+2025/07/28 14:34:58 DEBUG: Setup2FA - 2FA record saved successfully with backup codes
+{"timestamp":"2025-07-28T12:34:58.351648888Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706098210575277","method":"POST","path":"/profile/2fa/setup","status_code":200,"duration":"141.070011ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":395}}
+2025/07/28 14:35:25 POST request to /profile/2fa/verify with Content-Type: 'application/json'
+2025/07/28 14:35:25 Route Debug: POST /profile/2fa/verify
+2025/07/28 14:35:25 DEBUG: AuthMiddleware: Request URL: /profile/2fa/verify
+2025/07/28 14:35:25 DEBUG: AuthMiddleware: Found session cookie: 0211bf713ec0a10a942b429e3c81e4b6fb9c4ed4eb5dbd7d3c99eccce0fb5211 for /profile/2fa/verify
+2025/07/28 14:35:25 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/2fa/verify
+{"timestamp":"2025-07-28T12:35:25.58678993Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706125442832181","method":"POST","path":"/profile/2fa/verify","status_code":200,"duration":"143.954589ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":17,"bytes_out":38}}
+2025/07/28 14:35:49 Route Debug: GET /profile/settings
+2025/07/28 14:35:49 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/07/28 14:35:49 DEBUG: AuthMiddleware: Found session cookie: 0211bf713ec0a10a942b429e3c81e4b6fb9c4ed4eb5dbd7d3c99eccce0fb5211 for /profile/settings
+2025/07/28 14:35:49 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/settings
+{"timestamp":"2025-07-28T12:35:49.831675353Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706149695108204","method":"GET","path":"/profile/settings","status_code":200,"duration":"136.564652ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":47164}}
+2025/07/28 14:35:49 Route Debug: GET /static/manifest.json
+2025/07/28 14:35:55 POST request to /profile/2fa/setup with Content-Type: ''
+2025/07/28 14:35:55 Route Debug: POST /profile/2fa/setup
+2025/07/28 14:35:55 DEBUG: AuthMiddleware: Request URL: /profile/2fa/setup
+2025/07/28 14:35:55 DEBUG: AuthMiddleware: Found session cookie: 0211bf713ec0a10a942b429e3c81e4b6fb9c4ed4eb5dbd7d3c99eccce0fb5211 for /profile/2fa/setup
+2025/07/28 14:35:55 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/2fa/setup
+2025/07/28 14:35:55 DEBUG: Setup2FA called
+2025/07/28 14:35:55 DEBUG: Setup2FA - user authenticated: ntielmann (ID: 5)
+2025/07/28 14:35:55 ERROR: Setup2FA - 2FA already enabled
+{"timestamp":"2025-07-28T12:35:55.697502167Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706155604448082","method":"POST","path":"/profile/2fa/setup","status_code":400,"duration":"93.051407ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":34}}
+2025/07/28 14:36:00 Route Debug: GET /security/audit
+2025/07/28 14:36:00 DEBUG: AuthMiddleware: Request URL: /security/audit
+2025/07/28 14:36:00 DEBUG: AuthMiddleware: Found session cookie: 0211bf713ec0a10a942b429e3c81e4b6fb9c4ed4eb5dbd7d3c99eccce0fb5211 for /security/audit
+2025/07/28 14:36:00 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /security/audit
+{"timestamp":"2025-07-28T12:36:00.535359486Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706160415534296","method":"GET","path":"/security/audit","status_code":200,"duration":"119.821919ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":47581}}
+2025/07/28 14:36:00 Route Debug: GET /static/manifest.json
+2025/07/28 14:36:00 Route Debug: GET /api/security/audit
+2025/07/28 14:36:00 DEBUG: AuthMiddleware: Request URL: /api/security/audit
+2025/07/28 14:36:00 DEBUG: AuthMiddleware: Found session cookie: 0211bf713ec0a10a942b429e3c81e4b6fb9c4ed4eb5dbd7d3c99eccce0fb5211 for /api/security/audit
+2025/07/28 14:36:00 Route Debug: GET /api/v1/security/auth/users
+2025/07/28 14:36:00 DEBUG: AuthMiddleware: Request URL: /api/v1/security/auth/users
+2025/07/28 14:36:00 DEBUG: AuthMiddleware: Found session cookie: 0211bf713ec0a10a942b429e3c81e4b6fb9c4ed4eb5dbd7d3c99eccce0fb5211 for /api/v1/security/auth/users
+2025/07/28 14:36:00 Route Debug: GET /api/security/audit
+2025/07/28 14:36:00 DEBUG: AuthMiddleware: Request URL: /api/security/audit
+2025/07/28 14:36:00 DEBUG: AuthMiddleware: Found session cookie: 0211bf713ec0a10a942b429e3c81e4b6fb9c4ed4eb5dbd7d3c99eccce0fb5211 for /api/security/audit
+2025/07/28 14:36:00 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /api/security/audit
+{"timestamp":"2025-07-28T12:36:00.809401086Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706160669053420","method":"GET","path":"/api/security/audit","status_code":200,"duration":"140.344262ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":78}}
+2025/07/28 14:36:00 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /api/security/audit
+2025/07/28 14:36:00 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /api/v1/security/auth/users
+{"timestamp":"2025-07-28T12:36:00.848600616Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706160669052081","method":"GET","path":"/api/v1/security/auth/users","status_code":200,"duration":"179.545373ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":535}}
+{"timestamp":"2025-07-28T12:36:00.906430294Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706160676286925","method":"GET","path":"/api/security/audit","status_code":200,"duration":"230.137449ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":79}}
+2025/07/28 14:36:03 Route Debug: GET /logout
+{"timestamp":"2025-07-28T12:36:03.100659999Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706163051312557","method":"GET","path":"/logout","status_code":303,"duration":"49.344038ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":33}}
+2025/07/28 14:36:03 Route Debug: GET /login
+{"timestamp":"2025-07-28T12:36:03.217116218Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706163193396433","method":"GET","path":"/login","status_code":200,"duration":"23.715929ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":14745}}
+2025/07/28 14:36:03 Route Debug: GET /static/manifest.json
+2025/07/28 14:36:03 POST request to /auth/passkey/start-authentication with Content-Type: ''
+2025/07/28 14:36:03 Route Debug: POST /auth/passkey/start-authentication
+2025/07/28 14:36:03 DEBUG: StartPasskeyAuthentication called
+2025/07/28 14:36:03 DEBUG: Request scheme: http, host: job.nt.local
+2025/07/28 14:36:03 DEBUG: Found 1 active passkeys for authentication
+2025/07/28 14:36:03 DEBUG: Adding passkey to allowCredentials - ID: zMWqIIoaTBKmzcw2xzl8xw, Name: Bitwarden
+2025/07/28 14:36:03 DEBUG: Using RP ID: job.nt.local for authentication on host: job.nt.local
+2025/07/28 14:36:03 DEBUG: Prepared 1 allowCredentials for authentication
+{"timestamp":"2025-07-28T12:36:03.952538246Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706163880345569","method":"POST","path":"/auth/passkey/start-authentication","status_code":200,"duration":"72.18872ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":274}}
+2025/07/28 14:36:07 POST request to /auth/passkey/complete-authentication with Content-Type: 'application/json'
+2025/07/28 14:36:07 Route Debug: POST /auth/passkey/complete-authentication
+2025/07/28 14:36:07 DEBUG: CompletePasskeyAuthentication called
+{"timestamp":"2025-07-28T12:36:07.555962629Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706167120981721","method":"POST","path":"/auth/passkey/complete-authentication","status_code":200,"duration":"434.976911ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":486,"bytes_out":58}}
+2025/07/28 14:36:07 Route Debug: GET /dashboard
+2025/07/28 14:36:07 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/07/28 14:36:07 DEBUG: AuthMiddleware: Found session cookie: yURNkDSzA4HhnZ1IfH8OHO4E2Ks_EyS_HeEFx1sfc5E= for /dashboard
+2025/07/28 14:36:07 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /dashboard
+{"timestamp":"2025-07-28T12:36:07.774152617Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706167634916937","method":"GET","path":"/dashboard","status_code":200,"duration":"139.234121ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":18341}}
+2025/07/28 14:36:07 Route Debug: GET /static/manifest.json
+2025/07/28 14:36:10 Route Debug: GET /logout
+{"timestamp":"2025-07-28T12:36:10.607018247Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706170558937263","method":"GET","path":"/logout","status_code":303,"duration":"48.07886ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":33}}
+2025/07/28 14:36:10 Route Debug: GET /login
+{"timestamp":"2025-07-28T12:36:10.694620162Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706170672172508","method":"GET","path":"/login","status_code":200,"duration":"22.44546ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":14745}}
+2025/07/28 14:36:10 Route Debug: GET /static/manifest.json
+2025/07/28 14:36:11 POST request to /auth/passkey/start-authentication with Content-Type: ''
+2025/07/28 14:36:11 Route Debug: POST /auth/passkey/start-authentication
+2025/07/28 14:36:11 DEBUG: StartPasskeyAuthentication called
+2025/07/28 14:36:11 DEBUG: Request scheme: http, host: job.nt.local
+2025/07/28 14:36:11 DEBUG: Found 1 active passkeys for authentication
+2025/07/28 14:36:11 DEBUG: Adding passkey to allowCredentials - ID: zMWqIIoaTBKmzcw2xzl8xw, Name: Bitwarden
+2025/07/28 14:36:11 DEBUG: Using RP ID: job.nt.local for authentication on host: job.nt.local
+2025/07/28 14:36:11 DEBUG: Prepared 1 allowCredentials for authentication
+{"timestamp":"2025-07-28T12:36:11.424760534Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706171353563749","method":"POST","path":"/auth/passkey/start-authentication","status_code":200,"duration":"71.19443ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":274}}
+2025/07/28 14:36:21 POST request to /login with Content-Type: 'application/x-www-form-urlencoded'
+2025/07/28 14:36:21 Form _method parameter: ''
+2025/07/28 14:36:21 Route Debug: POST /login
+DEBUG: Creating session for user ntielmann (ID: 5)
+DEBUG: Login successful, session created: 4ea0e6f1daded8aa29fc4acded4d2eb6c0af2c313d26234e5fa003c272c09e67
+2025/07/28 14:36:22 SLOW REQUEST: POST /login took 1.129945795s (status: 303)
+{"timestamp":"2025-07-28T12:36:22.628751231Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706181498688171","method":"POST","path":"/login","status_code":303,"duration":"1.130060987s","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":42,"bytes_out":-1}}
+2025/07/28 14:36:22 Route Debug: GET /
+{"timestamp":"2025-07-28T12:36:22.719863849Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706182697137114","method":"GET","path":"/","status_code":307,"duration":"22.724341ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":46}}
+2025/07/28 14:36:22 Route Debug: GET /dashboard
+2025/07/28 14:36:22 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/07/28 14:36:22 DEBUG: AuthMiddleware: Found session cookie: 4ea0e6f1daded8aa29fc4acded4d2eb6c0af2c313d26234e5fa003c272c09e67 for /dashboard
+2025/07/28 14:36:22 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /dashboard
+{"timestamp":"2025-07-28T12:36:22.932636209Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706182792434610","method":"GET","path":"/dashboard","status_code":200,"duration":"140.199024ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":18341}}
+2025/07/28 14:36:23 Route Debug: GET /static/manifest.json
+2025/07/28 14:38:21 Route Debug: GET /profile/settings
+2025/07/28 14:38:21 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/07/28 14:38:21 DEBUG: AuthMiddleware: Found session cookie: 4ea0e6f1daded8aa29fc4acded4d2eb6c0af2c313d26234e5fa003c272c09e67 for /profile/settings
+2025/07/28 14:38:21 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/settings
+{"timestamp":"2025-07-28T12:38:21.985434243Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706301846940714","method":"GET","path":"/profile/settings","status_code":200,"duration":"138.490092ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":47680}}
+2025/07/28 14:38:22 Route Debug: GET /static/manifest.json
+2025/07/28 14:42:25 Running in production mode
+2025/07/28 14:42:25 Database connection established successfully
+2025/07/28 14:42:25 GoBD compliance table migration disabled
+2025/07/28 14:42:25 Database auto-migration disabled - using manual schema management
+2025/07/28 14:42:25 Templates already exist (1), skipping default template creation
+2025/07/28 14:42:25 Server starting on 0.0.0.0:8080
+2025/07/28 14:43:23 Route Debug: GET /profile/settings
+2025/07/28 14:43:23 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/07/28 14:43:23 DEBUG: AuthMiddleware: Found session cookie: 4ea0e6f1daded8aa29fc4acded4d2eb6c0af2c313d26234e5fa003c272c09e67 for /profile/settings
+2025/07/28 14:43:23 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/settings
+{"timestamp":"2025-07-28T12:43:23.784847828Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706603643653950","method":"GET","path":"/profile/settings","status_code":200,"duration":"141.191754ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":47712}}
+2025/07/28 14:43:23 Route Debug: GET /static/manifest.json
+2025/07/28 14:43:23 Route Debug: GET /static/css/rental-core-design.css
+2025/07/28 14:43:23 Route Debug: GET /static/js/rental-core-design.js
+2025/07/28 14:43:27 Route Debug: GET /profile/settings
+2025/07/28 14:43:27 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/07/28 14:43:27 DEBUG: AuthMiddleware: Found session cookie: 4ea0e6f1daded8aa29fc4acded4d2eb6c0af2c313d26234e5fa003c272c09e67 for /profile/settings
+2025/07/28 14:43:27 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/settings
+{"timestamp":"2025-07-28T12:43:28.058871705Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706607913890146","method":"GET","path":"/profile/settings","status_code":200,"duration":"144.979656ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":47712}}
+2025/07/28 14:43:28 Route Debug: GET /static/manifest.json
+2025/07/28 14:43:29 POST request to /profile/2fa/setup with Content-Type: ''
+2025/07/28 14:43:29 Route Debug: POST /profile/2fa/setup
+2025/07/28 14:43:29 DEBUG: AuthMiddleware: Request URL: /profile/2fa/setup
+2025/07/28 14:43:29 DEBUG: AuthMiddleware: Found session cookie: 4ea0e6f1daded8aa29fc4acded4d2eb6c0af2c313d26234e5fa003c272c09e67 for /profile/2fa/setup
+2025/07/28 14:43:29 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/2fa/setup
+2025/07/28 14:43:29 DEBUG: Setup2FA called
+2025/07/28 14:43:29 DEBUG: Setup2FA - user authenticated: ntielmann (ID: 5)
+2025/07/28 14:43:29 ERROR: Setup2FA - 2FA already enabled
+{"timestamp":"2025-07-28T12:43:29.389975931Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706609297671998","method":"POST","path":"/profile/2fa/setup","status_code":400,"duration":"92.301929ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":34}}
+2025/07/28 14:43:32 Route Debug: GET /logout
+{"timestamp":"2025-07-28T12:43:32.760106166Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706612712468327","method":"GET","path":"/logout","status_code":303,"duration":"47.635895ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":33}}
+2025/07/28 14:43:32 Route Debug: GET /login
+{"timestamp":"2025-07-28T12:43:32.856434199Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706612832878465","method":"GET","path":"/login","status_code":200,"duration":"23.552398ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":14745}}
+2025/07/28 14:43:32 Route Debug: GET /static/manifest.json
+2025/07/28 14:43:33 POST request to /auth/passkey/start-authentication with Content-Type: ''
+2025/07/28 14:43:33 Route Debug: POST /auth/passkey/start-authentication
+2025/07/28 14:43:33 DEBUG: StartPasskeyAuthentication called
+2025/07/28 14:43:33 DEBUG: Request scheme: http, host: job.nt.local
+2025/07/28 14:43:33 DEBUG: Found 1 active passkeys for authentication
+2025/07/28 14:43:33 DEBUG: Adding passkey to allowCredentials - ID: zMWqIIoaTBKmzcw2xzl8xw, Name: Bitwarden
+2025/07/28 14:43:33 DEBUG: Using RP ID: job.nt.local for authentication on host: job.nt.local
+2025/07/28 14:43:33 DEBUG: Prepared 1 allowCredentials for authentication
+{"timestamp":"2025-07-28T12:43:33.68992662Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706613619252749","method":"POST","path":"/auth/passkey/start-authentication","status_code":200,"duration":"70.671356ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":274}}
+2025/07/28 14:43:44 POST request to /login with Content-Type: 'application/x-www-form-urlencoded'
+2025/07/28 14:43:44 Form _method parameter: ''
+2025/07/28 14:43:44 Route Debug: POST /login
+2025/07/28 14:43:45 SLOW REQUEST: POST /login took 1.095999451s (status: 303)
+{"timestamp":"2025-07-28T12:43:45.450292048Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706624354179431","method":"POST","path":"/login","status_code":303,"duration":"1.096109761s","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":42,"bytes_out":-1}}
+2025/07/28 14:43:46 Route Debug: GET /login/2fa
+2025/07/28 14:43:46 NotFoundHandler: 404 for path: /login/2fa
+2025/07/28 14:43:46 renderErrorPage: Rendering error page - Status: 404, Message: Page not found
+{"timestamp":"2025-07-28T12:43:46.488371748Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706626464974086","method":"GET","path":"/login/2fa","status_code":404,"duration":"23.395527ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":4404}}
+2025/07/28 14:45:31 Running in production mode
+2025/07/28 14:45:31 Database connection established successfully
+2025/07/28 14:45:31 GoBD compliance table migration disabled
+2025/07/28 14:45:31 Database auto-migration disabled - using manual schema management
+2025/07/28 14:45:31 Templates already exist (1), skipping default template creation
+2025/07/28 14:45:31 Server starting on 0.0.0.0:8080
+2025/07/28 14:46:30 Route Debug: GET /login/2fa
+{"timestamp":"2025-07-28T12:46:30.44988283Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706790425722528","method":"GET","path":"/login/2fa","status_code":200,"duration":"24.158065ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":9188}}
+2025/07/28 14:46:30 Route Debug: GET /static/manifest.json
+2025/07/28 14:46:47 POST request to /login/2fa with Content-Type: 'application/x-www-form-urlencoded'
+2025/07/28 14:46:47 Form _method parameter: ''
+2025/07/28 14:46:47 Route Debug: POST /login/2fa
+{"timestamp":"2025-07-28T12:46:47.39276667Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706807226210192","method":"POST","path":"/login/2fa","status_code":303,"duration":"166.55431ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":11,"bytes_out":-1}}
+2025/07/28 14:46:47 Route Debug: GET /
+{"timestamp":"2025-07-28T12:46:47.510297633Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706807487305175","method":"GET","path":"/","status_code":307,"duration":"22.98895ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":46}}
+2025/07/28 14:46:47 Route Debug: GET /dashboard
+2025/07/28 14:46:47 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/07/28 14:46:47 DEBUG: AuthMiddleware: Found session cookie: 380ecddbc41573bbe463e20e05c2398f48a556a95d693b5a60593ce9aaa5cbaa for /dashboard
+2025/07/28 14:46:47 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /dashboard
+{"timestamp":"2025-07-28T12:46:47.743114497Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706807601960049","method":"GET","path":"/dashboard","status_code":200,"duration":"141.152181ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":18341}}
+2025/07/28 14:46:47 Route Debug: GET /static/manifest.json
+2025/07/28 14:46:51 Route Debug: GET /logout
+{"timestamp":"2025-07-28T12:46:51.831810417Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706811784743460","method":"GET","path":"/logout","status_code":303,"duration":"47.063972ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":33}}
+2025/07/28 14:46:51 Route Debug: GET /login
+{"timestamp":"2025-07-28T12:46:51.926701778Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706811903721770","method":"GET","path":"/login","status_code":200,"duration":"22.976451ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":14745}}
+2025/07/28 14:46:52 Route Debug: GET /static/manifest.json
+2025/07/28 14:46:52 POST request to /auth/passkey/start-authentication with Content-Type: ''
+2025/07/28 14:46:52 Route Debug: POST /auth/passkey/start-authentication
+2025/07/28 14:46:52 DEBUG: StartPasskeyAuthentication called
+2025/07/28 14:46:52 DEBUG: Request scheme: http, host: job.nt.local
+2025/07/28 14:46:52 DEBUG: Found 1 active passkeys for authentication
+2025/07/28 14:46:52 DEBUG: Adding passkey to allowCredentials - ID: zMWqIIoaTBKmzcw2xzl8xw, Name: Bitwarden
+2025/07/28 14:46:52 DEBUG: Using RP ID: job.nt.local for authentication on host: job.nt.local
+2025/07/28 14:46:52 DEBUG: Prepared 1 allowCredentials for authentication
+{"timestamp":"2025-07-28T12:46:52.680198204Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706812609194605","method":"POST","path":"/auth/passkey/start-authentication","status_code":200,"duration":"71.000243ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":274}}
+2025/07/28 14:47:04 POST request to /auth/passkey/complete-authentication with Content-Type: 'application/json'
+2025/07/28 14:47:04 Route Debug: POST /auth/passkey/complete-authentication
+2025/07/28 14:47:04 DEBUG: CompletePasskeyAuthentication called
+{"timestamp":"2025-07-28T12:47:04.510849751Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706824320711155","method":"POST","path":"/auth/passkey/complete-authentication","status_code":200,"duration":"190.136442ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":486,"bytes_out":58}}
+2025/07/28 14:47:04 Route Debug: GET /dashboard
+2025/07/28 14:47:04 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/07/28 14:47:04 DEBUG: AuthMiddleware: Found session cookie: bVvl309nDRhbbe8PPEOFBivs3J_vhDM1QgKjPCglpwU= for /dashboard
+2025/07/28 14:47:04 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /dashboard
+{"timestamp":"2025-07-28T12:47:04.713616826Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706824574032599","method":"GET","path":"/dashboard","status_code":200,"duration":"139.581783ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":18341}}
+2025/07/28 14:47:04 Route Debug: GET /static/manifest.json
+2025/07/28 14:47:07 Route Debug: GET /logout
+{"timestamp":"2025-07-28T12:47:07.231445105Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706827184459127","method":"GET","path":"/logout","status_code":303,"duration":"46.983914ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":33}}
+2025/07/28 14:47:07 Route Debug: GET /login
+{"timestamp":"2025-07-28T12:47:07.328915993Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706827306398191","method":"GET","path":"/login","status_code":200,"duration":"22.515928ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":14745}}
+2025/07/28 14:47:07 Route Debug: GET /static/manifest.json
+2025/07/28 14:47:07 POST request to /auth/passkey/start-authentication with Content-Type: ''
+2025/07/28 14:47:07 Route Debug: POST /auth/passkey/start-authentication
+2025/07/28 14:47:07 DEBUG: StartPasskeyAuthentication called
+2025/07/28 14:47:07 DEBUG: Request scheme: http, host: job.nt.local
+2025/07/28 14:47:08 DEBUG: Found 1 active passkeys for authentication
+2025/07/28 14:47:08 DEBUG: Adding passkey to allowCredentials - ID: zMWqIIoaTBKmzcw2xzl8xw, Name: Bitwarden
+2025/07/28 14:47:08 DEBUG: Using RP ID: job.nt.local for authentication on host: job.nt.local
+2025/07/28 14:47:08 DEBUG: Prepared 1 allowCredentials for authentication
+{"timestamp":"2025-07-28T12:47:08.061443745Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706827991884994","method":"POST","path":"/auth/passkey/start-authentication","status_code":200,"duration":"69.556698ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":274}}
+2025/07/28 14:47:17 POST request to /login with Content-Type: 'application/x-www-form-urlencoded'
+2025/07/28 14:47:17 Form _method parameter: ''
+2025/07/28 14:47:17 Route Debug: POST /login
+2025/07/28 14:47:18 SLOW REQUEST: POST /login took 1.13379303s (status: 303)
+{"timestamp":"2025-07-28T12:47:18.784930769Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706837650984387","method":"POST","path":"/login","status_code":303,"duration":"1.133942776s","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":42,"bytes_out":-1}}
+2025/07/28 14:47:19 Route Debug: GET /login/2fa
+{"timestamp":"2025-07-28T12:47:19.259534804Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706839236853151","method":"GET","path":"/login/2fa","status_code":200,"duration":"22.679709ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":9188}}
+2025/07/28 14:47:19 Route Debug: GET /static/manifest.json
+2025/07/28 14:47:28 POST request to /login/2fa with Content-Type: 'application/x-www-form-urlencoded'
+2025/07/28 14:47:28 Form _method parameter: ''
+2025/07/28 14:47:28 Route Debug: POST /login/2fa
+{"timestamp":"2025-07-28T12:47:28.98242138Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706848865774062","method":"POST","path":"/login/2fa","status_code":401,"duration":"116.644643ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":11,"bytes_out":9371}}
+2025/07/28 14:47:29 Route Debug: GET /static/manifest.json
+2025/07/28 14:47:39 POST request to /login/2fa with Content-Type: 'application/x-www-form-urlencoded'
+2025/07/28 14:47:39 Form _method parameter: ''
+2025/07/28 14:47:39 Route Debug: POST /login/2fa
+{"timestamp":"2025-07-28T12:47:40.009161535Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706859817712446","method":"POST","path":"/login/2fa","status_code":303,"duration":"191.447345ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":11,"bytes_out":-1}}
+2025/07/28 14:47:40 Route Debug: GET /
+{"timestamp":"2025-07-28T12:47:40.111100777Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706860088231837","method":"GET","path":"/","status_code":307,"duration":"22.865314ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":46}}
+2025/07/28 14:47:40 Route Debug: GET /dashboard
+2025/07/28 14:47:40 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/07/28 14:47:40 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /dashboard
+2025/07/28 14:47:40 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /dashboard
+{"timestamp":"2025-07-28T12:47:40.329488363Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706860188885773","method":"GET","path":"/dashboard","status_code":200,"duration":"140.600837ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":18341}}
+2025/07/28 14:47:40 Route Debug: GET /static/manifest.json
+2025/07/28 14:48:24 Route Debug: GET /jobs
+2025/07/28 14:48:24 DEBUG: AuthMiddleware: Request URL: /jobs
+2025/07/28 14:48:24 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /jobs
+2025/07/28 14:48:24 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /jobs
+DEBUG Job Handler: All query params: map[]
+DEBUG Job Handler: Raw search parameter: ''
+DEBUG Job Handler: Final params: SearchTerm='', StartDate=<nil>, EndDate=<nil>
+DEBUG: Found 3 jobs with search term ''
+DEBUG: First job: {JobID:1007 CustomerID:59 StatusID:1002 Description:0xc0007b04d0 StartDate:2025-07-12 00:00:00 +0200 CEST EndDate:2025-07-13 00:00:00 +0200 CEST Revenue:136 FinalRevenue:0xc000345fa0 CustomerName: Ben Mühlhan StatusName:paid DeviceCount:7 TotalRevenue:115.6}
+{"timestamp":"2025-07-28T12:48:24.858549416Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706904774331873","method":"GET","path":"/jobs","status_code":200,"duration":"84.215259ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":29481}}
+2025/07/28 14:48:27 Route Debug: GET /static/manifest.json
+2025/07/28 14:48:28 Route Debug: GET /devices
+2025/07/28 14:48:28 DEBUG: AuthMiddleware: Request URL: /devices
+2025/07/28 14:48:28 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /devices
+2025/07/28 14:48:28 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /devices
+2025/07/28 14:48:28 🚀 DeviceHandler.ListDevices() started
+2025/07/28 14:48:28 🐛 DEBUG: Device view requested: viewType='list', URL: /devices
+2025/07/28 14:48:28 ⏱️  Database query took: 128.736236ms
+2025/07/28 14:48:29 💾 Cached 20 devices
+2025/07/28 14:48:29 📋 LIST VIEW: Rendering list view template
+2025/07/28 14:48:29 SafeHTML: Rendering template devices_standalone.html with status 200
+2025/07/28 14:48:29 ⏱️  Template rendering took: 2.699996ms
+2025/07/28 14:48:29 🏁 DeviceHandler.ListDevices() completed in 604.798695ms
+2025/07/28 14:48:29 SLOW REQUEST: GET /devices took 673.882154ms (status: 200)
+{"timestamp":"2025-07-28T12:48:29.480694258Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706908806689726","method":"GET","path":"/devices","status_code":200,"duration":"674.002137ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":66479}}
+2025/07/28 14:48:30 Route Debug: GET /static/manifest.json
+2025/07/28 14:48:31 Route Debug: GET /products
+2025/07/28 14:48:31 DEBUG: AuthMiddleware: Request URL: /products
+2025/07/28 14:48:31 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /products
+2025/07/28 14:48:31 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /products
+2025/07/28 14:48:31 🚀 ProductHandler.ListProductsWeb() started
+2025/07/28 14:48:31 🐛 DEBUG: Product view requested: viewType='list'
+2025/07/28 14:48:31 ⏱️  Database query took: 104.472816ms
+2025/07/28 14:48:31 SafeHTML: Rendering template products_standalone.html with status 200
+2025/07/28 14:48:31 ⏱️  Template rendering took: 2.175035ms
+2025/07/28 14:48:31 🏁 ProductHandler.ListProductsWeb() completed in 106.715412ms
+{"timestamp":"2025-07-28T12:48:31.405812611Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706911229866414","method":"GET","path":"/products","status_code":200,"duration":"175.943702ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":78457}}
+2025/07/28 14:48:31 Route Debug: GET /static/manifest.json
+2025/07/28 14:48:32 Route Debug: GET /cables
+2025/07/28 14:48:32 DEBUG: AuthMiddleware: Request URL: /cables
+2025/07/28 14:48:32 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /cables
+2025/07/28 14:48:32 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /cables
+2025/07/28 14:48:32 🚀 CableHandler.ListCablesWeb() started
+2025/07/28 14:48:32 🐛 DEBUG: Cable view requested: viewType='list'
+
+2025/07/28 14:48:32 [35m/opt/dev/go-barcode-webapp/internal/repository/cable_repository.go:86
+[0m[31m[error] [0minvalid field found for struct go-barcode-webapp/internal/models.CableGroup's field Connector1Info: define a valid foreign key for relations or implement the Valuer/Scanner interface
+2025/07/28 14:48:34 ⏱️  Database query took: 1.388305904s
+2025/07/28 14:48:34 SafeHTML: Rendering template cables_standalone.html with status 200
+2025/07/28 14:48:34 ⏱️  Template rendering took: 3.818749ms
+2025/07/28 14:48:34 🏁 CableHandler.ListCablesWeb() completed in 1.403663953s
+2025/07/28 14:48:34 SLOW REQUEST: GET /cables took 1.473778186s (status: 200)
+{"timestamp":"2025-07-28T12:48:34.249970544Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706912776057236","method":"GET","path":"/cables","status_code":200,"duration":"1.473910733s","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":82160}}
+2025/07/28 14:48:34 Route Debug: GET /static/manifest.json
+2025/07/28 14:48:35 Route Debug: GET /
+{"timestamp":"2025-07-28T12:48:35.492176359Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706915469069827","method":"GET","path":"/","status_code":307,"duration":"23.103856ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":46}}
+2025/07/28 14:48:35 Route Debug: GET /dashboard
+2025/07/28 14:48:35 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/07/28 14:48:35 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /dashboard
+2025/07/28 14:48:35 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /dashboard
+{"timestamp":"2025-07-28T12:48:35.697567413Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706915560791447","method":"GET","path":"/dashboard","status_code":200,"duration":"136.77339ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":18341}}
+2025/07/28 14:48:35 Route Debug: GET /static/manifest.json
+2025/07/28 14:48:39 Route Debug: GET /scan
+2025/07/28 14:48:39 DEBUG: AuthMiddleware: Request URL: /scan
+2025/07/28 14:48:39 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /scan
+2025/07/28 14:48:39 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /scan
+🔍 DEBUG: CountDevicesAssignedToJobs called with targetDate: 2025-07-28
+🔍 DEBUG: Total devices assigned to jobs on 2025-07-28: 0
+2025/07/28 14:48:39 SafeHTML: Rendering template scan_select_job.html with status 200
+{"timestamp":"2025-07-28T12:48:39.503639701Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706919344748530","method":"GET","path":"/scan","status_code":200,"duration":"158.889301ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":15924}}
+2025/07/28 14:48:39 Route Debug: GET /static/manifest.json
+2025/07/28 14:48:54 Route Debug: GET /
+{"timestamp":"2025-07-28T12:48:54.965795089Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706934942430251","method":"GET","path":"/","status_code":307,"duration":"23.362559ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":46}}
+2025/07/28 14:48:55 Route Debug: GET /dashboard
+2025/07/28 14:48:55 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/07/28 14:48:55 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /dashboard
+2025/07/28 14:48:55 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /dashboard
+{"timestamp":"2025-07-28T12:48:55.172596547Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706935031467491","method":"GET","path":"/dashboard","status_code":200,"duration":"141.125219ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":18341}}
+2025/07/28 14:48:55 Route Debug: GET /static/manifest.json
+2025/07/28 14:48:55 Route Debug: GET /jobs
+2025/07/28 14:48:55 DEBUG: AuthMiddleware: Request URL: /jobs
+2025/07/28 14:48:55 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /jobs
+2025/07/28 14:48:55 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /jobs
+DEBUG Job Handler: All query params: map[]
+DEBUG Job Handler: Raw search parameter: ''
+DEBUG Job Handler: Final params: SearchTerm='', StartDate=<nil>, EndDate=<nil>
+DEBUG: Found 3 jobs with search term ''
+DEBUG: First job: {JobID:1007 CustomerID:59 StatusID:1002 Description:0xc0007095d0 StartDate:2025-07-12 00:00:00 +0200 CEST EndDate:2025-07-13 00:00:00 +0200 CEST Revenue:136 FinalRevenue:0xc0006bf4c0 CustomerName: Ben Mühlhan StatusName:paid DeviceCount:7 TotalRevenue:115.6}
+{"timestamp":"2025-07-28T12:48:55.816889588Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706935735800060","method":"GET","path":"/jobs","status_code":200,"duration":"81.08692ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":29481}}
+2025/07/28 14:48:55 Route Debug: GET /static/manifest.json
+2025/07/28 14:48:59 Route Debug: GET /jobs/new
+2025/07/28 14:48:59 DEBUG: AuthMiddleware: Request URL: /jobs/new
+2025/07/28 14:48:59 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /jobs/new
+2025/07/28 14:48:59 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /jobs/new
+{"timestamp":"2025-07-28T12:48:59.559855324Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706939453483229","method":"GET","path":"/jobs/new","status_code":200,"duration":"106.369916ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":25273}}
+2025/07/28 14:48:59 Route Debug: GET /static/manifest.json
+2025/07/28 14:49:14 POST request to /jobs with Content-Type: 'application/x-www-form-urlencoded'
+2025/07/28 14:49:14 Form _method parameter: ''
+2025/07/28 14:49:14 Route Debug: POST /jobs
+2025/07/28 14:49:14 DEBUG: AuthMiddleware: Request URL: /jobs
+2025/07/28 14:49:14 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /jobs
+2025/07/28 14:49:14 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /jobs
+{"timestamp":"2025-07-28T12:49:14.641307451Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706954538541684","method":"POST","path":"/jobs","status_code":302,"duration":"102.763368ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":127,"bytes_out":-1}}
+2025/07/28 14:49:14 Route Debug: GET /jobs
+2025/07/28 14:49:14 DEBUG: AuthMiddleware: Request URL: /jobs
+2025/07/28 14:49:14 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /jobs
+2025/07/28 14:49:14 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /jobs
+DEBUG Job Handler: All query params: map[]
+DEBUG Job Handler: Raw search parameter: ''
+DEBUG Job Handler: Final params: SearchTerm='', StartDate=<nil>, EndDate=<nil>
+DEBUG: Found 4 jobs with search term ''
+DEBUG: First job: {JobID:1008 CustomerID:52 StatusID:1001 Description:0xc000a7b300 StartDate:<nil> EndDate:<nil> Revenue:0 FinalRevenue:0xc0003dcbf0 CustomerName: Noah Ben Tielmann StatusName:open DeviceCount:0 TotalRevenue:0}
+{"timestamp":"2025-07-28T12:49:14.782145364Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706954700968270","method":"GET","path":"/jobs","status_code":200,"duration":"81.174816ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":31129}}
+2025/07/28 14:49:14 Route Debug: GET /static/manifest.json
+2025/07/28 14:49:29 Route Debug: GET /
+{"timestamp":"2025-07-28T12:49:29.224687711Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706969201241652","method":"GET","path":"/","status_code":307,"duration":"23.444109ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":46}}
+2025/07/28 14:49:29 Route Debug: GET /dashboard
+2025/07/28 14:49:29 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/07/28 14:49:29 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /dashboard
+2025/07/28 14:49:29 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /dashboard
+{"timestamp":"2025-07-28T12:49:29.424782338Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706969285386905","method":"GET","path":"/dashboard","status_code":200,"duration":"139.393104ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":18341}}
+2025/07/28 14:49:29 Route Debug: GET /static/manifest.json
+2025/07/28 14:49:30 Route Debug: GET /scan
+2025/07/28 14:49:30 DEBUG: AuthMiddleware: Request URL: /scan
+2025/07/28 14:49:30 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /scan
+2025/07/28 14:49:30 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /scan
+🔍 DEBUG: CountDevicesAssignedToJobs called with targetDate: 2025-07-28
+🔍 DEBUG: Total devices assigned to jobs on 2025-07-28: 0
+2025/07/28 14:49:30 SafeHTML: Rendering template scan_select_job.html with status 200
+{"timestamp":"2025-07-28T12:49:30.774475095Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706970612194802","method":"GET","path":"/scan","status_code":200,"duration":"162.276686ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":16873}}
+2025/07/28 14:49:30 Route Debug: GET /static/manifest.json
+2025/07/28 14:49:34 Route Debug: GET /scan/1008
+2025/07/28 14:49:34 DEBUG: AuthMiddleware: Request URL: /scan/1008
+2025/07/28 14:49:34 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /scan/1008
+2025/07/28 14:49:34 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /scan/1008
+🔧 DEBUG JobRepo.GetByID: Loaded job 1008 with description: ''
+2025/07/28 14:49:34 CaseRepository.List called
+2025/07/28 14:49:34 Executing SQL: 
+		SELECT 
+			c.caseID, 
+			c.name, 
+			c.description, 
+			c.width, 
+			c.height, 
+			c.depth, 
+			c.weight, 
+			c.status,
+			COALESCE(COUNT(dc.deviceID), 0) as device_count
+		FROM cases c 
+		LEFT JOIN devicescases dc ON c.caseID = dc.caseID GROUP BY c.caseID ORDER BY c.caseID
+2025/07/28 14:49:34 Found 6 cases
+2025/07/28 14:49:34 Case 1001 ('4x ETEC E-150 LED Spot') = 4 devices
+2025/07/28 14:49:34 Case 1002 ('6x Akku Uplights') = 6 devices
+2025/07/28 14:49:34 Case 1003 ('6x Akku Uplights') = 6 devices
+2025/07/28 14:49:34 Case 1004 ('Behringer X32') = 1 devices
+2025/07/28 14:49:34 Case 1005 ('Showtec Lampy 40 2U') = 1 devices
+2025/07/28 14:49:34 Case 1006 ('8x Cameo Thunderwash 600 RGBW') = 8 devices
+2025/07/28 14:49:34 Returning 6 cases
+{"timestamp":"2025-07-28T12:49:34.308089377Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753706974086561072","method":"GET","path":"/scan/1008","status_code":200,"duration":"221.526156ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":80258}}
+2025/07/28 14:49:34 Route Debug: GET /static/manifest.json
+2025/07/28 14:50:06 Route Debug: GET /api/v1/devices/Sub1001
+2025/07/28 14:50:06 DEBUG: AuthMiddleware: Request URL: /api/v1/devices/Sub1001
+2025/07/28 14:50:06 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /api/v1/devices/Sub1001
+2025/07/28 14:50:06 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /api/v1/devices/Sub1001
+{"timestamp":"2025-07-28T12:50:07.104257166Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753707006871688666","method":"GET","path":"/api/v1/devices/Sub1001","status_code":200,"duration":"232.564047ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":939}}
+2025/07/28 14:50:07 POST request to /api/v1/jobs/1008/assign-device with Content-Type: 'application/json'
+2025/07/28 14:50:07 Route Debug: POST /api/v1/jobs/1008/assign-device
+2025/07/28 14:50:07 DEBUG: AuthMiddleware: Request URL: /api/v1/jobs/1008/assign-device
+2025/07/28 14:50:07 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /api/v1/jobs/1008/assign-device
+2025/07/28 14:50:07 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /api/v1/jobs/1008/assign-device
+🚨 DEBUG SCANNER: ScanDevice called!
+🚨 DEBUG SCANNER: Request - JobID: 1008, DeviceID: Sub1001
+✅ DEBUG SCANNER: Device found: SUB1001
+🔧 DEBUG JobRepo.GetByID: Loaded job 1008 with description: ''
+🚨 DEBUG SCANNER: Job 1008 dates: <nil> to <nil>
+🚨 DEBUG SCANNER: Device available: false
+🔧 DEBUG JobRepo.GetByID: Loaded job 1002 with description: 'Abifeier 17.05. WvO'
+2025/07/28 14:50:08 SLOW REQUEST: POST /api/v1/jobs/1008/assign-device took 1.148541421s (status: 409)
+{"timestamp":"2025-07-28T12:50:08.454936357Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753707007306261854","method":"POST","path":"/api/v1/jobs/1008/assign-device","status_code":409,"duration":"1.148671168s","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":50,"bytes_out":81}}
+2025/07/28 14:50:25 Route Debug: GET /api/v1/devices/Par10012
+2025/07/28 14:50:25 DEBUG: AuthMiddleware: Request URL: /api/v1/devices/Par10012
+2025/07/28 14:50:25 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /api/v1/devices/Par10012
+2025/07/28 14:50:25 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /api/v1/devices/Par10012
+{"timestamp":"2025-07-28T12:50:25.28721826Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753707025171501477","method":"GET","path":"/api/v1/devices/Par10012","status_code":404,"duration":"115.714328ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":28}}
+2025/07/28 14:50:31 Route Debug: GET /api/v1/devices/Par1012
+2025/07/28 14:50:31 DEBUG: AuthMiddleware: Request URL: /api/v1/devices/Par1012
+2025/07/28 14:50:31 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /api/v1/devices/Par1012
+2025/07/28 14:50:31 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /api/v1/devices/Par1012
+{"timestamp":"2025-07-28T12:50:31.374385343Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753707031145951514","method":"GET","path":"/api/v1/devices/Par1012","status_code":200,"duration":"228.431185ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":780}}
+2025/07/28 14:50:56 Route Debug: GET /analytics
+2025/07/28 14:50:56 DEBUG: AuthMiddleware: Request URL: /analytics
+2025/07/28 14:50:56 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /analytics
+2025/07/28 14:50:56 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /analytics
+{"timestamp":"2025-07-28T12:50:57.27002811Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753707056853845933","method":"GET","path":"/analytics","status_code":200,"duration":"416.179754ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":92281}}
+2025/07/28 14:50:57 Route Debug: GET /static/manifest.json
+2025/07/28 14:51:08 Route Debug: GET /analytics/devices/all
+2025/07/28 14:51:08 DEBUG: AuthMiddleware: Request URL: /analytics/devices/all
+2025/07/28 14:51:08 DEBUG: AuthMiddleware: Found session cookie: 1c5d31c139c8f96f02137f265d836fcc1d29bca0478cbc6bf2156bad779f5a9c for /analytics/devices/all
+2025/07/28 14:51:08 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /analytics/devices/all
+{"timestamp":"2025-07-28T12:51:08.934899474Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753707068841102207","method":"GET","path":"/analytics/devices/all","status_code":200,"duration":"93.79282ms","ip":"10.0.0.7","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Safari/605.1.15","fields":{"bytes_in":0,"bytes_out":14755}}
+DEBUG: Cleaned up 1 expired sessions
+2025/07/29 11:00:47 Route Debug: GET /
+{"timestamp":"2025-07-29T09:00:48.020049698Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779647898556789","method":"GET","path":"/","status_code":307,"duration":"121.491224ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":42}}
+2025/07/29 11:00:48 Route Debug: GET /login
+{"timestamp":"2025-07-29T09:00:48.150340286Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779648126494903","method":"GET","path":"/login","status_code":200,"duration":"23.840092ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":14745}}
+2025/07/29 11:00:49 Route Debug: GET /sw.js
+{"timestamp":"2025-07-29T09:00:49.200044253Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779649176214272","method":"GET","path":"/sw.js","status_code":200,"duration":"23.827756ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":8867}}
+2025/07/29 11:00:49 POST request to /auth/passkey/start-authentication with Content-Type: ''
+2025/07/29 11:00:49 Route Debug: POST /auth/passkey/start-authentication
+2025/07/29 11:00:49 DEBUG: StartPasskeyAuthentication called
+2025/07/29 11:00:49 DEBUG: Request scheme: http, host: job.nt.local
+2025/07/29 11:00:49 DEBUG: Found 1 active passkeys for authentication
+2025/07/29 11:00:49 DEBUG: Adding passkey to allowCredentials - ID: zMWqIIoaTBKmzcw2xzl8xw, Name: Bitwarden
+2025/07/29 11:00:49 DEBUG: Using RP ID: job.nt.local for authentication on host: job.nt.local
+2025/07/29 11:00:49 DEBUG: Prepared 1 allowCredentials for authentication
+{"timestamp":"2025-07-29T09:00:49.501471401Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779649430065429","method":"POST","path":"/auth/passkey/start-authentication","status_code":200,"duration":"71.403426ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":274}}
+2025/07/29 11:00:52 POST request to /auth/passkey/complete-authentication with Content-Type: 'application/json'
+2025/07/29 11:00:52 Route Debug: POST /auth/passkey/complete-authentication
+2025/07/29 11:00:52 DEBUG: CompletePasskeyAuthentication called
+{"timestamp":"2025-07-29T09:00:53.091846103Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779652898575283","method":"POST","path":"/auth/passkey/complete-authentication","status_code":200,"duration":"193.26609ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":486,"bytes_out":58}}
+2025/07/29 11:00:53 Route Debug: GET /dashboard
+2025/07/29 11:00:53 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/07/29 11:00:53 DEBUG: AuthMiddleware: Found session cookie: 0twu8K9WOqUxdfnIifnXUwvdXdt8tdGd6va28RLujXw= for /dashboard
+2025/07/29 11:00:53 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /dashboard
+{"timestamp":"2025-07-29T09:00:53.356859531Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779653213230531","method":"GET","path":"/dashboard","status_code":200,"duration":"143.625875ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18341}}
+2025/07/29 11:00:53 Route Debug: GET /favicon.ico
+{"timestamp":"2025-07-29T09:00:53.726436838Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779653703726424","method":"GET","path":"/favicon.ico","status_code":200,"duration":"22.708289ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":6685}}
+2025/07/29 11:00:56 Route Debug: GET /logout
+{"timestamp":"2025-07-29T09:00:56.794675492Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779656745691352","method":"GET","path":"/logout","status_code":303,"duration":"48.981685ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":33}}
+2025/07/29 11:00:56 Route Debug: GET /login
+{"timestamp":"2025-07-29T09:00:56.864772682Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779656841766957","method":"GET","path":"/login","status_code":200,"duration":"23.003671ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":14745}}
+2025/07/29 11:00:57 POST request to /auth/passkey/start-authentication with Content-Type: ''
+2025/07/29 11:00:57 Route Debug: POST /auth/passkey/start-authentication
+2025/07/29 11:00:57 DEBUG: StartPasskeyAuthentication called
+2025/07/29 11:00:57 DEBUG: Request scheme: http, host: job.nt.local
+2025/07/29 11:00:57 DEBUG: Found 1 active passkeys for authentication
+2025/07/29 11:00:57 DEBUG: Adding passkey to allowCredentials - ID: zMWqIIoaTBKmzcw2xzl8xw, Name: Bitwarden
+2025/07/29 11:00:57 DEBUG: Using RP ID: job.nt.local for authentication on host: job.nt.local
+2025/07/29 11:00:57 DEBUG: Prepared 1 allowCredentials for authentication
+{"timestamp":"2025-07-29T09:00:57.993764037Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779657923401657","method":"POST","path":"/auth/passkey/start-authentication","status_code":200,"duration":"70.360205ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":274}}
+2025/07/29 11:01:02 POST request to /login with Content-Type: 'application/x-www-form-urlencoded'
+2025/07/29 11:01:02 Form _method parameter: ''
+2025/07/29 11:01:02 Route Debug: POST /login
+2025/07/29 11:01:04 SLOW REQUEST: POST /login took 1.112326552s (status: 303)
+{"timestamp":"2025-07-29T09:01:04.052668448Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779662940196019","method":"POST","path":"/login","status_code":303,"duration":"1.112464333s","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":42,"bytes_out":-1}}
+2025/07/29 11:01:04 Route Debug: GET /login/2fa
+{"timestamp":"2025-07-29T09:01:04.135493226Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779664112715849","method":"GET","path":"/login/2fa","status_code":200,"duration":"22.772026ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":9188}}
+2025/07/29 11:01:08 POST request to /login/2fa with Content-Type: 'application/x-www-form-urlencoded'
+2025/07/29 11:01:08 Form _method parameter: ''
+2025/07/29 11:01:08 Route Debug: POST /login/2fa
+{"timestamp":"2025-07-29T09:01:08.565363896Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779668398431062","method":"POST","path":"/login/2fa","status_code":303,"duration":"166.928956ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":11,"bytes_out":-1}}
+2025/07/29 11:01:08 Route Debug: GET /
+{"timestamp":"2025-07-29T09:01:08.645443658Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779668622535582","method":"GET","path":"/","status_code":307,"duration":"22.904689ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":46}}
+2025/07/29 11:01:08 Route Debug: GET /dashboard
+2025/07/29 11:01:08 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/07/29 11:01:08 DEBUG: AuthMiddleware: Found session cookie: 0de4f6f15ef67133b39c5924ddfaa936f487d94cc1506f73f72b6106f70938fb for /dashboard
+2025/07/29 11:01:08 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /dashboard
+{"timestamp":"2025-07-29T09:01:08.879435343Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779668738757340","method":"GET","path":"/dashboard","status_code":200,"duration":"140.675639ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18341}}
+2025/07/29 11:01:12 Route Debug: GET /jobs
+2025/07/29 11:01:12 DEBUG: AuthMiddleware: Request URL: /jobs
+2025/07/29 11:01:12 DEBUG: AuthMiddleware: Found session cookie: 0de4f6f15ef67133b39c5924ddfaa936f487d94cc1506f73f72b6106f70938fb for /jobs
+2025/07/29 11:01:12 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /jobs
+DEBUG Job Handler: All query params: map[]
+DEBUG Job Handler: Raw search parameter: ''
+DEBUG Job Handler: Final params: SearchTerm='', StartDate=<nil>, EndDate=<nil>
+DEBUG: Found 4 jobs with search term ''
+DEBUG: First job: {JobID:1008 CustomerID:52 StatusID:1001 Description:0xc000784750 StartDate:<nil> EndDate:<nil> Revenue:0 FinalRevenue:0xc000344c30 CustomerName: Noah Ben Tielmann StatusName:open DeviceCount:0 TotalRevenue:0}
+{"timestamp":"2025-07-29T09:01:12.968482503Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779672885720691","method":"GET","path":"/jobs","status_code":200,"duration":"82.759897ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":31129}}
+2025/07/29 11:01:14 Route Debug: GET /devices
+2025/07/29 11:01:14 DEBUG: AuthMiddleware: Request URL: /devices
+2025/07/29 11:01:14 DEBUG: AuthMiddleware: Found session cookie: 0de4f6f15ef67133b39c5924ddfaa936f487d94cc1506f73f72b6106f70938fb for /devices
+2025/07/29 11:01:14 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /devices
+2025/07/29 11:01:14 🚀 DeviceHandler.ListDevices() started
+2025/07/29 11:01:14 🐛 DEBUG: Device view requested: viewType='list', URL: /devices
+2025/07/29 11:01:14 ⏱️  Database query took: 126.628773ms
+2025/07/29 11:01:15 💾 Cached 20 devices
+2025/07/29 11:01:15 📋 LIST VIEW: Rendering list view template
+2025/07/29 11:01:15 SafeHTML: Rendering template devices_standalone.html with status 200
+2025/07/29 11:01:15 ⏱️  Template rendering took: 1.32169ms
+2025/07/29 11:01:15 🏁 DeviceHandler.ListDevices() completed in 598.56331ms
+2025/07/29 11:01:15 SLOW REQUEST: GET /devices took 668.574514ms (status: 200)
+{"timestamp":"2025-07-29T09:01:15.224730081Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779674556034010","method":"GET","path":"/devices","status_code":200,"duration":"668.693496ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":66479}}
+2025/07/29 11:01:18 Route Debug: GET /products
+2025/07/29 11:01:18 DEBUG: AuthMiddleware: Request URL: /products
+2025/07/29 11:01:18 DEBUG: AuthMiddleware: Found session cookie: 0de4f6f15ef67133b39c5924ddfaa936f487d94cc1506f73f72b6106f70938fb for /products
+2025/07/29 11:01:18 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /products
+2025/07/29 11:01:18 🚀 ProductHandler.ListProductsWeb() started
+2025/07/29 11:01:18 🐛 DEBUG: Product view requested: viewType='list'
+2025/07/29 11:01:18 ⏱️  Database query took: 105.139778ms
+2025/07/29 11:01:18 SafeHTML: Rendering template products_standalone.html with status 200
+2025/07/29 11:01:18 ⏱️  Template rendering took: 1.533822ms
+2025/07/29 11:01:18 🏁 ProductHandler.ListProductsWeb() completed in 106.754364ms
+{"timestamp":"2025-07-29T09:01:18.413651285Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779678235794824","method":"GET","path":"/products","status_code":200,"duration":"177.852172ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":78457}}
+2025/07/29 11:01:19 Route Debug: GET /cables
+2025/07/29 11:01:19 DEBUG: AuthMiddleware: Request URL: /cables
+2025/07/29 11:01:19 DEBUG: AuthMiddleware: Found session cookie: 0de4f6f15ef67133b39c5924ddfaa936f487d94cc1506f73f72b6106f70938fb for /cables
+2025/07/29 11:01:19 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /cables
+2025/07/29 11:01:19 🚀 CableHandler.ListCablesWeb() started
+2025/07/29 11:01:19 🐛 DEBUG: Cable view requested: viewType='list'
+
+2025/07/29 11:01:19 [35m/opt/dev/go-barcode-webapp/internal/repository/cable_repository.go:86
+[0m[31m[error] [0minvalid field found for struct go-barcode-webapp/internal/models.CableGroup's field Connector1Info: define a valid foreign key for relations or implement the Valuer/Scanner interface
+2025/07/29 11:01:21 ⏱️  Database query took: 1.391691866s
+2025/07/29 11:01:21 SafeHTML: Rendering template cables_standalone.html with status 200
+2025/07/29 11:01:21 ⏱️  Template rendering took: 1.392706ms
+2025/07/29 11:01:21 🏁 CableHandler.ListCablesWeb() completed in 1.404148294s
+2025/07/29 11:01:21 SLOW REQUEST: GET /cables took 1.473864608s (status: 200)
+{"timestamp":"2025-07-29T09:01:21.167627701Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779679693689905","method":"GET","path":"/cables","status_code":200,"duration":"1.473936043s","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":82160}}
+2025/07/29 11:01:22 Route Debug: GET /customers
+2025/07/29 11:01:22 DEBUG: AuthMiddleware: Request URL: /customers
+2025/07/29 11:01:22 DEBUG: AuthMiddleware: Found session cookie: 0de4f6f15ef67133b39c5924ddfaa936f487d94cc1506f73f72b6106f70938fb for /customers
+2025/07/29 11:01:22 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /customers
+{"timestamp":"2025-07-29T09:01:22.941224278Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779682853517078","method":"GET","path":"/customers","status_code":200,"duration":"87.705567ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":188609}}
+2025/07/29 11:01:24 Route Debug: GET /cases
+2025/07/29 11:01:24 DEBUG: AuthMiddleware: Request URL: /cases
+2025/07/29 11:01:24 DEBUG: AuthMiddleware: Found session cookie: 0de4f6f15ef67133b39c5924ddfaa936f487d94cc1506f73f72b6106f70938fb for /cases
+2025/07/29 11:01:24 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /cases
+DEBUG Case Handler: All query params: map[]
+DEBUG Case Handler: Raw search parameter: ''
+DEBUG Case Handler: Final params: SearchTerm=''
+2025/07/29 11:01:24 CaseRepository.List called
+2025/07/29 11:01:24 Executing SQL: 
+		SELECT 
+			c.caseID, 
+			c.name, 
+			c.description, 
+			c.width, 
+			c.height, 
+			c.depth, 
+			c.weight, 
+			c.status,
+			COALESCE(COUNT(dc.deviceID), 0) as device_count
+		FROM cases c 
+		LEFT JOIN devicescases dc ON c.caseID = dc.caseID GROUP BY c.caseID ORDER BY c.caseID
+2025/07/29 11:01:24 Found 6 cases
+2025/07/29 11:01:24 Case 1001 ('4x ETEC E-150 LED Spot') = 4 devices
+2025/07/29 11:01:24 Case 1002 ('6x Akku Uplights') = 6 devices
+2025/07/29 11:01:24 Case 1003 ('6x Akku Uplights') = 6 devices
+2025/07/29 11:01:24 Case 1004 ('Behringer X32') = 1 devices
+2025/07/29 11:01:24 Case 1005 ('Showtec Lampy 40 2U') = 1 devices
+2025/07/29 11:01:24 Case 1006 ('8x Cameo Thunderwash 600 RGBW') = 8 devices
+2025/07/29 11:01:24 Returning 6 cases
+DEBUG: Found 6 cases with search term ''
+2025/07/29 11:01:24 SafeHTML: Rendering template cases_list.html with status 200
+{"timestamp":"2025-07-29T09:01:24.344759876Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779684259035293","method":"GET","path":"/cases","status_code":200,"duration":"85.720835ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":69504}}
+2025/07/29 11:01:26 Route Debug: GET /workflow/packages
+2025/07/29 11:01:26 DEBUG: AuthMiddleware: Request URL: /workflow/packages
+2025/07/29 11:01:26 DEBUG: AuthMiddleware: Found session cookie: 0de4f6f15ef67133b39c5924ddfaa936f487d94cc1506f73f72b6106f70938fb for /workflow/packages
+2025/07/29 11:01:26 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /workflow/packages
+2025/07/29 11:01:26 🎯 EQUIPMENT PACKAGE HANDLER: ShowPackagesList called
+2025/07/29 11:01:26 📊 PACKAGE LIST: Starting List method with params: &{StartDate:<nil> EndDate:<nil> CustomerID:<nil> StatusID:<nil> MinRevenue:<nil> MaxRevenue:<nil> SearchTerm: Category: Available:<nil> Limit:25 Offset:0 Page:1 SortBy:created_at SortOrder:desc Status: ProductID:<nil> AssignmentStatus: JobID:<nil>}
+2025/07/29 11:01:26 🔍 CALL STACK: List method called from: /opt/dev/go-barcode-webapp/internal/handlers/equipment_package_handler.go:36 (go-barcode-webapp/internal/handlers.(*EquipmentPackageHandler).ShowPackagesList)
+2025/07/29 11:01:26 📊 PACKAGE COUNT: Package 2 ('Ton S') has 4 devices
+2025/07/29 11:01:26 🎯 BEFORE ENRICH: Package 2 ('Ton S') has 0 PackageDevices
+2025/07/29 11:01:26 🎯 AFTER ENRICH: Package 2 ('Ton S') has 0 PackageDevices and DeviceCount=4
+2025/07/29 11:01:26 🎯 TEMPLATE DEBUG: Rendering with 1 packages
+2025/07/29 11:01:26 🎯 TEMPLATE DEBUG: Package 0: ID=2, Name='Ton S', PackageDevices=0, DeviceCount=4
+{"timestamp":"2025-07-29T09:01:26.763030552Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779686622385315","method":"GET","path":"/workflow/packages","status_code":200,"duration":"140.643194ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":55284}}

@@ -3,6 +3,7 @@ package handlers
 import (
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,6 +14,7 @@ import (
 	"go-barcode-webapp/internal/models"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pquerna/otp/totp"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -75,7 +77,35 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	// Create session
+	// Check if user has 2FA enabled
+	var twoFAEnabled bool
+	h.db.Raw("SELECT COALESCE(is_enabled, false) FROM user_2fa WHERE user_id = ?", user.UserID).Scan(&twoFAEnabled)
+	
+	if twoFAEnabled {
+		// Store user info in session temporarily for 2FA verification
+		tempSessionID := h.generateSessionID()
+		tempSession := models.Session{
+			SessionID: tempSessionID,
+			UserID:    user.UserID,
+			ExpiresAt: time.Now().Add(5 * time.Minute), // Short-lived for 2FA verification
+			CreatedAt: time.Now(),
+		}
+		
+		if err := h.db.Create(&tempSession).Error; err != nil {
+			c.HTML(http.StatusInternalServerError, "login.html", gin.H{
+				"title": "Login",
+				"error": "Login failed. Please try again.",
+			})
+			return
+		}
+		
+		// Redirect to 2FA verification page
+		c.SetCookie("temp_session_id", tempSessionID, 300, "/", "", false, true) // 5 minutes
+		c.Redirect(http.StatusSeeOther, "/login/2fa")
+		return
+	}
+
+	// Create full session (no 2FA required)
 	sessionID := h.generateSessionID()
 	sessionTimeout := time.Duration(h.config.Security.SessionTimeout) * time.Second
 	session := models.Session{
@@ -120,6 +150,128 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 
 	// Redirect to login
 	c.Redirect(http.StatusSeeOther, "/login")
+}
+
+// Login2FAForm shows the 2FA verification page
+func (h *AuthHandler) Login2FAForm(c *gin.Context) {
+	c.HTML(http.StatusOK, "login_2fa.html", gin.H{
+		"title": "Two-Factor Authentication",
+	})
+}
+
+// Login2FAVerify handles 2FA verification during login
+func (h *AuthHandler) Login2FAVerify(c *gin.Context) {
+	var verifyData struct {
+		Code string `form:"code" binding:"required"`
+	}
+
+	if err := c.ShouldBind(&verifyData); err != nil {
+		c.HTML(http.StatusBadRequest, "login_2fa.html", gin.H{
+			"title": "Two-Factor Authentication",
+			"error": "Please enter a verification code",
+		})
+		return
+	}
+
+	// Get temporary session
+	tempSessionID, err := c.Cookie("temp_session_id")
+	if err != nil {
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+
+	// Find temp session
+	var tempSession models.Session
+	if err := h.db.Where("session_id = ? AND expires_at > ?", tempSessionID, time.Now()).First(&tempSession).Error; err != nil {
+		c.SetCookie("temp_session_id", "", -1, "/", "", false, true) // Clear cookie
+		c.HTML(http.StatusUnauthorized, "login_2fa.html", gin.H{
+			"title": "Two-Factor Authentication", 
+			"error": "Session expired. Please log in again.",
+		})
+		return
+	}
+
+	// Get user and 2FA info
+	var user models.User
+	if err := h.db.Where("userID = ?", tempSession.UserID).First(&user).Error; err != nil {
+		c.Redirect(http.StatusSeeOther, "/login")
+		return
+	}
+
+	// Get 2FA secret using raw SQL
+	var secret string
+	if err := h.db.Raw("SELECT secret FROM user_2fa WHERE user_id = ? AND is_enabled = 1", user.UserID).Scan(&secret).Error; err != nil {
+		c.HTML(http.StatusInternalServerError, "login_2fa.html", gin.H{
+			"title": "Two-Factor Authentication",
+			"error": "2FA not properly configured",
+		})
+		return
+	}
+
+	// Verify TOTP code
+	valid := totp.Validate(verifyData.Code, secret)
+	if !valid {
+		// Check backup codes
+		var backupCodesJSON string
+		h.db.Raw("SELECT backup_codes FROM user_2fa WHERE user_id = ?", user.UserID).Scan(&backupCodesJSON)
+		
+		if backupCodesJSON != "" {
+			var backupCodes []string
+			if json.Unmarshal([]byte(backupCodesJSON), &backupCodes) == nil {
+				for i, backupCode := range backupCodes {
+					if backupCode == verifyData.Code {
+						valid = true
+						// Remove used backup code
+						backupCodes = append(backupCodes[:i], backupCodes[i+1:]...)
+						newBackupCodesJSON, _ := json.Marshal(backupCodes)
+						h.db.Exec("UPDATE user_2fa SET backup_codes = ? WHERE user_id = ?", string(newBackupCodesJSON), user.UserID)
+						break
+					}
+				}
+			}
+		}
+	}
+
+	if !valid {
+		c.HTML(http.StatusUnauthorized, "login_2fa.html", gin.H{
+			"title": "Two-Factor Authentication",
+			"error": "Invalid verification code",
+		})
+		return
+	}
+
+	// Delete temporary session
+	h.db.Delete(&tempSession)
+	c.SetCookie("temp_session_id", "", -1, "/", "", false, true)
+
+	// Create full session
+	sessionID := h.generateSessionID()
+	sessionTimeout := time.Duration(h.config.Security.SessionTimeout) * time.Second
+	session := models.Session{
+		SessionID: sessionID,
+		UserID:    user.UserID,
+		ExpiresAt: time.Now().Add(sessionTimeout),
+		CreatedAt: time.Now(),
+	}
+
+	if err := h.db.Create(&session).Error; err != nil {
+		c.HTML(http.StatusInternalServerError, "login_2fa.html", gin.H{
+			"title": "Two-Factor Authentication",
+			"error": "Login failed. Please try again.",
+		})
+		return
+	}
+
+	// Update last login
+	now := time.Now()
+	user.LastLogin = &now
+	h.db.Save(&user)
+
+	// Set cookie
+	c.SetCookie("session_id", sessionID, h.config.Security.SessionTimeout, "/", "", false, true)
+
+	// Redirect to home
+	c.Redirect(http.StatusSeeOther, "/")
 }
 
 // AuthMiddleware checks if user is authenticated
@@ -548,183 +700,179 @@ func parseUserID(userIDStr string) uint {
 	return 0
 }
 
-// Profile Settings Handlers
 
-// ProfileSettingsForm displays the profile settings page
-func (h *AuthHandler) ProfileSettingsForm(c *gin.Context) {
-	log.Printf("DEBUG: ProfileSettingsForm: Handler invoked for URL: %s, Method: %s", c.Request.URL.Path, c.Request.Method)
-	
-	currentUser, exists := GetCurrentUser(c)
-	if !exists || currentUser == nil {
-		log.Printf("DEBUG: ProfileSettingsForm: User not authenticated, redirecting to /login")
-		c.Redirect(http.StatusSeeOther, "/login")
-		return
-	}
+// ================================================================
+// ADMIN USER MANAGEMENT FUNCTIONS
+// ================================================================
 
-	// Get or create user preferences
-	var preferences models.UserPreferences
-	if err := h.db.Where("user_id = ?", currentUser.UserID).First(&preferences).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Printf("DEBUG: ProfileSettingsForm: Preferences not found for user %d, creating defaults", currentUser.UserID)
-			// Create default preferences
-			preferences = models.UserPreferences{
-				UserID:                   currentUser.UserID,
-				Language:                 "de",
-				Theme:                    "dark",
-				TimeZone:                 "Europe/Berlin",
-				DateFormat:               "DD.MM.YYYY",
-				TimeFormat:               "24h",
-				EmailNotifications:       true,
-				SystemNotifications:      true,
-				JobStatusNotifications:   true,
-				DeviceAlertNotifications: true,
-				ItemsPerPage:             25,
-				DefaultView:              "list",
-				ShowAdvancedOptions:      false,
-				AutoSaveEnabled:          true,
-				CreatedAt:                time.Now(),
-				UpdatedAt:                time.Now(),
-			}
-			if err := h.db.Create(&preferences).Error; err != nil {
-				log.Printf("ERROR: ProfileSettingsForm: Failed to create user preferences: %v", err)
-				c.HTML(http.StatusInternalServerError, "error.html", gin.H{
-					"error": "Failed to create user preferences",
-					"user":  currentUser,
-				})
-				return
-			}
-		} else {
-			log.Printf("ERROR: ProfileSettingsForm: Failed to load user preferences: %v", err)
-			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
-				"error": "Failed to load user preferences",
-				"user":  currentUser,
-			})
-			return
-		}
-	}
-
-	log.Printf("DEBUG: ProfileSettingsForm: Rendering profile_settings.html for user %s", currentUser.Username)
-	c.HTML(http.StatusOK, "profile_settings.html", gin.H{
-		"title":       "Profile Settings",
-		"user":        currentUser,
-		"preferences": preferences,
-		"currentPage": "profile",
-	})
-}
-
-// UpdateProfileSettings handles profile settings updates
-func (h *AuthHandler) UpdateProfileSettings(c *gin.Context) {
-	currentUser, exists := GetCurrentUser(c)
-	if !exists || currentUser == nil {
-		c.Redirect(http.StatusSeeOther, "/login")
-		return
-	}
-
-	// Get current preferences
-	var preferences models.UserPreferences
-	if err := h.db.Where("user_id = ?", currentUser.UserID).First(&preferences).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load preferences"})
-		return
-	}
-
-	// Update preferences from form data
-	preferences.Language = c.PostForm("language")
-	preferences.Theme = c.PostForm("theme")
-	preferences.TimeZone = c.PostForm("time_zone")
-	preferences.DateFormat = c.PostForm("date_format")
-	preferences.TimeFormat = c.PostForm("time_format")
-	
-	// Parse boolean values
-	preferences.EmailNotifications = c.PostForm("email_notifications") == "on"
-	preferences.SystemNotifications = c.PostForm("system_notifications") == "on"
-	preferences.JobStatusNotifications = c.PostForm("job_status_notifications") == "on"
-	preferences.DeviceAlertNotifications = c.PostForm("device_alert_notifications") == "on"
-	preferences.ShowAdvancedOptions = c.PostForm("show_advanced_options") == "on"
-	preferences.AutoSaveEnabled = c.PostForm("auto_save_enabled") == "on"
-	
-	// Parse integer values
-	if itemsPerPage, err := strconv.Atoi(c.PostForm("items_per_page")); err == nil && itemsPerPage > 0 {
-		preferences.ItemsPerPage = itemsPerPage
-	}
-	
-	preferences.DefaultView = c.PostForm("default_view")
-	preferences.UpdatedAt = time.Now()
-
-	// Save preferences
-	if err := h.db.Save(&preferences).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save preferences"})
-		return
-	}
-
-	// Also update user profile information if provided
-	if firstName := c.PostForm("first_name"); firstName != "" {
-		currentUser.FirstName = firstName
-	}
-	if lastName := c.PostForm("last_name"); lastName != "" {
-		currentUser.LastName = lastName
-	}
-	if email := c.PostForm("email"); email != "" {
-		// Check if email is already taken by another user
-		var existingUser models.User
-		if err := h.db.Where("email = ? AND userID != ?", email, currentUser.UserID).First(&existingUser).Error; err == nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Email is already taken"})
-			return
-		}
-		currentUser.Email = email
-	}
-	
-	// Update password if provided
-	if password := c.PostForm("password"); password != "" {
-		hashedPassword, err := HashPassword(password)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
-			return
-		}
-		currentUser.PasswordHash = hashedPassword
-	}
-	
-	currentUser.UpdatedAt = time.Now()
-	if err := h.db.Save(currentUser).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user profile"})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "Profile settings updated successfully"})
-}
-
-// GetUserPreferences returns user preferences for the current user
-func (h *AuthHandler) GetUserPreferences(c *gin.Context) {
+// AdminSetUserPassword allows admins to set passwords for other users
+func (h *AuthHandler) AdminSetUserPassword(c *gin.Context) {
 	currentUser, exists := GetCurrentUser(c)
 	if !exists || currentUser == nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 
-	var preferences models.UserPreferences
-	if err := h.db.Where("user_id = ?", currentUser.UserID).First(&preferences).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			// Return default preferences
-			preferences = models.UserPreferences{
-				UserID:                   currentUser.UserID,
-				Language:                 "de",
-				Theme:                    "dark",
-				TimeZone:                 "Europe/Berlin",
-				DateFormat:               "DD.MM.YYYY",
-				TimeFormat:               "24h",
-				EmailNotifications:       true,
-				SystemNotifications:      true,
-				JobStatusNotifications:   true,
-				DeviceAlertNotifications: true,
-				ItemsPerPage:             25,
-				DefaultView:              "list",
-				ShowAdvancedOptions:      false,
-				AutoSaveEnabled:          true,
+	// Check if current user has admin privileges
+	if !h.hasAdminPermission(currentUser) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Admin privileges required"})
+		return
+	}
+
+	userID := c.Param("id")
+	var request struct {
+		Password string `json:"password" binding:"required,min=6"`
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Find the target user
+	var targetUser models.User
+	if err := h.db.Where("userID = ?", userID).First(&targetUser).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Hash the new password
+	hashedPassword, err := HashPassword(request.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+		return
+	}
+
+	// Update the user's password
+	targetUser.PasswordHash = hashedPassword
+	targetUser.UpdatedAt = time.Now()
+
+	if err := h.db.Save(&targetUser).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update password"})
+		return
+	}
+
+	// Log the action
+	h.logAdminAction(c, "set_password", "user", userID, currentUser.UserID)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Password updated successfully"})
+}
+
+// AdminBlockUser allows admins to block/unblock user logins
+func (h *AuthHandler) AdminBlockUser(c *gin.Context) {
+	currentUser, exists := GetCurrentUser(c)
+	if !exists || currentUser == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	// Check if current user has admin privileges
+	if !h.hasAdminPermission(currentUser) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Admin privileges required"})
+		return
+	}
+
+	userID := c.Param("id")
+	var request struct {
+		IsActive bool `json:"isActive"`
+	}
+
+	if err := c.ShouldBindJSON(&request); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Don't allow blocking self
+	if fmt.Sprintf("%d", currentUser.UserID) == userID {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot block your own account"})
+		return
+	}
+
+	// Find the target user
+	var targetUser models.User
+	if err := h.db.Where("userID = ?", userID).First(&targetUser).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	oldStatus := targetUser.IsActive
+	targetUser.IsActive = request.IsActive
+	targetUser.UpdatedAt = time.Now()
+
+	if err := h.db.Save(&targetUser).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user status"})
+		return
+	}
+
+	// If user is being blocked, invalidate all their sessions
+	if !request.IsActive {
+		h.db.Where("user_id = ?", userID).Delete(&models.Session{})
+	}
+
+	// Log the action
+	action := "unblock_user"
+	if !request.IsActive {
+		action = "block_user"
+	}
+	h.logAdminAction(c, action, "user", userID, currentUser.UserID)
+
+	statusText := "unblocked"
+	if !request.IsActive {
+		statusText = "blocked"
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": fmt.Sprintf("User %s successfully", statusText),
+		"oldStatus": oldStatus,
+		"newStatus": request.IsActive,
+	})
+}
+
+// hasAdminPermission checks if user has admin privileges
+func (h *AuthHandler) hasAdminPermission(user *models.User) bool {
+	// System admin always has permission
+	if user.Username == "admin" {
+		return true
+	}
+
+	// Check if user has admin role or specific permissions
+	var userRoles []models.UserRole
+	if err := h.db.Preload("Role").Where("userID = ? AND is_active = ?", user.UserID, true).Find(&userRoles).Error; err != nil {
+		return false
+	}
+
+	for _, userRole := range userRoles {
+		if userRole.Role == nil || !userRole.Role.IsActive {
+			continue
+		}
+
+		var permissions []string
+		if err := json.Unmarshal(userRole.Role.Permissions, &permissions); err != nil {
+			continue
+		}
+
+		for _, perm := range permissions {
+			if perm == "*" || perm == "users.manage" || perm == "users.admin" {
+				return true
 			}
-		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load preferences"})
-			return
 		}
 	}
 
-	c.JSON(http.StatusOK, preferences)
+	return false
+}
+
+// logAdminAction logs admin actions for auditing
+func (h *AuthHandler) logAdminAction(c *gin.Context, action, entityType, entityID string, adminUserID uint) {
+	auditLog := models.AuditLog{
+		UserID:     &adminUserID,
+		Action:     action,
+		EntityType: entityType,
+		EntityID:   entityID,
+		IPAddress:  c.ClientIP(),
+		UserAgent:  c.GetHeader("User-Agent"),
+		Timestamp:  time.Now(),
+	}
+
+	// Save audit log (ignore errors to not break main operation)
+	h.db.Create(&auditLog)
 }

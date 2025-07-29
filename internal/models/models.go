@@ -464,3 +464,79 @@ func (cg CableGroup) GetMM2Display() string {
 	}
 	return fmt.Sprintf("%.2f mm²", *cg.MM2)
 }
+
+// ================================================================
+// AUTHENTICATION MODELS - Passkeys and 2FA
+// ================================================================
+
+// UserPasskey represents a WebAuthn passkey for a user
+type UserPasskey struct {
+	PasskeyID    uint      `json:"passkeyID" gorm:"primaryKey;column:passkey_id"`
+	UserID       uint      `json:"userID" gorm:"not null;column:user_id"`
+	User         User      `json:"user,omitempty" gorm:"foreignKey:UserID"`
+	Name         string    `json:"name" gorm:"not null;column:name"`
+	CredentialID string    `json:"credentialID" gorm:"not null;unique;column:credential_id"`
+	PublicKey    []byte    `json:"publicKey" gorm:"column:public_key"`
+	SignCount    uint32    `json:"signCount" gorm:"default:0;column:sign_count"`
+	AAGUID       []byte    `json:"aaguid" gorm:"column:aaguid"`
+	IsActive     bool      `json:"isActive" gorm:"default:true;column:is_active"`
+	LastUsed     *time.Time `json:"lastUsed" gorm:"column:last_used"`
+	CreatedAt    time.Time `json:"createdAt" gorm:"column:created_at"`
+	UpdatedAt    time.Time `json:"updatedAt" gorm:"column:updated_at"`
+}
+
+func (UserPasskey) TableName() string {
+	return "user_passkeys"
+}
+
+// User2FA represents TOTP 2FA settings for a user
+type User2FA struct {
+	TwoFAID     uint      `json:"twoFAID" gorm:"primaryKey;column:two_fa_id"`
+	UserID      uint      `json:"userID" gorm:"not null;unique;column:user_id"`
+	User        User      `json:"user,omitempty" gorm:"foreignKey:UserID"`
+	Secret      string    `json:"secret" gorm:"not null;column:secret"`
+	QRCodeURL   string    `json:"qrCodeURL" gorm:"column:qr_code_url"`
+	IsEnabled   bool      `json:"isEnabled" gorm:"default:false;column:is_enabled"`
+	IsVerified  bool      `json:"isVerified" gorm:"default:false;column:is_verified"`
+	BackupCodes []string  `json:"backupCodes" gorm:"type:json;column:backup_codes"`
+	LastUsed    *time.Time `json:"lastUsed" gorm:"column:last_used"`
+	CreatedAt   time.Time `json:"createdAt" gorm:"column:created_at"`
+	UpdatedAt   time.Time `json:"updatedAt" gorm:"column:updated_at"`
+}
+
+func (User2FA) TableName() string {
+	return "user_2fa"
+}
+
+// AuthenticationAttempt logs authentication attempts for security monitoring
+type AuthenticationAttempt struct {
+	AttemptID    uint      `json:"attemptID" gorm:"primaryKey;column:attempt_id"`
+	UserID       *uint     `json:"userID" gorm:"column:user_id"`
+	User         *User     `json:"user,omitempty" gorm:"foreignKey:UserID"`
+	Method       string    `json:"method" gorm:"not null;column:method"` // password, passkey, 2fa, backup_code
+	IPAddress    string    `json:"ipAddress" gorm:"not null;column:ip_address"`
+	UserAgent    string    `json:"userAgent" gorm:"column:user_agent"`
+	Success      bool      `json:"success" gorm:"not null;column:success"`
+	FailureReason *string  `json:"failureReason" gorm:"column:failure_reason"`
+	PasskeyID    *uint     `json:"passkeyID" gorm:"column:passkey_id"`
+	AttemptedAt  time.Time `json:"attemptedAt" gorm:"column:attempted_at"`
+}
+
+func (AuthenticationAttempt) TableName() string {
+	return "authentication_attempts"
+}
+
+// WebAuthnSession represents temporary WebAuthn session data
+type WebAuthnSession struct {
+	SessionID     string    `json:"sessionID" gorm:"primaryKey;column:session_id"`
+	UserID        uint      `json:"userID" gorm:"not null;column:user_id"`
+	Challenge     string    `json:"challenge" gorm:"not null;column:challenge"`
+	SessionType   string    `json:"sessionType" gorm:"not null;column:session_type"` // registration, authentication
+	SessionData   string    `json:"sessionData" gorm:"type:text;column:session_data"`
+	ExpiresAt     time.Time `json:"expiresAt" gorm:"not null;column:expires_at"`
+	CreatedAt     time.Time `json:"createdAt" gorm:"column:created_at"`
+}
+
+func (WebAuthnSession) TableName() string {
+	return "webauthn_sessions"
+}

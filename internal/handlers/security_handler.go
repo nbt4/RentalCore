@@ -898,3 +898,22 @@ func (h *SecurityHandler) InitializeDefaultRoles() error {
 
 	return nil
 }
+
+// SecurityAuditPage displays the security audit page
+func (h *SecurityHandler) SecurityAuditPage(c *gin.Context) {
+	if !h.hasPermission(c, "audit.view") {
+		currentUser, _ := GetCurrentUser(c)
+		c.HTML(http.StatusForbidden, "error.html", gin.H{
+			"error": "Access denied: Security audit requires appropriate permissions",
+			"user":  currentUser,
+		})
+		return
+	}
+
+	currentUser, _ := GetCurrentUser(c)
+	c.HTML(http.StatusOK, "security_audit.html", gin.H{
+		"title":       "Security Audit",
+		"user":        currentUser,
+		"currentPage": "security",
+	})
+}

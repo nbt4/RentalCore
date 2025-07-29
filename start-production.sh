@@ -20,6 +20,11 @@ if [ ! -f "config.json" ]; then
     exit 1
 fi
 
+# Always build the latest binary to ensure code changes are included
+echo "📦 Building latest binary..."
+go build -o server ./cmd/server
+echo "✅ Binary built successfully"
+
 echo "Using configuration file: config.json"
 echo "Server will start on port 8080"
 echo "Logs will be written to: logs/production.log"

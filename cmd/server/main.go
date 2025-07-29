@@ -148,6 +148,8 @@ func main() {
 	barcodeHandler := handlers.NewBarcodeHandler(barcodeService, deviceRepo)
 	scannerHandler := handlers.NewScannerHandler(jobRepo, deviceRepo, customerRepo, caseRepo)
 	authHandler := handlers.NewAuthHandler(db.DB, cfg)
+	webauthnHandler := handlers.NewWebAuthnHandler(db.DB, cfg)
+	// profileHandler := handlers.NewProfileHandler(db.DB, cfg)
 	homeHandler := handlers.NewHomeHandler(jobRepo, deviceRepo, customerRepo, caseRepo, db.DB)
 	
 	// Start session cleanup background process
@@ -199,6 +201,22 @@ func main() {
 				return *p
 			}
 			return 0
+		},
+		"formatDateNew": func(t time.Time) string {
+			return t.Format("Jan 2, 2006")
+		},
+		"formatDateTime": func(t time.Time) string {
+			return t.Format("Jan 2, 2006 at 3:04 PM")
+		},
+		"substrNew": func(s string, start, length int) string {
+			if start >= len(s) {
+				return ""
+			}
+			end := start + length
+			if end > len(s) {
+				end = len(s)
+			}
+			return s[start:end]
 		},
 		"derefString": func(p *string) string {
 			if p != nil {
@@ -384,6 +402,12 @@ func main() {
 		c.File("web/static/manifest.json")
 	})
 	
+	// Favicon route
+	r.GET("/favicon.ico", func(c *gin.Context) {
+		c.Header("Cache-Control", "public, max-age=86400") // Cache for 24 hours
+		c.File("web/static/images/icon-180.png")
+	})
+	
 
 
 	// Initialize default roles
@@ -392,7 +416,7 @@ func main() {
 	}
 
 	// Routes
-	setupRoutes(r, jobHandler, deviceHandler, customerHandler, statusHandler, productHandler, cableHandler, barcodeHandler, scannerHandler, authHandler, homeHandler, caseHandler, analyticsHandler, searchHandler, pwaHandler, workflowHandler, equipmentPackageHandler, documentHandler, financialHandler, securityHandler, invoiceHandler, templateHandler, companyHandler, monitoringHandler, complianceMiddleware)
+	setupRoutes(r, jobHandler, deviceHandler, customerHandler, statusHandler, productHandler, cableHandler, barcodeHandler, scannerHandler, authHandler, webauthnHandler, homeHandler, caseHandler, analyticsHandler, searchHandler, pwaHandler, workflowHandler, equipmentPackageHandler, documentHandler, financialHandler, securityHandler, invoiceHandler, templateHandler, companyHandler, monitoringHandler, complianceMiddleware)
 	
 	// Add dedicated error route
 	r.GET("/error", func(c *gin.Context) {
@@ -456,6 +480,7 @@ func setupRoutes(r *gin.Engine,
 	barcodeHandler *handlers.BarcodeHandler,
 	scannerHandler *handlers.ScannerHandler,
 	authHandler *handlers.AuthHandler,
+	webauthnHandler *handlers.WebAuthnHandler,
 	homeHandler *handlers.HomeHandler,
 	caseHandler *handlers.CaseHandler,
 	analyticsHandler *handlers.AnalyticsHandler,
@@ -486,7 +511,19 @@ func setupRoutes(r *gin.Engine,
 	// Authentication routes (no auth required)
 	r.GET("/login", authHandler.LoginForm)
 	r.POST("/login", authHandler.Login)
+	r.GET("/login/2fa", authHandler.Login2FAForm)
+	r.POST("/login/2fa", authHandler.Login2FAVerify)
 	r.GET("/logout", authHandler.Logout)
+	
+	// Passkey authentication routes (no auth required for login)
+	auth := r.Group("/auth")
+	{
+		passkey := auth.Group("/passkey")
+		{
+			passkey.POST("/start-authentication", webauthnHandler.StartPasskeyAuthentication)
+			passkey.POST("/complete-authentication", webauthnHandler.CompletePasskeyAuthentication)
+		}
+	}
 	
 	// Debug route (no auth required)
 	r.GET("/debug/invoice-test", func(c *gin.Context) {
@@ -504,6 +541,7 @@ func setupRoutes(r *gin.Engine,
 		c.Header("Content-Type", "text/plain")
 		c.String(http.StatusOK, "Route Debug:\n/settings/company -> Company Settings\n/monitoring -> Monitoring Dashboard\nTime: %s", time.Now().Format("2006-01-02 15:04:05"))
 	})
+	
 	
 	
 
@@ -769,14 +807,7 @@ func setupRoutes(r *gin.Engine,
 					"currentPage": "security",
 				})
 			})
-			security.GET("/audit", func(c *gin.Context) {
-				user, _ := handlers.GetCurrentUser(c)
-				c.HTML(http.StatusOK, "security_audit.html", gin.H{
-					"title":       "Audit Logs",
-					"user":        user,
-					"currentPage": "security",
-				})
-			})
+			security.GET("/audit", securityHandler.SecurityAuditPage)
 
 			// Role management API
 			rolesAPI := security.Group("/api/roles")
@@ -794,6 +825,13 @@ func setupRoutes(r *gin.Engine,
 				userRolesAPI.GET("/:userId/roles", securityHandler.GetUserRoles)
 				userRolesAPI.POST("/:userId/roles", securityHandler.AssignUserRole)
 				userRolesAPI.DELETE("/:userId/roles/:roleId", securityHandler.RevokeUserRole)
+			}
+
+			// Admin user management API
+			adminAPI := security.Group("/api/admin")
+			{
+				adminAPI.PUT("/users/:id/password", authHandler.AdminSetUserPassword)
+				adminAPI.PUT("/users/:id/status", authHandler.AdminBlockUser)
 			}
 
 			// Audit API
@@ -867,9 +905,57 @@ func setupRoutes(r *gin.Engine,
 		// Profile Settings routes (moved to end to avoid potential conflicts)
 		profile := protected.Group("/profile")
 		{
-			profile.GET("/settings", authHandler.ProfileSettingsForm)
-			profile.POST("/settings", authHandler.UpdateProfileSettings)
-			profile.GET("/preferences", authHandler.GetUserPreferences)
+			// Profile settings route with full functionality
+			profile.GET("/settings", func(c *gin.Context) {
+				currentUser, exists := handlers.GetCurrentUser(c)
+				if !exists || currentUser == nil {
+					c.Redirect(http.StatusSeeOther, "/login")
+					return
+				}
+				
+				// Use webauthnHandler's database connection
+				webauthnDB := webauthnHandler.GetDB() // We'll need to add this method
+				
+				// Load user's passkeys
+				var passkeys []models.UserPasskey
+				webauthnDB.Where("user_id = ? AND is_active = ?", currentUser.UserID, true).Find(&passkeys)
+				
+				// Load 2FA status
+				var user2FA models.User2FA
+				twoFAEnabled := webauthnDB.Where("user_id = ? AND is_enabled = ?", currentUser.UserID, true).First(&user2FA).Error == nil
+				
+				// Load recent authentication attempts
+				var recentAttempts []models.AuthenticationAttempt
+				webauthnDB.Where("user_id = ?", currentUser.UserID).Order("attempted_at DESC").Limit(10).Find(&recentAttempts)
+				
+				c.HTML(http.StatusOK, "profile_settings_standalone.html", gin.H{
+					"title": "Profile Settings",
+					"user": currentUser,
+					"preferences": nil,
+					"twoFAEnabled": twoFAEnabled,
+					"passkeys": passkeys,
+					"recentAttempts": recentAttempts,
+					"currentPage": "profile",
+				})
+			})
+			
+			// WebAuthn (Passkey) routes
+			passkeys := profile.Group("/passkeys")
+			{
+				passkeys.POST("/start-registration", webauthnHandler.StartPasskeyRegistration)
+				passkeys.POST("/complete-registration", webauthnHandler.CompletePasskeyRegistration)
+				passkeys.GET("", webauthnHandler.ListUserPasskeys)
+				passkeys.DELETE("/:id", webauthnHandler.DeletePasskey)
+			}
+			
+			// 2FA routes
+			twoFA := profile.Group("/2fa")
+			{
+				twoFA.POST("/setup", webauthnHandler.Setup2FA)
+				twoFA.POST("/verify", webauthnHandler.Verify2FA)
+				twoFA.POST("/disable", webauthnHandler.Disable2FA)
+				twoFA.GET("/status", webauthnHandler.Get2FAStatus)
+			}
 		}
 		
 

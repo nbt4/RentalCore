@@ -8,6 +8,10 @@
     <!-- PWA Manifest -->
     <link rel="manifest" href="/static/manifest.json">
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/static/images/icon-180.png">
+    <link rel="shortcut icon" type="image/png" href="/static/images/icon-180.png">
+    
     <!-- iOS Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -275,16 +279,38 @@
                 </button>
             </form>
             
+            
             <div class="login-footer">
                 <i class="bi bi-shield-check"></i>
-                Secure login with encrypted passwords
+                Secure login with encrypted passwords & passkeys
             </div>
         </div>
     </div>
     
     <script>
-        // Auto-focus on username field
-        document.getElementById('username').focus();
+        // Check for available passkeys and auto-prompt
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Auto-focus on username field
+            document.getElementById('username').focus();
+            
+            // Check if WebAuthn is supported and if passkeys are available
+            if (window.PublicKeyCredential) {
+                try {
+                    // Check if conditional UI is supported (allows automatic passkey prompts)
+                    const conditionalMediationSupported = await PublicKeyCredential.isConditionalMediationAvailable();
+                    
+                    if (conditionalMediationSupported) {
+                        console.log('Conditional mediation supported - attempting automatic passkey prompt');
+                        // Automatically trigger passkey authentication
+                        setTimeout(() => loginWithPasskey(true), 500); // Small delay to ensure page is fully loaded
+                    } else {
+                        console.log('Conditional mediation not supported - manual passkey login only');
+                    }
+                } catch (error) {
+                    console.log('Error checking conditional mediation:', error);
+                }
+            }
+        });
         
         // Handle form submission
         document.querySelector('.login-form').addEventListener('submit', function(e) {
@@ -304,6 +330,100 @@
         document.querySelector('.login-submit').addEventListener('click', function() {
             this.classList.add('rc-animate-glow');
         });
+        
+        // Passkey login function
+        async function loginWithPasskey(isAutomatic = false) {
+            try {
+                // Check if WebAuthn is supported
+                if (!window.PublicKeyCredential) {
+                    if (!isAutomatic) {
+                        alert('Passkeys are not supported in this browser');
+                    }
+                    return;
+                }
+                
+                console.log('Starting passkey authentication...', isAutomatic ? '(automatic)' : '(manual)');
+                
+                // Start authentication
+                const response = await fetch('/auth/passkey/start-authentication', {
+                    method: 'POST'
+                });
+                
+                const data = await response.json();
+                if (data.error) {
+                    if (!isAutomatic) {
+                        alert('Error starting authentication: ' + data.error);
+                    }
+                    return;
+                }
+                
+                console.log('Authentication options received:', data.options);
+                
+                // Convert base64url strings to Uint8Array for WebAuthn API
+                const options = {
+                    ...data.options,
+                    challenge: Uint8Array.from(atob(data.options.challenge.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0))
+                };
+                
+                // If there are allowCredentials, convert them too
+                if (options.allowCredentials) {
+                    options.allowCredentials = options.allowCredentials.map(cred => ({
+                        ...cred,
+                        id: Uint8Array.from(atob(cred.id.replace(/-/g, '+').replace(/_/g, '/')), c => c.charCodeAt(0))
+                    }));
+                }
+                
+                // Check if there are any passkeys available
+                if (!options.allowCredentials || options.allowCredentials.length === 0) {
+                    if (!isAutomatic) {
+                        alert('No passkeys found for this application. Please register a passkey first.');
+                    }
+                    return;
+                }
+                
+                console.log('Converted options:', options);
+                
+                // Use WebAuthn API to get credential
+                const credential = await navigator.credentials.get({
+                    publicKey: options
+                });
+                
+                console.log('Credential received:', credential);
+                
+                // Complete authentication
+                const authResponse = await fetch('/auth/passkey/complete-authentication', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sessionId: data.sessionId,
+                        credentialId: credential.id,
+                        authenticatorData: btoa(String.fromCharCode(...new Uint8Array(credential.response.authenticatorData))),
+                        clientDataJSON: btoa(String.fromCharCode(...new Uint8Array(credential.response.clientDataJSON))),
+                        signature: btoa(String.fromCharCode(...new Uint8Array(credential.response.signature)))
+                    })
+                });
+                
+                const authResult = await authResponse.json();
+                if (authResult.error) {
+                    if (!isAutomatic) {
+                        alert('Authentication failed: ' + authResult.error);
+                    }
+                    return;
+                }
+                
+                console.log('Authentication successful!');
+                
+                // Redirect to dashboard
+                window.location.href = '/dashboard';
+                
+            } catch (error) {
+                console.error('Passkey authentication error:', error);
+                // Only show error if it's not automatic or if it's a non-user-cancellation error
+                if (!isAutomatic || error.name !== 'NotAllowedError') {
+                    alert('Failed to authenticate with passkey: ' + error.message);
+                }
+            }
+        }
     </script>
 </body>
 </html>
