@@ -1000,3 +1000,195 @@ DEBUG: Found 6 cases with search term ''
 2025/07/29 11:01:26 🎯 TEMPLATE DEBUG: Rendering with 1 packages
 2025/07/29 11:01:26 🎯 TEMPLATE DEBUG: Package 0: ID=2, Name='Ton S', PackageDevices=0, DeviceCount=4
 {"timestamp":"2025-07-29T09:01:26.763030552Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1753779686622385315","method":"GET","path":"/workflow/packages","status_code":200,"duration":"140.643194ms","ip":"10.0.0.5","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":55284}}
+2025/08/03 17:08:36 Running in production mode
+2025/08/03 17:08:36 Database connection established successfully
+2025/08/03 17:08:36 GoBD compliance table migration disabled
+2025/08/03 17:08:36 Database auto-migration disabled - using manual schema management
+2025/08/03 17:08:36 Templates already exist (1), skipping default template creation
+2025/08/03 17:08:36 Server starting on 0.0.0.0:8080
+2025/08/03 17:08:40 Route Debug: GET /jobs
+2025/08/03 17:08:40 DEBUG: AuthMiddleware: Request URL: /jobs
+2025/08/03 17:08:40 DEBUG: AuthMiddleware: Found session cookie: 4b4c675ee1901590d02da1ac481e7fe4699e2c1ae06d4f211229028ce9e98976 for /jobs
+2025/08/03 17:08:40 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /jobs
+DEBUG Job Handler: All query params: map[]
+DEBUG Job Handler: Raw search parameter: ''
+DEBUG Job Handler: Final params: SearchTerm='', StartDate=<nil>, EndDate=<nil>
+DEBUG: Found 4 jobs with search term ''
+DEBUG: First job: {JobID:1008 CustomerID:52 StatusID:1001 Description:0xc00042d4e0 StartDate:<nil> EndDate:<nil> Revenue:0 FinalRevenue:0xc0004e6c48 CustomerName: Noah Ben Tielmann StatusName:open DeviceCount:0 TotalRevenue:0}
+{"timestamp":"2025-08-03T15:08:40.322005256Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233720238987158","method":"GET","path":"/jobs","status_code":200,"duration":"83.016305ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":31131}}
+2025/08/03 17:08:40 Route Debug: GET /static/images/icon-180.png
+2025/08/03 17:08:42 Route Debug: GET /logout
+{"timestamp":"2025-08-03T15:08:42.448786286Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233722401729547","method":"GET","path":"/logout","status_code":303,"duration":"47.054344ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":33}}
+2025/08/03 17:08:42 Route Debug: GET /login
+{"timestamp":"2025-08-03T15:08:42.4794114Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233722455905462","method":"GET","path":"/login","status_code":200,"duration":"23.503574ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":14745}}
+2025/08/03 17:08:47 POST request to /login with Content-Type: 'application/x-www-form-urlencoded'
+2025/08/03 17:08:47 Form _method parameter: ''
+2025/08/03 17:08:47 Route Debug: POST /login
+2025/08/03 17:08:49 SLOW REQUEST: POST /login took 1.151931133s (status: 303)
+{"timestamp":"2025-08-03T15:08:49.116226735Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233727964205522","method":"POST","path":"/login","status_code":303,"duration":"1.152019169s","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":42,"bytes_out":-1}}
+2025/08/03 17:08:49 Route Debug: GET /login/2fa
+{"timestamp":"2025-08-03T15:08:49.145400737Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233729121990580","method":"GET","path":"/login/2fa","status_code":200,"duration":"23.408384ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":9188}}
+2025/08/03 17:08:51 POST request to /login/2fa with Content-Type: 'application/x-www-form-urlencoded'
+2025/08/03 17:08:51 Form _method parameter: ''
+2025/08/03 17:08:51 Route Debug: POST /login/2fa
+{"timestamp":"2025-08-03T15:08:51.74050394Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233731571032714","method":"POST","path":"/login/2fa","status_code":303,"duration":"169.468831ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":11,"bytes_out":-1}}
+2025/08/03 17:08:51 Route Debug: GET /
+{"timestamp":"2025-08-03T15:08:51.77024143Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233731746322197","method":"GET","path":"/","status_code":307,"duration":"23.91754ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":46}}
+2025/08/03 17:08:51 Route Debug: GET /dashboard
+2025/08/03 17:08:51 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/08/03 17:08:51 DEBUG: AuthMiddleware: Found session cookie: 4ace5725e52e6e15e42df96d17bf99dccae545237c34a8d446c602e083f66b8f for /dashboard
+2025/08/03 17:08:51 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /dashboard
+{"timestamp":"2025-08-03T15:08:51.920505067Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233731777818806","method":"GET","path":"/dashboard","status_code":200,"duration":"142.684317ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18341}}
+2025/08/03 17:08:51 Route Debug: GET /favicon.ico
+{"timestamp":"2025-08-03T15:08:51.986370509Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233731963581166","method":"GET","path":"/favicon.ico","status_code":200,"duration":"22.78741ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":6685}}
+2025/08/03 17:08:56 Route Debug: GET /profile/settings
+2025/08/03 17:08:56 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/03 17:08:56 DEBUG: AuthMiddleware: Found session cookie: 4ace5725e52e6e15e42df96d17bf99dccae545237c34a8d446c602e083f66b8f for /profile/settings
+2025/08/03 17:08:56 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/settings
+{"timestamp":"2025-08-03T15:08:56.573547389Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233736431543591","method":"GET","path":"/profile/settings","status_code":200,"duration":"142.001273ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":47255}}
+2025/08/03 17:09:02 POST request to /profile/passkeys/start-registration with Content-Type: ''
+2025/08/03 17:09:02 Route Debug: POST /profile/passkeys/start-registration
+2025/08/03 17:09:02 DEBUG: AuthMiddleware: Request URL: /profile/passkeys/start-registration
+2025/08/03 17:09:02 DEBUG: AuthMiddleware: Found session cookie: 4ace5725e52e6e15e42df96d17bf99dccae545237c34a8d446c602e083f66b8f for /profile/passkeys/start-registration
+2025/08/03 17:09:02 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/passkeys/start-registration
+2025/08/03 17:09:02 DEBUG: StartPasskeyRegistration called
+2025/08/03 17:09:02 DEBUG: User authenticated: ntielmann (ID: 5)
+2025/08/03 17:09:02 DEBUG: Request scheme: http, host: debian01:8080
+2025/08/03 17:09:02 DEBUG: Host validation - host: debian01:8080, isLocalhost: false, isInternalHost: true
+2025/08/03 17:09:02 DEBUG: Host validation passed - scheme: http, host: debian01:8080
+2025/08/03 17:09:02 DEBUG: Challenge generated
+2025/08/03 17:09:02 DEBUG: Attempting to create WebAuthn session in database
+2025/08/03 17:09:02 DEBUG: Session created successfully with ID: G8vy3XuBDtCxL0OcdGTRgqwcZQsdRMTlfZSUml5hC0c=
+2025/08/03 17:09:02 DEBUG: Generated challenge (base64): cQPqjDu7ukk8IVVfMC4n8S3A2gvHAdeG1VuUSfS2DE8=
+2025/08/03 17:09:02 DEBUG: Generated user ID (base64): NQ==
+2025/08/03 17:09:02 DEBUG: Using RP ID: debian01 for host: debian01:8080
+{"timestamp":"2025-08-03T15:09:02.665638106Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233742569774341","method":"POST","path":"/profile/passkeys/start-registration","status_code":200,"duration":"95.86191ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":512}}
+2025/08/03 17:09:08 Route Debug: GET /
+{"timestamp":"2025-08-03T15:09:08.304451969Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233748281153398","method":"GET","path":"/","status_code":307,"duration":"23.296679ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":42}}
+2025/08/03 17:09:08 Route Debug: GET /login
+{"timestamp":"2025-08-03T15:09:08.337068143Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233748313593974","method":"GET","path":"/login","status_code":200,"duration":"23.470893ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":14745}}
+2025/08/03 17:09:08 Route Debug: GET /static/css/rental-core-design.css
+2025/08/03 17:09:08 Route Debug: GET /static/images/icon-180.png
+2025/08/03 17:09:08 Route Debug: GET /static/images/icon-180.png
+2025/08/03 17:09:09 POST request to /auth/passkey/start-authentication with Content-Type: ''
+2025/08/03 17:09:09 Route Debug: POST /auth/passkey/start-authentication
+2025/08/03 17:09:09 DEBUG: StartPasskeyAuthentication called
+2025/08/03 17:09:09 DEBUG: Request scheme: http, host: job.nt.local
+2025/08/03 17:09:09 DEBUG: Found 0 active passkeys for authentication
+2025/08/03 17:09:09 DEBUG: Using RP ID: job.nt.local for authentication on host: job.nt.local
+2025/08/03 17:09:09 DEBUG: Prepared 0 allowCredentials for authentication
+{"timestamp":"2025-08-03T15:09:09.209244784Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233749136654516","method":"POST","path":"/auth/passkey/start-authentication","status_code":200,"duration":"72.586912ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":223}}
+2025/08/03 17:09:10 POST request to /login with Content-Type: 'application/x-www-form-urlencoded'
+2025/08/03 17:09:10 Form _method parameter: ''
+2025/08/03 17:09:10 Route Debug: POST /login
+2025/08/03 17:09:11 SLOW REQUEST: POST /login took 1.183028s (status: 303)
+{"timestamp":"2025-08-03T15:09:11.637697146Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233750454591293","method":"POST","path":"/login","status_code":303,"duration":"1.183102989s","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":42,"bytes_out":-1}}
+2025/08/03 17:09:11 Route Debug: GET /login/2fa
+{"timestamp":"2025-08-03T15:09:11.667314118Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233751644233347","method":"GET","path":"/login/2fa","status_code":200,"duration":"23.078777ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":9188}}
+2025/08/03 17:09:13 POST request to /login/2fa with Content-Type: 'application/x-www-form-urlencoded'
+2025/08/03 17:09:13 Form _method parameter: ''
+2025/08/03 17:09:13 Route Debug: POST /login/2fa
+{"timestamp":"2025-08-03T15:09:13.447572753Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233753280736933","method":"POST","path":"/login/2fa","status_code":303,"duration":"166.834058ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":11,"bytes_out":-1}}
+2025/08/03 17:09:13 Route Debug: GET /
+{"timestamp":"2025-08-03T15:09:13.477385506Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233753454500750","method":"GET","path":"/","status_code":307,"duration":"22.881892ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":46}}
+2025/08/03 17:09:13 Route Debug: GET /dashboard
+2025/08/03 17:09:13 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/08/03 17:09:13 DEBUG: AuthMiddleware: Found session cookie: a03102d0495984b6493e50fc6ca0ee97dd36f5dd4aa3a08659c7645c158585a5 for /dashboard
+2025/08/03 17:09:13 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /dashboard
+{"timestamp":"2025-08-03T15:09:13.625006952Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233753487830718","method":"GET","path":"/dashboard","status_code":200,"duration":"137.1735ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18341}}
+2025/08/03 17:09:13 Route Debug: GET /static/js/rental-core-design.js
+2025/08/03 17:09:13 Route Debug: GET /favicon.ico
+{"timestamp":"2025-08-03T15:09:13.731491465Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233753707066098","method":"GET","path":"/favicon.ico","status_code":200,"duration":"24.42105ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":6685}}
+2025/08/03 17:09:17 Route Debug: GET /profile/settings
+2025/08/03 17:09:17 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/03 17:09:17 DEBUG: AuthMiddleware: Found session cookie: a03102d0495984b6493e50fc6ca0ee97dd36f5dd4aa3a08659c7645c158585a5 for /profile/settings
+2025/08/03 17:09:17 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/settings
+{"timestamp":"2025-08-03T15:09:17.271910023Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233757113329942","method":"GET","path":"/profile/settings","status_code":200,"duration":"158.576776ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":47255}}
+2025/08/03 17:09:22 POST request to /profile/passkeys/start-registration with Content-Type: ''
+2025/08/03 17:09:22 Route Debug: POST /profile/passkeys/start-registration
+2025/08/03 17:09:22 DEBUG: AuthMiddleware: Request URL: /profile/passkeys/start-registration
+2025/08/03 17:09:22 DEBUG: AuthMiddleware: Found session cookie: a03102d0495984b6493e50fc6ca0ee97dd36f5dd4aa3a08659c7645c158585a5 for /profile/passkeys/start-registration
+2025/08/03 17:09:22 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/passkeys/start-registration
+2025/08/03 17:09:22 DEBUG: StartPasskeyRegistration called
+2025/08/03 17:09:22 DEBUG: User authenticated: ntielmann (ID: 5)
+2025/08/03 17:09:22 DEBUG: Request scheme: http, host: job.nt.local
+2025/08/03 17:09:22 DEBUG: Host validation - host: job.nt.local, isLocalhost: false, isInternalHost: true
+2025/08/03 17:09:22 DEBUG: Host validation passed - scheme: http, host: job.nt.local
+2025/08/03 17:09:22 DEBUG: Challenge generated
+2025/08/03 17:09:22 DEBUG: Attempting to create WebAuthn session in database
+2025/08/03 17:09:22 DEBUG: Session created successfully with ID: 2tt9PJ5bmCBnGMhN20HtO9trmxdgxQxDGNev3fDKSRw=
+2025/08/03 17:09:22 DEBUG: Generated challenge (base64): RZO3JCqWtcdYb3Kr5HxH5GbUAT7AxNflPEUFtP-l-H8=
+2025/08/03 17:09:22 DEBUG: Generated user ID (base64): NQ==
+2025/08/03 17:09:22 DEBUG: Using RP ID: job.nt.local for host: job.nt.local
+{"timestamp":"2025-08-03T15:09:22.990976279Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233762894202243","method":"POST","path":"/profile/passkeys/start-registration","status_code":200,"duration":"96.77105ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":516}}
+2025/08/03 17:09:29 POST request to /profile/passkeys/complete-registration with Content-Type: 'application/json'
+2025/08/03 17:09:29 Route Debug: POST /profile/passkeys/complete-registration
+2025/08/03 17:09:29 DEBUG: AuthMiddleware: Request URL: /profile/passkeys/complete-registration
+2025/08/03 17:09:29 DEBUG: AuthMiddleware: Found session cookie: a03102d0495984b6493e50fc6ca0ee97dd36f5dd4aa3a08659c7645c158585a5 for /profile/passkeys/complete-registration
+2025/08/03 17:09:29 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/passkeys/complete-registration
+2025/08/03 17:09:29 DEBUG: CompletePasskeyRegistration called
+2025/08/03 17:09:29 DEBUG: Extracted fields - sessionID: 2tt9PJ5bmCBnGMhN20HtO9trmxdgxQxDGNev3fDKSRw=, name: Bitwarden, credential length: 240, credentialID: qIFFWlhJTVmhl16_dF45ww
+2025/08/03 17:09:29 DEBUG: Verifying session - sessionID: 2tt9PJ5bmCBnGMhN20HtO9trmxdgxQxDGNev3fDKSRw=, userID: 5
+2025/08/03 17:09:29 DEBUG: Session verified successfully
+{"timestamp":"2025-08-03T15:09:29.960035515Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233769794809431","method":"POST","path":"/profile/passkeys/complete-registration","status_code":200,"duration":"165.22393ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":579,"bytes_out":59}}
+2025/08/03 17:09:29 Route Debug: GET /profile/settings
+2025/08/03 17:09:29 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/03 17:09:29 DEBUG: AuthMiddleware: Found session cookie: a03102d0495984b6493e50fc6ca0ee97dd36f5dd4aa3a08659c7645c158585a5 for /profile/settings
+2025/08/03 17:09:30 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/settings
+{"timestamp":"2025-08-03T15:09:30.114838223Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233769976379610","method":"GET","path":"/profile/settings","status_code":200,"duration":"138.455567ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":48200}}
+2025/08/03 17:09:30 Route Debug: GET /static/images/icon-180.png
+2025/08/03 17:09:30 Route Debug: GET /static/images/icon-180.png
+2025/08/03 17:09:33 Route Debug: GET /logout
+{"timestamp":"2025-08-03T15:09:33.214744491Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233773166557190","method":"GET","path":"/logout","status_code":303,"duration":"48.184556ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":33}}
+2025/08/03 17:09:33 Route Debug: GET /login
+{"timestamp":"2025-08-03T15:09:33.245501761Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233773222133699","method":"GET","path":"/login","status_code":200,"duration":"23.365908ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":14745}}
+2025/08/03 17:09:33 POST request to /auth/passkey/start-authentication with Content-Type: ''
+2025/08/03 17:09:33 Route Debug: POST /auth/passkey/start-authentication
+2025/08/03 17:09:33 DEBUG: StartPasskeyAuthentication called
+2025/08/03 17:09:33 DEBUG: Request scheme: http, host: job.nt.local
+2025/08/03 17:09:33 DEBUG: Found 1 active passkeys for authentication
+2025/08/03 17:09:33 DEBUG: Adding passkey to allowCredentials - ID: qIFFWlhJTVmhl16_dF45ww, Name: Bitwarden
+2025/08/03 17:09:33 DEBUG: Using RP ID: job.nt.local for authentication on host: job.nt.local
+2025/08/03 17:09:33 DEBUG: Prepared 1 allowCredentials for authentication
+{"timestamp":"2025-08-03T15:09:33.972724687Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233773901137744","method":"POST","path":"/auth/passkey/start-authentication","status_code":200,"duration":"71.584849ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":274}}
+2025/08/03 17:09:35 POST request to /auth/passkey/complete-authentication with Content-Type: 'application/json'
+2025/08/03 17:09:35 Route Debug: POST /auth/passkey/complete-authentication
+2025/08/03 17:09:35 DEBUG: CompletePasskeyAuthentication called
+{"timestamp":"2025-08-03T15:09:35.244015005Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233775053384323","method":"POST","path":"/auth/passkey/complete-authentication","status_code":200,"duration":"190.628108ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":486,"bytes_out":58}}
+2025/08/03 17:09:35 Route Debug: GET /dashboard
+2025/08/03 17:09:35 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/08/03 17:09:35 DEBUG: AuthMiddleware: Found session cookie: ly-nAAHOB8hHMZwy7GhqARU4xoSEXFuCfMvd4rvFv1E= for /dashboard
+2025/08/03 17:09:35 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /dashboard
+{"timestamp":"2025-08-03T15:09:35.407420554Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233775267844006","method":"GET","path":"/dashboard","status_code":200,"duration":"139.574264ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18341}}
+2025/08/03 17:09:38 Route Debug: GET /logout
+{"timestamp":"2025-08-03T15:09:38.089945161Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233778041516070","method":"GET","path":"/logout","status_code":303,"duration":"48.426547ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":33}}
+2025/08/03 17:09:38 Route Debug: GET /login
+{"timestamp":"2025-08-03T15:09:38.123578514Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233778100685948","method":"GET","path":"/login","status_code":200,"duration":"22.8896ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":14745}}
+2025/08/03 17:09:38 POST request to /auth/passkey/start-authentication with Content-Type: ''
+2025/08/03 17:09:38 Route Debug: POST /auth/passkey/start-authentication
+2025/08/03 17:09:38 DEBUG: StartPasskeyAuthentication called
+2025/08/03 17:09:38 DEBUG: Request scheme: http, host: job.nt.local
+2025/08/03 17:09:38 DEBUG: Found 1 active passkeys for authentication
+2025/08/03 17:09:38 DEBUG: Adding passkey to allowCredentials - ID: qIFFWlhJTVmhl16_dF45ww, Name: Bitwarden
+2025/08/03 17:09:38 DEBUG: Using RP ID: job.nt.local for authentication on host: job.nt.local
+2025/08/03 17:09:38 DEBUG: Prepared 1 allowCredentials for authentication
+{"timestamp":"2025-08-03T15:09:38.898311459Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233778827986619","method":"POST","path":"/auth/passkey/start-authentication","status_code":200,"duration":"70.323367ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":274}}
+2025/08/03 17:09:59 POST request to /login with Content-Type: 'application/x-www-form-urlencoded'
+2025/08/03 17:09:59 Form _method parameter: ''
+2025/08/03 17:09:59 Route Debug: POST /login
+DEBUG: Creating session for user mschuck (ID: 20)
+DEBUG: Login successful, session created: a9aeaf0960007675391326ce2b7227299220f05b295e94832e23d826b60394cd
+2025/08/03 17:10:00 SLOW REQUEST: POST /login took 1.370386353s (status: 303)
+{"timestamp":"2025-08-03T15:10:00.868146259Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233799497679519","method":"POST","path":"/login","status_code":303,"duration":"1.370464156s","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":46,"bytes_out":-1}}
+2025/08/03 17:10:00 Route Debug: GET /
+{"timestamp":"2025-08-03T15:10:00.89730233Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233800874765944","method":"GET","path":"/","status_code":307,"duration":"22.534172ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":46}}
+2025/08/03 17:10:00 Route Debug: GET /dashboard
+2025/08/03 17:10:00 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/08/03 17:10:00 DEBUG: AuthMiddleware: Found session cookie: a9aeaf0960007675391326ce2b7227299220f05b295e94832e23d826b60394cd for /dashboard
+2025/08/03 17:10:00 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /dashboard
+{"timestamp":"2025-08-03T15:10:01.04278246Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233800903878806","method":"GET","path":"/dashboard","status_code":200,"duration":"138.901328ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18343}}
+2025/08/03 17:10:08 Route Debug: GET /profile/settings
+2025/08/03 17:10:08 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/03 17:10:08 DEBUG: AuthMiddleware: Found session cookie: a9aeaf0960007675391326ce2b7227299220f05b295e94832e23d826b60394cd for /profile/settings
+2025/08/03 17:10:08 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-03T15:10:08.150061787Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233808010084779","method":"GET","path":"/profile/settings","status_code":200,"duration":"139.975295ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":41764}}
