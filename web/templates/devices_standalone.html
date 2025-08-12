@@ -72,7 +72,9 @@
             <!-- Hierarchical Tree View -->
             <div class="rc-card">
                 <div class="rc-card-body">
+                    <h3>Tree View Debug - View Type: {{.viewType}} - Tree Data Count: {{len .treeData}}</h3>
                     <div class="tree-container">
+                        {{if .treeData}}
                         {{range .treeData}}
                         <!-- CATEGORY LEVEL -->
                         <div class="tree-category">
@@ -188,6 +190,9 @@
                                 
                             </div>
                         </div>
+                        {{end}}
+                        {{else}}
+                        <p style="color: red; font-weight: bold;">ERROR: No tree data available!</p>
                         {{end}}
                     </div>
                 </div>
