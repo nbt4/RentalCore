@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
+	"strings"
 	"log"
 	"time"
 	"sync"
@@ -35,7 +36,7 @@ var deviceCache = &DeviceCache{
 }
 
 var treeCache = &TreeCache{
-	timestamp: time.Time{}, // Force cache miss initially
+	timestamp: time.Time{}, // Force cache miss initially - CLEARED FOR HIERARCHY FIX
 }
 
 type DeviceHandler struct {
@@ -831,6 +832,8 @@ func (h *DeviceHandler) buildTreeFromDevices(devices []models.Device) ([]TreeCat
 	subcategoryMap := make(map[string]*TreeSubcategory)
 	subbiercategoryMap := make(map[string]*TreeSubbiercategory)
 	
+	log.Printf("🔍 Processing %d devices to build tree hierarchy", len(devices))
+	
 	// Process all devices and build the tree structure
 	for _, device := range devices {
 		if device.Product == nil || device.Product.Category == nil {
@@ -850,6 +853,7 @@ func (h *DeviceHandler) buildTreeFromDevices(devices []models.Device) ([]TreeCat
 				DirectDevices: []TreeDevice{},
 				Subcategories: []TreeSubcategory{},
 			}
+			log.Printf("🏷️ Created category: %s (ID: %d)", category.Name, categoryID)
 		}
 		treeCategory := categoryMap[categoryID]
 		
@@ -863,14 +867,15 @@ func (h *DeviceHandler) buildTreeFromDevices(devices []models.Device) ([]TreeCat
 			
 			// Create or get subcategory
 			if _, exists := subcategoryMap[subcategoryKey]; !exists {
-				subcategoryMap[subcategoryKey] = &TreeSubcategory{
+				newSubcategory := &TreeSubcategory{
 					ID:                subcategory.SubcategoryID,
 					Name:              subcategory.Name,
 					DeviceCount:       0,
 					DirectDevices:     []TreeDevice{},
 					Subbiercategories: []TreeSubbiercategory{},
 				}
-				treeCategory.Subcategories = append(treeCategory.Subcategories, *subcategoryMap[subcategoryKey])
+				subcategoryMap[subcategoryKey] = newSubcategory
+				log.Printf("🏷️ Created subcategory: %s in %s", subcategory.Name, category.Name)
 			}
 			treeSubcategory := subcategoryMap[subcategoryKey]
 			
@@ -881,13 +886,14 @@ func (h *DeviceHandler) buildTreeFromDevices(devices []models.Device) ([]TreeCat
 				
 				// Create or get subbiercategory
 				if _, exists := subbiercategoryMap[subbiercategoryKey]; !exists {
-					subbiercategoryMap[subbiercategoryKey] = &TreeSubbiercategory{
+					newSubbiercategory := &TreeSubbiercategory{
 						ID:          subbiercategory.SubbiercategoryID,
 						Name:        subbiercategory.Name,
 						DeviceCount: 0,
 						Devices:     []TreeDevice{},
 					}
-					treeSubcategory.Subbiercategories = append(treeSubcategory.Subbiercategories, *subbiercategoryMap[subbiercategoryKey])
+					subbiercategoryMap[subbiercategoryKey] = newSubbiercategory
+					log.Printf("🏷️ Created subbiercategory: %s in %s->%s", subbiercategory.Name, category.Name, subcategory.Name)
 				}
 				treeSubbiercategory := subbiercategoryMap[subbiercategoryKey]
 				
@@ -908,24 +914,39 @@ func (h *DeviceHandler) buildTreeFromDevices(devices []models.Device) ([]TreeCat
 		treeCategory.DeviceCount++
 	}
 	
-	// Convert map to slice and update references
+	// Build final tree structure by properly linking the hierarchy
 	var treeCategories []TreeCategory
 	for _, category := range categoryMap {
-		// Update subcategory references with correct device counts
-		for i := range category.Subcategories {
-			subcategoryKey := fmt.Sprintf("%d-%s", category.ID, category.Subcategories[i].ID)
-			if subcategoryRef, exists := subcategoryMap[subcategoryKey]; exists {
-				category.Subcategories[i] = *subcategoryRef
-				
-				// Update subbiercategory references
-				for j := range category.Subcategories[i].Subbiercategories {
-					subbiercategoryKey := fmt.Sprintf("%s-%s", subcategoryKey, category.Subcategories[i].Subbiercategories[j].ID)
-					if subbiercategoryRef, exists := subbiercategoryMap[subbiercategoryKey]; exists {
-						category.Subcategories[i].Subbiercategories[j] = *subbiercategoryRef
+		// Build subcategories for this category
+		var subcategories []TreeSubcategory
+		for subcategoryKey, subcategory := range subcategoryMap {
+			// Check if this subcategory belongs to the current category
+			expectedPrefix := fmt.Sprintf("%d-", category.ID)
+			if strings.HasPrefix(subcategoryKey, expectedPrefix) {
+				// Build subbiercategories for this subcategory
+				var subbiercategories []TreeSubbiercategory
+				for subbiercategoryKey, subbiercategory := range subbiercategoryMap {
+					// Check if this subbiercategory belongs to the current subcategory
+					expectedSubPrefix := fmt.Sprintf("%s-", subcategoryKey)
+					if strings.HasPrefix(subbiercategoryKey, expectedSubPrefix) {
+						subbiercategories = append(subbiercategories, *subbiercategory)
 					}
 				}
+				
+				// Sort subbiercategories by name
+				sort.Slice(subbiercategories, func(i, j int) bool {
+					return subbiercategories[i].Name < subbiercategories[j].Name
+				})
+				subcategory.Subbiercategories = subbiercategories
+				subcategories = append(subcategories, *subcategory)
 			}
 		}
+		
+		// Sort subcategories by name
+		sort.Slice(subcategories, func(i, j int) bool {
+			return subcategories[i].Name < subcategories[j].Name
+		})
+		category.Subcategories = subcategories
 		treeCategories = append(treeCategories, *category)
 	}
 	
@@ -933,6 +954,9 @@ func (h *DeviceHandler) buildTreeFromDevices(devices []models.Device) ([]TreeCat
 	sort.Slice(treeCategories, func(i, j int) bool {
 		return treeCategories[i].Name < treeCategories[j].Name
 	})
+	
+	log.Printf("✅ Built tree with %d categories, %d subcategories, %d subbiercategories", 
+		len(treeCategories), len(subcategoryMap), len(subbiercategoryMap))
 	
 	return treeCategories, nil
 }
