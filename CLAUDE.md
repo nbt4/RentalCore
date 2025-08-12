@@ -31,3 +31,5 @@
 ### Server Management
 - Please restart the Server always, after you made changes, so i dont have to.
 - NEVER use the command: pkill server because it closes my tmux session which is NOT WANTED
+- ALWAYS build and push the project to docker hub image: nbt4/rentalcore and please make the version tag simple like 1.X and so on.
+- and always push your changes to github for possible easy rollbacks. and i mean every time you finished smth. push it to github

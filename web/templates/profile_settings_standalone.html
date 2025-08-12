@@ -646,7 +646,15 @@
         fetch('/profile/passkeys/start-registration', {
             method: 'POST'
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response) {
+                throw new Error('Network request failed - no response received');
+            }
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.error) {
                 showAlert('danger', data.error);
@@ -698,7 +706,15 @@
                 });
             });
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response) {
+                throw new Error('Network request failed - no response received');
+            }
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.json();
+        })
         .then(data => {
             if (data.error) {
                 showAlert('danger', data.error);

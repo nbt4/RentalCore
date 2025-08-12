@@ -58,14 +58,18 @@ func (h *WebAuthnHandler) StartPasskeyRegistration(c *gin.Context) {
 	
 	log.Printf("DEBUG: Request scheme: %s, host: %s", scheme, host)
 	
-	// WebAuthn requires HTTPS except for localhost and internal networks
+	// WebAuthn requires HTTPS except for localhost, internal networks, and Docker containers
 	isLocalhost := strings.Contains(host, "localhost") || strings.Contains(host, "127.0.0.1")
-	isInternalHost := strings.Contains(host, "debian01") || strings.Contains(host, ".local") || strings.Contains(host, "10.0.0.") || strings.Contains(host, "192.168.")
+	isInternalHost := strings.Contains(host, "debian01") || strings.Contains(host, ".local") || strings.Contains(host, "10.0.0.") || strings.Contains(host, "192.168.") || strings.Contains(host, "172.16.") || strings.Contains(host, "172.17.") || strings.Contains(host, "172.18.") || strings.Contains(host, "172.19.") || strings.Contains(host, "172.20.") || strings.Contains(host, "172.21.") || strings.Contains(host, "172.22.") || strings.Contains(host, "172.23.") || strings.Contains(host, "172.24.") || strings.Contains(host, "172.25.") || strings.Contains(host, "172.26.") || strings.Contains(host, "172.27.") || strings.Contains(host, "172.28.") || strings.Contains(host, "172.29.") || strings.Contains(host, "172.30.") || strings.Contains(host, "172.31.")
+	// Allow development and container environments (common Docker/development hostnames)
+	isDevelopmentHost := strings.Contains(host, "rentalcore") || strings.Contains(host, "app") || strings.Contains(host, "webapp") || 
+		                strings.Contains(host, "docker") || strings.Contains(host, "container") ||
+		                (strings.Contains(host, ":8080") || strings.Contains(host, ":3000") || strings.Contains(host, ":8000"))
 	
-	log.Printf("DEBUG: Host validation - host: %s, isLocalhost: %v, isInternalHost: %v", host, isLocalhost, isInternalHost)
+	log.Printf("DEBUG: Host validation - host: %s, isLocalhost: %v, isInternalHost: %v, isDevelopmentHost: %v", host, isLocalhost, isInternalHost, isDevelopmentHost)
 	
-	if scheme != "https" && !isLocalhost && !isInternalHost {
-		log.Printf("ERROR: WebAuthn requires HTTPS except for localhost/internal hosts - host: %s, scheme: %s", host, scheme)
+	if scheme != "https" && !isLocalhost && !isInternalHost && !isDevelopmentHost {
+		log.Printf("ERROR: WebAuthn requires HTTPS except for localhost/internal/development hosts - host: %s, scheme: %s", host, scheme)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "WebAuthn requires HTTPS for security"})
 		return
 	}
@@ -246,12 +250,16 @@ func (h *WebAuthnHandler) StartPasskeyAuthentication(c *gin.Context) {
 	
 	log.Printf("DEBUG: Request scheme: %s, host: %s", scheme, host)
 	
-	// WebAuthn requires HTTPS except for localhost and internal networks
+	// WebAuthn requires HTTPS except for localhost, internal networks, and Docker containers
 	isLocalhost := strings.Contains(host, "localhost") || strings.Contains(host, "127.0.0.1")
-	isInternalHost := strings.Contains(host, "debian01") || strings.Contains(host, ".local") || strings.Contains(host, "10.0.0.") || strings.Contains(host, "192.168.")
+	isInternalHost := strings.Contains(host, "debian01") || strings.Contains(host, ".local") || strings.Contains(host, "10.0.0.") || strings.Contains(host, "192.168.") || strings.Contains(host, "172.16.") || strings.Contains(host, "172.17.") || strings.Contains(host, "172.18.") || strings.Contains(host, "172.19.") || strings.Contains(host, "172.20.") || strings.Contains(host, "172.21.") || strings.Contains(host, "172.22.") || strings.Contains(host, "172.23.") || strings.Contains(host, "172.24.") || strings.Contains(host, "172.25.") || strings.Contains(host, "172.26.") || strings.Contains(host, "172.27.") || strings.Contains(host, "172.28.") || strings.Contains(host, "172.29.") || strings.Contains(host, "172.30.") || strings.Contains(host, "172.31.")
+	// Allow development and container environments (common Docker/development hostnames)
+	isDevelopmentHost := strings.Contains(host, "rentalcore") || strings.Contains(host, "app") || strings.Contains(host, "webapp") || 
+		                strings.Contains(host, "docker") || strings.Contains(host, "container") ||
+		                (strings.Contains(host, ":8080") || strings.Contains(host, ":3000") || strings.Contains(host, ":8000"))
 	
-	if scheme != "https" && !isLocalhost && !isInternalHost {
-		log.Printf("ERROR: WebAuthn requires HTTPS except for localhost/internal hosts")
+	if scheme != "https" && !isLocalhost && !isInternalHost && !isDevelopmentHost {
+		log.Printf("ERROR: WebAuthn requires HTTPS except for localhost/internal/development hosts")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "WebAuthn requires HTTPS for security"})
 		return
 	}
