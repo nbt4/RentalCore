@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
-	"strings"
 	"log"
 	"time"
 	"sync"
@@ -826,128 +825,161 @@ func (h *DeviceHandler) buildOptimizedTreeData() ([]TreeCategory, error) {
 }
 
 // buildTreeFromDevices constructs the hierarchical tree from a flat list of devices
+// COMPLETELY REWRITTEN with proper nested structure building
 func (h *DeviceHandler) buildTreeFromDevices(devices []models.Device) ([]TreeCategory, error) {
-	// Create maps for fast lookups
-	categoryMap := make(map[uint]*TreeCategory)
-	subcategoryMap := make(map[string]*TreeSubcategory)
-	subbiercategoryMap := make(map[string]*TreeSubbiercategory)
-	
 	log.Printf("🔍 Processing %d devices to build tree hierarchy", len(devices))
 	
-	// Process all devices and build the tree structure
+	// Group devices by their hierarchy path
+	categoryGroups := make(map[uint]map[string]map[string][]models.Device)
+	
 	for _, device := range devices {
 		if device.Product == nil || device.Product.Category == nil {
 			log.Printf("⚠️ Skipping device %d - missing product or category", device.DeviceID)
 			continue
 		}
 		
-		category := device.Product.Category
-		categoryID := category.CategoryID
+		categoryID := device.Product.Category.CategoryID
 		
-		// Create or get category
-		if _, exists := categoryMap[categoryID]; !exists {
-			categoryMap[categoryID] = &TreeCategory{
-				ID:            categoryID,
-				Name:          category.Name,
-				DeviceCount:   0,
-				DirectDevices: []TreeDevice{},
-				Subcategories: []TreeSubcategory{},
-			}
-			log.Printf("🏷️ Created category: %s (ID: %d)", category.Name, categoryID)
+		// Initialize category group if needed
+		if categoryGroups[categoryID] == nil {
+			categoryGroups[categoryID] = make(map[string]map[string][]models.Device)
 		}
-		treeCategory := categoryMap[categoryID]
 		
-		// Convert device
-		treeDevice := h.convertToTreeDevice(device)
+		var subcategoryID string = "DIRECT" // For devices directly in category
+		var subbiercategoryID string = "DIRECT" // For devices directly in subcategory
 		
-		// Handle subcategory level
 		if device.Product.Subcategory != nil {
-			subcategory := device.Product.Subcategory
-			subcategoryKey := fmt.Sprintf("%d-%s", categoryID, subcategory.SubcategoryID)
+			subcategoryID = device.Product.Subcategory.SubcategoryID
 			
-			// Create or get subcategory
-			if _, exists := subcategoryMap[subcategoryKey]; !exists {
-				newSubcategory := &TreeSubcategory{
-					ID:                subcategory.SubcategoryID,
-					Name:              subcategory.Name,
+			if device.Product.Subbiercategory != nil {
+				subbiercategoryID = device.Product.Subbiercategory.SubbiercategoryID
+			}
+		}
+		
+		// Initialize subcategory group if needed
+		if categoryGroups[categoryID][subcategoryID] == nil {
+			categoryGroups[categoryID][subcategoryID] = make(map[string][]models.Device)
+		}
+		
+		// Add device to appropriate subbiercategory
+		categoryGroups[categoryID][subcategoryID][subbiercategoryID] = append(
+			categoryGroups[categoryID][subcategoryID][subbiercategoryID], device)
+	}
+	
+	// Build the tree structure
+	var treeCategories []TreeCategory
+	
+	for categoryID, subcategoryGroups := range categoryGroups {
+		// Find the category info from first device
+		var categoryName string
+		for _, subGroup := range subcategoryGroups {
+			for _, deviceList := range subGroup {
+				if len(deviceList) > 0 && deviceList[0].Product != nil && deviceList[0].Product.Category != nil {
+					categoryName = deviceList[0].Product.Category.Name
+					break
+				}
+			}
+			if categoryName != "" {
+				break
+			}
+		}
+		
+		treeCategory := TreeCategory{
+			ID:            categoryID,
+			Name:          categoryName,
+			DeviceCount:   0,
+			DirectDevices: []TreeDevice{},
+			Subcategories: []TreeSubcategory{},
+		}
+		
+		log.Printf("🏷️ Building category: %s (ID: %d)", categoryName, categoryID)
+		
+		for subcategoryID, subbiercategoryGroups := range subcategoryGroups {
+			if subcategoryID == "DIRECT" {
+				// Devices directly in category (no subcategory)
+				if deviceList, exists := subbiercategoryGroups["DIRECT"]; exists {
+					for _, device := range deviceList {
+						treeCategory.DirectDevices = append(treeCategory.DirectDevices, h.convertToTreeDevice(device))
+						treeCategory.DeviceCount++
+					}
+					log.Printf("  📦 Added %d direct devices to category %s", len(deviceList), categoryName)
+				}
+			} else {
+				// Build subcategory
+				var subcategoryName string
+				var totalDevicesInSubcategory int
+				
+				// Find subcategory name from first device
+				for _, deviceList := range subbiercategoryGroups {
+					if len(deviceList) > 0 && deviceList[0].Product != nil && deviceList[0].Product.Subcategory != nil {
+						subcategoryName = deviceList[0].Product.Subcategory.Name
+						break
+					}
+				}
+				
+				treeSubcategory := TreeSubcategory{
+					ID:                subcategoryID,
+					Name:              subcategoryName,
 					DeviceCount:       0,
 					DirectDevices:     []TreeDevice{},
 					Subbiercategories: []TreeSubbiercategory{},
 				}
-				subcategoryMap[subcategoryKey] = newSubcategory
-				log.Printf("🏷️ Created subcategory: %s in %s", subcategory.Name, category.Name)
-			}
-			treeSubcategory := subcategoryMap[subcategoryKey]
-			
-			// Handle subbiercategory level
-			if device.Product.Subbiercategory != nil {
-				subbiercategory := device.Product.Subbiercategory
-				subbiercategoryKey := fmt.Sprintf("%s-%s", subcategoryKey, subbiercategory.SubbiercategoryID)
 				
-				// Create or get subbiercategory
-				if _, exists := subbiercategoryMap[subbiercategoryKey]; !exists {
-					newSubbiercategory := &TreeSubbiercategory{
-						ID:          subbiercategory.SubbiercategoryID,
-						Name:        subbiercategory.Name,
-						DeviceCount: 0,
-						Devices:     []TreeDevice{},
-					}
-					subbiercategoryMap[subbiercategoryKey] = newSubbiercategory
-					log.Printf("🏷️ Created subbiercategory: %s in %s->%s", subbiercategory.Name, category.Name, subcategory.Name)
-				}
-				treeSubbiercategory := subbiercategoryMap[subbiercategoryKey]
+				log.Printf("  🏷️ Building subcategory: %s in %s", subcategoryName, categoryName)
 				
-				// Add device to subbiercategory
-				treeSubbiercategory.Devices = append(treeSubbiercategory.Devices, treeDevice)
-				treeSubbiercategory.DeviceCount++
-			} else {
-				// Device directly in subcategory
-				treeSubcategory.DirectDevices = append(treeSubcategory.DirectDevices, treeDevice)
-			}
-			
-			treeSubcategory.DeviceCount++
-		} else {
-			// Device directly in category
-			treeCategory.DirectDevices = append(treeCategory.DirectDevices, treeDevice)
-		}
-		
-		treeCategory.DeviceCount++
-	}
-	
-	// Build final tree structure by properly linking the hierarchy
-	var treeCategories []TreeCategory
-	for _, category := range categoryMap {
-		// Build subcategories for this category
-		var subcategories []TreeSubcategory
-		for subcategoryKey, subcategory := range subcategoryMap {
-			// Check if this subcategory belongs to the current category
-			expectedPrefix := fmt.Sprintf("%d-", category.ID)
-			if strings.HasPrefix(subcategoryKey, expectedPrefix) {
-				// Build subbiercategories for this subcategory
-				var subbiercategories []TreeSubbiercategory
-				for subbiercategoryKey, subbiercategory := range subbiercategoryMap {
-					// Check if this subbiercategory belongs to the current subcategory
-					expectedSubPrefix := fmt.Sprintf("%s-", subcategoryKey)
-					if strings.HasPrefix(subbiercategoryKey, expectedSubPrefix) {
-						subbiercategories = append(subbiercategories, *subbiercategory)
+				for subbiercategoryID, deviceList := range subbiercategoryGroups {
+					if subbiercategoryID == "DIRECT" {
+						// Devices directly in subcategory (no subbiercategory)
+						for _, device := range deviceList {
+							treeSubcategory.DirectDevices = append(treeSubcategory.DirectDevices, h.convertToTreeDevice(device))
+							treeSubcategory.DeviceCount++
+							totalDevicesInSubcategory++
+						}
+						log.Printf("    📦 Added %d direct devices to subcategory %s", len(deviceList), subcategoryName)
+					} else {
+						// Build subbiercategory
+						var subbiercategoryName string
+						if len(deviceList) > 0 && deviceList[0].Product != nil && deviceList[0].Product.Subbiercategory != nil {
+							subbiercategoryName = deviceList[0].Product.Subbiercategory.Name
+						}
+						
+						var treeDevices []TreeDevice
+						for _, device := range deviceList {
+							treeDevices = append(treeDevices, h.convertToTreeDevice(device))
+						}
+						
+						treeSubbiercategory := TreeSubbiercategory{
+							ID:          subbiercategoryID,
+							Name:        subbiercategoryName,
+							DeviceCount: len(treeDevices),
+							Devices:     treeDevices,
+						}
+						
+						treeSubcategory.Subbiercategories = append(treeSubcategory.Subbiercategories, treeSubbiercategory)
+						treeSubcategory.DeviceCount += len(treeDevices)
+						totalDevicesInSubcategory += len(treeDevices)
+						
+						log.Printf("    🏷️ Added subbiercategory %s with %d devices", subbiercategoryName, len(treeDevices))
 					}
 				}
 				
 				// Sort subbiercategories by name
-				sort.Slice(subbiercategories, func(i, j int) bool {
-					return subbiercategories[i].Name < subbiercategories[j].Name
+				sort.Slice(treeSubcategory.Subbiercategories, func(i, j int) bool {
+					return treeSubcategory.Subbiercategories[i].Name < treeSubcategory.Subbiercategories[j].Name
 				})
-				subcategory.Subbiercategories = subbiercategories
-				subcategories = append(subcategories, *subcategory)
+				
+				treeCategory.Subcategories = append(treeCategory.Subcategories, treeSubcategory)
+				treeCategory.DeviceCount += totalDevicesInSubcategory
 			}
 		}
 		
 		// Sort subcategories by name
-		sort.Slice(subcategories, func(i, j int) bool {
-			return subcategories[i].Name < subcategories[j].Name
+		sort.Slice(treeCategory.Subcategories, func(i, j int) bool {
+			return treeCategory.Subcategories[i].Name < treeCategory.Subcategories[j].Name
 		})
-		category.Subcategories = subcategories
-		treeCategories = append(treeCategories, *category)
+		
+		treeCategories = append(treeCategories, treeCategory)
+		log.Printf("✅ Category %s completed with %d total devices", categoryName, treeCategory.DeviceCount)
 	}
 	
 	// Sort categories by name
@@ -955,8 +987,29 @@ func (h *DeviceHandler) buildTreeFromDevices(devices []models.Device) ([]TreeCat
 		return treeCategories[i].Name < treeCategories[j].Name
 	})
 	
-	log.Printf("✅ Built tree with %d categories, %d subcategories, %d subbiercategories", 
-		len(treeCategories), len(subcategoryMap), len(subbiercategoryMap))
+	log.Printf("✅ Built tree with %d categories", len(treeCategories))
+	
+	// Debug output for verification
+	for i, category := range treeCategories {
+		if i < 3 { // Show first 3 categories for debugging
+			log.Printf("🔍 Category '%s': %d subcategories, %d direct devices", 
+				category.Name, len(category.Subcategories), len(category.DirectDevices))
+			
+			for j, sub := range category.Subcategories {
+				if j < 3 { // Show first 3 subcategories
+					log.Printf("  🔍 Subcategory '%s': %d subbiercategories, %d direct devices", 
+						sub.Name, len(sub.Subbiercategories), len(sub.DirectDevices))
+					
+					for k, subbier := range sub.Subbiercategories {
+						if k < 3 { // Show first 3 subbiercategories
+							log.Printf("    🔍 Subbiercategory '%s': %d devices", 
+								subbier.Name, len(subbier.Devices))
+						}
+					}
+				}
+			}
+		}
+	}
 	
 	return treeCategories, nil
 }
