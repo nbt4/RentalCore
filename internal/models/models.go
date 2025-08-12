@@ -137,7 +137,7 @@ type Subcategory struct {
 	Name          string  `json:"name" gorm:"not null;column:name"`
 	Abbreviation  string  `json:"abbreviation" gorm:"column:abbreviation"`
 	CategoryID    uint    `json:"categoryID" gorm:"column:categoryID"`
-	Category      Category `json:"category,omitempty" gorm:"-"`
+	Category      Category `json:"category,omitempty" gorm:"foreignKey:CategoryID;references:CategoryID"`
 }
 
 func (Subcategory) TableName() string {
@@ -149,7 +149,7 @@ type Subbiercategory struct {
 	Name              string `json:"name" gorm:"not null;column:name"`
 	Abbreviation      string `json:"abbreviation" gorm:"column:abbreviation"`
 	SubcategoryID     string `json:"subcategoryID" gorm:"column:subcategoryID"`
-	Subcategory       Subcategory `json:"subcategory,omitempty" gorm:"-"`
+	Subcategory       Subcategory `json:"subcategory,omitempty" gorm:"foreignKey:SubcategoryID;references:SubcategoryID"`
 }
 
 func (Subbiercategory) TableName() string {

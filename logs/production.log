@@ -1847,3 +1847,17 @@ ERROR: Failed to cleanup expired sessions: dial tcp: lookup tsunami-events.de on
 2025/08/12 14:36:05 Templates already exist (1), skipping default template creation
 2025/08/12 14:36:06 Server starting on 0.0.0.0:8080
 2025/08/12 14:36:06 listen tcp 0.0.0.0:8080: bind: address already in use
+2025/08/12 17:16:08 Running in production mode
+2025/08/12 17:16:08 Database connection established successfully
+2025/08/12 17:16:08 GoBD compliance table migration disabled
+2025/08/12 17:16:08 Database auto-migration disabled - using manual schema management
+2025/08/12 17:16:08 Templates already exist (1), skipping default template creation
+2025/08/12 17:16:08 Server starting on 0.0.0.0:8080
+2025/08/12 17:16:08 listen tcp 0.0.0.0:8080: bind: address already in use
+2025/08/12 17:16:31 Running in production mode
+2025/08/12 17:16:31 Database connection established successfully
+2025/08/12 17:16:31 GoBD compliance table migration disabled
+2025/08/12 17:16:31 Database auto-migration disabled - using manual schema management
+2025/08/12 17:16:31 Templates already exist (1), skipping default template creation
+2025/08/12 17:16:32 Server starting on 0.0.0.0:8080
+2025/08/12 17:16:32 listen tcp 0.0.0.0:8080: bind: address already in use
