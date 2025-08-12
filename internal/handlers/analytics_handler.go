@@ -258,11 +258,10 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 							COALESCE(p.itemcostperday, 0) * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)
 					END
 			END as revenue,
-			COALESCE(s.status, 'unknown') as job_status
+			CAST(j.statusID as CHAR) as job_status
 		FROM jobdevices jd
 		JOIN jobs j ON jd.jobID = j.jobID
 		JOIN customers c ON j.customerID = c.customerID
-		LEFT JOIN statuses s ON j.statusID = s.statusID
 		LEFT JOIN devices d ON jd.deviceID = d.deviceID
 		LEFT JOIN products p ON d.productID = p.productID
 		WHERE jd.deviceID = ?
@@ -303,11 +302,10 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 				0.0 as discount,
 				NULL as discount_type,
 				300.0 as revenue,
-				COALESCE(s.status, 'unknown') as job_status
+				CAST(j.statusID as CHAR) as job_status
 			FROM jobdevices jd
 			JOIN jobs j ON jd.jobID = j.jobID
 			JOIN customers c ON j.customerID = c.customerID
-			LEFT JOIN statuses s ON j.statusID = s.statusID
 			WHERE jd.deviceID = ?
 			LIMIT 5
 		`, deviceID).Scan(&customerBookings)
