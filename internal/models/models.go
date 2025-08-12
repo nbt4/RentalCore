@@ -121,8 +121,8 @@ type Product struct {
 	PowerConsumption      *float64     `json:"powerconsumption" gorm:"column:powerconsumption"`
 	PosInCategory         *uint        `json:"pos_in_category" gorm:"column:pos_in_category"`
 	Category              *Category       `json:"category,omitempty" gorm:"foreignKey:CategoryID;references:CategoryID"`
-	Subcategory           *Subcategory    `json:"subcategory,omitempty" gorm:"foreignKey:SubcategoryID"`
-	Subbiercategory       *Subbiercategory `json:"subbiercategory,omitempty" gorm:"foreignKey:SubbiercategoryID"`
+	Subcategory           *Subcategory    `json:"subcategory,omitempty" gorm:"foreignKey:SubcategoryID;references:SubcategoryID"`
+	Subbiercategory       *Subbiercategory `json:"subbiercategory,omitempty" gorm:"foreignKey:SubbiercategoryID;references:SubbiercategoryID"`
 	Brand                 *Brand          `json:"brand,omitempty" gorm:"foreignKey:BrandID"`
 	Manufacturer          *Manufacturer   `json:"manufacturer,omitempty" gorm:"foreignKey:ManufacturerID"`
 }
