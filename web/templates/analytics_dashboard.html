@@ -475,6 +475,7 @@
                                         <th style="cursor: pointer;" onclick="sortAllDevices('rental_count', 'desc')">Rentals <i class="bi bi-arrow-up-down"></i></th>
                                         <th style="cursor: pointer;" onclick="sortAllDevices('total_revenue', 'desc')">Revenue <i class="bi bi-arrow-up-down"></i></th>
                                         <th>Status</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="allDevicesTableBody">
@@ -1028,7 +1029,7 @@ function renderAllDevicesTable() {
     if (pageData.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" style="text-align: center; color: var(--text-secondary); padding: var(--space-xl);">
+                <td colspan="6" style="text-align: center; color: var(--text-secondary); padding: var(--space-xl);">
                     <i class="bi bi-inbox" style="font-size: 2rem; margin-bottom: var(--space-sm); display: block;"></i>
                     No device revenue data available for the selected period.
                 </td>
@@ -1063,6 +1064,11 @@ function renderAllDevicesTable() {
             <td><span class="status-badge status-info">${device.rentalCount || 0}</span></td>
             <td><strong>€${Number(device.totalRevenue || 0).toFixed(0)}</strong></td>
             <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+            <td>
+                <button class="rc-btn rc-btn-sm rc-btn-accent" onclick="openDeviceAnalytics('${device.deviceID || ''}')" title="Detailed Analytics">
+                    <i class="bi bi-bar-chart"></i>
+                </button>
+            </td>
         `;
         
         tbody.appendChild(row);
@@ -1159,6 +1165,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Add tooltips and interactions to metric cards
     document.querySelectorAll('.rc-metric-card').forEach((card, index) => {
+        // Skip metric cards inside device analytics modal
+        if (card.closest('#deviceAnalyticsModal')) {
+            return;
+        }
+        
         card.title = 'Click to view detailed breakdown';
         card.style.cursor = 'pointer';
         
@@ -1200,7 +1211,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </script>
 
     <!-- Device Analytics Popup Modal -->
-    <div id="deviceAnalyticsModal" class="rc-modal" style="display: none;">
+    <div id="deviceAnalyticsModal" class="rc-modal" style="display: none; z-index: 2000;">
         <div class="rc-modal-content rc-modal-xl">
             <div class="rc-modal-header">
                 <h3 id="deviceAnalyticsTitle">
@@ -1400,7 +1411,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Update device info header
             document.getElementById('deviceName').textContent = `${data.deviceInfo.productName} Analytics`;
             document.getElementById('deviceProductName').textContent = data.deviceInfo.productName;
-            document.getElementById('deviceIdDisplay').textContent = `ID: ${data.deviceInfo.deviceId}`;
+            document.getElementById('deviceIdDisplay').textContent = `ID: ${data.deviceInfo.deviceId || currentDeviceId}`;
             document.getElementById('deviceSerial').textContent = data.deviceInfo.serialNumber ? `SN: ${data.deviceInfo.serialNumber}` : '';
             document.getElementById('deviceCategory').textContent = data.deviceInfo.categoryName;
             document.getElementById('deviceStatus').textContent = data.deviceInfo.status;
@@ -1475,26 +1486,58 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     scales: {
                         x: {
-                            ticks: { color: 'var(--text-secondary)' },
-                            grid: { color: 'var(--surface-3)' }
+                            title: {
+                                display: true,
+                                text: 'Month',
+                                color: 'var(--text-primary)',
+                                font: { size: 12, weight: 'bold' }
+                            },
+                            ticks: { 
+                                color: 'var(--text-secondary)',
+                                font: { size: 11 }
+                            },
+                            grid: { 
+                                color: 'var(--surface-3)',
+                                lineWidth: 1
+                            }
                         },
                         y: {
                             type: 'linear',
                             display: true,
                             position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Revenue (€)',
+                                color: 'var(--accent-electric)',
+                                font: { size: 12, weight: 'bold' }
+                            },
                             ticks: { 
                                 color: 'var(--text-secondary)',
+                                font: { size: 11 },
                                 callback: function(value) {
                                     return '€' + Math.round(value);
                                 }
                             },
-                            grid: { color: 'var(--surface-3)' }
+                            grid: { 
+                                color: 'var(--surface-3)',
+                                lineWidth: 1
+                            }
                         },
                         y1: {
                             type: 'linear',
                             display: true,
                             position: 'right',
-                            ticks: { color: 'var(--text-secondary)' },
+                            title: {
+                                display: true,
+                                text: 'Bookings',
+                                color: 'var(--accent-success)',
+                                font: { size: 12, weight: 'bold' }
+                            },
+                            ticks: { 
+                                color: 'var(--text-secondary)',
+                                font: { size: 11 },
+                                stepSize: 1
+                            },
                             grid: { drawOnChartArea: false }
                         }
                     }

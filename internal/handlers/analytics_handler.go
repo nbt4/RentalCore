@@ -192,8 +192,23 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 	}
 
 	// Get customer booking history with details
-	var customerBookings []map[string]interface{}
-	rows, err := h.db.Raw(`
+	type CustomerBooking struct {
+		CustomerName  string    `json:"customer_name"`
+		CustomerEmail *string   `json:"customer_email"`
+		JobID         string    `json:"jobID"`
+		StartDate     time.Time `json:"startDate"`
+		EndDate       *time.Time `json:"endDate"`
+		Description   *string   `json:"description"`
+		RentalDays    int       `json:"rental_days"`
+		Revenue       float64   `json:"revenue"`
+		DailyRate     float64   `json:"daily_rate"`
+		Discount      float64   `json:"discount"`
+		DiscountType  *string   `json:"discount_type"`
+		JobStatus     string    `json:"job_status"`
+	}
+	
+	var customerBookings []CustomerBooking
+	h.db.Raw(`
 		SELECT 
 			c.name as customer_name,
 			c.email as customer_email,
@@ -237,20 +252,17 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 		WHERE jd.deviceID = ? 
 		AND j.startDate BETWEEN ? AND ?
 		ORDER BY j.startDate DESC
-	`, deviceID, startDate, endDate).Rows()
-	
-	if err == nil {
-		defer rows.Close()
-		for rows.Next() {
-			var booking map[string]interface{}
-			h.db.ScanRows(rows, &booking)
-			customerBookings = append(customerBookings, booking)
-		}
-	}
+	`, deviceID, startDate, endDate).Scan(&customerBookings)
 
 	// Get monthly revenue trend
-	var monthlyRevenue []map[string]interface{}
-	monthlyRows, err := h.db.Raw(`
+	type MonthlyRevenue struct {
+		Month    string  `json:"month"`
+		Revenue  float64 `json:"revenue"`
+		Bookings int     `json:"bookings"`
+	}
+	
+	var monthlyRevenue []MonthlyRevenue
+	h.db.Raw(`
 		SELECT 
 			DATE_FORMAT(j.startDate, '%Y-%m') as month,
 			COALESCE(SUM(
@@ -285,16 +297,7 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 		GROUP BY DATE_FORMAT(j.startDate, '%Y-%m')
 		ORDER BY month DESC
 		LIMIT 12
-	`, deviceID, startDate, endDate).Rows()
-	
-	if err == nil {
-		defer monthlyRows.Close()
-		for monthlyRows.Next() {
-			var trend map[string]interface{}
-			h.db.ScanRows(monthlyRows, &trend)
-			monthlyRevenue = append(monthlyRevenue, trend)
-		}
-	}
+	`, deviceID, startDate, endDate).Scan(&monthlyRevenue)
 
 	// Get utilization metrics
 	var utilizationStats struct {
