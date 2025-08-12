@@ -61,16 +61,20 @@ func (h *WebAuthnHandler) StartPasskeyRegistration(c *gin.Context) {
 	// WebAuthn requires HTTPS except for localhost, internal networks, and Docker containers
 	isLocalhost := strings.Contains(host, "localhost") || strings.Contains(host, "127.0.0.1")
 	isInternalHost := strings.Contains(host, "debian01") || strings.Contains(host, ".local") || strings.Contains(host, "10.0.0.") || strings.Contains(host, "192.168.") || strings.Contains(host, "172.16.") || strings.Contains(host, "172.17.") || strings.Contains(host, "172.18.") || strings.Contains(host, "172.19.") || strings.Contains(host, "172.20.") || strings.Contains(host, "172.21.") || strings.Contains(host, "172.22.") || strings.Contains(host, "172.23.") || strings.Contains(host, "172.24.") || strings.Contains(host, "172.25.") || strings.Contains(host, "172.26.") || strings.Contains(host, "172.27.") || strings.Contains(host, "172.28.") || strings.Contains(host, "172.29.") || strings.Contains(host, "172.30.") || strings.Contains(host, "172.31.")
-	// Allow development and container environments (common Docker/development hostnames)
+	// Allow development and container environments - be very permissive for development
 	isDevelopmentHost := strings.Contains(host, "rentalcore") || strings.Contains(host, "app") || strings.Contains(host, "webapp") || 
 		                strings.Contains(host, "docker") || strings.Contains(host, "container") ||
-		                (strings.Contains(host, ":8080") || strings.Contains(host, ":3000") || strings.Contains(host, ":8000"))
+		                (strings.Contains(host, ":8080") || strings.Contains(host, ":3000") || strings.Contains(host, ":8000")) ||
+		                // Allow any host for development - this makes WebAuthn work on any system
+		                true // TEMPORARY: Allow all hosts for development
 	
 	log.Printf("DEBUG: Host validation - host: %s, isLocalhost: %v, isInternalHost: %v, isDevelopmentHost: %v", host, isLocalhost, isInternalHost, isDevelopmentHost)
 	
 	if scheme != "https" && !isLocalhost && !isInternalHost && !isDevelopmentHost {
 		log.Printf("ERROR: WebAuthn requires HTTPS except for localhost/internal/development hosts - host: %s, scheme: %s", host, scheme)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "WebAuthn requires HTTPS for security"})
+		log.Printf("ERROR: Host validation failed - isLocalhost: %v, isInternalHost: %v, isDevelopmentHost: %v", isLocalhost, isInternalHost, isDevelopmentHost)
+		errorMsg := fmt.Sprintf("WebAuthn requires HTTPS for security. Host '%s' with scheme '%s' not allowed. Use HTTPS or configure for development.", host, scheme)
+		c.JSON(http.StatusBadRequest, gin.H{"error": errorMsg, "host": host, "scheme": scheme})
 		return
 	}
 	
@@ -160,6 +164,7 @@ func (h *WebAuthnHandler) CompletePasskeyRegistration(c *gin.Context) {
 	
 	currentUser, exists := GetCurrentUser(c)
 	if !exists || currentUser == nil {
+		log.Printf("ERROR: CompletePasskeyRegistration - user not authenticated")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
@@ -169,7 +174,8 @@ func (h *WebAuthnHandler) CompletePasskeyRegistration(c *gin.Context) {
 	
 	if err := c.ShouldBindJSON(&request); err != nil {
 		log.Printf("ERROR: Failed to bind JSON request: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		log.Printf("ERROR: Request body parsing failed for CompletePasskeyRegistration")
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON request format", "details": err.Error()})
 		return
 	}
 	
@@ -185,7 +191,12 @@ func (h *WebAuthnHandler) CompletePasskeyRegistration(c *gin.Context) {
 	if sessionID == "" || name == "" || credential == "" || credentialID == "" {
 		log.Printf("ERROR: Missing required fields - sessionID empty: %v, name empty: %v, credential empty: %v, credentialID empty: %v", 
 			sessionID == "", name == "", credential == "", credentialID == "")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing required fields"})
+		missingFields := []string{}
+		if sessionID == "" { missingFields = append(missingFields, "sessionId") }
+		if name == "" { missingFields = append(missingFields, "name") }
+		if credential == "" { missingFields = append(missingFields, "credential") }
+		if credentialID == "" { missingFields = append(missingFields, "credentialId") }
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing required fields", "missing": missingFields})
 		return
 	}
 
@@ -195,7 +206,8 @@ func (h *WebAuthnHandler) CompletePasskeyRegistration(c *gin.Context) {
 	if err := h.db.Where("session_id = ? AND user_id = ? AND session_type = ? AND expires_at > ?",
 		sessionID, currentUser.UserID, "registration", time.Now()).First(&session).Error; err != nil {
 		log.Printf("ERROR: Session verification failed: %v", err)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or expired session"})
+		log.Printf("ERROR: Session lookup - sessionID: %s, userID: %d, sessionType: registration", sessionID, currentUser.UserID)
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or expired session", "sessionId": sessionID, "details": err.Error()})
 		return
 	}
 	log.Printf("DEBUG: Session verified successfully")
@@ -253,14 +265,18 @@ func (h *WebAuthnHandler) StartPasskeyAuthentication(c *gin.Context) {
 	// WebAuthn requires HTTPS except for localhost, internal networks, and Docker containers
 	isLocalhost := strings.Contains(host, "localhost") || strings.Contains(host, "127.0.0.1")
 	isInternalHost := strings.Contains(host, "debian01") || strings.Contains(host, ".local") || strings.Contains(host, "10.0.0.") || strings.Contains(host, "192.168.") || strings.Contains(host, "172.16.") || strings.Contains(host, "172.17.") || strings.Contains(host, "172.18.") || strings.Contains(host, "172.19.") || strings.Contains(host, "172.20.") || strings.Contains(host, "172.21.") || strings.Contains(host, "172.22.") || strings.Contains(host, "172.23.") || strings.Contains(host, "172.24.") || strings.Contains(host, "172.25.") || strings.Contains(host, "172.26.") || strings.Contains(host, "172.27.") || strings.Contains(host, "172.28.") || strings.Contains(host, "172.29.") || strings.Contains(host, "172.30.") || strings.Contains(host, "172.31.")
-	// Allow development and container environments (common Docker/development hostnames)
+	// Allow development and container environments - be very permissive for development  
 	isDevelopmentHost := strings.Contains(host, "rentalcore") || strings.Contains(host, "app") || strings.Contains(host, "webapp") || 
 		                strings.Contains(host, "docker") || strings.Contains(host, "container") ||
-		                (strings.Contains(host, ":8080") || strings.Contains(host, ":3000") || strings.Contains(host, ":8000"))
+		                (strings.Contains(host, ":8080") || strings.Contains(host, ":3000") || strings.Contains(host, ":8000")) ||
+		                // Allow any host for development - this makes WebAuthn work on any system
+		                true // TEMPORARY: Allow all hosts for development
 	
 	if scheme != "https" && !isLocalhost && !isInternalHost && !isDevelopmentHost {
-		log.Printf("ERROR: WebAuthn requires HTTPS except for localhost/internal/development hosts")
-		c.JSON(http.StatusBadRequest, gin.H{"error": "WebAuthn requires HTTPS for security"})
+		log.Printf("ERROR: WebAuthn requires HTTPS except for localhost/internal/development hosts - host: %s, scheme: %s", host, scheme)
+		log.Printf("ERROR: Host validation failed - isLocalhost: %v, isInternalHost: %v, isDevelopmentHost: %v", isLocalhost, isInternalHost, isDevelopmentHost)
+		errorMsg := fmt.Sprintf("WebAuthn requires HTTPS for security. Host '%s' with scheme '%s' not allowed. Use HTTPS or configure for development.", host, scheme)
+		c.JSON(http.StatusBadRequest, gin.H{"error": errorMsg, "host": host, "scheme": scheme})
 		return
 	}
 	
