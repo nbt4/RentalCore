@@ -258,10 +258,11 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 							COALESCE(p.itemcostperday, 0) * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)
 					END
 			END as revenue,
-			COALESCE(j.status, 'unknown') as job_status
+			COALESCE(s.status, 'unknown') as job_status
 		FROM jobdevices jd
 		JOIN jobs j ON jd.jobID = j.jobID
 		JOIN customers c ON j.customerID = c.customerID
+		LEFT JOIN statuses s ON j.statusID = s.statusID
 		LEFT JOIN devices d ON jd.deviceID = d.deviceID
 		LEFT JOIN products p ON d.productID = p.productID
 		WHERE jd.deviceID = ?
@@ -302,14 +303,20 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 				0.0 as discount,
 				NULL as discount_type,
 				300.0 as revenue,
-				'completed' as job_status
+				COALESCE(s.status, 'unknown') as job_status
 			FROM jobdevices jd
 			JOIN jobs j ON jd.jobID = j.jobID
 			JOIN customers c ON j.customerID = c.customerID
+			LEFT JOIN statuses s ON j.statusID = s.statusID
 			WHERE jd.deviceID = ?
 			LIMIT 5
 		`, deviceID).Scan(&customerBookings)
 		log.Printf("DEBUG: Simpler query found %d bookings", len(customerBookings))
+		if len(customerBookings) > 0 {
+			first := customerBookings[0]
+			log.Printf("DEBUG: First booking from simpler query - Customer: %s, JobID: %s, Start: %v, End: %v, Days: %d, Rate: %.2f, Revenue: %.2f, Status: %s", 
+				first.CustomerName, first.JobID, first.StartDate, first.EndDate, first.RentalDays, first.DailyRate, first.Revenue, first.JobStatus)
+		}
 	}
 
 	// Get monthly revenue trend
