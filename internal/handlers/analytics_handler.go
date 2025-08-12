@@ -120,22 +120,22 @@ func (h *AnalyticsHandler) GetDeviceAnalytics(c *gin.Context) {
 func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, endDate time.Time, period string) map[string]interface{} {
 	// Get device basic info
 	var deviceInfo struct {
-		DeviceID     string  `json:"deviceId"`
-		ProductName  string  `json:"productName"`
-		SerialNumber *string `json:"serialNumber"`
-		CategoryName string  `json:"categoryName"`
-		Status       string  `json:"status"`
+		DeviceID     string  `json:"deviceId" gorm:"column:deviceID"`
+		ProductName  string  `json:"productName" gorm:"column:product_name"`
+		SerialNumber *string `json:"serialNumber" gorm:"column:serial_number"`
+		CategoryName string  `json:"categoryName" gorm:"column:category_name"`
+		Status       string  `json:"status" gorm:"column:status"`
 	}
 	
 	deviceResult := h.db.Raw(`
 		SELECT 
 			d.deviceID,
-			p.name as product_name,
+			COALESCE(p.name, 'Unknown Product') as product_name,
 			d.serialnumber as serial_number,
-			c.name as category_name,
+			COALESCE(c.name, 'Unknown Category') as category_name,
 			d.status
 		FROM devices d
-		JOIN products p ON d.productID = p.productID
+		LEFT JOIN products p ON d.productID = p.productID
 		LEFT JOIN categories c ON p.categoryID = c.categoryID
 		WHERE d.deviceID = ?
 	`, deviceID).Scan(&deviceInfo)
@@ -198,18 +198,18 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 
 	// Get customer booking history with details - simplified approach
 	type CustomerBooking struct {
-		CustomerName  string    `json:"customer_name"`
-		CustomerEmail *string   `json:"customer_email"`
-		JobID         string    `json:"jobID"`
-		StartDate     time.Time `json:"startDate"`
-		EndDate       *time.Time `json:"endDate"`
-		Description   *string   `json:"description"`
-		RentalDays    int       `json:"rental_days"`
-		Revenue       float64   `json:"revenue"`
-		DailyRate     float64   `json:"daily_rate"`
-		Discount      float64   `json:"discount"`
-		DiscountType  *string   `json:"discount_type"`
-		JobStatus     string    `json:"job_status"`
+		CustomerName  string    `json:"customer_name" gorm:"column:customer_name"`
+		CustomerEmail *string   `json:"customer_email" gorm:"column:customer_email"`
+		JobID         string    `json:"jobID" gorm:"column:jobID"`
+		StartDate     time.Time `json:"startDate" gorm:"column:startDate"`
+		EndDate       *time.Time `json:"endDate" gorm:"column:endDate"`
+		Description   *string   `json:"description" gorm:"column:description"`
+		RentalDays    int       `json:"rental_days" gorm:"column:rental_days"`
+		Revenue       float64   `json:"revenue" gorm:"column:revenue"`
+		DailyRate     float64   `json:"daily_rate" gorm:"column:daily_rate"`
+		Discount      float64   `json:"discount" gorm:"column:discount"`
+		DiscountType  *string   `json:"discount_type" gorm:"column:discount_type"`
+		JobStatus     string    `json:"job_status" gorm:"column:job_status"`
 	}
 	
 	var customerBookings []CustomerBooking
@@ -233,8 +233,8 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 			j.endDate,
 			j.description,
 			CASE 
-				WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1
-				ELSE DATEDIFF(NOW(), j.startDate) + 1
+				WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate)
+				ELSE DATEDIFF(NOW(), j.startDate)
 			END as rental_days,
 			CASE 
 				WHEN jd.custom_price IS NOT NULL THEN jd.custom_price
@@ -246,28 +246,29 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 				WHEN jd.custom_price IS NOT NULL THEN 
 					CASE 
 						WHEN j.discount_type = 'percent' AND j.discount > 0 THEN 
-							jd.custom_price * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END) * (1 - j.discount/100)
+							jd.custom_price * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) ELSE DATEDIFF(NOW(), j.startDate) END) * (1 - j.discount/100)
 						WHEN j.discount_type = 'amount' AND j.discount > 0 THEN 
-							(jd.custom_price * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)) - j.discount
+							(jd.custom_price * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) ELSE DATEDIFF(NOW(), j.startDate) END)) - j.discount
 						ELSE 
-							jd.custom_price * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)
+							jd.custom_price * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) ELSE DATEDIFF(NOW(), j.startDate) END)
 					END
 				ELSE 
 					CASE 
 						WHEN j.discount_type = 'percent' AND j.discount > 0 THEN 
-							COALESCE(p.itemcostperday, 0) * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END) * (1 - j.discount/100)
+							COALESCE(p.itemcostperday, 0) * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) ELSE DATEDIFF(NOW(), j.startDate) END) * (1 - j.discount/100)
 						WHEN j.discount_type = 'amount' AND j.discount > 0 THEN 
-							(COALESCE(p.itemcostperday, 0) * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)) - j.discount
+							(COALESCE(p.itemcostperday, 0) * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) ELSE DATEDIFF(NOW(), j.startDate) END)) - j.discount
 						ELSE 
-							COALESCE(p.itemcostperday, 0) * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)
+							COALESCE(p.itemcostperday, 0) * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) ELSE DATEDIFF(NOW(), j.startDate) END)
 					END
 			END as revenue,
-			CAST(j.statusID as CHAR) as job_status
+			COALESCE(s.status, 'Unknown Status') as job_status
 		FROM jobdevices jd
 		JOIN jobs j ON jd.jobID = j.jobID
 		JOIN customers c ON j.customerID = c.customerID
 		LEFT JOIN devices d ON jd.deviceID = d.deviceID
 		LEFT JOIN products p ON d.productID = p.productID
+		LEFT JOIN status s ON j.statusID = s.statusID
 		WHERE jd.deviceID = ?
 		ORDER BY j.startDate DESC
 		LIMIT 50
