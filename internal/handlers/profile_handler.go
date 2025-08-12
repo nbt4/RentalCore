@@ -236,6 +236,28 @@ func (h *ProfileHandler) DeletePasskey(c *gin.Context) {
 	h.webauthnHandler.DeletePasskey(c)
 }
 
+// SecurityStatus returns the current security status for the user
+func (h *ProfileHandler) SecurityStatus(c *gin.Context) {
+	currentUser, exists := GetCurrentUser(c)
+	if !exists || currentUser == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	// Get 2FA status
+	var twoFAEnabled bool
+	h.db.Raw("SELECT COALESCE(is_enabled, false) FROM user_2fa WHERE user_id = ?", currentUser.UserID).Scan(&twoFAEnabled)
+
+	// Get passkey count
+	var passkeyCount int64
+	h.db.Model(&models.UserPasskey{}).Where("user_id = ? AND is_active = ?", currentUser.UserID, true).Count(&passkeyCount)
+
+	c.JSON(http.StatusOK, gin.H{
+		"twoFAEnabled": twoFAEnabled,
+		"passkeyCount": passkeyCount,
+	})
+}
+
 // ================================================================
 // HELPER FUNCTIONS
 // ================================================================

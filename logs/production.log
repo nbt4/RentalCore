@@ -1192,3 +1192,651 @@ DEBUG: Login successful, session created: a9aeaf0960007675391326ce2b7227299220f0
 2025/08/03 17:10:08 DEBUG: AuthMiddleware: Found session cookie: a9aeaf0960007675391326ce2b7227299220f05b295e94832e23d826b60394cd for /profile/settings
 2025/08/03 17:10:08 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
 {"timestamp":"2025-08-03T15:10:08.150061787Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754233808010084779","method":"GET","path":"/profile/settings","status_code":200,"duration":"139.975295ms","ip":"10.0.0.9","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":41764}}
+2025/08/11 22:11:55 Running in production mode
+2025/08/11 22:11:55 Database connection established successfully
+2025/08/11 22:11:55 GoBD compliance table migration disabled
+2025/08/11 22:11:55 Database auto-migration disabled - using manual schema management
+2025/08/11 22:11:56 Templates already exist (1), skipping default template creation
+2025/08/11 22:11:56 Server starting on 0.0.0.0:8080
+2025/08/11 22:14:06 Running in production mode
+2025/08/11 22:14:06 Database connection established successfully
+2025/08/11 22:14:06 GoBD compliance table migration disabled
+2025/08/11 22:14:06 Database auto-migration disabled - using manual schema management
+2025/08/11 22:14:07 Templates already exist (1), skipping default template creation
+2025/08/11 22:14:07 Server starting on 0.0.0.0:8080
+2025/08/11 22:15:25 Running in production mode
+2025/08/11 22:15:26 Database connection established successfully
+2025/08/11 22:15:26 GoBD compliance table migration disabled
+2025/08/11 22:15:26 Database auto-migration disabled - using manual schema management
+2025/08/11 22:15:26 Templates already exist (1), skipping default template creation
+2025/08/11 22:15:26 Server starting on 0.0.0.0:8080
+2025/08/11 22:15:29 Route Debug: GET /
+{"timestamp":"2025-08-11T20:15:29.596843666Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943329573038639","method":"GET","path":"/","status_code":307,"duration":"23.802261ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":42}}
+2025/08/11 22:15:29 Route Debug: GET /login
+{"timestamp":"2025-08-11T20:15:29.640675569Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943329616289242","method":"GET","path":"/login","status_code":200,"duration":"24.384213ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":14745}}
+2025/08/11 22:15:30 POST request to /auth/passkey/start-authentication with Content-Type: ''
+2025/08/11 22:15:30 Route Debug: POST /auth/passkey/start-authentication
+2025/08/11 22:15:30 DEBUG: StartPasskeyAuthentication called
+2025/08/11 22:15:30 DEBUG: Request scheme: http, host: job.nt.local
+2025/08/11 22:15:30 DEBUG: Found 0 active passkeys for authentication
+2025/08/11 22:15:30 DEBUG: Using RP ID: job.nt.local for authentication on host: job.nt.local
+2025/08/11 22:15:30 DEBUG: Prepared 0 allowCredentials for authentication
+{"timestamp":"2025-08-11T20:15:30.555927331Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943330485799013","method":"POST","path":"/auth/passkey/start-authentication","status_code":200,"duration":"70.126415ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":223}}
+2025/08/11 22:15:33 POST request to /login with Content-Type: 'application/x-www-form-urlencoded'
+2025/08/11 22:15:33 Form _method parameter: ''
+2025/08/11 22:15:33 Route Debug: POST /login
+2025/08/11 22:15:34 SLOW REQUEST: POST /login took 1.042953413s (status: 303)
+{"timestamp":"2025-08-11T20:15:34.34017265Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943333297110042","method":"POST","path":"/login","status_code":303,"duration":"1.043059582s","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":42,"bytes_out":-1}}
+2025/08/11 22:15:34 Route Debug: GET /login/2fa
+{"timestamp":"2025-08-11T20:15:34.417750777Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943334395045411","method":"GET","path":"/login/2fa","status_code":200,"duration":"22.703713ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":9188}}
+2025/08/11 22:15:36 POST request to /login/2fa with Content-Type: 'application/x-www-form-urlencoded'
+2025/08/11 22:15:36 Form _method parameter: ''
+2025/08/11 22:15:36 Route Debug: POST /login/2fa
+{"timestamp":"2025-08-11T20:15:36.850183918Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943336682274204","method":"POST","path":"/login/2fa","status_code":303,"duration":"167.906167ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":11,"bytes_out":-1}}
+2025/08/11 22:15:36 Route Debug: GET /
+{"timestamp":"2025-08-11T20:15:36.89247868Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943336867915824","method":"GET","path":"/","status_code":307,"duration":"24.560432ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":46}}
+2025/08/11 22:15:36 Route Debug: GET /dashboard
+2025/08/11 22:15:36 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/08/11 22:15:36 DEBUG: AuthMiddleware: Found session cookie: 60d1d1bd53db0d861f903fb210d1d4b7a5ec65f251ab67be4a90a0b484f0b428 for /dashboard
+2025/08/11 22:15:37 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /dashboard
+{"timestamp":"2025-08-11T20:15:37.138616551Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943336994379234","method":"GET","path":"/dashboard","status_code":200,"duration":"144.234982ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18341}}
+2025/08/11 22:15:42 Route Debug: GET /profile/settings
+2025/08/11 22:15:42 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:15:42 DEBUG: AuthMiddleware: Found session cookie: 60d1d1bd53db0d861f903fb210d1d4b7a5ec65f251ab67be4a90a0b484f0b428 for /profile/settings
+2025/08/11 22:15:42 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:15:42.364670717Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943342226650161","method":"GET","path":"/profile/settings","status_code":200,"duration":"138.017831ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":47251}}
+2025/08/11 22:15:53 POST request to /profile/passkeys/start-registration with Content-Type: ''
+2025/08/11 22:15:53 Route Debug: POST /profile/passkeys/start-registration
+2025/08/11 22:15:53 DEBUG: AuthMiddleware: Request URL: /profile/passkeys/start-registration
+2025/08/11 22:15:53 DEBUG: AuthMiddleware: Found session cookie: 60d1d1bd53db0d861f903fb210d1d4b7a5ec65f251ab67be4a90a0b484f0b428 for /profile/passkeys/start-registration
+2025/08/11 22:15:53 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/passkeys/start-registration
+2025/08/11 22:15:53 DEBUG: StartPasskeyRegistration called
+2025/08/11 22:15:53 DEBUG: User authenticated: ntielmann (ID: 5)
+2025/08/11 22:15:53 DEBUG: Request scheme: http, host: job.nt.local
+2025/08/11 22:15:53 DEBUG: Host validation - host: job.nt.local, isLocalhost: false, isInternalHost: true
+2025/08/11 22:15:53 DEBUG: Host validation passed - scheme: http, host: job.nt.local
+2025/08/11 22:15:53 DEBUG: Challenge generated
+2025/08/11 22:15:53 DEBUG: Attempting to create WebAuthn session in database
+2025/08/11 22:15:53 DEBUG: Session created successfully with ID: WWM0V00Os7U0JVDPE3-f4YzyiMGSgWHk2qxGPnawR0A=
+2025/08/11 22:15:53 DEBUG: Generated challenge (base64): vtrU9IbybsmgVTHXiupF22LgcVMCQUY84NBkGX_RIb0=
+2025/08/11 22:15:53 DEBUG: Generated user ID (base64): NQ==
+2025/08/11 22:15:53 DEBUG: Using RP ID: job.nt.local for host: job.nt.local
+{"timestamp":"2025-08-11T20:15:53.801921837Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943353705247155","method":"POST","path":"/profile/passkeys/start-registration","status_code":200,"duration":"96.671797ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":516}}
+2025/08/11 22:15:59 POST request to /profile/passkeys/complete-registration with Content-Type: 'application/json'
+2025/08/11 22:15:59 Route Debug: POST /profile/passkeys/complete-registration
+2025/08/11 22:15:59 DEBUG: AuthMiddleware: Request URL: /profile/passkeys/complete-registration
+2025/08/11 22:15:59 DEBUG: AuthMiddleware: Found session cookie: 60d1d1bd53db0d861f903fb210d1d4b7a5ec65f251ab67be4a90a0b484f0b428 for /profile/passkeys/complete-registration
+2025/08/11 22:15:59 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/passkeys/complete-registration
+2025/08/11 22:15:59 DEBUG: CompletePasskeyRegistration called
+2025/08/11 22:15:59 DEBUG: Extracted fields - sessionID: WWM0V00Os7U0JVDPE3-f4YzyiMGSgWHk2qxGPnawR0A=, name: Bitwarden, credential length: 240, credentialID: 5KCEKyVcRV6tudXrK_owIA
+2025/08/11 22:15:59 DEBUG: Verifying session - sessionID: WWM0V00Os7U0JVDPE3-f4YzyiMGSgWHk2qxGPnawR0A=, userID: 5
+2025/08/11 22:15:59 DEBUG: Session verified successfully
+{"timestamp":"2025-08-11T20:15:59.810577446Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943359642919936","method":"POST","path":"/profile/passkeys/complete-registration","status_code":200,"duration":"167.653162ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":579,"bytes_out":59}}
+2025/08/11 22:15:59 Route Debug: GET /profile/settings
+2025/08/11 22:15:59 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:15:59 DEBUG: AuthMiddleware: Found session cookie: 60d1d1bd53db0d861f903fb210d1d4b7a5ec65f251ab67be4a90a0b484f0b428 for /profile/settings
+2025/08/11 22:15:59 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:16:00.003702661Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943359864089298","method":"GET","path":"/profile/settings","status_code":200,"duration":"139.610278ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":48198}}
+2025/08/11 22:16:06 Route Debug: GET /logout
+{"timestamp":"2025-08-11T20:16:06.07386982Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943366024204364","method":"GET","path":"/logout","status_code":303,"duration":"49.66249ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":33}}
+2025/08/11 22:16:06 Route Debug: GET /login
+{"timestamp":"2025-08-11T20:16:06.115558308Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943366092190460","method":"GET","path":"/login","status_code":200,"duration":"23.36403ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":14745}}
+2025/08/11 22:16:06 POST request to /auth/passkey/start-authentication with Content-Type: ''
+2025/08/11 22:16:06 Route Debug: POST /auth/passkey/start-authentication
+2025/08/11 22:16:06 DEBUG: StartPasskeyAuthentication called
+2025/08/11 22:16:06 DEBUG: Request scheme: http, host: job.nt.local
+2025/08/11 22:16:07 DEBUG: Found 1 active passkeys for authentication
+2025/08/11 22:16:07 DEBUG: Adding passkey to allowCredentials - ID: 5KCEKyVcRV6tudXrK_owIA, Name: Bitwarden
+2025/08/11 22:16:07 DEBUG: Using RP ID: job.nt.local for authentication on host: job.nt.local
+2025/08/11 22:16:07 DEBUG: Prepared 1 allowCredentials for authentication
+{"timestamp":"2025-08-11T20:16:07.048953817Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943366977148535","method":"POST","path":"/auth/passkey/start-authentication","status_code":200,"duration":"71.802126ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":274}}
+2025/08/11 22:16:08 POST request to /auth/passkey/complete-authentication with Content-Type: 'application/json'
+2025/08/11 22:16:08 Route Debug: POST /auth/passkey/complete-authentication
+2025/08/11 22:16:08 DEBUG: CompletePasskeyAuthentication called
+{"timestamp":"2025-08-11T20:16:09.046985935Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943368857539545","method":"POST","path":"/auth/passkey/complete-authentication","status_code":200,"duration":"189.443084ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":486,"bytes_out":58}}
+2025/08/11 22:16:09 Route Debug: GET /dashboard
+2025/08/11 22:16:09 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/08/11 22:16:09 DEBUG: AuthMiddleware: Found session cookie: jOIWKugqHG_Dbc8j8C-CQHNkzNzMutZ_xtBsZCO8dMw= for /dashboard
+2025/08/11 22:16:09 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /dashboard
+{"timestamp":"2025-08-11T20:16:09.236037348Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943369099258507","method":"GET","path":"/dashboard","status_code":200,"duration":"136.771768ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18341}}
+2025/08/11 22:16:12 Route Debug: GET /logout
+{"timestamp":"2025-08-11T20:16:12.234632219Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943372187616960","method":"GET","path":"/logout","status_code":303,"duration":"47.012684ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":33}}
+2025/08/11 22:16:12 Route Debug: GET /login
+{"timestamp":"2025-08-11T20:16:12.278428847Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943372255336265","method":"GET","path":"/login","status_code":200,"duration":"23.090208ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":14745}}
+2025/08/11 22:16:13 POST request to /auth/passkey/start-authentication with Content-Type: ''
+2025/08/11 22:16:13 Route Debug: POST /auth/passkey/start-authentication
+2025/08/11 22:16:13 DEBUG: StartPasskeyAuthentication called
+2025/08/11 22:16:13 DEBUG: Request scheme: http, host: job.nt.local
+2025/08/11 22:16:13 DEBUG: Found 1 active passkeys for authentication
+2025/08/11 22:16:13 DEBUG: Adding passkey to allowCredentials - ID: 5KCEKyVcRV6tudXrK_owIA, Name: Bitwarden
+2025/08/11 22:16:13 DEBUG: Using RP ID: job.nt.local for authentication on host: job.nt.local
+2025/08/11 22:16:13 DEBUG: Prepared 1 allowCredentials for authentication
+{"timestamp":"2025-08-11T20:16:13.107781367Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943373036006933","method":"POST","path":"/auth/passkey/start-authentication","status_code":200,"duration":"71.771719ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":274}}
+2025/08/11 22:16:32 POST request to /login with Content-Type: 'application/x-www-form-urlencoded'
+2025/08/11 22:16:32 Form _method parameter: ''
+2025/08/11 22:16:32 Route Debug: POST /login
+2025/08/11 22:16:33 SLOW REQUEST: POST /login took 1.045571041s (status: 303)
+{"timestamp":"2025-08-11T20:16:33.060124961Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943392014456768","method":"POST","path":"/login","status_code":303,"duration":"1.045665668s","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":46,"bytes_out":-1}}
+2025/08/11 22:16:33 Route Debug: GET /login/2fa
+{"timestamp":"2025-08-11T20:16:33.101065637Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943393077557076","method":"GET","path":"/login/2fa","status_code":200,"duration":"23.505465ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":9188}}
+2025/08/11 22:16:34 POST request to /login/2fa with Content-Type: 'application/x-www-form-urlencoded'
+2025/08/11 22:16:34 Form _method parameter: ''
+2025/08/11 22:16:34 Route Debug: POST /login/2fa
+{"timestamp":"2025-08-11T20:16:34.872787511Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943394702793158","method":"POST","path":"/login/2fa","status_code":303,"duration":"169.991157ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":11,"bytes_out":-1}}
+2025/08/11 22:16:34 Route Debug: GET /
+{"timestamp":"2025-08-11T20:16:34.932647439Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943394908445418","method":"GET","path":"/","status_code":307,"duration":"24.198715ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":46}}
+2025/08/11 22:16:34 Route Debug: GET /dashboard
+2025/08/11 22:16:34 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/08/11 22:16:34 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /dashboard
+2025/08/11 22:16:34 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /dashboard
+{"timestamp":"2025-08-11T20:16:35.092513732Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943394951859439","method":"GET","path":"/dashboard","status_code":200,"duration":"140.65255ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18343}}
+2025/08/11 22:16:39 Route Debug: GET /profile/settings
+2025/08/11 22:16:39 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:16:39 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:16:40 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:16:40.102262841Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943399966378634","method":"GET","path":"/profile/settings","status_code":200,"duration":"135.881863ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":43122}}
+2025/08/11 22:16:46 POST request to /profile/passkeys/start-registration with Content-Type: ''
+2025/08/11 22:16:46 Route Debug: POST /profile/passkeys/start-registration
+2025/08/11 22:16:46 DEBUG: AuthMiddleware: Request URL: /profile/passkeys/start-registration
+2025/08/11 22:16:46 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/passkeys/start-registration
+2025/08/11 22:16:46 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/passkeys/start-registration
+2025/08/11 22:16:46 DEBUG: StartPasskeyRegistration called
+2025/08/11 22:16:46 DEBUG: User authenticated: mschuck (ID: 20)
+2025/08/11 22:16:46 DEBUG: Request scheme: http, host: job.nt.local
+2025/08/11 22:16:46 DEBUG: Host validation - host: job.nt.local, isLocalhost: false, isInternalHost: true
+2025/08/11 22:16:46 DEBUG: Host validation passed - scheme: http, host: job.nt.local
+2025/08/11 22:16:46 DEBUG: Challenge generated
+2025/08/11 22:16:46 DEBUG: Attempting to create WebAuthn session in database
+2025/08/11 22:16:46 DEBUG: Session created successfully with ID: 6JCZD5qz6eQahvDWzUd97hhlymt1qWZKR-fO2soBCJk=
+2025/08/11 22:16:46 DEBUG: Generated challenge (base64): kgpwISzWT-MaQJ5qvt6MlCVi3LcM5ojhKD3_1m7loEs=
+2025/08/11 22:16:46 DEBUG: Generated user ID (base64): MjA=
+2025/08/11 22:16:46 DEBUG: Using RP ID: job.nt.local for host: job.nt.local
+{"timestamp":"2025-08-11T20:16:46.554161495Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943406460076766","method":"POST","path":"/profile/passkeys/start-registration","status_code":200,"duration":"94.082866ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":524}}
+2025/08/11 22:16:54 POST request to /profile/passkeys/complete-registration with Content-Type: 'application/json'
+2025/08/11 22:16:54 Route Debug: POST /profile/passkeys/complete-registration
+2025/08/11 22:16:54 DEBUG: AuthMiddleware: Request URL: /profile/passkeys/complete-registration
+2025/08/11 22:16:54 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/passkeys/complete-registration
+2025/08/11 22:16:54 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/passkeys/complete-registration
+2025/08/11 22:16:54 DEBUG: CompletePasskeyRegistration called
+2025/08/11 22:16:54 DEBUG: Extracted fields - sessionID: 6JCZD5qz6eQahvDWzUd97hhlymt1qWZKR-fO2soBCJk=, name: Bitwarden, credential length: 240, credentialID: jdXSVK_tTpazHcedMWb95A
+2025/08/11 22:16:54 DEBUG: Verifying session - sessionID: 6JCZD5qz6eQahvDWzUd97hhlymt1qWZKR-fO2soBCJk=, userID: 20
+2025/08/11 22:16:54 DEBUG: Session verified successfully
+{"timestamp":"2025-08-11T20:16:54.164495045Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943414001432149","method":"POST","path":"/profile/passkeys/complete-registration","status_code":200,"duration":"163.060632ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":579,"bytes_out":59}}
+2025/08/11 22:16:54 Route Debug: GET /profile/settings
+2025/08/11 22:16:54 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:16:54 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:16:54 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:16:54.419703605Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754943414283447042","method":"GET","path":"/profile/settings","status_code":200,"duration":"136.254149ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":44585}}
+2025/08/11 22:28:52 Running in production mode
+2025/08/11 22:28:52 Database connection established successfully
+2025/08/11 22:28:52 GoBD compliance table migration disabled
+2025/08/11 22:28:52 Database auto-migration disabled - using manual schema management
+2025/08/11 22:28:52 Templates already exist (1), skipping default template creation
+2025/08/11 22:28:52 Server starting on 0.0.0.0:8080
+2025/08/11 22:29:10 Route Debug: GET /profile/settings
+2025/08/11 22:29:10 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:29:10 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:29:10 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:29:10.46209156Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754944150319671171","method":"GET","path":"/profile/settings","status_code":200,"duration":"142.418004ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":58114}}
+2025/08/11 22:29:11 Route Debug: GET /sw.js
+{"timestamp":"2025-08-11T20:29:11.510232571Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754944151482048545","method":"GET","path":"/sw.js","status_code":200,"duration":"28.181091ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":8867}}
+2025/08/11 22:29:13 Route Debug: GET /profile/settings
+2025/08/11 22:29:13 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:29:13 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:29:13 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:29:13.775119106Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754944153637432219","method":"GET","path":"/profile/settings","status_code":200,"duration":"137.684402ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":58114}}
+2025/08/11 22:33:27 Running in production mode
+2025/08/11 22:33:27 Database connection established successfully
+2025/08/11 22:33:27 GoBD compliance table migration disabled
+2025/08/11 22:33:28 Database auto-migration disabled - using manual schema management
+2025/08/11 22:33:28 Templates already exist (1), skipping default template creation
+2025/08/11 22:33:28 Server starting on 0.0.0.0:8080
+2025/08/11 22:33:40 Route Debug: GET /profile/settings
+2025/08/11 22:33:40 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:33:40 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:33:40 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:33:40.689637951Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754944420549862737","method":"GET","path":"/profile/settings","status_code":200,"duration":"139.77331ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":58111}}
+2025/08/11 22:33:45 POST request to /profile/passkeys/start-registration with Content-Type: ''
+2025/08/11 22:33:45 Route Debug: POST /profile/passkeys/start-registration
+2025/08/11 22:33:45 DEBUG: AuthMiddleware: Request URL: /profile/passkeys/start-registration
+2025/08/11 22:33:45 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/passkeys/start-registration
+2025/08/11 22:33:45 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/passkeys/start-registration
+2025/08/11 22:33:45 DEBUG: StartPasskeyRegistration called
+2025/08/11 22:33:45 DEBUG: User authenticated: mschuck (ID: 20)
+2025/08/11 22:33:45 DEBUG: Request scheme: http, host: job.nt.local
+2025/08/11 22:33:45 DEBUG: Host validation - host: job.nt.local, isLocalhost: false, isInternalHost: true
+2025/08/11 22:33:45 DEBUG: Host validation passed - scheme: http, host: job.nt.local
+2025/08/11 22:33:45 DEBUG: Challenge generated
+2025/08/11 22:33:45 DEBUG: Attempting to create WebAuthn session in database
+2025/08/11 22:33:45 DEBUG: Session created successfully with ID: RgBEjAX7aZr9IAtTjD9N3UlVEtruB6zmR9tb1r0qiFM=
+2025/08/11 22:33:45 DEBUG: Generated challenge (base64): ZPe6iiuigwgY1h8ugRx3VIHtjqlaxQTLKgOMX4tp4lE=
+2025/08/11 22:33:45 DEBUG: Generated user ID (base64): MjA=
+2025/08/11 22:33:45 DEBUG: Using RP ID: job.nt.local for host: job.nt.local
+{"timestamp":"2025-08-11T20:33:45.92332323Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754944425829075885","method":"POST","path":"/profile/passkeys/start-registration","status_code":200,"duration":"94.24457ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":524}}
+2025/08/11 22:33:53 POST request to /profile/passkeys/complete-registration with Content-Type: 'application/json'
+2025/08/11 22:33:53 Route Debug: POST /profile/passkeys/complete-registration
+2025/08/11 22:33:53 DEBUG: AuthMiddleware: Request URL: /profile/passkeys/complete-registration
+2025/08/11 22:33:53 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/passkeys/complete-registration
+2025/08/11 22:33:53 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/passkeys/complete-registration
+2025/08/11 22:33:53 DEBUG: CompletePasskeyRegistration called
+2025/08/11 22:33:53 DEBUG: Extracted fields - sessionID: RgBEjAX7aZr9IAtTjD9N3UlVEtruB6zmR9tb1r0qiFM=, name: b, credential length: 240, credentialID: mgCFX7GcR5uR9QFaVcF2lQ
+2025/08/11 22:33:53 DEBUG: Verifying session - sessionID: RgBEjAX7aZr9IAtTjD9N3UlVEtruB6zmR9tb1r0qiFM=, userID: 20
+2025/08/11 22:33:53 DEBUG: Session verified successfully
+{"timestamp":"2025-08-11T20:33:53.241544227Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754944433076763400","method":"POST","path":"/profile/passkeys/complete-registration","status_code":200,"duration":"164.777691ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":571,"bytes_out":59}}
+2025/08/11 22:33:53 Route Debug: GET /profile/settings
+2025/08/11 22:33:53 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:33:53 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:33:53 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:33:53.49022666Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754944433349036466","method":"GET","path":"/profile/settings","status_code":200,"duration":"141.1879ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":59791}}
+2025/08/11 22:33:57 Route Debug: DELETE /profile/passkeys/5
+2025/08/11 22:33:57 DEBUG: AuthMiddleware: Request URL: /profile/passkeys/5
+2025/08/11 22:33:57 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/passkeys/5
+2025/08/11 22:33:57 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/passkeys/5
+{"timestamp":"2025-08-11T20:33:57.732252079Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754944437638745742","method":"DELETE","path":"/profile/passkeys/5","status_code":200,"duration":"93.504133ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":42}}
+2025/08/11 22:37:39 Running in production mode
+2025/08/11 22:37:39 Database connection established successfully
+2025/08/11 22:37:39 GoBD compliance table migration disabled
+2025/08/11 22:37:39 Database auto-migration disabled - using manual schema management
+2025/08/11 22:37:39 Templates already exist (1), skipping default template creation
+2025/08/11 22:37:39 Server starting on 0.0.0.0:8080
+2025/08/11 22:37:56 Route Debug: GET /profile/settings
+2025/08/11 22:37:56 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:37:56 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:37:56 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:37:56.198401074Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754944676056494907","method":"GET","path":"/profile/settings","status_code":200,"duration":"141.903462ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":63574}}
+2025/08/11 22:38:01 Route Debug: GET /profile/settings
+2025/08/11 22:38:01 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:38:01 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:38:01 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:38:01.329986137Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754944681186944772","method":"GET","path":"/profile/settings","status_code":200,"duration":"143.03893ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":63574}}
+2025/08/11 22:38:05 Route Debug: GET /profile/settings
+2025/08/11 22:38:05 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:38:05 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:38:05 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:38:05.791794733Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754944685653567301","method":"GET","path":"/profile/settings","status_code":200,"duration":"138.225448ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":63574}}
+2025/08/11 22:38:05 Route Debug: GET /static/css/rental-core-design.css
+2025/08/11 22:38:05 Route Debug: GET /static/js/rental-core-design.js
+2025/08/11 22:38:06 Route Debug: GET /static/images/icon-180.png
+2025/08/11 22:38:06 Route Debug: GET /static/images/icon-180.png
+2025/08/11 22:40:04 Running in production mode
+2025/08/11 22:40:04 Database connection established successfully
+2025/08/11 22:40:04 GoBD compliance table migration disabled
+2025/08/11 22:40:04 Database auto-migration disabled - using manual schema management
+2025/08/11 22:40:04 Templates already exist (1), skipping default template creation
+2025/08/11 22:40:05 Server starting on 0.0.0.0:8080
+2025/08/11 22:40:06 Route Debug: GET /profile/settings
+2025/08/11 22:40:06 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:40:06 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:40:06 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:40:06.3801293Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754944806225201022","method":"GET","path":"/profile/settings","status_code":200,"duration":"154.926735ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":63574}}
+2025/08/11 22:41:36 Route Debug: GET /profile/security-status
+2025/08/11 22:41:36 DEBUG: AuthMiddleware: Request URL: /profile/security-status
+2025/08/11 22:41:36 DEBUG: AuthMiddleware: No session cookie found for /profile/security-status, redirecting to /login
+{"timestamp":"2025-08-11T20:41:36.666105172Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754944896643014318","method":"GET","path":"/profile/security-status","status_code":303,"duration":"23.08849ms","ip":"::1","user_agent":"curl/8.13.0","fields":{"bytes_in":0,"bytes_out":33}}
+2025/08/11 22:42:17 Running in production mode
+2025/08/11 22:42:17 Database connection established successfully
+2025/08/11 22:42:17 GoBD compliance table migration disabled
+2025/08/11 22:42:17 Database auto-migration disabled - using manual schema management
+2025/08/11 22:42:18 Templates already exist (1), skipping default template creation
+2025/08/11 22:42:18 Server starting on 0.0.0.0:8080
+2025/08/11 22:42:18 listen tcp 0.0.0.0:8080: bind: address already in use
+2025/08/11 22:42:32 Route Debug: GET /profile/settings
+2025/08/11 22:42:32 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:42:32 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:42:32 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:42:32.291607852Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754944952155039134","method":"GET","path":"/profile/settings","status_code":200,"duration":"136.567195ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":63574}}
+2025/08/11 22:42:33 Route Debug: GET /profile/settings
+2025/08/11 22:42:33 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:42:33 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:42:33 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:42:33.891548804Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754944953752980299","method":"GET","path":"/profile/settings","status_code":200,"duration":"138.566311ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":63574}}
+2025/08/11 22:43:48 Running in production mode
+2025/08/11 22:43:48 Database connection established successfully
+2025/08/11 22:43:48 GoBD compliance table migration disabled
+2025/08/11 22:43:49 Database auto-migration disabled - using manual schema management
+2025/08/11 22:43:49 Templates already exist (1), skipping default template creation
+2025/08/11 22:43:49 Server starting on 0.0.0.0:8080
+2025/08/11 22:43:54 Route Debug: GET /profile/settings
+2025/08/11 22:43:54 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:43:54 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:43:54 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+2025/08/11 22:43:54 DEBUG: Loading profile for user ID: 20, username: mschuck
+2025/08/11 22:43:55 DEBUG: Found 1 passkeys for user 20
+2025/08/11 22:43:55 DEBUG: 2FA enabled: true for user 20
+{"timestamp":"2025-08-11T20:43:55.064316922Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945034925875436","method":"GET","path":"/profile/settings","status_code":200,"duration":"138.439202ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":63564}}
+2025/08/11 22:43:56 Route Debug: GET /profile/settings
+2025/08/11 22:43:56 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:43:56 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:43:56 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+2025/08/11 22:43:56 DEBUG: Loading profile for user ID: 20, username: mschuck
+2025/08/11 22:43:56 DEBUG: Found 1 passkeys for user 20
+2025/08/11 22:43:56 DEBUG: 2FA enabled: true for user 20
+{"timestamp":"2025-08-11T20:43:56.725298591Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945036586656970","method":"GET","path":"/profile/settings","status_code":200,"duration":"138.638956ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":63564}}
+2025/08/11 22:43:58 Route Debug: GET /profile/settings
+2025/08/11 22:43:58 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:43:58 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:43:58 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+2025/08/11 22:43:58 DEBUG: Loading profile for user ID: 20, username: mschuck
+2025/08/11 22:43:58 DEBUG: Found 1 passkeys for user 20
+2025/08/11 22:43:58 DEBUG: 2FA enabled: true for user 20
+{"timestamp":"2025-08-11T20:43:58.256711331Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945038120001681","method":"GET","path":"/profile/settings","status_code":200,"duration":"136.707986ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":63564}}
+2025/08/11 22:44:02 Route Debug: DELETE /profile/passkeys/6
+2025/08/11 22:44:02 DEBUG: AuthMiddleware: Request URL: /profile/passkeys/6
+2025/08/11 22:44:02 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/passkeys/6
+2025/08/11 22:44:02 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/passkeys/6
+{"timestamp":"2025-08-11T20:44:02.525063787Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945042430845798","method":"DELETE","path":"/profile/passkeys/6","status_code":200,"duration":"94.216296ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":42}}
+2025/08/11 22:44:02 Route Debug: GET /profile/security-status
+2025/08/11 22:44:02 DEBUG: AuthMiddleware: Request URL: /profile/security-status
+2025/08/11 22:44:02 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/security-status
+2025/08/11 22:44:02 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/security-status
+{"timestamp":"2025-08-11T20:44:02.658442125Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945042544504260","method":"GET","path":"/profile/security-status","status_code":200,"duration":"113.936202ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":38}}
+2025/08/11 22:44:04 POST request to /profile/passkeys/start-registration with Content-Type: ''
+2025/08/11 22:44:04 Route Debug: POST /profile/passkeys/start-registration
+2025/08/11 22:44:04 DEBUG: AuthMiddleware: Request URL: /profile/passkeys/start-registration
+2025/08/11 22:44:04 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/passkeys/start-registration
+2025/08/11 22:44:04 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/passkeys/start-registration
+2025/08/11 22:44:04 DEBUG: StartPasskeyRegistration called
+2025/08/11 22:44:04 DEBUG: User authenticated: mschuck (ID: 20)
+2025/08/11 22:44:04 DEBUG: Request scheme: http, host: job.nt.local
+2025/08/11 22:44:04 DEBUG: Host validation - host: job.nt.local, isLocalhost: false, isInternalHost: true
+2025/08/11 22:44:04 DEBUG: Host validation passed - scheme: http, host: job.nt.local
+2025/08/11 22:44:04 DEBUG: Challenge generated
+2025/08/11 22:44:04 DEBUG: Attempting to create WebAuthn session in database
+2025/08/11 22:44:04 DEBUG: Session created successfully with ID: Hgz13Cx7MZojluZasQow0e-XCLHpSoKRGVYkVaARWcw=
+2025/08/11 22:44:04 DEBUG: Generated challenge (base64): Rft8KRm_pLqRzak8F88Q9tXsx3gsXW0OLARzA2vUr2Y=
+2025/08/11 22:44:04 DEBUG: Generated user ID (base64): MjA=
+2025/08/11 22:44:04 DEBUG: Using RP ID: job.nt.local for host: job.nt.local
+{"timestamp":"2025-08-11T20:44:04.996148979Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945044903065977","method":"POST","path":"/profile/passkeys/start-registration","status_code":200,"duration":"93.079345ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":524}}
+2025/08/11 22:44:15 POST request to /profile/passkeys/complete-registration with Content-Type: 'application/json'
+2025/08/11 22:44:15 Route Debug: POST /profile/passkeys/complete-registration
+2025/08/11 22:44:15 DEBUG: AuthMiddleware: Request URL: /profile/passkeys/complete-registration
+2025/08/11 22:44:15 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/passkeys/complete-registration
+2025/08/11 22:44:15 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/passkeys/complete-registration
+2025/08/11 22:44:15 DEBUG: CompletePasskeyRegistration called
+2025/08/11 22:44:15 DEBUG: Extracted fields - sessionID: Hgz13Cx7MZojluZasQow0e-XCLHpSoKRGVYkVaARWcw=, name: b, credential length: 240, credentialID: bcHR1mBNR1mlX40mvhY1wA
+2025/08/11 22:44:15 DEBUG: Verifying session - sessionID: Hgz13Cx7MZojluZasQow0e-XCLHpSoKRGVYkVaARWcw=, userID: 20
+2025/08/11 22:44:15 DEBUG: Session verified successfully
+{"timestamp":"2025-08-11T20:44:15.620152069Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945055454186803","method":"POST","path":"/profile/passkeys/complete-registration","status_code":200,"duration":"165.963192ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":571,"bytes_out":59}}
+2025/08/11 22:44:15 Route Debug: GET /profile/security-status
+2025/08/11 22:44:15 DEBUG: AuthMiddleware: Request URL: /profile/security-status
+2025/08/11 22:44:15 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/security-status
+2025/08/11 22:44:15 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/security-status
+{"timestamp":"2025-08-11T20:44:15.753114999Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945055637684556","method":"GET","path":"/profile/security-status","status_code":200,"duration":"115.42901ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":38}}
+2025/08/11 22:46:23 Running in production mode
+2025/08/11 22:46:23 Database connection established successfully
+2025/08/11 22:46:23 GoBD compliance table migration disabled
+2025/08/11 22:46:23 Database auto-migration disabled - using manual schema management
+2025/08/11 22:46:24 Templates already exist (1), skipping default template creation
+2025/08/11 22:46:24 Server starting on 0.0.0.0:8080
+2025/08/11 22:46:31 Route Debug: GET /profile/settings
+2025/08/11 22:46:31 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:46:31 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:46:31 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:46:32.049410297Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945191897733338","method":"GET","path":"/profile/settings","status_code":200,"duration":"151.675817ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":64078}}
+2025/08/11 22:46:51 POST request to /profile/2fa/disable with Content-Type: 'application/json'
+2025/08/11 22:46:51 Route Debug: POST /profile/2fa/disable
+2025/08/11 22:46:51 DEBUG: AuthMiddleware: Request URL: /profile/2fa/disable
+2025/08/11 22:46:51 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/2fa/disable
+2025/08/11 22:46:51 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/2fa/disable
+{"timestamp":"2025-08-11T20:46:51.70569745Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945211613548519","method":"POST","path":"/profile/2fa/disable","status_code":404,"duration":"92.146827ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":17,"bytes_out":27}}
+2025/08/11 22:49:14 Running in production mode
+2025/08/11 22:49:14 Database connection established successfully
+2025/08/11 22:49:14 GoBD compliance table migration disabled
+2025/08/11 22:49:14 Database auto-migration disabled - using manual schema management
+2025/08/11 22:49:14 Templates already exist (1), skipping default template creation
+2025/08/11 22:49:14 Server starting on 0.0.0.0:8080
+2025/08/11 22:49:14 listen tcp 0.0.0.0:8080: bind: address already in use
+2025/08/11 22:49:34 Route Debug: GET /profile/settings
+2025/08/11 22:49:34 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:49:34 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:49:34 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:49:34.771341682Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945374631415425","method":"GET","path":"/profile/settings","status_code":200,"duration":"139.92293ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":64078}}
+2025/08/11 22:49:48 POST request to /profile/2fa/disable with Content-Type: 'application/json'
+2025/08/11 22:49:48 Route Debug: POST /profile/2fa/disable
+2025/08/11 22:49:48 DEBUG: AuthMiddleware: Request URL: /profile/2fa/disable
+2025/08/11 22:49:48 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/2fa/disable
+2025/08/11 22:49:48 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/2fa/disable
+{"timestamp":"2025-08-11T20:49:48.166849699Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945388073718469","method":"POST","path":"/profile/2fa/disable","status_code":404,"duration":"93.127313ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":17,"bytes_out":27}}
+2025/08/11 22:49:55 Running in production mode
+2025/08/11 22:49:55 Database connection established successfully
+2025/08/11 22:49:55 GoBD compliance table migration disabled
+2025/08/11 22:49:55 Database auto-migration disabled - using manual schema management
+2025/08/11 22:49:55 Templates already exist (1), skipping default template creation
+2025/08/11 22:49:55 Server starting on 0.0.0.0:8080
+2025/08/11 22:49:57 Route Debug: GET /profile/settings
+2025/08/11 22:49:57 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:49:57 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:49:57 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:49:57.826184698Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945397681100828","method":"GET","path":"/profile/settings","status_code":200,"duration":"145.081726ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":64078}}
+2025/08/11 22:50:07 POST request to /profile/2fa/disable with Content-Type: 'application/json'
+2025/08/11 22:50:07 Route Debug: POST /profile/2fa/disable
+2025/08/11 22:50:07 DEBUG: AuthMiddleware: Request URL: /profile/2fa/disable
+2025/08/11 22:50:07 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/2fa/disable
+2025/08/11 22:50:07 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/2fa/disable
+{"timestamp":"2025-08-11T20:50:07.33691203Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945407242615446","method":"POST","path":"/profile/2fa/disable","status_code":404,"duration":"94.29453ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":17,"bytes_out":25}}
+2025/08/11 22:51:57 Running in production mode
+2025/08/11 22:51:57 Database connection established successfully
+2025/08/11 22:51:57 GoBD compliance table migration disabled
+2025/08/11 22:51:57 Database auto-migration disabled - using manual schema management
+2025/08/11 22:51:57 Templates already exist (1), skipping default template creation
+2025/08/11 22:51:58 Server starting on 0.0.0.0:8080
+2025/08/11 22:51:58 listen tcp 0.0.0.0:8080: bind: address already in use
+2025/08/11 22:52:46 Running in production mode
+2025/08/11 22:52:46 Database connection established successfully
+2025/08/11 22:52:46 GoBD compliance table migration disabled
+2025/08/11 22:52:46 Database auto-migration disabled - using manual schema management
+2025/08/11 22:52:46 Templates already exist (1), skipping default template creation
+2025/08/11 22:52:46 Server starting on 0.0.0.0:8080
+2025/08/11 22:52:46 listen tcp 0.0.0.0:8080: bind: address already in use
+2025/08/11 22:53:12 Route Debug: GET /profile/settings
+2025/08/11 22:53:12 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:53:12 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:53:12 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:53:12.864898012Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945592724739423","method":"GET","path":"/profile/settings","status_code":200,"duration":"140.154632ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":64078}}
+2025/08/11 22:53:31 POST request to /profile/2fa/disable with Content-Type: 'application/json'
+2025/08/11 22:53:31 Route Debug: POST /profile/2fa/disable
+2025/08/11 22:53:31 DEBUG: AuthMiddleware: Request URL: /profile/2fa/disable
+2025/08/11 22:53:31 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/2fa/disable
+2025/08/11 22:53:31 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/2fa/disable
+{"timestamp":"2025-08-11T20:53:31.279260044Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945611187438218","method":"POST","path":"/profile/2fa/disable","status_code":404,"duration":"91.819451ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":17,"bytes_out":25}}
+2025/08/11 22:53:39 Running in production mode
+2025/08/11 22:53:39 Database connection established successfully
+2025/08/11 22:53:39 GoBD compliance table migration disabled
+2025/08/11 22:53:39 Database auto-migration disabled - using manual schema management
+2025/08/11 22:53:39 Templates already exist (1), skipping default template creation
+2025/08/11 22:53:39 Server starting on 0.0.0.0:8080
+2025/08/11 22:53:41 Route Debug: GET /profile/settings
+2025/08/11 22:53:41 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:53:41 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:53:41 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:53:41.192444148Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945621052040249","method":"GET","path":"/profile/settings","status_code":200,"duration":"140.402156ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":64078}}
+2025/08/11 22:53:45 POST request to /profile/2fa/disable with Content-Type: 'application/json'
+2025/08/11 22:53:45 Route Debug: POST /profile/2fa/disable
+2025/08/11 22:53:45 DEBUG: AuthMiddleware: Request URL: /profile/2fa/disable
+2025/08/11 22:53:45 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/2fa/disable
+2025/08/11 22:53:45 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/2fa/disable
+{"timestamp":"2025-08-11T20:53:45.236252603Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945625144128632","method":"POST","path":"/profile/2fa/disable","status_code":404,"duration":"92.121817ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":17,"bytes_out":25}}
+2025/08/11 22:54:30 Running in production mode
+2025/08/11 22:54:30 Database connection established successfully
+2025/08/11 22:54:30 GoBD compliance table migration disabled
+2025/08/11 22:54:30 Database auto-migration disabled - using manual schema management
+2025/08/11 22:54:31 Templates already exist (1), skipping default template creation
+2025/08/11 22:54:31 Server starting on 0.0.0.0:8080
+2025/08/11 22:54:31 listen tcp 0.0.0.0:8080: bind: address already in use
+2025/08/11 22:56:04 Running in production mode
+2025/08/11 22:56:04 Database connection established successfully
+2025/08/11 22:56:04 GoBD compliance table migration disabled
+2025/08/11 22:56:04 Database auto-migration disabled - using manual schema management
+2025/08/11 22:56:05 Templates already exist (1), skipping default template creation
+2025/08/11 22:56:05 Server starting on 0.0.0.0:8080
+2025/08/11 22:56:05 listen tcp 0.0.0.0:8080: bind: address already in use
+2025/08/11 22:56:33 Route Debug: GET /profile/settings
+2025/08/11 22:56:33 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:56:33 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:56:33 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:56:34.029829448Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945793892042034","method":"GET","path":"/profile/settings","status_code":200,"duration":"137.78512ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":64078}}
+2025/08/11 22:56:46 POST request to /profile/2fa/disable with Content-Type: 'application/json'
+2025/08/11 22:56:46 Route Debug: POST /profile/2fa/disable
+2025/08/11 22:56:46 DEBUG: AuthMiddleware: Request URL: /profile/2fa/disable
+2025/08/11 22:56:46 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/2fa/disable
+2025/08/11 22:56:46 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/2fa/disable
+{"timestamp":"2025-08-11T20:56:46.719227095Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945806628719794","method":"POST","path":"/profile/2fa/disable","status_code":404,"duration":"90.503063ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":17,"bytes_out":25}}
+2025/08/11 22:58:25 Running in production mode
+2025/08/11 22:58:25 Database connection established successfully
+2025/08/11 22:58:25 GoBD compliance table migration disabled
+2025/08/11 22:58:25 Database auto-migration disabled - using manual schema management
+2025/08/11 22:58:25 Templates already exist (1), skipping default template creation
+2025/08/11 22:58:26 Server starting on 0.0.0.0:8080
+2025/08/11 22:58:26 listen tcp 0.0.0.0:8080: bind: address already in use
+2025/08/11 22:58:32 Route Debug: GET /profile/settings
+2025/08/11 22:58:32 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:58:32 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:58:32 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:58:33.0435869Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945912903470010","method":"GET","path":"/profile/settings","status_code":200,"duration":"140.112872ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":64078}}
+2025/08/11 22:58:43 POST request to /profile/2fa/disable with Content-Type: 'application/json'
+2025/08/11 22:58:43 Route Debug: POST /profile/2fa/disable
+2025/08/11 22:58:43 DEBUG: AuthMiddleware: Request URL: /profile/2fa/disable
+2025/08/11 22:58:43 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/2fa/disable
+2025/08/11 22:58:43 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/2fa/disable
+{"timestamp":"2025-08-11T20:58:43.83355343Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945923735545073","method":"POST","path":"/profile/2fa/disable","status_code":404,"duration":"98.005933ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":17,"bytes_out":25}}
+2025/08/11 22:58:50 Running in production mode
+2025/08/11 22:58:50 Database connection established successfully
+2025/08/11 22:58:50 GoBD compliance table migration disabled
+2025/08/11 22:58:50 Database auto-migration disabled - using manual schema management
+2025/08/11 22:58:50 Templates already exist (1), skipping default template creation
+2025/08/11 22:58:51 Server starting on 0.0.0.0:8080
+2025/08/11 22:58:52 Route Debug: GET /profile/settings
+2025/08/11 22:58:52 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/11 22:58:52 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/settings
+2025/08/11 22:58:52 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/settings
+{"timestamp":"2025-08-11T20:58:52.250489578Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945932107574465","method":"GET","path":"/profile/settings","status_code":200,"duration":"142.911235ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":64078}}
+2025/08/11 22:58:54 POST request to /profile/2fa/disable with Content-Type: 'application/json'
+2025/08/11 22:58:54 Route Debug: POST /profile/2fa/disable
+2025/08/11 22:58:54 DEBUG: AuthMiddleware: Request URL: /profile/2fa/disable
+2025/08/11 22:58:54 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/2fa/disable
+2025/08/11 22:58:54 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/2fa/disable
+{"timestamp":"2025-08-11T20:58:54.430618908Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945934315171239","method":"POST","path":"/profile/2fa/disable","status_code":200,"duration":"115.444724ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":17,"bytes_out":39}}
+2025/08/11 22:58:54 Route Debug: GET /profile/security-status
+2025/08/11 22:58:54 DEBUG: AuthMiddleware: Request URL: /profile/security-status
+2025/08/11 22:58:54 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/security-status
+2025/08/11 22:58:54 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/security-status
+{"timestamp":"2025-08-11T20:58:54.566210758Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945934452951219","method":"GET","path":"/profile/security-status","status_code":200,"duration":"113.257626ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":39}}
+2025/08/11 22:58:56 POST request to /profile/2fa/setup with Content-Type: ''
+2025/08/11 22:58:56 Route Debug: POST /profile/2fa/setup
+2025/08/11 22:58:56 DEBUG: AuthMiddleware: Request URL: /profile/2fa/setup
+2025/08/11 22:58:56 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/2fa/setup
+2025/08/11 22:58:56 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/2fa/setup
+2025/08/11 22:58:56 DEBUG: Setup2FA called
+2025/08/11 22:58:56 DEBUG: Setup2FA - user authenticated: mschuck (ID: 20)
+2025/08/11 22:58:56 DEBUG: Setup2FA - deleting any existing incomplete setup records
+2025/08/11 22:58:56 DEBUG: Setup2FA - generating TOTP secret
+2025/08/11 22:58:56 DEBUG: Setup2FA - TOTP secret generated successfully
+2025/08/11 22:58:56 DEBUG: Setup2FA - generating backup codes
+2025/08/11 22:58:56 DEBUG: Setup2FA - generated 10 backup codes
+2025/08/11 22:58:56 DEBUG: Setup2FA - creating 2FA database record with manual JSON serialization
+2025/08/11 22:58:56 DEBUG: Setup2FA - backup codes JSON: ["7ab068a3","99460dd4","7b800505","b95f19e7","6f7b2f1d","59c1db73","2f55a515","8f316b29","74fa7607","4c325463"]
+2025/08/11 22:58:56 DEBUG: Setup2FA - 2FA record saved successfully with backup codes
+{"timestamp":"2025-08-11T20:58:57.005063507Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945936830805035","method":"POST","path":"/profile/2fa/setup","status_code":200,"duration":"174.256008ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":399}}
+2025/08/11 22:59:31 POST request to /profile/2fa/verify with Content-Type: 'application/json'
+2025/08/11 22:59:31 Route Debug: POST /profile/2fa/verify
+2025/08/11 22:59:31 DEBUG: AuthMiddleware: Request URL: /profile/2fa/verify
+2025/08/11 22:59:31 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/2fa/verify
+2025/08/11 22:59:31 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/2fa/verify
+{"timestamp":"2025-08-11T20:59:31.37629668Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945971238337544","method":"POST","path":"/profile/2fa/verify","status_code":200,"duration":"137.957152ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":17,"bytes_out":38}}
+2025/08/11 22:59:34 Route Debug: GET /profile/security-status
+2025/08/11 22:59:34 DEBUG: AuthMiddleware: Request URL: /profile/security-status
+2025/08/11 22:59:34 DEBUG: AuthMiddleware: Found session cookie: 9dade98238fa9fe82f45be88e3f9f3299446f800d496e1e72499861222557338 for /profile/security-status
+2025/08/11 22:59:34 DEBUG: AuthMiddleware: Session valid for user: mschuck (ID: 20) for URL: /profile/security-status
+{"timestamp":"2025-08-11T20:59:34.506126882Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754945974223946926","method":"GET","path":"/profile/security-status","status_code":200,"duration":"282.177532ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":38}}
+DEBUG: Cleaned up 1 expired sessions
+ERROR: Failed to cleanup expired sessions: dial tcp: lookup tsunami-events.de on 10.0.0.2:53: read udp 10.0.0.111:50983->10.0.0.2:53: i/o timeout
+ERROR: Failed to cleanup expired sessions: dial tcp: lookup tsunami-events.de on 10.0.0.2:53: read udp 10.0.0.111:41752->10.0.0.2:53: i/o timeout
+ERROR: Failed to cleanup expired sessions: dial tcp: lookup tsunami-events.de on 10.0.0.2:53: read udp 10.0.0.111:54708->10.0.0.2:53: i/o timeout
+ERROR: Failed to cleanup expired sessions: dial tcp: lookup tsunami-events.de on 10.0.0.2:53: read udp 10.0.0.111:48108->10.0.0.2:53: i/o timeout
+ERROR: Failed to cleanup expired sessions: dial tcp: lookup tsunami-events.de on 10.0.0.2:53: read udp 10.0.0.111:44023->10.0.0.2:53: i/o timeout
+ERROR: Failed to cleanup expired sessions: dial tcp: lookup tsunami-events.de on 10.0.0.2:53: read udp 10.0.0.111:58430->10.0.0.2:53: i/o timeout
+ERROR: Failed to cleanup expired sessions: dial tcp: lookup tsunami-events.de on 10.0.0.2:53: read udp 10.0.0.111:33819->10.0.0.2:53: i/o timeout
+ERROR: Failed to cleanup expired sessions: dial tcp: lookup tsunami-events.de on 10.0.0.2:53: read udp 10.0.0.111:50346->10.0.0.2:53: i/o timeout
+ERROR: Failed to cleanup expired sessions: dial tcp: lookup tsunami-events.de on 10.0.0.2:53: read udp 10.0.0.111:47074->10.0.0.2:53: i/o timeout
+2025/08/12 11:47:59 Running in production mode
+2025/08/12 11:47:59 Database connection established successfully
+2025/08/12 11:47:59 GoBD compliance table migration disabled
+2025/08/12 11:47:59 Database auto-migration disabled - using manual schema management
+2025/08/12 11:47:59 Templates already exist (1), skipping default template creation
+2025/08/12 11:47:59 Server starting on 0.0.0.0:8080
+2025/08/12 11:48:06 Route Debug: GET /
+{"timestamp":"2025-08-12T09:48:06.300769552Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754992086276620051","method":"GET","path":"/","status_code":307,"duration":"24.147468ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":42}}
+2025/08/12 11:48:06 Route Debug: GET /login
+{"timestamp":"2025-08-12T09:48:06.624486994Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754992086600525735","method":"GET","path":"/login","status_code":200,"duration":"23.958875ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":14745}}
+2025/08/12 11:48:07 Route Debug: GET /sw.js
+{"timestamp":"2025-08-12T09:48:07.617740948Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754992087589576041","method":"GET","path":"/sw.js","status_code":200,"duration":"28.162032ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":8867}}
+2025/08/12 11:48:08 Route Debug: GET /static/images/icon-180.png
+2025/08/12 11:48:08 Route Debug: GET /static/images/icon-180.png
+2025/08/12 11:48:09 POST request to /auth/passkey/start-authentication with Content-Type: ''
+2025/08/12 11:48:09 Route Debug: POST /auth/passkey/start-authentication
+2025/08/12 11:48:09 DEBUG: StartPasskeyAuthentication called
+2025/08/12 11:48:09 DEBUG: Request scheme: http, host: job.nt.local
+2025/08/12 11:48:09 DEBUG: Found 2 active passkeys for authentication
+2025/08/12 11:48:09 DEBUG: Adding passkey to allowCredentials - ID: 5KCEKyVcRV6tudXrK_owIA, Name: Bitwarden
+2025/08/12 11:48:09 DEBUG: Adding passkey to allowCredentials - ID: bcHR1mBNR1mlX40mvhY1wA, Name: b
+2025/08/12 11:48:09 DEBUG: Using RP ID: job.nt.local for authentication on host: job.nt.local
+2025/08/12 11:48:09 DEBUG: Prepared 2 allowCredentials for authentication
+{"timestamp":"2025-08-12T09:48:09.509483455Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754992089438254476","method":"POST","path":"/auth/passkey/start-authentication","status_code":200,"duration":"71.225763ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":326}}
+2025/08/12 11:48:12 POST request to /auth/passkey/complete-authentication with Content-Type: 'application/json'
+2025/08/12 11:48:12 Route Debug: POST /auth/passkey/complete-authentication
+2025/08/12 11:48:12 DEBUG: CompletePasskeyAuthentication called
+{"timestamp":"2025-08-12T09:48:12.771257976Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754992092580928005","method":"POST","path":"/auth/passkey/complete-authentication","status_code":200,"duration":"190.326034ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":486,"bytes_out":58}}
+2025/08/12 11:48:12 Route Debug: GET /dashboard
+2025/08/12 11:48:12 DEBUG: AuthMiddleware: Request URL: /dashboard
+2025/08/12 11:48:12 DEBUG: AuthMiddleware: Found session cookie: jiNtE5TC5nre0hVzvRB5t_QqhVaTZEtFbtQtEqVw2Zg= for /dashboard
+2025/08/12 11:48:12 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /dashboard
+{"timestamp":"2025-08-12T09:48:13.019415669Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754992092879977681","method":"GET","path":"/dashboard","status_code":200,"duration":"139.435574ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":18341}}
+2025/08/12 11:48:13 Route Debug: GET /favicon.ico
+{"timestamp":"2025-08-12T09:48:13.263713949Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754992093240809881","method":"GET","path":"/favicon.ico","status_code":200,"duration":"22.902184ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":6685}}
+2025/08/12 11:48:16 Route Debug: GET /profile/settings
+2025/08/12 11:48:16 DEBUG: AuthMiddleware: Request URL: /profile/settings
+2025/08/12 11:48:16 DEBUG: AuthMiddleware: Found session cookie: jiNtE5TC5nre0hVzvRB5t_QqhVaTZEtFbtQtEqVw2Zg= for /profile/settings
+2025/08/12 11:48:16 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/settings
+{"timestamp":"2025-08-12T09:48:16.628044632Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754992096489544672","method":"GET","path":"/profile/settings","status_code":200,"duration":"138.498346ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":66695}}
+2025/08/12 11:48:30 Route Debug: DELETE /profile/passkeys/4
+2025/08/12 11:48:30 DEBUG: AuthMiddleware: Request URL: /profile/passkeys/4
+2025/08/12 11:48:30 DEBUG: AuthMiddleware: Found session cookie: jiNtE5TC5nre0hVzvRB5t_QqhVaTZEtFbtQtEqVw2Zg= for /profile/passkeys/4
+2025/08/12 11:48:30 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/passkeys/4
+{"timestamp":"2025-08-12T09:48:30.386016669Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754992110291055563","method":"DELETE","path":"/profile/passkeys/4","status_code":200,"duration":"94.959544ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":42}}
+2025/08/12 11:48:30 Route Debug: GET /profile/security-status
+2025/08/12 11:48:30 DEBUG: AuthMiddleware: Request URL: /profile/security-status
+2025/08/12 11:48:30 DEBUG: AuthMiddleware: Found session cookie: jiNtE5TC5nre0hVzvRB5t_QqhVaTZEtFbtQtEqVw2Zg= for /profile/security-status
+2025/08/12 11:48:30 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/security-status
+{"timestamp":"2025-08-12T09:48:30.571816997Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754992110457636800","method":"GET","path":"/profile/security-status","status_code":200,"duration":"114.176841ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":38}}
+2025/08/12 11:48:36 POST request to /profile/passkeys/start-registration with Content-Type: ''
+2025/08/12 11:48:36 Route Debug: POST /profile/passkeys/start-registration
+2025/08/12 11:48:36 DEBUG: AuthMiddleware: Request URL: /profile/passkeys/start-registration
+2025/08/12 11:48:36 DEBUG: AuthMiddleware: Found session cookie: jiNtE5TC5nre0hVzvRB5t_QqhVaTZEtFbtQtEqVw2Zg= for /profile/passkeys/start-registration
+2025/08/12 11:48:36 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/passkeys/start-registration
+2025/08/12 11:48:36 DEBUG: StartPasskeyRegistration called
+2025/08/12 11:48:36 DEBUG: User authenticated: ntielmann (ID: 5)
+2025/08/12 11:48:36 DEBUG: Request scheme: http, host: job.nt.local
+2025/08/12 11:48:36 DEBUG: Host validation - host: job.nt.local, isLocalhost: false, isInternalHost: true
+2025/08/12 11:48:36 DEBUG: Host validation passed - scheme: http, host: job.nt.local
+2025/08/12 11:48:36 DEBUG: Challenge generated
+2025/08/12 11:48:36 DEBUG: Attempting to create WebAuthn session in database
+2025/08/12 11:48:36 DEBUG: Session created successfully with ID: TcyTYB3NREq44cmb474REHD6pIo5mOlXRGNGGZwpSpk=
+2025/08/12 11:48:36 DEBUG: Generated challenge (base64): Tu6blxVz-vlow5fbviWv82JTzv2Scvt9-EeIvnwZoDU=
+2025/08/12 11:48:36 DEBUG: Generated user ID (base64): NQ==
+2025/08/12 11:48:36 DEBUG: Using RP ID: job.nt.local for host: job.nt.local
+{"timestamp":"2025-08-12T09:48:37.007630238Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754992116910734946","method":"POST","path":"/profile/passkeys/start-registration","status_code":200,"duration":"96.893659ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":516}}
+2025/08/12 11:48:48 POST request to /profile/passkeys/complete-registration with Content-Type: 'application/json'
+2025/08/12 11:48:48 Route Debug: POST /profile/passkeys/complete-registration
+2025/08/12 11:48:48 DEBUG: AuthMiddleware: Request URL: /profile/passkeys/complete-registration
+2025/08/12 11:48:48 DEBUG: AuthMiddleware: Found session cookie: jiNtE5TC5nre0hVzvRB5t_QqhVaTZEtFbtQtEqVw2Zg= for /profile/passkeys/complete-registration
+2025/08/12 11:48:48 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/passkeys/complete-registration
+2025/08/12 11:48:48 DEBUG: CompletePasskeyRegistration called
+2025/08/12 11:48:48 DEBUG: Extracted fields - sessionID: TcyTYB3NREq44cmb474REHD6pIo5mOlXRGNGGZwpSpk=, name: Bitwarden, credential length: 240, credentialID: M_gKMgCKReCLLujpCySbuQ
+2025/08/12 11:48:48 DEBUG: Verifying session - sessionID: TcyTYB3NREq44cmb474REHD6pIo5mOlXRGNGGZwpSpk=, userID: 5
+2025/08/12 11:48:48 DEBUG: Session verified successfully
+{"timestamp":"2025-08-12T09:48:48.170451337Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754992128003804219","method":"POST","path":"/profile/passkeys/complete-registration","status_code":200,"duration":"166.645234ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":579,"bytes_out":59}}
+2025/08/12 11:48:48 Route Debug: GET /profile/security-status
+2025/08/12 11:48:48 DEBUG: AuthMiddleware: Request URL: /profile/security-status
+2025/08/12 11:48:48 DEBUG: AuthMiddleware: Found session cookie: jiNtE5TC5nre0hVzvRB5t_QqhVaTZEtFbtQtEqVw2Zg= for /profile/security-status
+2025/08/12 11:48:48 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/security-status
+{"timestamp":"2025-08-12T09:48:48.483941398Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754992128368805452","method":"GET","path":"/profile/security-status","status_code":200,"duration":"115.133001ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":38}}

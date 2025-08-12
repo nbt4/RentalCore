@@ -149,7 +149,7 @@ func main() {
 	scannerHandler := handlers.NewScannerHandler(jobRepo, deviceRepo, customerRepo, caseRepo)
 	authHandler := handlers.NewAuthHandler(db.DB, cfg)
 	webauthnHandler := handlers.NewWebAuthnHandler(db.DB, cfg)
-	// profileHandler := handlers.NewProfileHandler(db.DB, cfg)
+	// profileHandler := handlers.NewProfileHandler(db.DB, cfg) // Commented out - using webauthnHandler instead
 	homeHandler := handlers.NewHomeHandler(jobRepo, deviceRepo, customerRepo, caseRepo, db.DB)
 	
 	// Start session cleanup background process
@@ -379,6 +379,11 @@ func main() {
 	}
 	r.SetFuncMap(funcMap)
 	r.LoadHTMLGlob("web/templates/*")
+	
+	// Simple health check endpoint for Docker
+	r.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{"status": "ok", "service": "RentalCore"})
+	})
 	
 	// Add caching for static files
 	r.StaticFS("/static", http.Dir("web/static"))
@@ -914,15 +919,15 @@ func setupRoutes(r *gin.Engine,
 				}
 				
 				// Use webauthnHandler's database connection
-				webauthnDB := webauthnHandler.GetDB() // We'll need to add this method
+				webauthnDB := webauthnHandler.GetDB()
 				
 				// Load user's passkeys
 				var passkeys []models.UserPasskey
 				webauthnDB.Where("user_id = ? AND is_active = ?", currentUser.UserID, true).Find(&passkeys)
 				
-				// Load 2FA status
-				var user2FA models.User2FA
-				twoFAEnabled := webauthnDB.Where("user_id = ? AND is_enabled = ?", currentUser.UserID, true).First(&user2FA).Error == nil
+				// Load 2FA status using the correct query
+				var twoFAEnabled bool
+				webauthnDB.Raw("SELECT COALESCE(is_enabled, false) FROM user_2fa WHERE user_id = ?", currentUser.UserID).Scan(&twoFAEnabled)
 				
 				// Load recent authentication attempts
 				var recentAttempts []models.AuthenticationAttempt
@@ -938,6 +943,9 @@ func setupRoutes(r *gin.Engine,
 					"currentPage": "profile",
 				})
 			})
+			
+			// Security status endpoint
+			profile.GET("/security-status", webauthnHandler.SecurityStatus)
 			
 			// WebAuthn (Passkey) routes
 			passkeys := profile.Group("/passkeys")

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/run/current-system/sw/bin/bash
 
 # TS RentalCore - Production Startup Script
 # Uses config.json for configuration

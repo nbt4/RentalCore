@@ -455,6 +455,28 @@ func (h *WebAuthnHandler) DeletePasskey(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Passkey deleted successfully"})
 }
 
+// SecurityStatus returns the current security status for the user
+func (h *WebAuthnHandler) SecurityStatus(c *gin.Context) {
+	currentUser, exists := GetCurrentUser(c)
+	if !exists || currentUser == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	// Get 2FA status
+	var twoFAEnabled bool
+	h.db.Raw("SELECT COALESCE(is_enabled, false) FROM user_2fa WHERE user_id = ?", currentUser.UserID).Scan(&twoFAEnabled)
+
+	// Get passkey count
+	var passkeyCount int64
+	h.db.Model(&models.UserPasskey{}).Where("user_id = ? AND is_active = ?", currentUser.UserID, true).Count(&passkeyCount)
+
+	c.JSON(http.StatusOK, gin.H{
+		"twoFAEnabled": twoFAEnabled,
+		"passkeyCount": passkeyCount,
+	})
+}
+
 // ================================================================
 // 2FA (TOTP) ENDPOINTS
 // ================================================================
@@ -611,47 +633,54 @@ func (h *WebAuthnHandler) Disable2FA(c *gin.Context) {
 	var request struct {
 		Code string `json:"code" binding:"required"`
 	}
-
 	if err := c.ShouldBindJSON(&request); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Get 2FA record
-	var twoFA models.User2FA
-	if err := h.db.Where("user_id = ? AND is_enabled = ?", currentUser.UserID, true).First(&twoFA).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "2FA not enabled"})
+	// Simple approach: Use raw SQL to disable 2FA directly
+	// First verify that 2FA exists and is enabled
+	var secret string
+	var backupCodes string
+	var isEnabled bool
+	
+	row := h.db.Raw("SELECT secret, COALESCE(backup_codes, '[]'), is_enabled FROM user_2fa WHERE user_id = ? LIMIT 1", currentUser.UserID).Row()
+	if err := row.Scan(&secret, &backupCodes, &isEnabled); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "2FA not found"})
 		return
 	}
 
-	// Verify TOTP code or backup code
-	valid := totp.Validate(request.Code, twoFA.Secret)
+	if !isEnabled {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "2FA not enabled"})
+		return
+	}
+
+	// Verify the provided code
+	valid := totp.Validate(request.Code, secret)
 	if !valid {
-		// Check if it's a backup code
-		for i, backupCode := range twoFA.BackupCodes {
-			if backupCode == request.Code {
-				valid = true
-				// Remove used backup code
-				twoFA.BackupCodes = append(twoFA.BackupCodes[:i], twoFA.BackupCodes[i+1:]...)
-				break
+		// Check backup codes
+		var backupCodeList []string
+		if backupCodes != "" && backupCodes != "[]" {
+			json.Unmarshal([]byte(backupCodes), &backupCodeList)
+			for _, backupCode := range backupCodeList {
+				if backupCode == request.Code {
+					valid = true
+					break
+				}
 			}
+		}
+		
+		if !valid {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid verification code"})
+			return
 		}
 	}
 
-	if !valid {
-		h.logAuthAttempt(currentUser.UserID, "2fa_disable_attempt", c.ClientIP(), c.GetHeader("User-Agent"), false, stringPtr("Invalid code"), nil)
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid verification code"})
-		return
-	}
-
-	// Delete 2FA record
-	if err := h.db.Delete(&twoFA).Error; err != nil {
+	// Disable 2FA directly with raw SQL
+	if err := h.db.Exec("UPDATE user_2fa SET is_enabled = 0 WHERE user_id = ?", currentUser.UserID).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to disable 2FA"})
 		return
 	}
-
-	// Log successful disable
-	h.logAuthAttempt(currentUser.UserID, "2fa_disabled", c.ClientIP(), c.GetHeader("User-Agent"), true, nil, nil)
 
 	c.JSON(http.StatusOK, gin.H{"message": "2FA disabled successfully"})
 }
