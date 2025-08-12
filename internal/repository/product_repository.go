@@ -13,6 +13,11 @@ func NewProductRepository(db *Database) *ProductRepository {
 	return &ProductRepository{db: db}
 }
 
+// GetDB returns the database connection for direct queries
+func (r *ProductRepository) GetDB() *Database {
+	return r.db
+}
+
 func (r *ProductRepository) Create(product *models.Product) error {
 	return r.db.Create(product).Error
 }
