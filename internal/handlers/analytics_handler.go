@@ -214,7 +214,15 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 	log.Printf("DEBUG: Looking for bookings for device: %s", deviceID)
 	result := h.db.Raw(`
 		SELECT 
-			c.name as customer_name,
+			COALESCE(
+				CASE 
+					WHEN c.companyname IS NOT NULL AND c.companyname != '' THEN c.companyname
+					WHEN c.firstname IS NOT NULL AND c.lastname IS NOT NULL THEN CONCAT(c.firstname, ' ', c.lastname)
+					WHEN c.lastname IS NOT NULL THEN c.lastname
+					WHEN c.firstname IS NOT NULL THEN c.firstname
+					ELSE 'Unknown Customer'
+				END
+			) as customer_name,
 			c.email as customer_email,
 			j.jobID,
 			j.startDate,
@@ -243,7 +251,15 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 		log.Printf("DEBUG: No bookings found, trying simpler query")
 		h.db.Raw(`
 			SELECT 
-				c.name as customer_name,
+				COALESCE(
+					CASE 
+						WHEN c.companyname IS NOT NULL AND c.companyname != '' THEN c.companyname
+						WHEN c.firstname IS NOT NULL AND c.lastname IS NOT NULL THEN CONCAT(c.firstname, ' ', c.lastname)
+						WHEN c.lastname IS NOT NULL THEN c.lastname
+						WHEN c.firstname IS NOT NULL THEN c.firstname
+						ELSE 'Unknown Customer'
+					END
+				) as customer_name,
 				c.email as customer_email,
 				j.jobID,
 				j.startDate,
