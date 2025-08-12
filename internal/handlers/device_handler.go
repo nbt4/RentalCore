@@ -196,11 +196,37 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 		// For tree view, load tree data and render in the main template
 		treeData, err := h.buildTreeData()
 		if err != nil {
-			log.Printf("❌ Error building tree data: %v", err)
-			c.Redirect(http.StatusSeeOther, fmt.Sprintf("/error?code=500&message=Tree Error&details=%s", err.Error()))
+			log.Printf("❌ CRITICAL ERROR building tree data: %v", err)
+			log.Printf("❌ Falling back to list view due to tree error")
+			// Fall back to list view instead of error page
+			SafeHTML(c, http.StatusOK, "devices_standalone.html", gin.H{
+				"title":         "Devices (Tree Error - Showing List)",
+				"devices":       devices,
+				"params":        params,
+				"user":          user,
+				"viewType":      "list", // Force list view
+				"currentPage":   "devices",
+				"treeError":     err.Error(),
+			})
 			return
 		}
 		
+		if len(treeData) == 0 {
+			log.Printf("⚠️ WARNING: Tree data is empty! No categories found.")
+			log.Printf("⚠️ Falling back to list view - empty tree data")
+			SafeHTML(c, http.StatusOK, "devices_standalone.html", gin.H{
+				"title":         "Devices (Empty Tree - Showing List)",
+				"devices":       devices,
+				"params":        params,
+				"user":          user,
+				"viewType":      "list", // Force list view
+				"currentPage":   "devices",
+				"treeError":     "No categories found for tree view",
+			})
+			return
+		}
+		
+		log.Printf("✅ Successfully built tree with %d categories", len(treeData))
 		SafeHTML(c, http.StatusOK, "devices_standalone.html", gin.H{
 			"title":       "Device Tree View",
 			"params":      params,
@@ -802,6 +828,8 @@ func (h *DeviceHandler) buildOptimizedTreeData() ([]TreeCategory, error) {
 	// Single query to get all devices with their complete hierarchy
 	var devices []models.Device
 	
+	log.Printf("🔍 Starting database query for tree data...")
+	
 	err := h.productRepo.GetDB().Model(&models.Device{}).
 		Preload("Product").
 		Preload("Product.Category").
@@ -815,10 +843,24 @@ func (h *DeviceHandler) buildOptimizedTreeData() ([]TreeCategory, error) {
 		Find(&devices).Error
 	
 	if err != nil {
+		log.Printf("❌ Database query failed: %v", err)
 		return nil, fmt.Errorf("failed to fetch devices with hierarchy: %v", err)
 	}
 	
-	log.Printf("🔍 Fetched %d devices in single query", len(devices))
+	log.Printf("🔍 Fetched %d devices from database", len(devices))
+	
+	if len(devices) == 0 {
+		log.Printf("⚠️ WARNING: No devices found in database!")
+		return []TreeCategory{}, nil
+	}
+	
+	// Log sample of first few devices for debugging
+	for i, device := range devices {
+		if i >= 3 { break } // Only log first 3
+		log.Printf("🔍 Device %d: ID=%d, Product=%v, Category=%v", 
+			i+1, device.DeviceID, device.Product != nil, 
+			device.Product != nil && device.Product.Category != nil)
+	}
 	
 	// Build the tree structure from the single result set
 	return h.buildTreeFromDevices(devices)

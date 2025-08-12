@@ -1840,3 +1840,10 @@ ERROR: Failed to cleanup expired sessions: dial tcp: lookup tsunami-events.de on
 2025/08/12 11:48:48 DEBUG: AuthMiddleware: Found session cookie: jiNtE5TC5nre0hVzvRB5t_QqhVaTZEtFbtQtEqVw2Zg= for /profile/security-status
 2025/08/12 11:48:48 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /profile/security-status
 {"timestamp":"2025-08-12T09:48:48.483941398Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754992128368805452","method":"GET","path":"/profile/security-status","status_code":200,"duration":"115.133001ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":38}}
+2025/08/12 14:36:05 Running in production mode
+2025/08/12 14:36:05 Database connection established successfully
+2025/08/12 14:36:05 GoBD compliance table migration disabled
+2025/08/12 14:36:05 Database auto-migration disabled - using manual schema management
+2025/08/12 14:36:05 Templates already exist (1), skipping default template creation
+2025/08/12 14:36:06 Server starting on 0.0.0.0:8080
+2025/08/12 14:36:06 listen tcp 0.0.0.0:8080: bind: address already in use
