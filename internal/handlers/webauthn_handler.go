@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -38,16 +37,13 @@ func (h *WebAuthnHandler) GetDB() *gorm.DB {
 
 // StartPasskeyRegistration initiates passkey registration for a user
 func (h *WebAuthnHandler) StartPasskeyRegistration(c *gin.Context) {
-	log.Printf("DEBUG: StartPasskeyRegistration called")
 	
 	currentUser, exists := GetCurrentUser(c)
 	if !exists || currentUser == nil {
-		log.Printf("ERROR: User not authenticated")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 	
-	log.Printf("DEBUG: User authenticated: %s (ID: %d)", currentUser.Username, currentUser.UserID)
 
 	// Check if running over HTTPS or localhost (WebAuthn requirement)
 	host := c.Request.Host
@@ -56,7 +52,6 @@ func (h *WebAuthnHandler) StartPasskeyRegistration(c *gin.Context) {
 		scheme = "https"
 	}
 	
-	log.Printf("DEBUG: Request scheme: %s, host: %s", scheme, host)
 	
 	// WebAuthn requires HTTPS except for localhost, internal networks, and Docker containers
 	isLocalhost := strings.Contains(host, "localhost") || strings.Contains(host, "127.0.0.1")
@@ -68,27 +63,21 @@ func (h *WebAuthnHandler) StartPasskeyRegistration(c *gin.Context) {
 		                // Allow any host for development - this makes WebAuthn work on any system
 		                true // TEMPORARY: Allow all hosts for development
 	
-	log.Printf("DEBUG: Host validation - host: %s, isLocalhost: %v, isInternalHost: %v, isDevelopmentHost: %v", host, isLocalhost, isInternalHost, isDevelopmentHost)
 	
 	if scheme != "https" && !isLocalhost && !isInternalHost && !isDevelopmentHost {
-		log.Printf("ERROR: WebAuthn requires HTTPS except for localhost/internal/development hosts - host: %s, scheme: %s", host, scheme)
-		log.Printf("ERROR: Host validation failed - isLocalhost: %v, isInternalHost: %v, isDevelopmentHost: %v", isLocalhost, isInternalHost, isDevelopmentHost)
 		errorMsg := fmt.Sprintf("WebAuthn requires HTTPS for security. Host '%s' with scheme '%s' not allowed. Use HTTPS or configure for development.", host, scheme)
 		c.JSON(http.StatusBadRequest, gin.H{"error": errorMsg, "host": host, "scheme": scheme})
 		return
 	}
 	
-	log.Printf("DEBUG: Host validation passed - scheme: %s, host: %s", scheme, host)
 
 	// Generate challenge
 	challenge := make([]byte, 32)
 	if _, err := rand.Read(challenge); err != nil {
-		log.Printf("ERROR: Failed to generate challenge: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate challenge"})
 		return
 	}
 	
-	log.Printf("DEBUG: Challenge generated")
 
 	// Create WebAuthn session
 	sessionID := generateSessionID()
@@ -101,22 +90,17 @@ func (h *WebAuthnHandler) StartPasskeyRegistration(c *gin.Context) {
 		CreatedAt:   time.Now(),
 	}
 
-	log.Printf("DEBUG: Attempting to create WebAuthn session in database")
 	if err := h.db.Create(&session).Error; err != nil {
-		log.Printf("ERROR: Failed to create session in database: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create session"})
 		return
 	}
 	
-	log.Printf("DEBUG: Session created successfully with ID: %s", sessionID)
 
 	// Return registration options - challenge and user.id need to be base64url encoded strings
 	// but the client will need to convert them to Uint8Array
 	challengeB64 := base64.URLEncoding.EncodeToString(challenge)
 	userIdB64 := base64.URLEncoding.EncodeToString([]byte(fmt.Sprintf("%d", currentUser.UserID)))
 	
-	log.Printf("DEBUG: Generated challenge (base64): %s", challengeB64)
-	log.Printf("DEBUG: Generated user ID (base64): %s", userIdB64)
 	
 	// For WebAuthn RP ID, it must be a valid domain suffix of the origin
 	// For .local domains, we need to use the full domain or a valid suffix
@@ -126,7 +110,6 @@ func (h *WebAuthnHandler) StartPasskeyRegistration(c *gin.Context) {
 		rpID = strings.Split(host, ":")[0]
 	}
 	
-	log.Printf("DEBUG: Using RP ID: %s for host: %s", rpID, host)
 	
 	options := map[string]interface{}{
 		"challenge": challengeB64,
@@ -160,11 +143,9 @@ func (h *WebAuthnHandler) StartPasskeyRegistration(c *gin.Context) {
 
 // CompletePasskeyRegistration completes passkey registration
 func (h *WebAuthnHandler) CompletePasskeyRegistration(c *gin.Context) {
-	log.Printf("DEBUG: CompletePasskeyRegistration called")
 	
 	currentUser, exists := GetCurrentUser(c)
 	if !exists || currentUser == nil {
-		log.Printf("ERROR: CompletePasskeyRegistration - user not authenticated")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
@@ -173,8 +154,6 @@ func (h *WebAuthnHandler) CompletePasskeyRegistration(c *gin.Context) {
 	var request map[string]interface{}
 	
 	if err := c.ShouldBindJSON(&request); err != nil {
-		log.Printf("ERROR: Failed to bind JSON request: %v", err)
-		log.Printf("ERROR: Request body parsing failed for CompletePasskeyRegistration")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON request format", "details": err.Error()})
 		return
 	}
@@ -185,12 +164,7 @@ func (h *WebAuthnHandler) CompletePasskeyRegistration(c *gin.Context) {
 	credential, _ := request["credential"].(string)
 	credentialID, _ := request["credentialId"].(string)
 	
-	log.Printf("DEBUG: Extracted fields - sessionID: %s, name: %s, credential length: %d, credentialID: %s", 
-		sessionID, name, len(credential), credentialID)
-	
 	if sessionID == "" || name == "" || credential == "" || credentialID == "" {
-		log.Printf("ERROR: Missing required fields - sessionID empty: %v, name empty: %v, credential empty: %v, credentialID empty: %v", 
-			sessionID == "", name == "", credential == "", credentialID == "")
 		missingFields := []string{}
 		if sessionID == "" { missingFields = append(missingFields, "sessionId") }
 		if name == "" { missingFields = append(missingFields, "name") }
@@ -201,16 +175,12 @@ func (h *WebAuthnHandler) CompletePasskeyRegistration(c *gin.Context) {
 	}
 
 	// Verify session
-	log.Printf("DEBUG: Verifying session - sessionID: %s, userID: %d", sessionID, currentUser.UserID)
 	var session models.WebAuthnSession
 	if err := h.db.Where("session_id = ? AND user_id = ? AND session_type = ? AND expires_at > ?",
 		sessionID, currentUser.UserID, "registration", time.Now()).First(&session).Error; err != nil {
-		log.Printf("ERROR: Session verification failed: %v", err)
-		log.Printf("ERROR: Session lookup - sessionID: %s, userID: %d, sessionType: registration", sessionID, currentUser.UserID)
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid or expired session", "sessionId": sessionID, "details": err.Error()})
 		return
 	}
-	log.Printf("DEBUG: Session verified successfully")
 
 	// For now, we'll store a placeholder public key
 	publicKeyBytes := []byte("placeholder-public-key")
@@ -228,7 +198,6 @@ func (h *WebAuthnHandler) CompletePasskeyRegistration(c *gin.Context) {
 	}
 
 	if err := h.db.Create(&passkey).Error; err != nil {
-		log.Printf("ERROR: Failed to save passkey: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save passkey"})
 		return
 	}
@@ -251,7 +220,6 @@ func (h *WebAuthnHandler) CompletePasskeyRegistration(c *gin.Context) {
 
 // StartPasskeyAuthentication initiates passkey authentication for login
 func (h *WebAuthnHandler) StartPasskeyAuthentication(c *gin.Context) {
-	log.Printf("DEBUG: StartPasskeyAuthentication called")
 	
 	// Check if running over HTTPS or localhost (WebAuthn requirement)
 	host := c.Request.Host
@@ -260,7 +228,6 @@ func (h *WebAuthnHandler) StartPasskeyAuthentication(c *gin.Context) {
 		scheme = "https"
 	}
 	
-	log.Printf("DEBUG: Request scheme: %s, host: %s", scheme, host)
 	
 	// WebAuthn requires HTTPS except for localhost, internal networks, and Docker containers
 	isLocalhost := strings.Contains(host, "localhost") || strings.Contains(host, "127.0.0.1")
@@ -273,8 +240,6 @@ func (h *WebAuthnHandler) StartPasskeyAuthentication(c *gin.Context) {
 		                true // TEMPORARY: Allow all hosts for development
 	
 	if scheme != "https" && !isLocalhost && !isInternalHost && !isDevelopmentHost {
-		log.Printf("ERROR: WebAuthn requires HTTPS except for localhost/internal/development hosts - host: %s, scheme: %s", host, scheme)
-		log.Printf("ERROR: Host validation failed - isLocalhost: %v, isInternalHost: %v, isDevelopmentHost: %v", isLocalhost, isInternalHost, isDevelopmentHost)
 		errorMsg := fmt.Sprintf("WebAuthn requires HTTPS for security. Host '%s' with scheme '%s' not allowed. Use HTTPS or configure for development.", host, scheme)
 		c.JSON(http.StatusBadRequest, gin.H{"error": errorMsg, "host": host, "scheme": scheme})
 		return
@@ -283,7 +248,6 @@ func (h *WebAuthnHandler) StartPasskeyAuthentication(c *gin.Context) {
 	// Generate challenge
 	challenge := make([]byte, 32)
 	if _, err := rand.Read(challenge); err != nil {
-		log.Printf("ERROR: Failed to generate challenge: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate challenge"})
 		return
 	}
@@ -300,7 +264,6 @@ func (h *WebAuthnHandler) StartPasskeyAuthentication(c *gin.Context) {
 	}
 
 	if err := h.db.Create(&session).Error; err != nil {
-		log.Printf("ERROR: Failed to create session in database: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create session"})
 		return
 	}
@@ -309,11 +272,9 @@ func (h *WebAuthnHandler) StartPasskeyAuthentication(c *gin.Context) {
 	var passkeys []models.UserPasskey
 	h.db.Where("is_active = ?", true).Find(&passkeys)
 	
-	log.Printf("DEBUG: Found %d active passkeys for authentication", len(passkeys))
 	
 	allowCredentials := make([]map[string]interface{}, len(passkeys))
 	for i, passkey := range passkeys {
-		log.Printf("DEBUG: Adding passkey to allowCredentials - ID: %s, Name: %s", passkey.CredentialID, passkey.Name)
 		allowCredentials[i] = map[string]interface{}{
 			"type": "public-key",
 			"id":   passkey.CredentialID, // Use the credential ID directly as it's already base64url encoded
@@ -327,8 +288,6 @@ func (h *WebAuthnHandler) StartPasskeyAuthentication(c *gin.Context) {
 		rpID = strings.Split(host, ":")[0]
 	}
 	
-	log.Printf("DEBUG: Using RP ID: %s for authentication on host: %s", rpID, host)
-	log.Printf("DEBUG: Prepared %d allowCredentials for authentication", len(allowCredentials))
 	
 	// Return authentication options
 	challengeB64 := base64.URLEncoding.EncodeToString(challenge)
@@ -348,12 +307,10 @@ func (h *WebAuthnHandler) StartPasskeyAuthentication(c *gin.Context) {
 
 // CompletePasskeyAuthentication completes passkey authentication for login
 func (h *WebAuthnHandler) CompletePasskeyAuthentication(c *gin.Context) {
-	log.Printf("DEBUG: CompletePasskeyAuthentication called")
 	
 	var request map[string]interface{}
 	
 	if err := c.ShouldBindJSON(&request); err != nil {
-		log.Printf("ERROR: Failed to bind JSON request: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -363,7 +320,6 @@ func (h *WebAuthnHandler) CompletePasskeyAuthentication(c *gin.Context) {
 	credentialID, _ := request["credentialId"].(string)
 	
 	if sessionID == "" || credentialID == "" {
-		log.Printf("ERROR: Missing required fields")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing required fields"})
 		return
 	}
@@ -379,7 +335,6 @@ func (h *WebAuthnHandler) CompletePasskeyAuthentication(c *gin.Context) {
 	// Find the passkey and associated user
 	var passkey models.UserPasskey
 	if err := h.db.Where("credential_id = ? AND is_active = ?", credentialID, true).First(&passkey).Error; err != nil {
-		log.Printf("ERROR: Passkey not found: %v", err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid passkey"})
 		return
 	}
@@ -387,7 +342,6 @@ func (h *WebAuthnHandler) CompletePasskeyAuthentication(c *gin.Context) {
 	// Get the user
 	var user models.User
 	if err := h.db.Where("userID = ? AND is_active = ?", passkey.UserID, true).First(&user).Error; err != nil {
-		log.Printf("ERROR: User not found or inactive: %v", err)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
 		return
 	}
@@ -412,7 +366,6 @@ func (h *WebAuthnHandler) CompletePasskeyAuthentication(c *gin.Context) {
 	}
 	
 	if err := h.db.Create(&userSession).Error; err != nil {
-		log.Printf("ERROR: Failed to create user session: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create session"})
 		return
 	}
@@ -507,71 +460,57 @@ func (h *WebAuthnHandler) SecurityStatus(c *gin.Context) {
 
 // Setup2FA generates a new TOTP secret and QR code for the user
 func (h *WebAuthnHandler) Setup2FA(c *gin.Context) {
-	log.Printf("DEBUG: Setup2FA called")
 	
 	currentUser, exists := GetCurrentUser(c)
 	if !exists || currentUser == nil {
-		log.Printf("ERROR: Setup2FA - user not authenticated")
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
 		return
 	}
 	
-	log.Printf("DEBUG: Setup2FA - user authenticated: %s (ID: %d)", currentUser.Username, currentUser.UserID)
 
 	// Check if 2FA is already setup - use raw SQL to avoid GORM JSON scanning issues
 	var count int64
 	if err := h.db.Raw("SELECT COUNT(*) FROM user_2fa WHERE user_id = ? AND is_enabled = 1", currentUser.UserID).Scan(&count).Error; err != nil {
-		log.Printf("ERROR: Setup2FA - failed to check existing 2FA: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to setup 2FA"})
 		return
 	}
 	
 	if count > 0 {
-		log.Printf("ERROR: Setup2FA - 2FA already enabled")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "2FA is already enabled"})
 		return
 	}
 	
 	// Delete any existing incomplete setup records
-	log.Printf("DEBUG: Setup2FA - deleting any existing incomplete setup records")
 	h.db.Exec("DELETE FROM user_2fa WHERE user_id = ? AND is_enabled = 0", currentUser.UserID)
 
 	// Generate TOTP secret
-	log.Printf("DEBUG: Setup2FA - generating TOTP secret")
 	key, err := totp.Generate(totp.GenerateOpts{
 		Issuer:      "RentalCore",
 		AccountName: currentUser.Email,
 		SecretSize:  32,
 	})
 	if err != nil {
-		log.Printf("ERROR: Setup2FA - failed to generate TOTP secret: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to generate 2FA secret"})
 		return
 	}
-	log.Printf("DEBUG: Setup2FA - TOTP secret generated successfully")
 
 	// Generate backup codes
-	log.Printf("DEBUG: Setup2FA - generating backup codes")
 	backupCodes := make([]string, 10)
 	for i := range backupCodes {
 		code := make([]byte, 6)
 		rand.Read(code)
 		backupCodes[i] = fmt.Sprintf("%x", code)[:8]
 	}
-	log.Printf("DEBUG: Setup2FA - generated %d backup codes", len(backupCodes))
 
 	// Create 2FA record with manual JSON serialization
-	log.Printf("DEBUG: Setup2FA - creating 2FA database record with manual JSON serialization")
 	
 	// Convert backup codes to JSON manually
 	backupCodesJSON, err := json.Marshal(backupCodes)
 	if err != nil {
-		log.Printf("ERROR: Setup2FA - failed to marshal backup codes to JSON: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to setup 2FA"})
 		return
 	}
 	
-	log.Printf("DEBUG: Setup2FA - backup codes JSON: %s", string(backupCodesJSON))
 	
 	// Use raw SQL to insert the record to avoid GORM's JSON handling
 	result := h.db.Exec(`
@@ -580,12 +519,10 @@ func (h *WebAuthnHandler) Setup2FA(c *gin.Context) {
 	`, currentUser.UserID, key.Secret(), key.URL(), false, false, string(backupCodesJSON), time.Now(), time.Now())
 	
 	if result.Error != nil {
-		log.Printf("ERROR: Setup2FA - failed to create 2FA record with raw SQL: %v", result.Error)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to setup 2FA"})
 		return
 	}
 	
-	log.Printf("DEBUG: Setup2FA - 2FA record saved successfully with backup codes")
 
 	c.JSON(http.StatusOK, gin.H{
 		"qrCodeURL":   key.URL(),

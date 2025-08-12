@@ -182,11 +182,6 @@ func main() {
 	r.Use(monitoring.GlobalErrorTracker.ErrorTrackingMiddleware())
 	r.Use(perfMonitor.PerformanceMiddleware())
 	
-	// Add route debugging middleware
-	r.Use(func(c *gin.Context) {
-		log.Printf("Route Debug: %s %s", c.Request.Method, c.Request.URL.Path)
-		c.Next()
-	})
 	
 	if complianceMiddleware != nil {
 		r.Use(complianceMiddleware.AuditMiddleware())
@@ -530,22 +525,7 @@ func setupRoutes(r *gin.Engine,
 		}
 	}
 	
-	// Debug route (no auth required)
-	r.GET("/debug/invoice-test", func(c *gin.Context) {
-		c.String(http.StatusOK, "Invoice test route is working! Time: %s", time.Now().Format("2006-01-02 15:04:05"))
-	})
 	
-	// Debug route for customer selection
-	r.GET("/debug/customer-selection", func(c *gin.Context) {
-		c.Header("Content-Type", "text/plain")
-		c.String(http.StatusOK, "Customer selection debug route working!")
-	})
-	
-	// Debug route for route testing
-	r.GET("/debug/routes", func(c *gin.Context) {
-		c.Header("Content-Type", "text/plain")
-		c.String(http.StatusOK, "Route Debug:\n/settings/company -> Company Settings\n/monitoring -> Monitoring Dashboard\nTime: %s", time.Now().Format("2006-01-02 15:04:05"))
-	})
 	
 	
 	
@@ -787,9 +767,8 @@ func setupRoutes(r *gin.Engine,
 		// Company Settings routes - NOW ACTIVE
 		settings := protected.Group("/settings")
 		{
-			// Company settings form route with enhanced debugging
+			// Company settings form route
 			settings.GET("/company", func(c *gin.Context) {
-				log.Printf("🏢 COMPANY SETTINGS ROUTE CALLED - URL: %s, Method: %s", c.Request.URL.Path, c.Request.Method)
 				companyHandler.CompanySettingsForm(c)
 			})
 			settings.POST("/company", companyHandler.UpdateCompanySettingsForm)
@@ -860,7 +839,6 @@ func setupRoutes(r *gin.Engine,
 		monitoring := protected.Group("/monitoring")
 		{
 			monitoring.GET("", func(c *gin.Context) {
-				log.Printf("DEBUG: /monitoring route called - URL: %s, Method: %s", c.Request.URL.Path, c.Request.Method)
 				monitoringHandler.Dashboard(c)
 			})
 			monitoring.GET("/health", monitoringHandler.GetApplicationHealth)

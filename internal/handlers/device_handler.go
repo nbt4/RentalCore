@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
-	"log"
 	"time"
 	"sync"
 
@@ -55,14 +54,11 @@ func NewDeviceHandler(deviceRepo *repository.DeviceRepository, barcodeService *s
 
 // Web interface handlers
 func (h *DeviceHandler) ListDevices(c *gin.Context) {
-	startTime := time.Now()
-	log.Printf("🚀 DeviceHandler.ListDevices() started")
 	
 	user, _ := GetCurrentUser(c)
 	
 	params := &models.FilterParams{}
 	if err := c.ShouldBindQuery(params); err != nil {
-		log.Printf("❌ Error binding query parameters: %v", err)
 		c.Redirect(http.StatusSeeOther, fmt.Sprintf("/error?code=400&message=Bad Request&details=%s", err.Error()))
 		return
 	}
@@ -85,7 +81,6 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 	params.Page = page
 
 	viewType := c.DefaultQuery("view", "list") // Default to list view
-	log.Printf("🐛 DEBUG: Device view requested: viewType='%s', URL: %s", viewType, c.Request.URL.String())
 
 	// Use cache for basic list view without search (but not for tree or categorized views)
 	var devices []models.DeviceWithJobInfo
@@ -101,24 +96,19 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 				devices = devices[:limit]
 			}
 			deviceCache.mutex.RUnlock()
-			log.Printf("⚡ Using cached devices (%d items)", len(devices))
 		} else {
 			deviceCache.mutex.RUnlock()
 			
 			// Fetch fresh data using ListWithCategories to ensure categories are loaded
-			dbStart := time.Now()
 			deviceList, err := h.deviceRepo.ListWithCategories(params)
-			dbTime := time.Since(dbStart)
-			log.Printf("⏱️  Database query took: %v", dbTime)
-			
+				
 			// Convert to DeviceWithJobInfo format with proper assignment checking
 			devices = make([]models.DeviceWithJobInfo, len(deviceList))
 			for i, device := range deviceList {
 				// Check if device is currently assigned to an active job
 				isAssigned, jobID, err := h.deviceRepo.IsDeviceCurrentlyAssigned(device.DeviceID)
 				if err != nil {
-					log.Printf("❌ Error checking device assignment for %s: %v", device.DeviceID, err)
-					isAssigned = false
+						isAssigned = false
 					jobID = nil
 				}
 				
@@ -130,8 +120,7 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 			}
 			
 			if err != nil {
-				log.Printf("❌ Database error: %v", err)
-				c.Redirect(http.StatusSeeOther, fmt.Sprintf("/error?code=500&message=Database Error&details=%s", err.Error()))
+					c.Redirect(http.StatusSeeOther, fmt.Sprintf("/error?code=500&message=Database Error&details=%s", err.Error()))
 				return
 			}
 			
@@ -140,14 +129,10 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 			deviceCache.data = devices
 			deviceCache.timestamp = time.Now()
 			deviceCache.mutex.Unlock()
-			log.Printf("💾 Cached %d devices", len(devices))
 		}
 	} else {
 		// For search or pagination, use ListWithCategories to ensure categories are loaded
-		dbStart := time.Now()
 		deviceList, err := h.deviceRepo.ListWithCategories(params)
-		dbTime := time.Since(dbStart)
-		log.Printf("⏱️  Database query took: %v", dbTime)
 		
 		// Convert to DeviceWithJobInfo format with proper assignment checking
 		devices = make([]models.DeviceWithJobInfo, len(deviceList))
@@ -155,7 +140,6 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 			// Check if device is currently assigned to an active job
 			isAssigned, jobID, err := h.deviceRepo.IsDeviceCurrentlyAssigned(device.DeviceID)
 			if err != nil {
-				log.Printf("❌ Error checking device assignment for %s: %v", device.DeviceID, err)
 				isAssigned = false
 				jobID = nil
 			}
@@ -168,7 +152,6 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 		}
 		
 		if err != nil {
-			log.Printf("❌ Database error: %v", err)
 			c.Redirect(http.StatusSeeOther, fmt.Sprintf("/error?code=500&message=Database Error&details=%s", err.Error()))
 			return
 		}
@@ -181,7 +164,6 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 		// Get total device count for pagination
 		totalDevices, err = h.deviceRepo.GetTotalCount()
 		if err != nil {
-			log.Printf("❌ Error getting total device count: %v", err)
 			totalDevices = 0
 		}
 		
@@ -190,14 +172,10 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 			totalPages = 1
 		}
 	}
-	templateStart := time.Now()
 	if viewType == "tree" {
-		log.Printf("🌲 TREE VIEW DETECTED! Building tree data...")
 		// For tree view, load tree data and render in the main template
 		treeData, err := h.buildTreeData()
 		if err != nil {
-			log.Printf("❌ CRITICAL ERROR building tree data: %v", err)
-			log.Printf("❌ Falling back to list view due to tree error")
 			// Fall back to list view instead of error page
 			SafeHTML(c, http.StatusOK, "devices_standalone.html", gin.H{
 				"title":         "Devices (Tree Error - Showing List)",
@@ -212,8 +190,6 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 		}
 		
 		if len(treeData) == 0 {
-			log.Printf("⚠️ WARNING: Tree data is empty! No categories found.")
-			log.Printf("⚠️ Falling back to list view - empty tree data")
 			SafeHTML(c, http.StatusOK, "devices_standalone.html", gin.H{
 				"title":         "Devices (Empty Tree - Showing List)",
 				"devices":       devices,
@@ -226,7 +202,6 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 			return
 		}
 		
-		log.Printf("✅ Successfully built tree with %d categories", len(treeData))
 		SafeHTML(c, http.StatusOK, "devices_standalone.html", gin.H{
 			"title":       "Device Tree View",
 			"params":      params,
@@ -236,7 +211,6 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 			"treeData":    treeData,
 		})
 	} else {
-		log.Printf("📋 LIST VIEW: Rendering list view template")
 		// Safe template rendering with error handling
 		SafeHTML(c, http.StatusOK, "devices_standalone.html", gin.H{
 			"title":         "Devices",
@@ -252,10 +226,6 @@ func (h *DeviceHandler) ListDevices(c *gin.Context) {
 			"totalDevices":  totalDevices,
 		})
 	}
-	templateTime := time.Since(templateStart)
-	totalTime := time.Since(startTime)
-	log.Printf("⏱️  Template rendering took: %v", templateTime)
-	log.Printf("🏁 DeviceHandler.ListDevices() completed in %v", totalTime)
 }
 
 func (h *DeviceHandler) NewDeviceForm(c *gin.Context) {
@@ -276,7 +246,6 @@ func (h *DeviceHandler) NewDeviceForm(c *gin.Context) {
 }
 
 func (h *DeviceHandler) CreateDevice(c *gin.Context) {
-	log.Printf("🔥 CREATE DEVICE HANDLER CALLED")
 	
 	// Get form values
 	serialNumber := c.PostForm("serialnumber")
@@ -284,7 +253,6 @@ func (h *DeviceHandler) CreateDevice(c *gin.Context) {
 	notes := c.PostForm("notes")
 	quantityStr := c.PostForm("quantity")
 	
-	log.Printf("📝 Form values: serialNumber='%s', status='%s', notes='%s', quantity='%s'", serialNumber, status, notes, quantityStr)
 	
 	if status == "" {
 		status = "free"
@@ -303,12 +271,10 @@ func (h *DeviceHandler) CreateDevice(c *gin.Context) {
 		if pid, err := strconv.ParseUint(productIDStr, 10, 32); err == nil {
 			prodID := uint(pid)
 			productID = &prodID
-			log.Printf("📝 Product ID: %d", prodID)
 		}
 	}
 	
 	if productID == nil {
-		log.Printf("❌ No product ID provided")
 		user, _ := GetCurrentUser(c)
 		products, _ := h.productRepo.List(&models.FilterParams{})
 		c.HTML(http.StatusBadRequest, "device_form.html", gin.H{
@@ -321,7 +287,6 @@ func (h *DeviceHandler) CreateDevice(c *gin.Context) {
 		return
 	}
 	
-	log.Printf("📊 Creating %d device(s)", quantity)
 	
 	// Create multiple devices
 	createdDevices := make([]models.Device, 0, quantity)
@@ -361,16 +326,13 @@ func (h *DeviceHandler) CreateDevice(c *gin.Context) {
 			}
 		}
 
-		log.Printf("💾 Creating device %d/%d: %+v", i+1, quantity, device)
 		
 		if err := h.deviceRepo.Create(&device); err != nil {
-			log.Printf("❌ Error creating device %d/%d: %v", i+1, quantity, err)
 			lastError = err
 			break
 		}
 		
 		createdDevices = append(createdDevices, device)
-		log.Printf("✅ Device %d/%d created successfully with ID: %s", i+1, quantity, device.DeviceID)
 	}
 	
 	// Handle errors
@@ -391,7 +353,6 @@ func (h *DeviceHandler) CreateDevice(c *gin.Context) {
 		return
 	}
 
-	log.Printf("✅ All %d device(s) created successfully", len(createdDevices))
 	c.Redirect(http.StatusFound, "/devices")
 }
 
@@ -699,7 +660,6 @@ func (h *DeviceHandler) GetDeviceStatsAPI(c *gin.Context) {
 	// Get device statistics
 	stats, err := h.deviceRepo.GetDeviceStats(deviceID)
 	if err != nil {
-		log.Printf("Error getting device stats: %v", err)
 		// Return basic device info even if stats fail
 		c.JSON(http.StatusOK, gin.H{
 			"device": device,
@@ -796,14 +756,11 @@ func (h *DeviceHandler) buildTreeData() ([]TreeCategory, error) {
 	// Check cache first
 	treeCache.mutex.RLock()
 	if time.Since(treeCache.timestamp) < 2*time.Minute && len(treeCache.data) > 0 {
-		log.Printf("🎯 Returning cached tree data (%d categories)", len(treeCache.data))
 		defer treeCache.mutex.RUnlock()
 		return treeCache.data, nil
 	}
 	treeCache.mutex.RUnlock()
 	
-	log.Printf("🚀 Building optimized hierarchical tree data with single query...")
-	startTime := time.Now()
 	
 	// Get all data in ONE optimized query with preloading
 	treeCategories, err := h.buildOptimizedTreeData()
@@ -817,8 +774,6 @@ func (h *DeviceHandler) buildTreeData() ([]TreeCategory, error) {
 	treeCache.timestamp = time.Now()
 	treeCache.mutex.Unlock()
 	
-	elapsed := time.Since(startTime)
-	log.Printf("✅ Built hierarchical tree with %d categories in %v (cached for 2 minutes)", len(treeCategories), elapsed)
 	
 	return treeCategories, nil
 }
@@ -828,7 +783,6 @@ func (h *DeviceHandler) buildOptimizedTreeData() ([]TreeCategory, error) {
 	// Single query to get all devices with their complete hierarchy
 	var devices []models.Device
 	
-	log.Printf("🔍 Starting database query for tree data...")
 	
 	err := h.productRepo.GetDB().Model(&models.Device{}).
 		Preload("Product").
@@ -843,34 +797,12 @@ func (h *DeviceHandler) buildOptimizedTreeData() ([]TreeCategory, error) {
 		Find(&devices).Error
 	
 	if err != nil {
-		log.Printf("❌ Database query failed: %v", err)
 		return nil, fmt.Errorf("failed to fetch devices with hierarchy: %v", err)
 	}
 	
-	log.Printf("🔍 Fetched %d devices from database", len(devices))
 	
 	if len(devices) == 0 {
-		log.Printf("⚠️ WARNING: No devices found in database!")
 		return []TreeCategory{}, nil
-	}
-	
-	// Log sample of first few devices for debugging
-	for i, device := range devices {
-		if i >= 3 { break } // Only log first 3
-		hasSubcategory := device.Product != nil && device.Product.Subcategory != nil
-		hasSubbiercategory := device.Product != nil && device.Product.Subbiercategory != nil
-		log.Printf("🔍 Device %d: ID=%v, Product=%v, Category=%v, Subcategory=%v, Subbiercategory=%v", 
-			i+1, device.DeviceID, device.Product != nil, 
-			device.Product != nil && device.Product.Category != nil,
-			hasSubcategory, hasSubbiercategory)
-		
-		if device.Product != nil {
-			log.Printf("    Product ID: %d, CategoryID: %v, SubcategoryID: %v, SubbiercategoryID: %v",
-				device.Product.ProductID, 
-				device.Product.Category != nil,
-				device.Product.Subcategory != nil,
-				device.Product.Subbiercategory != nil)
-		}
 	}
 	
 	// Build the tree structure from the single result set
@@ -880,14 +812,12 @@ func (h *DeviceHandler) buildOptimizedTreeData() ([]TreeCategory, error) {
 // buildTreeFromDevices constructs the hierarchical tree from a flat list of devices
 // COMPLETELY REWRITTEN with proper nested structure building
 func (h *DeviceHandler) buildTreeFromDevices(devices []models.Device) ([]TreeCategory, error) {
-	log.Printf("🔍 Processing %d devices to build tree hierarchy", len(devices))
 	
 	// Group devices by their hierarchy path
 	categoryGroups := make(map[uint]map[string]map[string][]models.Device)
 	
 	for _, device := range devices {
 		if device.Product == nil || device.Product.Category == nil {
-			log.Printf("⚠️ Skipping device %d - missing product or category", device.DeviceID)
 			continue
 		}
 		
@@ -945,7 +875,6 @@ func (h *DeviceHandler) buildTreeFromDevices(devices []models.Device) ([]TreeCat
 			Subcategories: []TreeSubcategory{},
 		}
 		
-		log.Printf("🏷️ Building category: %s (ID: %d)", categoryName, categoryID)
 		
 		for subcategoryID, subbiercategoryGroups := range subcategoryGroups {
 			if subcategoryID == "DIRECT" {
@@ -955,7 +884,6 @@ func (h *DeviceHandler) buildTreeFromDevices(devices []models.Device) ([]TreeCat
 						treeCategory.DirectDevices = append(treeCategory.DirectDevices, h.convertToTreeDevice(device))
 						treeCategory.DeviceCount++
 					}
-					log.Printf("  📦 Added %d direct devices to category %s", len(deviceList), categoryName)
 				}
 			} else {
 				// Build subcategory
@@ -978,7 +906,6 @@ func (h *DeviceHandler) buildTreeFromDevices(devices []models.Device) ([]TreeCat
 					Subbiercategories: []TreeSubbiercategory{},
 				}
 				
-				log.Printf("  🏷️ Building subcategory: %s in %s", subcategoryName, categoryName)
 				
 				for subbiercategoryID, deviceList := range subbiercategoryGroups {
 					if subbiercategoryID == "DIRECT" {
@@ -988,7 +915,6 @@ func (h *DeviceHandler) buildTreeFromDevices(devices []models.Device) ([]TreeCat
 							treeSubcategory.DeviceCount++
 							totalDevicesInSubcategory++
 						}
-						log.Printf("    📦 Added %d direct devices to subcategory %s", len(deviceList), subcategoryName)
 					} else {
 						// Build subbiercategory
 						var subbiercategoryName string
@@ -1012,7 +938,6 @@ func (h *DeviceHandler) buildTreeFromDevices(devices []models.Device) ([]TreeCat
 						treeSubcategory.DeviceCount += len(treeDevices)
 						totalDevicesInSubcategory += len(treeDevices)
 						
-						log.Printf("    🏷️ Added subbiercategory %s with %d devices", subbiercategoryName, len(treeDevices))
 					}
 				}
 				
@@ -1032,7 +957,6 @@ func (h *DeviceHandler) buildTreeFromDevices(devices []models.Device) ([]TreeCat
 		})
 		
 		treeCategories = append(treeCategories, treeCategory)
-		log.Printf("✅ Category %s completed with %d total devices", categoryName, treeCategory.DeviceCount)
 	}
 	
 	// Sort categories by name
@@ -1040,29 +964,7 @@ func (h *DeviceHandler) buildTreeFromDevices(devices []models.Device) ([]TreeCat
 		return treeCategories[i].Name < treeCategories[j].Name
 	})
 	
-	log.Printf("✅ Built tree with %d categories", len(treeCategories))
 	
-	// Debug output for verification
-	for i, category := range treeCategories {
-		if i < 3 { // Show first 3 categories for debugging
-			log.Printf("🔍 Category '%s': %d subcategories, %d direct devices", 
-				category.Name, len(category.Subcategories), len(category.DirectDevices))
-			
-			for j, sub := range category.Subcategories {
-				if j < 3 { // Show first 3 subcategories
-					log.Printf("  🔍 Subcategory '%s': %d subbiercategories, %d direct devices", 
-						sub.Name, len(sub.Subbiercategories), len(sub.DirectDevices))
-					
-					for k, subbier := range sub.Subbiercategories {
-						if k < 3 { // Show first 3 subbiercategories
-							log.Printf("    🔍 Subbiercategory '%s': %d devices", 
-								subbier.Name, len(subbier.Devices))
-						}
-					}
-				}
-			}
-		}
-	}
 	
 	return treeCategories, nil
 }
@@ -1091,6 +993,5 @@ func (h *DeviceHandler) convertToTreeDevice(device models.Device) TreeDevice {
 func (h *DeviceHandler) getDirectCategoryDevices(categoryID uint) ([]models.DeviceWithJobInfo, error) {
 	// For now, return empty slice - we'll focus on the hierarchical structure first
 	// Direct category devices are rare in most setups
-	log.Printf("🔧 Getting direct devices for category %d (temporarily returning empty)", categoryID)
 	return []models.DeviceWithJobInfo{}, nil
 }
