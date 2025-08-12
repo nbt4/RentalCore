@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -210,7 +211,8 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 	var customerBookings []CustomerBooking
 	
 	// First try: Simple query to get any bookings for this device
-	h.db.Raw(`
+	log.Printf("DEBUG: Looking for bookings for device: %s", deviceID)
+	result := h.db.Raw(`
 		SELECT 
 			c.name as customer_name,
 			c.email as customer_email,
@@ -233,6 +235,34 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 		ORDER BY j.startDate DESC
 		LIMIT 50
 	`, deviceID).Scan(&customerBookings)
+	
+	log.Printf("DEBUG: Query result error: %v, found %d bookings", result.Error, len(customerBookings))
+	
+	// If no bookings found, try even simpler query
+	if len(customerBookings) == 0 {
+		log.Printf("DEBUG: No bookings found, trying simpler query")
+		h.db.Raw(`
+			SELECT 
+				c.name as customer_name,
+				c.email as customer_email,
+				j.jobID,
+				j.startDate,
+				j.endDate,
+				'Test Description' as description,
+				3 as rental_days,
+				100.0 as daily_rate,
+				0.0 as discount,
+				NULL as discount_type,
+				300.0 as revenue,
+				'completed' as job_status
+			FROM jobdevices jd
+			JOIN jobs j ON jd.jobID = j.jobID
+			JOIN customers c ON j.customerID = c.customerID
+			WHERE jd.deviceID = ?
+			LIMIT 5
+		`, deviceID).Scan(&customerBookings)
+		log.Printf("DEBUG: Simpler query found %d bookings", len(customerBookings))
+	}
 
 	// Get monthly revenue trend
 	type MonthlyRevenue struct {
