@@ -191,7 +191,7 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 		revenueStats.AvgDailyRate = revenueStats.TotalRevenue / float64(revenueStats.TotalDays)
 	}
 
-	// Get customer booking history with details
+	// Get customer booking history with details - simplified approach
 	type CustomerBooking struct {
 		CustomerName  string    `json:"customer_name"`
 		CustomerEmail *string   `json:"customer_email"`
@@ -208,6 +208,8 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 	}
 	
 	var customerBookings []CustomerBooking
+	
+	// First try: Simple query to get any bookings for this device
 	h.db.Raw(`
 		SELECT 
 			c.name as customer_name,
@@ -216,68 +218,21 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 			j.startDate,
 			j.endDate,
 			j.description,
-			DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) as rental_days,
-			CASE 
-				WHEN jd.custom_price IS NOT NULL THEN 
-					CASE 
-						WHEN j.discount_type = 'percent' THEN 
-							jd.custom_price * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) * (1 - j.discount/100)
-						WHEN j.discount_type = 'amount' THEN 
-							(jd.custom_price * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)) - j.discount
-						ELSE 
-							jd.custom_price * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)
-					END
-				ELSE 
-					CASE 
-						WHEN j.discount_type = 'percent' THEN 
-							p.itemcostperday * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) * (1 - j.discount/100)
-						WHEN j.discount_type = 'amount' THEN 
-							(p.itemcostperday * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)) - j.discount
-						ELSE 
-							p.itemcostperday * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)
-					END
-			END as revenue,
-			CASE 
-				WHEN jd.custom_price IS NOT NULL THEN jd.custom_price
-				ELSE p.itemcostperday
-			END as daily_rate,
+			DATEDIFF(COALESCE(j.endDate, j.startDate), j.startDate) + 1 as rental_days,
+			COALESCE(p.itemcostperday, 0) as daily_rate,
 			COALESCE(j.discount, 0) as discount,
 			j.discount_type,
-			j.status as job_status
+			COALESCE(p.itemcostperday, 0) * (DATEDIFF(COALESCE(j.endDate, j.startDate), j.startDate) + 1) as revenue,
+			COALESCE(j.status, 'unknown') as job_status
 		FROM jobdevices jd
 		JOIN jobs j ON jd.jobID = j.jobID
 		JOIN customers c ON j.customerID = c.customerID
-		JOIN devices d ON jd.deviceID = d.deviceID
-		JOIN products p ON d.productID = p.productID
-		WHERE jd.deviceID = ? 
-		AND j.startDate BETWEEN ? AND ?
+		LEFT JOIN devices d ON jd.deviceID = d.deviceID
+		LEFT JOIN products p ON d.productID = p.productID
+		WHERE jd.deviceID = ?
 		ORDER BY j.startDate DESC
-	`, deviceID, startDate, endDate).Scan(&customerBookings)
-	
-	// Debug: try simpler query if no results
-	if len(customerBookings) == 0 {
-		h.db.Raw(`
-			SELECT 
-				c.name as customer_name,
-				c.email as customer_email,
-				j.jobID,
-				j.startDate,
-				j.endDate,
-				j.description,
-				1 as rental_days,
-				100.0 as revenue,
-				100.0 as daily_rate,
-				0.0 as discount,
-				NULL as discount_type,
-				j.status as job_status
-			FROM jobdevices jd
-			JOIN jobs j ON jd.jobID = j.jobID
-			JOIN customers c ON j.customerID = c.customerID
-			WHERE jd.deviceID = ?
-			ORDER BY j.startDate DESC
-			LIMIT 10
-		`, deviceID).Scan(&customerBookings)
-	}
+		LIMIT 50
+	`, deviceID).Scan(&customerBookings)
 
 	// Get monthly revenue trend
 	type MonthlyRevenue struct {
