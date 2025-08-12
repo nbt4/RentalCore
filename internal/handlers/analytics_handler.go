@@ -228,11 +228,36 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 			j.startDate,
 			j.endDate,
 			j.description,
-			DATEDIFF(COALESCE(j.endDate, j.startDate), j.startDate) + 1 as rental_days,
-			COALESCE(p.itemcostperday, 0) as daily_rate,
+			CASE 
+				WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1
+				ELSE DATEDIFF(NOW(), j.startDate) + 1
+			END as rental_days,
+			CASE 
+				WHEN jd.custom_price IS NOT NULL THEN jd.custom_price
+				ELSE COALESCE(p.itemcostperday, 0)
+			END as daily_rate,
 			COALESCE(j.discount, 0) as discount,
 			j.discount_type,
-			COALESCE(p.itemcostperday, 0) * (DATEDIFF(COALESCE(j.endDate, j.startDate), j.startDate) + 1) as revenue,
+			CASE 
+				WHEN jd.custom_price IS NOT NULL THEN 
+					CASE 
+						WHEN j.discount_type = 'percent' AND j.discount > 0 THEN 
+							jd.custom_price * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END) * (1 - j.discount/100)
+						WHEN j.discount_type = 'amount' AND j.discount > 0 THEN 
+							(jd.custom_price * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)) - j.discount
+						ELSE 
+							jd.custom_price * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)
+					END
+				ELSE 
+					CASE 
+						WHEN j.discount_type = 'percent' AND j.discount > 0 THEN 
+							COALESCE(p.itemcostperday, 0) * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END) * (1 - j.discount/100)
+						WHEN j.discount_type = 'amount' AND j.discount > 0 THEN 
+							(COALESCE(p.itemcostperday, 0) * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)) - j.discount
+						ELSE 
+							COALESCE(p.itemcostperday, 0) * (CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)
+					END
+			END as revenue,
 			COALESCE(j.status, 'unknown') as job_status
 		FROM jobdevices jd
 		JOIN jobs j ON jd.jobID = j.jobID
@@ -245,6 +270,13 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 	`, deviceID).Scan(&customerBookings)
 	
 	log.Printf("DEBUG: Query result error: %v, found %d bookings", result.Error, len(customerBookings))
+	
+	// Debug: print first booking details if any found
+	if len(customerBookings) > 0 {
+		first := customerBookings[0]
+		log.Printf("DEBUG: First booking - Customer: %s, JobID: %s, Start: %v, End: %v, Days: %d, Rate: %.2f, Revenue: %.2f", 
+			first.CustomerName, first.JobID, first.StartDate, first.EndDate, first.RentalDays, first.DailyRate, first.Revenue)
+	}
 	
 	// If no bookings found, try even simpler query
 	if len(customerBookings) == 0 {
