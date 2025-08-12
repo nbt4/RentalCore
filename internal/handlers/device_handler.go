@@ -857,9 +857,20 @@ func (h *DeviceHandler) buildOptimizedTreeData() ([]TreeCategory, error) {
 	// Log sample of first few devices for debugging
 	for i, device := range devices {
 		if i >= 3 { break } // Only log first 3
-		log.Printf("🔍 Device %d: ID=%d, Product=%v, Category=%v", 
+		hasSubcategory := device.Product != nil && device.Product.Subcategory != nil
+		hasSubbiercategory := device.Product != nil && device.Product.Subbiercategory != nil
+		log.Printf("🔍 Device %d: ID=%v, Product=%v, Category=%v, Subcategory=%v, Subbiercategory=%v", 
 			i+1, device.DeviceID, device.Product != nil, 
-			device.Product != nil && device.Product.Category != nil)
+			device.Product != nil && device.Product.Category != nil,
+			hasSubcategory, hasSubbiercategory)
+		
+		if device.Product != nil {
+			log.Printf("    Product ID: %d, CategoryID: %v, SubcategoryID: %v, SubbiercategoryID: %v",
+				device.Product.ProductID, 
+				device.Product.Category != nil,
+				device.Product.Subcategory != nil,
+				device.Product.Subbiercategory != nil)
+		}
 	}
 	
 	// Build the tree structure from the single result set
