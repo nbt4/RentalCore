@@ -127,7 +127,7 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 		Status       string  `json:"status"`
 	}
 	
-	h.db.Raw(`
+	deviceResult := h.db.Raw(`
 		SELECT 
 			d.deviceID,
 			p.name as product_name,
@@ -139,6 +139,10 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 		LEFT JOIN categories c ON p.categoryID = c.categoryID
 		WHERE d.deviceID = ?
 	`, deviceID).Scan(&deviceInfo)
+	
+	log.Printf("DEBUG: Device info query error: %v", deviceResult.Error)
+	log.Printf("DEBUG: Device info - ID: %s, Name: %s, Serial: %v, Category: %s, Status: %s", 
+		deviceInfo.DeviceID, deviceInfo.ProductName, deviceInfo.SerialNumber, deviceInfo.CategoryName, deviceInfo.Status)
 
 	// Get total revenue and booking statistics
 	var revenueStats struct {
@@ -270,12 +274,14 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 	`, deviceID).Scan(&customerBookings)
 	
 	log.Printf("DEBUG: Query result error: %v, found %d bookings", result.Error, len(customerBookings))
+	log.Printf("DEBUG: Device ID requested: %s", deviceID)
 	
 	// Debug: print first booking details if any found
 	if len(customerBookings) > 0 {
 		first := customerBookings[0]
-		log.Printf("DEBUG: First booking - Customer: %s, JobID: %s, Start: %v, End: %v, Days: %d, Rate: %.2f, Revenue: %.2f", 
-			first.CustomerName, first.JobID, first.StartDate, first.EndDate, first.RentalDays, first.DailyRate, first.Revenue)
+		log.Printf("DEBUG: First booking - Customer: %s, JobID: %s, Start: %v, End: %v, Days: %d, Rate: %.2f, Discount: %.2f (%s), Revenue: %.2f, Status: %s", 
+			first.CustomerName, first.JobID, first.StartDate, first.EndDate, first.RentalDays, first.DailyRate, first.Discount, 
+			*first.DiscountType, first.Revenue, first.JobStatus)
 	}
 	
 	// If no bookings found, try even simpler query
