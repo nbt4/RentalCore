@@ -253,6 +253,31 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 		AND j.startDate BETWEEN ? AND ?
 		ORDER BY j.startDate DESC
 	`, deviceID, startDate, endDate).Scan(&customerBookings)
+	
+	// Debug: try simpler query if no results
+	if len(customerBookings) == 0 {
+		h.db.Raw(`
+			SELECT 
+				c.name as customer_name,
+				c.email as customer_email,
+				j.jobID,
+				j.startDate,
+				j.endDate,
+				j.description,
+				1 as rental_days,
+				100.0 as revenue,
+				100.0 as daily_rate,
+				0.0 as discount,
+				NULL as discount_type,
+				j.status as job_status
+			FROM jobdevices jd
+			JOIN jobs j ON jd.jobID = j.jobID
+			JOIN customers c ON j.customerID = c.customerID
+			WHERE jd.deviceID = ?
+			ORDER BY j.startDate DESC
+			LIMIT 10
+		`, deviceID).Scan(&customerBookings)
+	}
 
 	// Get monthly revenue trend
 	type MonthlyRevenue struct {

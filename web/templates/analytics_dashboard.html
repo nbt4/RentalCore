@@ -1409,12 +1409,36 @@ document.addEventListener('DOMContentLoaded', function() {
             dataDiv.style.display = 'block';
 
             // Update device info header
-            document.getElementById('deviceName').textContent = `${data.deviceInfo.productName} Analytics`;
-            document.getElementById('deviceProductName').textContent = data.deviceInfo.productName;
+            document.getElementById('deviceName').textContent = `${data.deviceInfo.productName || 'Device'} Analytics`;
+            document.getElementById('deviceProductName').textContent = data.deviceInfo.productName || 'Unknown Product';
             document.getElementById('deviceIdDisplay').textContent = `ID: ${data.deviceInfo.deviceId || currentDeviceId}`;
-            document.getElementById('deviceSerial').textContent = data.deviceInfo.serialNumber ? `SN: ${data.deviceInfo.serialNumber}` : '';
-            document.getElementById('deviceCategory').textContent = data.deviceInfo.categoryName;
-            document.getElementById('deviceStatus').textContent = data.deviceInfo.status;
+            
+            // Only show serial number if it exists
+            const serialSpan = document.getElementById('deviceSerial');
+            if (data.deviceInfo.serialNumber) {
+                serialSpan.textContent = `SN: ${data.deviceInfo.serialNumber}`;
+                serialSpan.style.display = 'inline-block';
+            } else {
+                serialSpan.style.display = 'none';
+            }
+            
+            // Only show category if it exists
+            const categorySpan = document.getElementById('deviceCategory');
+            if (data.deviceInfo.categoryName) {
+                categorySpan.textContent = data.deviceInfo.categoryName;
+                categorySpan.style.display = 'inline-block';
+            } else {
+                categorySpan.style.display = 'none';
+            }
+            
+            // Only show status if it exists
+            const statusSpan = document.getElementById('deviceStatus');
+            if (data.deviceInfo.status) {
+                statusSpan.textContent = data.deviceInfo.status;
+                statusSpan.style.display = 'inline-block';
+            } else {
+                statusSpan.style.display = 'none';
+            }
 
             // Update metrics
             document.getElementById('deviceTotalRevenue').textContent = `€${Math.round(data.revenueStats.totalRevenue)}`;
@@ -1456,16 +1480,28 @@ document.addEventListener('DOMContentLoaded', function() {
                     datasets: [{
                         label: 'Revenue (€)',
                         data: revenues,
-                        borderColor: 'var(--accent-electric)',
-                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderColor: '#3B82F6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#3B82F6',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
                         fill: true,
                         tension: 0.4,
                         yAxisID: 'y'
                     }, {
                         label: 'Bookings',
                         data: bookings,
-                        borderColor: 'var(--accent-success)',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderColor: '#10B981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.15)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#10B981',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
                         fill: false,
                         tension: 0.4,
                         yAxisID: 'y1'
@@ -1474,13 +1510,46 @@ document.addEventListener('DOMContentLoaded', function() {
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
                     plugins: {
                         title: {
                             display: false
                         },
                         legend: {
+                            position: 'top',
                             labels: {
-                                color: 'var(--text-primary)'
+                                color: 'var(--text-primary)',
+                                font: { size: 12, weight: '500' },
+                                padding: 20,
+                                usePointStyle: true,
+                                pointStyle: 'circle'
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'var(--surface-1)',
+                            titleColor: 'var(--text-primary)',
+                            bodyColor: 'var(--text-secondary)',
+                            borderColor: 'var(--surface-3)',
+                            borderWidth: 1,
+                            cornerRadius: 8,
+                            padding: 12,
+                            displayColors: true,
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.datasetIndex === 0) {
+                                        label += '€' + Math.round(context.parsed.y);
+                                    } else {
+                                        label += context.parsed.y + ' bookings';
+                                    }
+                                    return label;
+                                }
                             }
                         }
                     },
@@ -1508,7 +1577,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             title: {
                                 display: true,
                                 text: 'Revenue (€)',
-                                color: 'var(--accent-electric)',
+                                color: '#3B82F6',
                                 font: { size: 12, weight: 'bold' }
                             },
                             ticks: { 
@@ -1530,7 +1599,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             title: {
                                 display: true,
                                 text: 'Bookings',
-                                color: 'var(--accent-success)',
+                                color: '#10B981',
                                 font: { size: 12, weight: 'bold' }
                             },
                             ticks: { 
