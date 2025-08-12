@@ -323,6 +323,7 @@
                             <th>Product</th>
                             <th>Rentals</th>
                             <th>Revenue</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -332,10 +333,15 @@
                             <td>{{.productName}}</td>
                             <td><span class="status-badge status-info">{{.rentalCount}}</span></td>
                             <td><strong>€{{printf "%.0f" .totalRevenue}}</strong></td>
+                            <td>
+                                <button class="rc-btn rc-btn-sm rc-btn-accent" onclick="openDeviceAnalytics('{{.deviceID}}')" title="Detailed Analytics">
+                                    <i class="bi bi-bar-chart"></i>
+                                </button>
+                            </td>
                         </tr>
                         {{else}}
                         <tr>
-                            <td colspan="4" style="text-align: center; color: var(--text-secondary);">No data available</td>
+                            <td colspan="5" style="text-align: center; color: var(--text-secondary);">No data available</td>
                         </tr>
                         {{end}}
                     </tbody>
@@ -1192,5 +1198,497 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 300000); // 5 minutes
 });
     </script>
+
+    <!-- Device Analytics Popup Modal -->
+    <div id="deviceAnalyticsModal" class="rc-modal" style="display: none;">
+        <div class="rc-modal-content rc-modal-xl">
+            <div class="rc-modal-header">
+                <h3 id="deviceAnalyticsTitle">
+                    <i class="bi bi-bar-chart-line"></i>
+                    <span id="deviceName">Device Analytics</span>
+                </h3>
+                <button class="rc-btn rc-btn-icon" onclick="closeDeviceAnalytics()">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            
+            <div class="rc-modal-body" id="deviceAnalyticsContent">
+                <div class="rc-loading" id="deviceAnalyticsLoading">
+                    <div class="rc-spinner"></div>
+                    <span>Loading device analytics...</span>
+                </div>
+                
+                <div id="deviceAnalyticsData" style="display: none;">
+                    <!-- Device Info Header -->
+                    <div class="device-analytics-header">
+                        <div class="device-info-card">
+                            <div class="device-basic-info">
+                                <h4 id="deviceProductName"></h4>
+                                <div class="device-details">
+                                    <span class="device-id" id="deviceIdDisplay"></span>
+                                    <span class="device-serial" id="deviceSerial"></span>
+                                    <span class="device-category" id="deviceCategory"></span>
+                                    <span class="device-status" id="deviceStatus"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Analytics Period Selector -->
+                    <div class="period-selector" style="margin-bottom: var(--space-lg);">
+                        <div class="rc-form-group">
+                            <label>Analytics Period:</label>
+                            <select id="deviceAnalyticsPeriod" class="rc-form-control" onchange="updateDeviceAnalyticsPeriod()">
+                                <option value="all">All Time</option>
+                                <option value="1year">Last Year</option>
+                                <option value="90days">Last 90 Days</option>
+                                <option value="30days">Last 30 Days</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Key Metrics Cards -->
+                    <div class="device-metrics-grid">
+                        <div class="rc-metric-card">
+                            <div class="metric-icon">
+                                <i class="bi bi-currency-euro"></i>
+                            </div>
+                            <div class="metric-value" id="deviceTotalRevenue">€0</div>
+                            <div class="metric-label">Total Revenue</div>
+                            <div class="metric-subtitle" id="deviceFirstLastBooking"></div>
+                        </div>
+                        
+                        <div class="rc-metric-card">
+                            <div class="metric-icon">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <div class="metric-value" id="deviceTotalBookings">0</div>
+                            <div class="metric-label">Total Bookings</div>
+                            <div class="metric-subtitle" id="deviceTotalDays"></div>
+                        </div>
+                        
+                        <div class="rc-metric-card">
+                            <div class="metric-icon">
+                                <i class="bi bi-graph-up"></i>
+                            </div>
+                            <div class="metric-value" id="deviceAvgDailyRate">€0</div>
+                            <div class="metric-label">Avg. Daily Rate</div>
+                            <div class="metric-subtitle">Per rental day</div>
+                        </div>
+                        
+                        <div class="rc-metric-card">
+                            <div class="metric-icon">
+                                <i class="bi bi-speedometer2"></i>
+                            </div>
+                            <div class="metric-value" id="deviceUtilizationRate">0%</div>
+                            <div class="metric-label">Utilization Rate</div>
+                            <div class="metric-subtitle" id="deviceUtilizationDetails"></div>
+                        </div>
+                    </div>
+
+                    <!-- Revenue Trend Chart -->
+                    <div class="device-chart-section">
+                        <h5><i class="bi bi-graph-up"></i> Monthly Revenue Trend</h5>
+                        <div class="chart-container">
+                            <canvas id="deviceRevenueChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Customer Booking History -->
+                    <div class="device-bookings-section">
+                        <div class="booking-header">
+                            <h5><i class="bi bi-people"></i> Customer Booking History</h5>
+                            <button class="rc-btn rc-btn-sm rc-btn-secondary" onclick="toggleBookingHistory()">
+                                <i class="bi bi-chevron-down" id="bookingToggleIcon"></i>
+                                <span id="bookingToggleText">Show Details</span>
+                            </button>
+                        </div>
+                        
+                        <div id="customerBookingsTable" class="booking-table-container" style="display: none;">
+                            <div class="analytics-table">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Customer</th>
+                                            <th>Job ID</th>
+                                            <th>Start Date</th>
+                                            <th>End Date</th>
+                                            <th>Days</th>
+                                            <th>Daily Rate</th>
+                                            <th>Discount</th>
+                                            <th>Revenue</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="customerBookingsBody">
+                                        <!-- Dynamic content -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Device Analytics Functions
+        let currentDeviceId = null;
+        let currentDeviceData = null;
+        let deviceRevenueChart = null;
+
+        function openDeviceAnalytics(deviceId) {
+            currentDeviceId = deviceId;
+            const modal = document.getElementById('deviceAnalyticsModal');
+            const loading = document.getElementById('deviceAnalyticsLoading');
+            const data = document.getElementById('deviceAnalyticsData');
+            
+            // Show modal and loading state
+            modal.style.display = 'flex';
+            loading.style.display = 'flex';
+            data.style.display = 'none';
+            
+            // Reset period selector
+            document.getElementById('deviceAnalyticsPeriod').value = 'all';
+            
+            // Load analytics data
+            loadDeviceAnalytics(deviceId, 'all');
+        }
+
+        function closeDeviceAnalytics() {
+            const modal = document.getElementById('deviceAnalyticsModal');
+            modal.style.display = 'none';
+            
+            // Destroy chart if exists
+            if (deviceRevenueChart) {
+                deviceRevenueChart.destroy();
+                deviceRevenueChart = null;
+            }
+        }
+
+        function loadDeviceAnalytics(deviceId, period) {
+            fetch(`/analytics/devices/${deviceId}?period=${period}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to load device analytics');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    currentDeviceData = data;
+                    displayDeviceAnalytics(data);
+                })
+                .catch(error => {
+                    console.error('Error loading device analytics:', error);
+                    document.getElementById('deviceAnalyticsContent').innerHTML = `
+                        <div class="rc-alert rc-alert-error">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            Failed to load device analytics: ${error.message}
+                        </div>
+                    `;
+                });
+        }
+
+        function displayDeviceAnalytics(data) {
+            const loading = document.getElementById('deviceAnalyticsLoading');
+            const dataDiv = document.getElementById('deviceAnalyticsData');
+            
+            loading.style.display = 'none';
+            dataDiv.style.display = 'block';
+
+            // Update device info header
+            document.getElementById('deviceName').textContent = `${data.deviceInfo.productName} Analytics`;
+            document.getElementById('deviceProductName').textContent = data.deviceInfo.productName;
+            document.getElementById('deviceIdDisplay').textContent = `ID: ${data.deviceInfo.deviceId}`;
+            document.getElementById('deviceSerial').textContent = data.deviceInfo.serialNumber ? `SN: ${data.deviceInfo.serialNumber}` : '';
+            document.getElementById('deviceCategory').textContent = data.deviceInfo.categoryName;
+            document.getElementById('deviceStatus').textContent = data.deviceInfo.status;
+
+            // Update metrics
+            document.getElementById('deviceTotalRevenue').textContent = `€${Math.round(data.revenueStats.totalRevenue)}`;
+            document.getElementById('deviceTotalBookings').textContent = data.revenueStats.totalBookings;
+            document.getElementById('deviceTotalDays').textContent = `${data.revenueStats.totalDays} rental days`;
+            document.getElementById('deviceAvgDailyRate').textContent = `€${Math.round(data.revenueStats.avgDailyRate)}`;
+            document.getElementById('deviceUtilizationRate').textContent = `${Math.round(data.utilizationStats.utilizationRate)}%`;
+            document.getElementById('deviceUtilizationDetails').textContent = `${data.utilizationStats.daysBooked} of ${data.utilizationStats.daysAvailable} days`;
+
+            // Update booking date range
+            const firstBooking = data.revenueStats.firstBooking ? new Date(data.revenueStats.firstBooking).toLocaleDateString() : 'N/A';
+            const lastBooking = data.revenueStats.lastBooking ? new Date(data.revenueStats.lastBooking).toLocaleDateString() : 'N/A';
+            document.getElementById('deviceFirstLastBooking').textContent = `${firstBooking} - ${lastBooking}`;
+
+            // Update revenue chart
+            updateDeviceRevenueChart(data.monthlyRevenue);
+
+            // Update customer bookings table
+            updateCustomerBookingsTable(data.customerBookings);
+        }
+
+        function updateDeviceRevenueChart(monthlyData) {
+            const ctx = document.getElementById('deviceRevenueChart').getContext('2d');
+            
+            // Destroy existing chart
+            if (deviceRevenueChart) {
+                deviceRevenueChart.destroy();
+            }
+
+            // Prepare data for chart
+            const labels = monthlyData.map(item => item.month).reverse();
+            const revenues = monthlyData.map(item => item.revenue).reverse();
+            const bookings = monthlyData.map(item => item.bookings).reverse();
+
+            deviceRevenueChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Revenue (€)',
+                        data: revenues,
+                        borderColor: 'var(--accent-electric)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y'
+                    }, {
+                        label: 'Bookings',
+                        data: bookings,
+                        borderColor: 'var(--accent-success)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: false,
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: false
+                        },
+                        legend: {
+                            labels: {
+                                color: 'var(--text-primary)'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: 'var(--text-secondary)' },
+                            grid: { color: 'var(--surface-3)' }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            ticks: { 
+                                color: 'var(--text-secondary)',
+                                callback: function(value) {
+                                    return '€' + Math.round(value);
+                                }
+                            },
+                            grid: { color: 'var(--surface-3)' }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            ticks: { color: 'var(--text-secondary)' },
+                            grid: { drawOnChartArea: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCustomerBookingsTable(bookings) {
+            const tbody = document.getElementById('customerBookingsBody');
+            tbody.innerHTML = '';
+
+            if (bookings && bookings.length > 0) {
+                bookings.forEach(booking => {
+                    const row = tbody.insertRow();
+                    
+                    // Format dates
+                    const startDate = new Date(booking.startDate).toLocaleDateString();
+                    const endDate = booking.endDate ? new Date(booking.endDate).toLocaleDateString() : 'Ongoing';
+                    
+                    // Format discount display
+                    let discountDisplay = '';
+                    if (booking.discount && booking.discount > 0) {
+                        if (booking.discount_type === 'percent') {
+                            discountDisplay = `${booking.discount}%`;
+                        } else {
+                            discountDisplay = `€${Math.round(booking.discount)}`;
+                        }
+                    } else {
+                        discountDisplay = '-';
+                    }
+
+                    row.innerHTML = `
+                        <td><strong>${booking.customer_name}</strong><br><small>${booking.customer_email || ''}</small></td>
+                        <td><a href="/jobs/${booking.jobID}" class="rc-link">${booking.jobID}</a></td>
+                        <td>${startDate}</td>
+                        <td>${endDate}</td>
+                        <td><span class="status-badge status-info">${booking.rental_days} days</span></td>
+                        <td>€${Math.round(booking.daily_rate)}</td>
+                        <td>${discountDisplay}</td>
+                        <td><strong>€${Math.round(booking.revenue)}</strong></td>
+                        <td><span class="status-badge status-${booking.job_status}">${booking.job_status}</span></td>
+                    `;
+                });
+            } else {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--text-secondary);">No bookings found for this period</td></tr>';
+            }
+        }
+
+        function updateDeviceAnalyticsPeriod() {
+            const period = document.getElementById('deviceAnalyticsPeriod').value;
+            const loading = document.getElementById('deviceAnalyticsLoading');
+            const data = document.getElementById('deviceAnalyticsData');
+            
+            loading.style.display = 'flex';
+            data.style.display = 'none';
+            
+            loadDeviceAnalytics(currentDeviceId, period);
+        }
+
+        function toggleBookingHistory() {
+            const table = document.getElementById('customerBookingsTable');
+            const icon = document.getElementById('bookingToggleIcon');
+            const text = document.getElementById('bookingToggleText');
+            
+            if (table.style.display === 'none') {
+                table.style.display = 'block';
+                icon.className = 'bi bi-chevron-up';
+                text.textContent = 'Hide Details';
+            } else {
+                table.style.display = 'none';
+                icon.className = 'bi bi-chevron-down';
+                text.textContent = 'Show Details';
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('deviceAnalyticsModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeDeviceAnalytics();
+            }
+        });
+
+        // Close modal with ESC key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && document.getElementById('deviceAnalyticsModal').style.display === 'flex') {
+                closeDeviceAnalytics();
+            }
+        });
+    </script>
+
+    <style>
+        /* Device Analytics Modal Styles */
+        .device-analytics-header {
+            margin-bottom: var(--space-lg);
+        }
+
+        .device-info-card {
+            background: var(--surface-1);
+            border: 1px solid var(--surface-3);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+        }
+
+        .device-basic-info h4 {
+            margin: 0 0 var(--space-sm) 0;
+            color: var(--text-primary);
+        }
+
+        .device-details {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+
+        .device-details span {
+            padding: var(--space-xs) var(--space-sm);
+            background: var(--surface-2);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .device-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .device-chart-section {
+            margin-bottom: var(--space-xl);
+        }
+
+        .device-chart-section h5 {
+            margin-bottom: var(--space-md);
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            background: var(--surface-1);
+            border: 1px solid var(--surface-3);
+            border-radius: var(--radius-lg);
+            padding: var(--space-md);
+        }
+
+        .device-bookings-section {
+            margin-bottom: var(--space-lg);
+        }
+
+        .booking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .booking-header h5 {
+            margin: 0;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .booking-table-container {
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+            }
+        }
+
+        .rc-modal-xl {
+            max-width: 95vw;
+            max-height: 95vh;
+            width: 1200px;
+        }
+
+        .rc-modal-body {
+            max-height: calc(95vh - 80px);
+            overflow-y: auto;
+        }
+    </style>
 </body>
 </html>

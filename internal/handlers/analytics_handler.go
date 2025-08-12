@@ -86,6 +86,243 @@ func (h *AnalyticsHandler) getAnalyticsData(startDate, endDate time.Time) map[st
 	return analytics
 }
 
+// GetDeviceAnalytics returns detailed analytics for a specific device
+func (h *AnalyticsHandler) GetDeviceAnalytics(c *gin.Context) {
+	deviceID := c.Param("deviceId")
+	
+	// Get period from query params (default: all time)
+	period := c.DefaultQuery("period", "all")
+	
+	// Calculate date range
+	endDate := time.Now()
+	var startDate time.Time
+	
+	switch period {
+	case "30days":
+		startDate = endDate.AddDate(0, 0, -30)
+	case "90days":
+		startDate = endDate.AddDate(0, 0, -90)
+	case "1year":
+		startDate = endDate.AddDate(-1, 0, 0)
+	case "all":
+		startDate = time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC) // Far back date
+	default:
+		startDate = time.Date(2020, 1, 1, 0, 0, 0, 0, time.UTC)
+	}
+
+	analytics := h.getDeviceAnalyticsData(deviceID, startDate, endDate, period)
+	
+	c.JSON(http.StatusOK, analytics)
+}
+
+// getDeviceAnalyticsData collects detailed analytics for a specific device
+func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, endDate time.Time, period string) map[string]interface{} {
+	// Get device basic info
+	var deviceInfo struct {
+		DeviceID     string  `json:"deviceId"`
+		ProductName  string  `json:"productName"`
+		SerialNumber *string `json:"serialNumber"`
+		CategoryName string  `json:"categoryName"`
+		Status       string  `json:"status"`
+	}
+	
+	h.db.Raw(`
+		SELECT 
+			d.deviceID,
+			p.name as product_name,
+			d.serialnumber as serial_number,
+			c.name as category_name,
+			d.status
+		FROM devices d
+		JOIN products p ON d.productID = p.productID
+		LEFT JOIN categories c ON p.categoryID = c.categoryID
+		WHERE d.deviceID = ?
+	`, deviceID).Scan(&deviceInfo)
+
+	// Get total revenue and booking statistics
+	var revenueStats struct {
+		TotalRevenue  float64 `json:"totalRevenue"`
+		TotalBookings int     `json:"totalBookings"`
+		TotalDays     int     `json:"totalDays"`
+		AvgDailyRate  float64 `json:"avgDailyRate"`
+		FirstBooking  *time.Time `json:"firstBooking"`
+		LastBooking   *time.Time `json:"lastBooking"`
+	}
+	
+	h.db.Raw(`
+		SELECT 
+			COALESCE(SUM(
+				CASE 
+					WHEN jd.custom_price IS NOT NULL THEN 
+						CASE 
+							WHEN j.discount_type = 'percent' THEN 
+								jd.custom_price * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) * (1 - j.discount/100)
+							WHEN j.discount_type = 'amount' THEN 
+								(jd.custom_price * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)) - j.discount
+							ELSE 
+								jd.custom_price * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)
+						END
+					ELSE 
+						CASE 
+							WHEN j.discount_type = 'percent' THEN 
+								p.itemcostperday * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) * (1 - j.discount/100)
+							WHEN j.discount_type = 'amount' THEN 
+								(p.itemcostperday * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)) - j.discount
+							ELSE 
+								p.itemcostperday * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)
+						END
+				END
+			), 0) as total_revenue,
+			COUNT(DISTINCT j.jobID) as total_bookings,
+			COALESCE(SUM(DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)), 0) as total_days,
+			MIN(j.startDate) as first_booking,
+			MAX(j.startDate) as last_booking
+		FROM jobdevices jd
+		JOIN jobs j ON jd.jobID = j.jobID
+		JOIN products p ON jd.deviceID = ? AND p.productID = (
+			SELECT productID FROM devices WHERE deviceID = ?
+		)
+		WHERE jd.deviceID = ? 
+		AND j.startDate BETWEEN ? AND ?
+	`, deviceID, deviceID, deviceID, startDate, endDate).Scan(&revenueStats)
+	
+	// Calculate average daily rate
+	if revenueStats.TotalDays > 0 {
+		revenueStats.AvgDailyRate = revenueStats.TotalRevenue / float64(revenueStats.TotalDays)
+	}
+
+	// Get customer booking history with details
+	var customerBookings []map[string]interface{}
+	rows, err := h.db.Raw(`
+		SELECT 
+			c.name as customer_name,
+			c.email as customer_email,
+			j.jobID,
+			j.startDate,
+			j.endDate,
+			j.description,
+			DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) as rental_days,
+			CASE 
+				WHEN jd.custom_price IS NOT NULL THEN 
+					CASE 
+						WHEN j.discount_type = 'percent' THEN 
+							jd.custom_price * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) * (1 - j.discount/100)
+						WHEN j.discount_type = 'amount' THEN 
+							(jd.custom_price * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)) - j.discount
+						ELSE 
+							jd.custom_price * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)
+					END
+				ELSE 
+					CASE 
+						WHEN j.discount_type = 'percent' THEN 
+							p.itemcostperday * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) * (1 - j.discount/100)
+						WHEN j.discount_type = 'amount' THEN 
+							(p.itemcostperday * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)) - j.discount
+						ELSE 
+							p.itemcostperday * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)
+					END
+			END as revenue,
+			CASE 
+				WHEN jd.custom_price IS NOT NULL THEN jd.custom_price
+				ELSE p.itemcostperday
+			END as daily_rate,
+			COALESCE(j.discount, 0) as discount,
+			j.discount_type,
+			j.status as job_status
+		FROM jobdevices jd
+		JOIN jobs j ON jd.jobID = j.jobID
+		JOIN customers c ON j.customerID = c.customerID
+		JOIN devices d ON jd.deviceID = d.deviceID
+		JOIN products p ON d.productID = p.productID
+		WHERE jd.deviceID = ? 
+		AND j.startDate BETWEEN ? AND ?
+		ORDER BY j.startDate DESC
+	`, deviceID, startDate, endDate).Rows()
+	
+	if err == nil {
+		defer rows.Close()
+		for rows.Next() {
+			var booking map[string]interface{}
+			h.db.ScanRows(rows, &booking)
+			customerBookings = append(customerBookings, booking)
+		}
+	}
+
+	// Get monthly revenue trend
+	var monthlyRevenue []map[string]interface{}
+	monthlyRows, err := h.db.Raw(`
+		SELECT 
+			DATE_FORMAT(j.startDate, '%Y-%m') as month,
+			COALESCE(SUM(
+				CASE 
+					WHEN jd.custom_price IS NOT NULL THEN 
+						CASE 
+							WHEN j.discount_type = 'percent' THEN 
+								jd.custom_price * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) * (1 - j.discount/100)
+							WHEN j.discount_type = 'amount' THEN 
+								(jd.custom_price * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)) - j.discount
+							ELSE 
+								jd.custom_price * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)
+						END
+					ELSE 
+						CASE 
+							WHEN j.discount_type = 'percent' THEN 
+								p.itemcostperday * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) * (1 - j.discount/100)
+							WHEN j.discount_type = 'amount' THEN 
+								(p.itemcostperday * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)) - j.discount
+							ELSE 
+								p.itemcostperday * DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)
+						END
+				END
+			), 0) as revenue,
+			COUNT(DISTINCT j.jobID) as bookings
+		FROM jobdevices jd
+		JOIN jobs j ON jd.jobID = j.jobID
+		JOIN devices d ON jd.deviceID = d.deviceID
+		JOIN products p ON d.productID = p.productID
+		WHERE jd.deviceID = ? 
+		AND j.startDate BETWEEN ? AND ?
+		GROUP BY DATE_FORMAT(j.startDate, '%Y-%m')
+		ORDER BY month DESC
+		LIMIT 12
+	`, deviceID, startDate, endDate).Rows()
+	
+	if err == nil {
+		defer monthlyRows.Close()
+		for monthlyRows.Next() {
+			var trend map[string]interface{}
+			h.db.ScanRows(monthlyRows, &trend)
+			monthlyRevenue = append(monthlyRevenue, trend)
+		}
+	}
+
+	// Get utilization metrics
+	var utilizationStats struct {
+		DaysBooked     int     `json:"daysBooked"`
+		DaysAvailable  int     `json:"daysAvailable"`
+		UtilizationRate float64 `json:"utilizationRate"`
+	}
+	
+	totalDaysInPeriod := int(endDate.Sub(startDate).Hours() / 24)
+	utilizationStats.DaysAvailable = totalDaysInPeriod
+	utilizationStats.DaysBooked = revenueStats.TotalDays
+	
+	if totalDaysInPeriod > 0 {
+		utilizationStats.UtilizationRate = (float64(revenueStats.TotalDays) / float64(totalDaysInPeriod)) * 100
+	}
+
+	return map[string]interface{}{
+		"deviceInfo":        deviceInfo,
+		"revenueStats":      revenueStats,
+		"customerBookings":  customerBookings,
+		"monthlyRevenue":    monthlyRevenue,
+		"utilizationStats":  utilizationStats,
+		"period":           period,
+		"startDate":        startDate.Format("2006-01-02"),
+		"endDate":          endDate.Format("2006-01-02"),
+	}
+}
+
 // getRevenueAnalytics calculates revenue metrics
 func (h *AnalyticsHandler) getRevenueAnalytics(startDate, endDate time.Time) map[string]interface{} {
 	var totalRevenue, avgJobValue float64

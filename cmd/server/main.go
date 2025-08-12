@@ -643,6 +643,7 @@ func setupRoutes(r *gin.Engine,
 			analytics.GET("/revenue", analyticsHandler.GetRevenueAPI)
 			analytics.GET("/equipment", analyticsHandler.GetEquipmentAPI)
 			analytics.GET("/devices/all", analyticsHandler.GetAllDeviceRevenuesAPI)
+			analytics.GET("/devices/:deviceId", analyticsHandler.GetDeviceAnalytics)
 			analytics.GET("/export", analyticsHandler.ExportAnalytics)
 		}
 

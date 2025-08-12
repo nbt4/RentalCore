@@ -8,7 +8,7 @@ set -e
 # Configuration
 DOCKER_USERNAME="nbt4"
 IMAGE_NAME="rentalcore"
-VERSION=$(date +%Y%m%d-%H%M%S)  # Timestamp version
+VERSION="${1:-$(date +%Y%m%d-%H%M%S)}"  # Use argument or timestamp version
 LATEST_TAG="latest"
 
 # Colors for output
@@ -149,12 +149,13 @@ case "${1:-}" in
         echo "RentalCore Docker Build & Push Script"
         echo ""
         echo "Usage:"
-        echo "  $0                    Build and push images"
+        echo "  $0 [VERSION]          Build and push images with version (default: timestamp)"
         echo "  $0 --set-username USER Set Docker Hub username"
         echo "  $0 --help             Show this help"
         echo ""
-        echo "Before first use, set your Docker Hub username:"
-        echo "  $0 --set-username your-dockerhub-username"
+        echo "Examples:"
+        echo "  $0 1.11               Build version 1.11"
+        echo "  $0                    Build with timestamp version"
         echo ""
         exit 0
         ;;
