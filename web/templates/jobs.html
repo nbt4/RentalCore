@@ -78,6 +78,8 @@
                                     <th>ID</th>
                                     <th>Title</th>
                                     <th>Customer</th>
+                                    <th>Start Date</th>
+                                    <th>End Date</th>
                                     <th>Status</th>
                                     <th>Devices</th>
                                     <th>Revenue</th>
@@ -90,6 +92,8 @@
                                     <td><span class="rc-text-mono">{{.JobID}}</span></td>
                                     <td>{{.Description}}</td>
                                     <td>{{.CustomerName}}</td>
+                                    <td><span class="rc-text-sm">{{.StartDate.Format "2006-01-02"}}</span></td>
+                                    <td><span class="rc-text-sm">{{if .EndDate}}{{.EndDate.Format "2006-01-02"}}{{else}}-{{end}}</span></td>
                                     <td><span class="rc-badge rc-badge-secondary">{{.StatusName}}</span></td>
                                     <td><span class="rc-badge rc-badge-info">{{.DeviceCount}} devices</span></td>
                                     <td><span class="rc-text-mono">€{{printf "%.2f" .TotalRevenue}}</span></td>

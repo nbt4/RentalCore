@@ -816,13 +816,7 @@ func (h *DeviceHandler) buildTreeData() ([]TreeCategory, error) {
 
 // buildTreeDataWithAvailability creates tree structure with device availability for date range
 func (h *DeviceHandler) buildTreeDataWithAvailability(startDate, endDate time.Time, excludeJobID string) ([]TreeCategory, error) {
-	// Get base tree data
-	treeCategories, err := h.buildOptimizedTreeData()
-	if err != nil {
-		return nil, err
-	}
-	
-	// Get conflicting jobs for the date range
+	// Get conflicting jobs for the date range first (more efficient)
 	var conflictingJobs []struct {
 		JobID    string `json:"job_id"`
 		DeviceID string `json:"device_id"`
@@ -832,23 +826,34 @@ func (h *DeviceHandler) buildTreeDataWithAvailability(startDate, endDate time.Ti
 		Table("jobdevices jd").
 		Select("j.jobID, jd.deviceID").
 		Joins("JOIN jobs j ON jd.jobID = j.jobID").
-		Where("((j.startDate <= ? AND COALESCE(j.endDate, j.startDate) >= ?) OR (j.startDate <= ? AND COALESCE(j.endDate, j.startDate) >= ?) OR (j.startDate >= ? AND j.startDate <= ?))",
-			startDate, startDate, endDate, endDate, startDate, endDate)
+		Where("NOT (COALESCE(j.endDate, j.startDate) < ? OR j.startDate > ?)", startDate, endDate)
 	
 	// Exclude current job if provided
 	if excludeJobID != "" {
 		query = query.Where("j.jobID != ?", excludeJobID)
 	}
 	
-	err = query.Scan(&conflictingJobs).Error
+	err := query.Scan(&conflictingJobs).Error
 	if err != nil {
 		return nil, fmt.Errorf("failed to check device availability: %v", err)
+	}
+	
+	// Debug logging
+	fmt.Printf("DEBUG: Checking availability for dates %s to %s, found %d conflicts\n", startDate.Format("2006-01-02"), endDate.Format("2006-01-02"), len(conflictingJobs))
+	for _, conflict := range conflictingJobs {
+		fmt.Printf("DEBUG: Device %s conflicts with Job %s\n", conflict.DeviceID, conflict.JobID)
 	}
 	
 	// Create a map for quick conflict lookup
 	conflicts := make(map[string]string) // deviceID -> jobID
 	for _, conflict := range conflictingJobs {
 		conflicts[conflict.DeviceID] = conflict.JobID
+	}
+	
+	// Now get tree data (after we have conflicts for better performance)
+	treeCategories, err := h.buildOptimizedTreeData()
+	if err != nil {
+		return nil, err
 	}
 	
 	// Update availability information in tree
@@ -859,13 +864,19 @@ func (h *DeviceHandler) buildTreeDataWithAvailability(startDate, endDate time.Ti
 
 // updateTreeAvailability recursively updates availability info in tree structure
 func (h *DeviceHandler) updateTreeAvailability(categories []TreeCategory, conflicts map[string]string) {
+	totalDevices := 0
+	unavailableDevices := 0
+	
 	for i := range categories {
 		// Update direct devices in category
 		for j := range categories[i].DirectDevices {
 			device := &categories[i].DirectDevices[j]
+			totalDevices++
 			if conflictJob, hasConflict := conflicts[device.DeviceID]; hasConflict {
 				device.Available = false
 				device.ConflictJob = conflictJob
+				unavailableDevices++
+				fmt.Printf("DEBUG: Device %s in category %s marked as unavailable (Job %s)\n", device.DeviceID, categories[i].Name, conflictJob)
 			} else {
 				device.Available = true
 			}
@@ -893,9 +904,12 @@ func (h *DeviceHandler) updateTreeAvailability(categories []TreeCategory, confli
 				// Update devices in subbiercategory
 				for j := range subbiercategory.Devices {
 					device := &subbiercategory.Devices[j]
+					totalDevices++
 					if conflictJob, hasConflict := conflicts[device.DeviceID]; hasConflict {
 						device.Available = false
 						device.ConflictJob = conflictJob
+						unavailableDevices++
+						fmt.Printf("DEBUG: Device %s in %s->%s->%s marked as unavailable (Job %s)\n", device.DeviceID, categories[i].Name, subcategory.Name, subbiercategory.Name, conflictJob)
 					} else {
 						device.Available = true
 					}
@@ -903,6 +917,8 @@ func (h *DeviceHandler) updateTreeAvailability(categories []TreeCategory, confli
 			}
 		}
 	}
+	
+	fmt.Printf("DEBUG: Tree availability update complete - %d total devices, %d unavailable\n", totalDevices, unavailableDevices)
 }
 
 // buildOptimizedTreeData performs a single query to get all data and builds the tree structure
