@@ -838,40 +838,8 @@ func (h *DeviceHandler) buildTreeDataWithAvailability(startDate, endDate time.Ti
 		return nil, fmt.Errorf("failed to check device availability: %v", err)
 	}
 	
-	// Debug logging
-	fmt.Printf("DEBUG: Checking availability for dates %s to %s (excludeJob: %s)\n", startDate.Format("2006-01-02"), endDate.Format("2006-01-02"), excludeJobID)
-	fmt.Printf("DEBUG: Query: NOT (COALESCE(j.endDate, j.startDate) < '%s' OR j.startDate > '%s')\n", startDate.Format("2006-01-02"), endDate.Format("2006-01-02"))
 	
-	// Debug: Show all jobs with devices in date range for debugging
-	var debugJobs []struct {
-		JobID     string `json:"job_id" gorm:"column:jobID"`
-		DeviceID  string `json:"device_id" gorm:"column:deviceID"`
-		StartDate *time.Time `json:"start_date" gorm:"column:startDate"`
-		EndDate   *time.Time `json:"end_date" gorm:"column:endDate"`
-	}
-	h.deviceRepo.GetDB().
-		Table("jobdevices jd").
-		Select("j.jobID, jd.deviceID, j.startDate, j.endDate").
-		Joins("JOIN jobs j ON jd.jobID = j.jobID").
-		Scan(&debugJobs)
 	
-	fmt.Printf("DEBUG: All jobs with devices in database:\n")
-	for _, job := range debugJobs {
-		startStr := "NULL"
-		endStr := "NULL"
-		if job.StartDate != nil {
-			startStr = job.StartDate.Format("2006-01-02")
-		}
-		if job.EndDate != nil {
-			endStr = job.EndDate.Format("2006-01-02")
-		}
-		fmt.Printf("  Job %s Device %s: %s to %s\n", job.JobID, job.DeviceID, startStr, endStr)
-	}
-	
-	fmt.Printf("DEBUG: Found %d conflicts\n", len(conflictingJobs))
-	for _, conflict := range conflictingJobs {
-		fmt.Printf("DEBUG: Device %s conflicts with Job %s\n", conflict.DeviceID, conflict.JobID)
-	}
 	
 	// Create a map for quick conflict lookup
 	conflicts := make(map[string]string) // deviceID -> jobID
@@ -905,7 +873,6 @@ func (h *DeviceHandler) updateTreeAvailability(categories []TreeCategory, confli
 				device.Available = false
 				device.ConflictJob = conflictJob
 				unavailableDevices++
-				fmt.Printf("DEBUG: Device %s in category %s marked as unavailable (Job %s)\n", device.DeviceID, categories[i].Name, conflictJob)
 			} else {
 				device.Available = true
 			}
@@ -938,7 +905,6 @@ func (h *DeviceHandler) updateTreeAvailability(categories []TreeCategory, confli
 						device.Available = false
 						device.ConflictJob = conflictJob
 						unavailableDevices++
-						fmt.Printf("DEBUG: Device %s in %s->%s->%s marked as unavailable (Job %s)\n", device.DeviceID, categories[i].Name, subcategory.Name, subbiercategory.Name, conflictJob)
 					} else {
 						device.Available = true
 					}
@@ -947,7 +913,6 @@ func (h *DeviceHandler) updateTreeAvailability(categories []TreeCategory, confli
 		}
 	}
 	
-	fmt.Printf("DEBUG: Tree availability update complete - %d total devices, %d unavailable\n", totalDevices, unavailableDevices)
 }
 
 // buildOptimizedTreeData performs a single query to get all data and builds the tree structure

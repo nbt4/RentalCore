@@ -1,23 +1,7 @@
-2025/08/12 12:07:50 Running in production mode
-2025/08/12 12:07:50 Database connection established successfully
-2025/08/12 12:07:50 GoBD compliance table migration disabled
-2025/08/12 12:07:50 Database auto-migration disabled - using manual schema management
-2025/08/12 12:07:51 Templates already exist (1), skipping default template creation
-2025/08/12 12:07:51 Server starting on 0.0.0.0:8080
-2025/08/12 12:08:10 Route Debug: GET /settings/company
-2025/08/12 12:08:10 DEBUG: AuthMiddleware: Request URL: /settings/company
-2025/08/12 12:08:10 DEBUG: AuthMiddleware: Found session cookie: jiNtE5TC5nre0hVzvRB5t_QqhVaTZEtFbtQtEqVw2Zg= for /settings/company
-2025/08/12 12:08:10 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /settings/company
-2025/08/12 12:08:10 🏢 COMPANY SETTINGS ROUTE CALLED - URL: /settings/company, Method: GET
-2025/08/12 12:08:10 DEBUG: CompanySettingsForm handler called successfully - rendering company_settings.html
-{"timestamp":"2025-08-12T10:08:10.893317471Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754993290809294292","method":"GET","path":"/settings/company","status_code":200,"duration":"84.019923ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":20321}}
-2025/08/12 12:08:11 Route Debug: GET /favicon.ico
-{"timestamp":"2025-08-12T10:08:11.097925468Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754993291069762991","method":"GET","path":"/favicon.ico","status_code":200,"duration":"28.159351ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":6685}}
-2025/08/12 12:08:11 Route Debug: GET /api/settings/smtp
-2025/08/12 12:08:11 DEBUG: AuthMiddleware: Request URL: /api/settings/smtp
-2025/08/12 12:08:11 DEBUG: AuthMiddleware: Found session cookie: jiNtE5TC5nre0hVzvRB5t_QqhVaTZEtFbtQtEqVw2Zg= for /api/settings/smtp
-2025/08/12 12:08:11 DEBUG: AuthMiddleware: Session valid for user: ntielmann (ID: 5) for URL: /api/settings/smtp
-{"timestamp":"2025-08-12T10:08:11.364444649Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754993291284346331","method":"GET","path":"/api/settings/smtp","status_code":200,"duration":"80.095071ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":221}}
-2025/08/12 12:08:11 Route Debug: GET /sw.js
-{"timestamp":"2025-08-12T10:08:11.958326938Z","level":"INFO","message":"HTTP Request","service":"go-barcode-webapp","version":"1.0.0","environment":"production","request_id":"1754993291935473436","method":"GET","path":"/sw.js","status_code":200,"duration":"22.849234ms","ip":"10.0.0.3","user_agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:141.0) Gecko/20100101 Firefox/141.0","fields":{"bytes_in":0,"bytes_out":8867}}
-2025/08/12 12:09:50 Route Debug: GET /health
+2025/08/13 15:20:07 Running in production mode
+2025/08/13 15:20:07 Database connection established successfully
+2025/08/13 15:20:07 GoBD compliance table migration disabled
+2025/08/13 15:20:07 Database auto-migration disabled - using manual schema management
+2025/08/13 15:20:08 Templates already exist (1), skipping default template creation
+2025/08/13 15:20:08 Server starting on 0.0.0.0:8080
+2025/08/13 15:20:08 listen tcp 0.0.0.0:8080: bind: address already in use

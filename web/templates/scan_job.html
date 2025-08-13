@@ -2054,7 +2054,7 @@
         }
         
         function renderScanDeviceHtml(device) {
-            const isAvailable = device.available !== false;
+            const isAvailable = device.available === true;
             
             let classes = 'tree-device';
             if (!isAvailable) classes += ' unavailable';
