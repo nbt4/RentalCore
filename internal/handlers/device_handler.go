@@ -818,8 +818,8 @@ func (h *DeviceHandler) buildTreeData() ([]TreeCategory, error) {
 func (h *DeviceHandler) buildTreeDataWithAvailability(startDate, endDate time.Time, excludeJobID string) ([]TreeCategory, error) {
 	// Get conflicting jobs for the date range first (more efficient)
 	var conflictingJobs []struct {
-		JobID    string `json:"job_id"`
-		DeviceID string `json:"device_id"`
+		JobID    string `json:"job_id" gorm:"column:jobID"`
+		DeviceID string `json:"device_id" gorm:"column:deviceID"`
 	}
 	
 	query := h.deviceRepo.GetDB().
@@ -844,10 +844,10 @@ func (h *DeviceHandler) buildTreeDataWithAvailability(startDate, endDate time.Ti
 	
 	// Debug: Show all jobs with devices in date range for debugging
 	var debugJobs []struct {
-		JobID     string `json:"job_id"`
-		DeviceID  string `json:"device_id"`
-		StartDate *time.Time `json:"start_date"`
-		EndDate   *time.Time `json:"end_date"`
+		JobID     string `json:"job_id" gorm:"column:jobID"`
+		DeviceID  string `json:"device_id" gorm:"column:deviceID"`
+		StartDate *time.Time `json:"start_date" gorm:"column:startDate"`
+		EndDate   *time.Time `json:"end_date" gorm:"column:endDate"`
 	}
 	h.deviceRepo.GetDB().
 		Table("jobdevices jd").
