@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"go-barcode-webapp/internal/models"
@@ -667,6 +668,54 @@ func (h *JobHandler) UpdateJobAPI(c *gin.Context) {
 	if err := h.jobRepo.Update(&job); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
+	}
+
+	// Handle device assignments if selected_devices is provided
+	if selectedDevicesStr, ok := requestData["selected_devices"]; ok {
+		if deviceStr, ok := selectedDevicesStr.(string); ok && deviceStr != "" {
+			// Parse selected devices
+			selectedDevices := strings.Split(deviceStr, ",")
+			
+			// Get current job devices
+			currentDevices, err := h.jobRepo.GetJobDevices(uint(id))
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get current devices"})
+				return
+			}
+			
+			// Create sets for comparison
+			currentDeviceIDs := make(map[string]bool)
+			for _, device := range currentDevices {
+				currentDeviceIDs[device.DeviceID] = true
+			}
+			
+			newDeviceIDs := make(map[string]bool)
+			for _, deviceID := range selectedDevices {
+				if deviceID != "" {
+					newDeviceIDs[deviceID] = true
+				}
+			}
+			
+			// Remove devices that are no longer selected
+			for deviceID := range currentDeviceIDs {
+				if !newDeviceIDs[deviceID] {
+					if err := h.jobRepo.UnassignDevice(uint(id), deviceID); err != nil {
+						c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to unassign device " + deviceID})
+						return
+					}
+				}
+			}
+			
+			// Add new devices
+			for deviceID := range newDeviceIDs {
+				if !currentDeviceIDs[deviceID] {
+					if err := h.jobRepo.AssignDevice(uint(id), deviceID, 0.0); err != nil {
+						c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to assign device " + deviceID})
+						return
+					}
+				}
+			}
+		}
 	}
 
 	c.JSON(http.StatusOK, job)

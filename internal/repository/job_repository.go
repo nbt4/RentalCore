@@ -323,6 +323,23 @@ func (r *JobRepository) RemoveDevice(jobID uint, deviceID string) error {
 	return r.CalculateAndUpdateRevenue(jobID)
 }
 
+func (r *JobRepository) UnassignDevice(jobID uint, deviceID string) error {
+	// Remove device from job
+	err := r.db.Where("jobID = ? AND deviceID = ?", jobID, deviceID).Delete(&models.JobDevice{}).Error
+	if err != nil {
+		return fmt.Errorf("failed to unassign device %s from job %d: %v", deviceID, jobID, err)
+	}
+	
+	// Update device status to free
+	err = r.db.Model(&models.Device{}).Where("deviceID = ?", deviceID).Update("status", "free").Error
+	if err != nil {
+		return fmt.Errorf("failed to update device status: %v", err)
+	}
+	
+	// Recalculate and update job revenue
+	return r.CalculateAndUpdateRevenue(jobID)
+}
+
 func (r *JobRepository) BulkAssignDevices(jobID uint, deviceIDs []string, price float64) ([]models.ScanResult, error) {
 	var results []models.ScanResult
 	hasSuccessfulAssignments := false
