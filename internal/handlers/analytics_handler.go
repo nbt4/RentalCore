@@ -170,16 +170,16 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 					ELSE 
 						CASE 
 							WHEN j.discount_type = 'percent' THEN 
-								p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)) * (1 - LEAST(100, j.discount)/100)
+								p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) + 1) * (1 - LEAST(100, j.discount)/100)
 							WHEN j.discount_type = 'amount' THEN 
-								GREATEST(0, (p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate))) - j.discount)
+								GREATEST(0, (p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) + 1)) - j.discount)
 							ELSE 
-								p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate))
+								p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) + 1)
 						END
 				END
 			), 0) as total_revenue,
 			COUNT(DISTINCT j.jobID) as total_bookings,
-			COALESCE(SUM(GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate))), 0) as total_days,
+			COALESCE(SUM(GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) + 1)), 0) as total_days,
 			MIN(j.startDate) as first_booking,
 			MAX(j.startDate) as last_booking
 		FROM jobdevices jd
@@ -233,8 +233,8 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 			j.endDate,
 			j.description,
 			GREATEST(1, CASE 
-				WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate)
-				ELSE DATEDIFF(NOW(), j.startDate)
+				WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1
+				ELSE DATEDIFF(NOW(), j.startDate) + 1
 			END) as rental_days,
 			CASE 
 				WHEN jd.custom_price IS NOT NULL THEN jd.custom_price
@@ -246,20 +246,20 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 				WHEN jd.custom_price IS NOT NULL THEN 
 					CASE 
 						WHEN j.discount_type = 'percent' AND j.discount > 0 THEN 
-							jd.custom_price * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) ELSE DATEDIFF(NOW(), j.startDate) END) * (1 - LEAST(100, j.discount)/100)
+							jd.custom_price * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END) * (1 - LEAST(100, j.discount)/100)
 						WHEN j.discount_type = 'amount' AND j.discount > 0 THEN 
-							GREATEST(0, (jd.custom_price * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) ELSE DATEDIFF(NOW(), j.startDate) END)) - j.discount)
+							GREATEST(0, (jd.custom_price * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)) - j.discount)
 						ELSE 
-							jd.custom_price * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) ELSE DATEDIFF(NOW(), j.startDate) END)
+							jd.custom_price * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)
 					END
 				ELSE 
 					CASE 
 						WHEN j.discount_type = 'percent' AND j.discount > 0 THEN 
-							COALESCE(p.itemcostperday, 0) * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) ELSE DATEDIFF(NOW(), j.startDate) END) * (1 - LEAST(100, j.discount)/100)
+							COALESCE(p.itemcostperday, 0) * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END) * (1 - LEAST(100, j.discount)/100)
 						WHEN j.discount_type = 'amount' AND j.discount > 0 THEN 
-							GREATEST(0, (COALESCE(p.itemcostperday, 0) * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) ELSE DATEDIFF(NOW(), j.startDate) END)) - j.discount)
+							GREATEST(0, (COALESCE(p.itemcostperday, 0) * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)) - j.discount)
 						ELSE 
-							COALESCE(p.itemcostperday, 0) * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) ELSE DATEDIFF(NOW(), j.startDate) END)
+							COALESCE(p.itemcostperday, 0) * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)
 					END
 			END) as revenue,
 			COALESCE(s.status, 'Unknown Status') as job_status
@@ -349,11 +349,11 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 					ELSE 
 						CASE 
 							WHEN j.discount_type = 'percent' THEN 
-								p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate)) * (1 - LEAST(100, j.discount)/100)
+								p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) + 1) * (1 - LEAST(100, j.discount)/100)
 							WHEN j.discount_type = 'amount' THEN 
-								GREATEST(0, (p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate))) - j.discount)
+								GREATEST(0, (p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) + 1)) - j.discount)
 							ELSE 
-								p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate))
+								p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) + 1)
 						END
 				END
 			), 0) as revenue,
