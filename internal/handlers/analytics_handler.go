@@ -148,7 +148,7 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 	var revenueStats struct {
 		TotalRevenue  float64 `json:"totalRevenue"`
 		TotalBookings int     `json:"totalBookings"`
-		TotalDays     int     `json:"totalDays"`
+		TotalRentals  int     `json:"totalRentals"`
 		AvgDailyRate  float64 `json:"avgDailyRate"`
 		FirstBooking  *time.Time `json:"firstBooking"`
 		LastBooking   *time.Time `json:"lastBooking"`
@@ -170,16 +170,16 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 					ELSE 
 						CASE 
 							WHEN j.discount_type = 'percent' THEN 
-								p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) + 1) * (1 - LEAST(100, j.discount)/100)
+								p.itemcostperday * (1 - LEAST(100, j.discount)/100)
 							WHEN j.discount_type = 'amount' THEN 
-								GREATEST(0, (p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) + 1)) - j.discount)
+								GREATEST(0, p.itemcostperday - j.discount)
 							ELSE 
-								p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) + 1)
+								p.itemcostperday
 						END
 				END
 			), 0) as total_revenue,
 			COUNT(DISTINCT j.jobID) as total_bookings,
-			COALESCE(SUM(GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) + 1)), 0) as total_days,
+			COUNT(DISTINCT j.jobID) as total_rentals,
 			MIN(j.startDate) as first_booking,
 			MAX(j.startDate) as last_booking
 		FROM jobdevices jd
@@ -192,8 +192,8 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 	`, deviceID, deviceID, deviceID, startDate, endDate).Scan(&revenueStats)
 	
 	// Calculate average daily rate
-	if revenueStats.TotalDays > 0 {
-		revenueStats.AvgDailyRate = revenueStats.TotalRevenue / float64(revenueStats.TotalDays)
+	if revenueStats.TotalRentals > 0 {
+		revenueStats.AvgDailyRate = revenueStats.TotalRevenue / float64(revenueStats.TotalRentals)
 	}
 
 	// Get customer booking history with details - simplified approach
@@ -246,20 +246,20 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 				WHEN jd.custom_price IS NOT NULL THEN 
 					CASE 
 						WHEN j.discount_type = 'percent' AND j.discount > 0 THEN 
-							jd.custom_price * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END) * (1 - LEAST(100, j.discount)/100)
+							jd.custom_price * (1 - LEAST(100, j.discount)/100)
 						WHEN j.discount_type = 'amount' AND j.discount > 0 THEN 
-							GREATEST(0, (jd.custom_price * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)) - j.discount)
+							GREATEST(0, jd.custom_price - j.discount)
 						ELSE 
-							jd.custom_price * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)
+							jd.custom_price
 					END
 				ELSE 
 					CASE 
 						WHEN j.discount_type = 'percent' AND j.discount > 0 THEN 
-							COALESCE(p.itemcostperday, 0) * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END) * (1 - LEAST(100, j.discount)/100)
+							COALESCE(p.itemcostperday, 0) * (1 - LEAST(100, j.discount)/100)
 						WHEN j.discount_type = 'amount' AND j.discount > 0 THEN 
-							GREATEST(0, (COALESCE(p.itemcostperday, 0) * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)) - j.discount)
+							GREATEST(0, COALESCE(p.itemcostperday, 0) - j.discount)
 						ELSE 
-							COALESCE(p.itemcostperday, 0) * GREATEST(1, CASE WHEN j.endDate IS NOT NULL THEN DATEDIFF(j.endDate, j.startDate) + 1 ELSE DATEDIFF(NOW(), j.startDate) + 1 END)
+							COALESCE(p.itemcostperday, 0)
 					END
 			END) as revenue,
 			COALESCE(s.status, 'Unknown Status') as job_status
@@ -349,11 +349,11 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 					ELSE 
 						CASE 
 							WHEN j.discount_type = 'percent' THEN 
-								p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) + 1) * (1 - LEAST(100, j.discount)/100)
+								p.itemcostperday * (1 - LEAST(100, j.discount)/100)
 							WHEN j.discount_type = 'amount' THEN 
-								GREATEST(0, (p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) + 1)) - j.discount)
+								GREATEST(0, p.itemcostperday - j.discount)
 							ELSE 
-								p.itemcostperday * GREATEST(1, DATEDIFF(COALESCE(j.endDate, NOW()), j.startDate) + 1)
+								p.itemcostperday
 						END
 				END
 			), 0) as revenue,
@@ -378,10 +378,10 @@ func (h *AnalyticsHandler) getDeviceAnalyticsData(deviceID string, startDate, en
 	
 	totalDaysInPeriod := int(endDate.Sub(startDate).Hours() / 24)
 	utilizationStats.DaysAvailable = totalDaysInPeriod
-	utilizationStats.DaysBooked = revenueStats.TotalDays
+	utilizationStats.DaysBooked = revenueStats.TotalRentals
 	
 	if totalDaysInPeriod > 0 {
-		utilizationStats.UtilizationRate = (float64(revenueStats.TotalDays) / float64(totalDaysInPeriod)) * 100
+		utilizationStats.UtilizationRate = (float64(revenueStats.TotalRentals) / float64(totalDaysInPeriod)) * 100
 	}
 
 	return map[string]interface{}{
