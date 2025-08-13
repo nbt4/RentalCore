@@ -564,10 +564,23 @@
             // Refresh button
             document.getElementById('refreshDeviceTree').addEventListener('click', loadDeviceTree);
             
-            // Initially load devices if dates are set
+            // Initially load devices if dates are set (for edit mode)
             if (startDateInput.value && endDateInput.value) {
+                console.log('DEBUG: Loading device tree for edit mode with dates:', startDateInput.value, 'to', endDateInput.value);
                 loadDeviceTree();
+            } else {
+                console.log('DEBUG: Not loading device tree - missing dates:', startDateInput.value, endDateInput.value);
             }
+            
+            // Also try loading after a short delay in case of timing issues
+            setTimeout(function() {
+                const startDate = document.querySelector('input[name="start_date"]').value;
+                const endDate = document.querySelector('input[name="end_date"]').value;
+                if (startDate && endDate && (!deviceTreeData || deviceTreeData.length === 0)) {
+                    console.log('DEBUG: Delayed loading device tree with dates:', startDate, 'to', endDate);
+                    loadDeviceTree();
+                }
+            }, 500);
         });
         
         function loadDeviceTree() {
