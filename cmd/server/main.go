@@ -995,6 +995,7 @@ func setupRoutes(r *gin.Engine,
 				apiDevices.DELETE("/:id", deviceHandler.DeleteDeviceAPI)
 				apiDevices.GET("/available", deviceHandler.GetAvailableDevicesAPI)
 				apiDevices.GET("/available/job/:jobId", deviceHandler.GetAvailableDevicesForJobAPI)
+				apiDevices.GET("/tree/availability", deviceHandler.GetDeviceTreeWithAvailability)
 			}
 
 			// Product API

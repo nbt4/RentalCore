@@ -740,6 +740,30 @@
                 </div>
                 {{end}}
                 
+                <!-- Device Selection Tree Section -->
+                <div class="rc-card rc-mb-md">
+                    <div class="rc-card-header rc-flex rc-flex-between" style="align-items: center;">
+                        <h6><i class="bi bi-diagram-3"></i> Device Selection</h6>
+                        <div class="rc-flex rc-flex-gap-sm">
+                            <button type="button" id="refreshDeviceTreeScan" class="rc-btn rc-btn-outline rc-btn-sm">
+                                <i class="bi bi-arrow-clockwise"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                    <div class="rc-card-body">
+                        <div id="deviceSelectionContainerScan">
+                            <div id="loadingDevicesScan" class="rc-flex rc-flex-center rc-py-lg">
+                                <i class="bi bi-arrow-repeat" style="animation: spin 1s linear infinite; margin-right: var(--space-sm);"></i>
+                                Loading available devices for this job...
+                            </div>
+                            
+                            <div id="deviceTreeContainerScan" style="display: none;">
+                                <!-- Tree view will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <!-- Devices Section -->
                 <div class="rc-card">
                     <div class="rc-card-header rc-flex rc-flex-between" style="align-items: center;">
@@ -1881,6 +1905,207 @@
         window.addEventListener('beforeunload', function() {
             stopScanner();
         });
+        
+        // Device Tree Selection for Scan Page
+        let scanDeviceTreeData = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load device tree on page load
+            loadScanDeviceTree();
+            
+            // Refresh button
+            const refreshBtn = document.getElementById('refreshDeviceTreeScan');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', loadScanDeviceTree);
+            }
+        });
+        
+        function loadScanDeviceTree() {
+            const jobId = '{{.job.JobID}}';
+            const startDate = '{{.job.StartDate.Format "2006-01-02"}}';
+            const endDate = '{{if .job.EndDate}}{{.job.EndDate.Format "2006-01-02"}}{{else}}{{.job.StartDate.Format "2006-01-02"}}{{end}}';
+            
+            document.getElementById('loadingDevicesScan').style.display = 'block';
+            document.getElementById('deviceTreeContainerScan').style.display = 'none';
+            
+            const url = `/api/v1/devices/tree/availability?start_date=${startDate}&end_date=${endDate}&job_id=${jobId}`;
+            
+            fetch(url, {
+                credentials: 'include'
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                scanDeviceTreeData = data.treeData;
+                renderScanDeviceTree(scanDeviceTreeData);
+                document.getElementById('loadingDevicesScan').style.display = 'none';
+                document.getElementById('deviceTreeContainerScan').style.display = 'block';
+            })
+            .catch(error => {
+                console.error('Error loading device tree:', error);
+                document.getElementById('loadingDevicesScan').innerHTML = '<div style="color: var(--error);"><i class="bi bi-exclamation-triangle"></i> Error loading devices: ' + error.message + '</div>';
+                document.getElementById('deviceTreeContainerScan').style.display = 'none';
+            });
+        }
+        
+        function renderScanDeviceTree(treeData) {
+            const container = document.getElementById('deviceTreeContainerScan');
+            
+            if (!treeData || treeData.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: var(--space-xl); color: var(--text-muted);">No devices available for this job period</div>';
+                return;
+            }
+            
+            let html = '<div class="device-tree-container" style="max-height: 400px; overflow-y: auto;">';
+            
+            treeData.forEach(category => {
+                html += renderScanCategoryHtml(category);
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        function renderScanCategoryHtml(category) {
+            let html = `
+                <div class="tree-category" style="margin-bottom: var(--space-sm); border: 1px solid var(--surface-3); border-radius: var(--radius-md); background: var(--surface-1);">
+                    <div class="tree-category-header" onclick="toggleScanTreeNode('scan-category-${category.id}')" style="display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-sm); cursor: pointer; transition: var(--transition-normal);">
+                        <i class="bi bi-chevron-right tree-chevron" id="chevron-scan-category-${category.id}" style="color: var(--text-muted); transition: transform 0.2s ease; font-size: 0.9rem;"></i>
+                        <i class="bi bi-folder2 tree-icon" style="color: var(--accent-electric); font-size: 1rem;"></i>
+                        <span class="tree-title" style="font-weight: 600; color: var(--text-primary); flex: 1; font-size: 0.9rem;">${category.name}</span>
+                        <span class="tree-count" style="font-size: 0.75rem; color: var(--text-muted); background: var(--surface-3); padding: 2px 6px; border-radius: var(--radius-sm);">${category.device_count} devices</span>
+                    </div>
+                    <div class="tree-content" id="scan-category-${category.id}" style="display: none; padding-left: var(--space-md); border-left: 2px solid var(--surface-3); margin-left: var(--space-md);">
+            `;
+            
+            // Direct devices in category
+            if (category.direct_devices && category.direct_devices.length > 0) {
+                category.direct_devices.forEach(device => {
+                    html += renderScanDeviceHtml(device);
+                });
+            }
+            
+            // Subcategories
+            if (category.subcategories && category.subcategories.length > 0) {
+                category.subcategories.forEach(subcategory => {
+                    html += renderScanSubcategoryHtml(subcategory);
+                });
+            }
+            
+            html += '</div></div>';
+            return html;
+        }
+        
+        function renderScanSubcategoryHtml(subcategory) {
+            let html = `
+                <div class="tree-subcategory" style="margin: var(--space-xs) 0; border: 1px solid var(--surface-2); border-radius: var(--radius-sm); background: var(--surface-0);">
+                    <div class="tree-subcategory-header" onclick="toggleScanTreeNode('scan-subcategory-${subcategory.id}')" style="display: flex; align-items: center; gap: var(--space-sm); padding: var(--space-xs) var(--space-sm); cursor: pointer; transition: var(--transition-normal);">
+                        <i class="bi bi-chevron-right tree-chevron" id="chevron-scan-subcategory-${subcategory.id}" style="color: var(--text-muted); transition: transform 0.2s ease; font-size: 0.8rem;"></i>
+                        <i class="bi bi-folder tree-icon" style="color: var(--accent-purple); font-size: 0.9rem;"></i>
+                        <span class="tree-title" style="font-weight: 500; color: var(--text-primary); flex: 1; font-size: 0.85rem;">${subcategory.name}</span>
+                        <span class="tree-count" style="font-size: 0.7rem; color: var(--text-muted); background: var(--surface-3); padding: 1px 4px; border-radius: var(--radius-sm);">${subcategory.device_count}</span>
+                    </div>
+                    <div class="tree-content" id="scan-subcategory-${subcategory.id}" style="display: none; padding-left: var(--space-sm);">
+            `;
+            
+            // Direct devices in subcategory
+            if (subcategory.direct_devices && subcategory.direct_devices.length > 0) {
+                subcategory.direct_devices.forEach(device => {
+                    html += renderScanDeviceHtml(device);
+                });
+            }
+            
+            // Subbiercategories
+            if (subcategory.subbiercategories && subcategory.subbiercategories.length > 0) {
+                subcategory.subbiercategories.forEach(subbiercategory => {
+                    html += renderScanSubbiercategoryHtml(subbiercategory);
+                });
+            }
+            
+            html += '</div></div>';
+            return html;
+        }
+        
+        function renderScanSubbiercategoryHtml(subbiercategory) {
+            let html = `
+                <div class="tree-subbiercategory" style="margin: var(--space-xs) 0; border: 1px solid var(--surface-2); border-radius: var(--radius-sm); background: var(--surface-0);">
+                    <div class="tree-subbiercategory-header" onclick="toggleScanTreeNode('scan-subbiercategory-${subbiercategory.id}')" style="display: flex; align-items: center; gap: var(--space-xs); padding: var(--space-xs); cursor: pointer; transition: var(--transition-normal);">
+                        <i class="bi bi-chevron-right tree-chevron" id="chevron-scan-subbiercategory-${subbiercategory.id}" style="color: var(--text-muted); transition: transform 0.2s ease; font-size: 0.75rem;"></i>
+                        <i class="bi bi-folder-fill tree-icon" style="color: var(--accent-coral); font-size: 0.85rem;"></i>
+                        <span class="tree-title" style="font-weight: 400; color: var(--text-primary); flex: 1; font-size: 0.8rem;">${subbiercategory.name}</span>
+                        <span class="tree-count" style="font-size: 0.65rem; color: var(--text-muted); background: var(--surface-3); padding: 1px 3px; border-radius: var(--radius-sm);">${subbiercategory.device_count}</span>
+                    </div>
+                    <div class="tree-content" id="scan-subbiercategory-${subbiercategory.id}" style="display: none; padding-left: var(--space-xs);">
+            `;
+            
+            // Devices in subbiercategory
+            if (subbiercategory.devices && subbiercategory.devices.length > 0) {
+                subbiercategory.devices.forEach(device => {
+                    html += renderScanDeviceHtml(device);
+                });
+            }
+            
+            html += '</div></div>';
+            return html;
+        }
+        
+        function renderScanDeviceHtml(device) {
+            const isAvailable = device.available !== false;
+            
+            let classes = 'tree-device';
+            if (!isAvailable) classes += ' unavailable';
+            else classes += ' available';
+            
+            let onclick = '';
+            if (isAvailable) {
+                onclick = `onclick="assignScanDevice('${device.device_id}')"`;
+            }
+            
+            let statusColor = 'var(--success)';
+            if (device.status === 'assigned') statusColor = 'var(--warning)';
+            if (device.status === 'maintenance') statusColor = 'var(--error)';
+            
+            return `
+                <div class="${classes}" ${onclick} style="display: flex; align-items: center; justify-content: space-between; padding: var(--space-xs); margin: 2px 0; background: var(--surface-1); border: 1px solid ${isAvailable ? 'var(--success)' : 'var(--error)'}; border-radius: var(--radius-sm); transition: var(--transition-normal); cursor: ${isAvailable ? 'pointer' : 'not-allowed'}; opacity: ${isAvailable ? '1' : '0.5'}; font-size: 0.8rem;">
+                    <div class="device-info" style="flex: 1;">
+                        <div class="device-name" style="font-weight: 500; color: var(--text-primary); margin-bottom: 1px; font-size: 0.8rem;">${device.product_name}</div>
+                        <div class="device-details" style="display: flex; align-items: center; gap: var(--space-xs); font-size: 0.7rem;">
+                            <span class="device-id" style="font-family: 'JetBrains Mono', monospace; color: var(--text-muted); background: var(--surface-2); padding: 1px 3px; border-radius: 2px;">${device.device_id}</span>
+                            ${device.serial_number ? '<span class="device-serial" style="color: var(--text-muted);">• ' + device.serial_number + '</span>' : ''}
+                            <span class="device-status" style="padding: 1px 4px; border-radius: var(--radius-sm); font-size: 0.65rem; font-weight: 500; text-transform: uppercase; background: ${statusColor}; color: white;">${device.status}</span>
+                            ${!isAvailable && device.conflict_job ? '<span style="color: var(--error); font-size: 0.65rem;">• Job ' + device.conflict_job + '</span>' : ''}
+                        </div>
+                    </div>
+                    ${isAvailable ? '<div style="color: var(--success); font-size: 0.9rem;"><i class="bi bi-plus-circle"></i></div>' : '<div style="color: var(--error); font-size: 0.9rem;"><i class="bi bi-x-circle"></i></div>'}
+                </div>
+            `;
+        }
+        
+        function toggleScanTreeNode(nodeId) {
+            const contentDiv = document.getElementById(nodeId);
+            const chevron = document.getElementById('chevron-' + nodeId);
+            
+            if (contentDiv && chevron) {
+                if (contentDiv.style.display === 'none') {
+                    contentDiv.style.display = 'block';
+                    chevron.classList.add('expanded');
+                    chevron.style.transform = 'rotate(90deg)';
+                } else {
+                    contentDiv.style.display = 'none';
+                    chevron.classList.remove('expanded');
+                    chevron.style.transform = 'rotate(0deg)';
+                }
+            }
+        }
+        
+        function assignScanDevice(deviceId) {
+            // Use existing assignDevice function that's already in the page
+            assignDevice(deviceId);
+        }
     </script>
 
     <!-- JavaScript -->

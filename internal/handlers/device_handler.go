@@ -719,6 +719,40 @@ func (h *DeviceHandler) GetAvailableDevicesForJobAPI(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"devices": devices})
 }
 
+// GetDeviceTreeWithAvailability returns the device tree structure with availability checking
+func (h *DeviceHandler) GetDeviceTreeWithAvailability(c *gin.Context) {
+	startDate := c.Query("start_date")
+	endDate := c.Query("end_date")
+	jobID := c.Query("job_id") // Optional - exclude this job from availability check
+	
+	if startDate == "" || endDate == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "start_date and end_date are required"})
+		return
+	}
+	
+	// Parse dates
+	start, err := time.Parse("2006-01-02", startDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid start_date format. Use YYYY-MM-DD"})
+		return
+	}
+	
+	end, err := time.Parse("2006-01-02", endDate)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid end_date format. Use YYYY-MM-DD"})
+		return
+	}
+	
+	// Get tree data with availability information
+	treeData, err := h.buildTreeDataWithAvailability(start, end, jobID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	
+	c.JSON(http.StatusOK, gin.H{"treeData": treeData})
+}
+
 // Hierarchical tree data structures
 type TreeCategory struct {
 	ID            uint              `json:"id"`
@@ -748,6 +782,8 @@ type TreeDevice struct {
 	ProductName  string `json:"product_name"`
 	SerialNumber string `json:"serial_number"`
 	Status       string `json:"status"`
+	Available    bool   `json:"available,omitempty"`    // Only included in availability checks
+	ConflictJob  string `json:"conflict_job,omitempty"` // Job ID that conflicts
 }
 
 // buildTreeData creates a hierarchical tree structure with categories, subcategories, subbiercategories, and devices
@@ -776,6 +812,97 @@ func (h *DeviceHandler) buildTreeData() ([]TreeCategory, error) {
 	
 	
 	return treeCategories, nil
+}
+
+// buildTreeDataWithAvailability creates tree structure with device availability for date range
+func (h *DeviceHandler) buildTreeDataWithAvailability(startDate, endDate time.Time, excludeJobID string) ([]TreeCategory, error) {
+	// Get base tree data
+	treeCategories, err := h.buildOptimizedTreeData()
+	if err != nil {
+		return nil, err
+	}
+	
+	// Get conflicting jobs for the date range
+	var conflictingJobs []struct {
+		JobID    string `json:"job_id"`
+		DeviceID string `json:"device_id"`
+	}
+	
+	query := h.deviceRepo.GetDB().
+		Table("jobdevices jd").
+		Select("j.jobID, jd.deviceID").
+		Joins("JOIN jobs j ON jd.jobID = j.jobID").
+		Where("((j.startDate <= ? AND COALESCE(j.endDate, j.startDate) >= ?) OR (j.startDate <= ? AND COALESCE(j.endDate, j.startDate) >= ?) OR (j.startDate >= ? AND j.startDate <= ?))",
+			startDate, startDate, endDate, endDate, startDate, endDate)
+	
+	// Exclude current job if provided
+	if excludeJobID != "" {
+		query = query.Where("j.jobID != ?", excludeJobID)
+	}
+	
+	err = query.Scan(&conflictingJobs).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed to check device availability: %v", err)
+	}
+	
+	// Create a map for quick conflict lookup
+	conflicts := make(map[string]string) // deviceID -> jobID
+	for _, conflict := range conflictingJobs {
+		conflicts[conflict.DeviceID] = conflict.JobID
+	}
+	
+	// Update availability information in tree
+	h.updateTreeAvailability(treeCategories, conflicts)
+	
+	return treeCategories, nil
+}
+
+// updateTreeAvailability recursively updates availability info in tree structure
+func (h *DeviceHandler) updateTreeAvailability(categories []TreeCategory, conflicts map[string]string) {
+	for i := range categories {
+		// Update direct devices in category
+		for j := range categories[i].DirectDevices {
+			device := &categories[i].DirectDevices[j]
+			if conflictJob, hasConflict := conflicts[device.DeviceID]; hasConflict {
+				device.Available = false
+				device.ConflictJob = conflictJob
+			} else {
+				device.Available = true
+			}
+		}
+		
+		// Update subcategories
+		for k := range categories[i].Subcategories {
+			subcategory := &categories[i].Subcategories[k]
+			
+			// Update direct devices in subcategory
+			for j := range subcategory.DirectDevices {
+				device := &subcategory.DirectDevices[j]
+				if conflictJob, hasConflict := conflicts[device.DeviceID]; hasConflict {
+					device.Available = false
+					device.ConflictJob = conflictJob
+				} else {
+					device.Available = true
+				}
+			}
+			
+			// Update subbiercategories
+			for l := range subcategory.Subbiercategories {
+				subbiercategory := &subcategory.Subbiercategories[l]
+				
+				// Update devices in subbiercategory
+				for j := range subbiercategory.Devices {
+					device := &subbiercategory.Devices[j]
+					if conflictJob, hasConflict := conflicts[device.DeviceID]; hasConflict {
+						device.Available = false
+						device.ConflictJob = conflictJob
+					} else {
+						device.Available = true
+					}
+				}
+			}
+		}
+	}
 }
 
 // buildOptimizedTreeData performs a single query to get all data and builds the tree structure
